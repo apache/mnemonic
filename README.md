@@ -29,6 +29,7 @@ To build this library, you may need to install some required packages on the bui
 * **Maven** -- the software project management tool for compiling Java project and resolve its dependences
 * **Autotools** -- the GNU build system for compiling native project
 * **PMFS** -- the PMFS should be properly installed and configured on Linux system if you want to simulate read latency
+* **Javapoet** -- the 1.3.1-SNAPSHOT revised for bdmem at https//github.com/wewela/javapoet.git
 
 
 Once the build system is setup, the Big Memory Library is built using this command at the top level:
