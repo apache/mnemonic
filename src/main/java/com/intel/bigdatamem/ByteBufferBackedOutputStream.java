@@ -8,7 +8,6 @@ import java.nio.ByteBuffer;
 /**
  * an output Stream that is backed by a in-memory ByteBuffer.
  * 
- * @author Wang, Gang {@literal <gang1.wang@intel.com>}
  *
  */
 public class ByteBufferBackedOutputStream extends OutputStream {

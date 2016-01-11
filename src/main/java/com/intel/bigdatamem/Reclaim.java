@@ -4,7 +4,6 @@ package com.intel.bigdatamem;
 /**
  * an interface to reclaim its memory resource.
  * 
- * @author Wang, Gang {@literal <gang1.wang@intel.com>}
  *
  */
 public interface Reclaim<MRES> {

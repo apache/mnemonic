@@ -8,7 +8,6 @@ import java.io.File;
  * class depends on PMFS, we suggest that NVM library to support this feature in
  * native layer. In addition, the permission of /mnt/pmfs will be set properly.
  * 
- * @author Wang, Gang {@literal <gang1.wang@intel.com>}
  *
  */
 public class MemFile extends File {

@@ -5,7 +5,6 @@ import java.nio.ByteBuffer;
 /**
  * hold a ByteBuffer object.
  * 
- * @author Wang, Gang {@literal <gang1.wang@intel.com>}
  *
  */
 public class MemBufferHolder<A extends CommonAllocator<A>> extends MemHolder<A, ByteBuffer, MemBufferHolder<A>> {

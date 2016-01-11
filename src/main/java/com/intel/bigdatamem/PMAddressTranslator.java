@@ -3,7 +3,6 @@ package com.intel.bigdatamem;
 
 /**
  *
- * @author Wang, Gang {@literal <gang1.wang@intel.com>}
  *
  */
 

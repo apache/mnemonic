@@ -13,7 +13,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * inherited abstract methods. it specialized to cache MemBufferHolder objects
  * that is backed by native memory pool.
  * 
- * @author Wang, Gang(Gary) {@literal <gang1.wang@intel.com>}
  */
 public class MemBufferHolderCachePool<KeyT> extends
 		CachePool<KeyT, MemBufferHolder<?>> {

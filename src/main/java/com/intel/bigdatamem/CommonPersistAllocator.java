@@ -4,7 +4,6 @@ package com.intel.bigdatamem;
  * an abstract common class for persistent memory allocator to provide common
  * functionalities.
  * 
- * @author Wang, Gang {@literal <gang1.wang@intel.com>}
  *
  */
 public abstract class CommonPersistAllocator<A extends CommonAllocator<A>> extends CommonAllocator<A> {

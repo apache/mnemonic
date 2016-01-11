@@ -8,7 +8,6 @@ import java.util.*;
  * memory pool for allocation. it will notify client when the underlying memory
  * storage has been switched or down-grading to next level of memory storage.
  * 
- * @author Wang, Gang {@literal <gang1.wang@intel.com>}
  *
  */
 public class MemClustering {

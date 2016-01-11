@@ -8,7 +8,6 @@ import org.flowcomputing.commons.primitives.*;
 /**
  * manage a big native persistent memory pool through libvmem.so provied by Intel nvml library.
  * 
- * @author Wang, Gang {@literal <gang1.wang@intel.com>}
  *
  */
 public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllocator> implements PMAddressTranslator{

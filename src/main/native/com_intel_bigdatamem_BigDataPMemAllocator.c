@@ -1,9 +1,5 @@
 /****************************************************************************************
-
-Author: gang1.wang@intel.com
-WWID: 11526414
 Revise Date: 20 Apr. 2014
-Reviser: gang1.wang@intel.com
 *****************************************************************************************/
 
 #include "com_intel_bigdatamem_BigDataPMemAllocator.h"

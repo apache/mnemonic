@@ -4,7 +4,6 @@ import java.util.List;
 
 /**
  *
- * @author Wang, Gang {@literal <gang1.wang@intel.com>}
  *
  */
 

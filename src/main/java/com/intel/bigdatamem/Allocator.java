@@ -5,7 +5,6 @@ package com.intel.bigdatamem;
  * a interface to allocate big memory resource from any underlying memory kind
  * of storage and manage automatically reclaiming of memory resources.
  * 
- * @author Wang, Gang {@literal <gang1.wang@intel.com>}
  *
  */
 public interface Allocator<A extends CommonAllocator<A>> extends Allocatable<A> {

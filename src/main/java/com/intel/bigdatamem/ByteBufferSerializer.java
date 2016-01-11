@@ -12,7 +12,6 @@ import java.io.InputStream;
  * a serializer class that manages to serialize any serilizable objects from/to
  * ByteBuffer.
  * 
- * @author Wang, Gang(Gary) {@literal <gang1.wang@intel.com>}
  */
 
 public class ByteBufferSerializer {

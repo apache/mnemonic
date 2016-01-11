@@ -10,7 +10,6 @@ import java.util.Map;
  * it extends functionalities of its parent class to support some new features
  * that is usually requried in data caching usage scenario.
  * 
- * @author Wang, Gang(Gary) {@literal <gang1.wang@intel.com>}
  * 
  */
 public abstract class CachePool<KeyT, ValueT> extends

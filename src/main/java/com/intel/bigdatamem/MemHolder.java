@@ -5,7 +5,6 @@ import org.flowcomputing.commons.resgc.*;
 /**
  * hold a memory kind of resource.
  * 
- * @author Wang, Gang {@literal <gang1.wang@intel.com>}
  *
  */
 public abstract class MemHolder<A extends CommonAllocator<A>, T, H extends MemHolder<A, T, H>> extends ResHolder<T, H> {

@@ -4,7 +4,6 @@ package com.intel.bigdatamem;
 /**
  * A listener callback to validate its accepted key-value pair for evacuation.
  * 
- * @author Wang, Gang(Gary) {@literal <gang1.wang@intel.com>}
  */
 public interface EvictFilter<KeyT, ValueT> {
 	/**

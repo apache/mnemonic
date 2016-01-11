@@ -5,7 +5,6 @@ package com.intel.bigdatamem;
  * A event listener to monitor and post-process an entry's evacuation.
  * 
  * 
- * @author Wang, Gang(Gary) {@literal <gang1.wang@intel.com>}
  */
 public interface DropEvent<KeyT, ValueT> {
 	/**

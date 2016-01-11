@@ -5,7 +5,6 @@ package com.intel.bigdatamem;
  * a dummy object that is used for other test cases.
  * 
  * 
- * @author Wang, Gang {@literal <gang1.wang@intel.com>}
  *
  */
 public class Payload implements java.io.Serializable, Comparable<Payload> {

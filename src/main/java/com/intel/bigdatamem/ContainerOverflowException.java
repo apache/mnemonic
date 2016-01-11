@@ -4,7 +4,6 @@ package com.intel.bigdatamem;
 /**
  * this Exception will be thrown once cache pool has been out of space.
  * 
- * @author Wang, Gang(Gary) {@literal <gang1.wang@intel.com>}
  */
 public class ContainerOverflowException extends RuntimeException {
 

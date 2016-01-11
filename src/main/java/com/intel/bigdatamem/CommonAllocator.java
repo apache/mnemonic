@@ -9,7 +9,6 @@ import org.flowcomputing.commons.resgc.ResCollector;
  * an abstract common class for memory allocator to provide common
  * functionalities.
  * 
- * @author Wang, Gang {@literal <gang1.wang@intel.com>}
  *
  */
 public abstract class CommonAllocator<A extends CommonAllocator<A>> implements Allocator<A> {

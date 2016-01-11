@@ -3,7 +3,6 @@ package com.intel.bigdatamem;
 /**
  * hold a memory chunk.
  * 
- * @author Wang, Gang {@literal <gang1.wang@intel.com>}
  *
  */
 public class MemChunkHolder<A extends CommonAllocator<A>> extends MemHolder<A, Long, MemChunkHolder<A>> {
