@@ -27,7 +27,7 @@ To build this library, you may need to install some required packages on the bui
 * **JDK** -- the Java Develop Kit 1.6 or above (please properly configure JAVA_HOME)
 * **PMFS** -- the PMFS should be properly installed and configured on Linux system if you want to simulate read latency
 * **PMalloc** -- the supported durable memory native library at https://github.com/bigdata-memory/pmalloc.git
-* **Javapoet** -- the 1.3.1-SNAPSHOT revised for bdmem at https//github.com/wewela/javapoet.git
+* **Javapoet** -- the 1.3.1-SNAPSHOT revised for bdmem at https://github.com/wewela/javapoet.git
 
 
 Once the build system is setup, the Big Memory Library is built using this command at the top level:
