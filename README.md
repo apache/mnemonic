@@ -20,7 +20,7 @@ A durable heterogeneous memory-like resource management library. It supports In-
 
 ```java
 /**
- * an durable class should be abstract and implemented from Durable interface with @PersistentEntity annotation
+ * a durable class should be abstract and implemented from Durable interface with @PersistentEntity annotation
  */
 @PersistentEntity
 public abstract class Person<E> implements Durable, Comparable<Person<E>> {
@@ -64,7 +64,7 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
         }
 
         /**
-         * Getters and Setters for persistent fields
+         * Getters and Setters for persistent fields with @persistentGetter and @PersistentSetter
          */
         @PersistentGetter
         abstract public Short getAge();
