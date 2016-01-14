@@ -1,6 +1,5 @@
 bdmem: Big Data Memory Library
 ================================
-### What is this ?
 
 A durable heterogeneous memory-like resource management library. It supports In-place persistent Java object programming.
 
