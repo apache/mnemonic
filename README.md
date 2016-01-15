@@ -12,6 +12,10 @@ A durable heterogeneous memory-like resource management library. It supports In-
 * Reclaim allocated memory when it is no longer used
 * Hierarchical cache pool  for massive data caching
 * A set of persistent data structures is provided by bdmemgeneric project
+* Minimize memory footprint on Java heap
+* Reduce GC Overhead as following data shown (collected from Apache Spark experiments)
+
+![BDML_GC_Footprint](http://bigdata-memory.github.io/images/BDML_GC_impact.png)
 
 ### How to use it ?
 
