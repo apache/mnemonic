@@ -168,7 +168,7 @@ Please see the file LICENSE for information on how this library is licensed.
 To build this library, you may need to install some required packages on the build system:
 
 
-* **NVML** -- the Linux NVM library (Tag: 0.1+b16) (http://pmem.io) [Required]
+* **NVML** -- the NVM library (Please compile this library that is tagged with 0.1+b16) (http://pmem.io) [Required]
 * **JDK** -- the Java Develop Kit 1.6 or above (please properly configure JAVA_HOME) [Required]
 * **PMFS** -- the PMFS should be properly installed and configured on Linux system if you want to simulate read latency [Optional]
 * **PMalloc** -- the supported durable memory native library at https://github.com/bigdata-memory/pmalloc.git [Required]
