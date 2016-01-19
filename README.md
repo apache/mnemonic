@@ -155,11 +155,6 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
 Please see the file LICENSE for information on how this library is licensed.
 
 
-This tree contains a library for using Java Big Data Memory.
-Here you'll find:
-
-[JavaDoc: https://bigdata-memory.github.io/bigdata-memory](https://bigdata-memory.github.io/bigdata-memory/)
-
 * **src** -- the source for the library
 * **src/main/java** -- the Java source for the library
 * **examples** -- Brief examples for this library
@@ -173,11 +168,11 @@ Here you'll find:
 To build this library, you may need to install some required packages on the build system:
 
 
-* **NVML** -- the Linux NVM library (Tag: 0.1+b16) (http://pmem.io)
-* **JDK** -- the Java Develop Kit 1.6 or above (please properly configure JAVA_HOME)
-* **PMFS** -- the PMFS should be properly installed and configured on Linux system if you want to simulate read latency
-* **PMalloc** -- the supported durable memory native library at https://github.com/bigdata-memory/pmalloc.git
-* **Javapoet** -- the 1.3.1-SNAPSHOT revised for bdmem at https://github.com/wewela/javapoet.git
+* **NVML** -- the Linux NVM library (Tag: 0.1+b16) (http://pmem.io) [Required]
+* **JDK** -- the Java Develop Kit 1.6 or above (please properly configure JAVA_HOME) [Required]
+* **PMFS** -- the PMFS should be properly installed and configured on Linux system if you want to simulate read latency [Optional]
+* **PMalloc** -- the supported durable memory native library at https://github.com/bigdata-memory/pmalloc.git [Required]
+* **Javapoet** -- the 1.3.1-SNAPSHOT revised for bdmem at https://github.com/wewela/javapoet.git [Required]
 
 
 Once the build system is setup, the Big Memory Library is built using this command at the top level:
