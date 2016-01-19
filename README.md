@@ -1,16 +1,16 @@
 bdmem: Big Data Memory Library
 ================================
 
-A durable heterogeneous memory-like resource management library. It supports In-place persistent Java object programming.
+A durable hybrid memory resources management library. It is featured with in-place durable Java object programming model.
 
 ### Features:
 
 * In-place data storage on local non-volatile memory
 * In-place generic Java object persistence
 * Lazily data object loading
-* Any mappable device could be used as a non-volatile memory resource
+* Any map-able device could be used as a non-volatile memory resource
 * Reclaim allocated memory when it is no longer used
-* Hierarchical cache pool  for massive data caching
+* Hierarchical cache pool for massive data caching
 * A set of persistent data structures is provided by bdmemgeneric project
 * Minimize memory footprint on Java heap
 * Reduce GC Overhead as following data shown (collected from Apache Spark experiments)
