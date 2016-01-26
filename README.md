@@ -1,7 +1,7 @@
 bdmem: Big Data Memory Library
 ================================
 
-A durable hybrid memory resources management library. It is featured with in-place durable Java object programming model.
+A hybrid memory resources management library. It is featured with in-place non-volatile Java object programming model.
 
 ### Features:
 
