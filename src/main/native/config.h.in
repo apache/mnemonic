@@ -1,0 +1,6 @@
+#ifndef GUARD
+#define GUARD
+
+#cmakedefine _CONFIG_HEADER_H_
+
+#endif //GUARD

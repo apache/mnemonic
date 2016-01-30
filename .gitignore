@@ -8,9 +8,8 @@ target/
 *.la
 *.so
 test-output/
-
+build/
 aclocal.m4
-config.h.in
 configure
 dist
 m4

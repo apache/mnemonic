@@ -110,16 +110,18 @@
 							<goal>run</goal>
 						</goals>
 						<configuration>
-							<tasks>
+							<target>
 								<echo>Java Home: ${java.home}</echo>
-								<exec dir="src/main/native" executable="./autogen.sh" failonerror="true"/>
-								<exec dir="src/main/native" executable="./configure" failonerror="true"/>
-								<exec dir="src/main/native" executable="make" failonerror="true">
+								<mkdir dir="src/main/native/build" />
+								<exec dir="src/main/native/build" executable="cmake" failonerror="true">
+									<arg value=".." />
+								</exec>
+								<exec dir="src/main/native/build" executable="make" failonerror="true">
 									<env key="JAVA_HOME" value="${java.home}/.." />
 								</exec>
-								<copy file="src/main/native/.libs/libbigdatamem.so" tofile="src/main/native/dist/native/libbigdatamem.so" />
-								<copy file="src/main/native/.libs/libbigdatapmem.so" tofile="src/main/native/dist/native/libbigdatapmem.so" />
-							</tasks>
+								<copy file="src/main/native/build/libbigdatamem.so" tofile="src/main/native/dist/native/libbigdatamem.so" />
+								<copy file="src/main/native/build/libbigdatapmem.so" tofile="src/main/native/dist/native/libbigdatapmem.so" />
+							</target>
 						</configuration>
 					</execution>
 					<execution>
@@ -129,13 +131,10 @@
 							<goal>run</goal>
 						</goals>
 						<configuration>
-							<tasks>
-								<exec dir="src/main/native" executable="make" failonerror="false">
-									<arg value="maintainer-clean" />
-								</exec>
-								<delete file="src/main/native/dist/native/libbigdatamem.so" />
-								<delete file="src/main/native/dist/native/libbigdatapmem.so" />
-							</tasks>
+							<target>
+								<delete dir="src/main/native/build" />
+								<delete dir="src/main/native/dist" />
+							</target>
 						</configuration>
 					</execution>
 				</executions>
@@ -207,6 +206,7 @@
 			<plugin>
                 <groupId>com.github.wvengen</groupId>
                 <artifactId>proguard-maven-plugin</artifactId>
+                <version>2.0.11</version>
                 <executions>
                    <execution>
                        <phase>package</phase>
