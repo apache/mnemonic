@@ -6,14 +6,14 @@ package com.intel.bigdatamem;
  */
 
 
-public class RetrievePersistentEntityError extends RuntimeException {
+public class RetrieveNonVolatileEntityError extends RuntimeException {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 3985459401986971131L;
 
-	public RetrievePersistentEntityError(String s) {
+	public RetrieveNonVolatileEntityError(String s) {
 		super(s);
 	}
 }

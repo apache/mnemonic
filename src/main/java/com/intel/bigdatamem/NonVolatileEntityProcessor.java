@@ -27,7 +27,7 @@ import javax.tools.Diagnostic;
 
 import com.squareup.javapoet.MethodSpec;
 
-public class PersistentEntityProcessor extends AbstractProcessor {
+public class NonVolatileEntityProcessor extends AbstractProcessor {
 	private Types typeUtils;
 	private Elements elementUtils;
 	private Filer filer;
@@ -47,7 +47,7 @@ public class PersistentEntityProcessor extends AbstractProcessor {
 	@Override
 	public Set<String> getSupportedAnnotationTypes() {
 		Set<String> annotataions = new LinkedHashSet<String>();
-		annotataions.add(PersistentEntity.class.getCanonicalName());
+		annotataions.add(NonVolatileEntity.class.getCanonicalName());
 		return annotataions;
 	}
 
@@ -69,7 +69,7 @@ public class PersistentEntityProcessor extends AbstractProcessor {
 		
 		try {
 
-			for (Element annotatedElement : roundEnv.getElementsAnnotatedWith(PersistentEntity.class)) {
+			for (Element annotatedElement : roundEnv.getElementsAnnotatedWith(NonVolatileEntity.class)) {
 
 				String outputstr = String.format("++++++++++%s+++++++++++", annotatedElement.getSimpleName());
 				note(annotatedElement, outputstr);
@@ -78,14 +78,14 @@ public class PersistentEntityProcessor extends AbstractProcessor {
 				if (annotatedElement.getKind() != ElementKind.CLASS) {
 					throw new AnnotationProcessingException(
 							annotatedElement, "Only classes can be annotated with @%s",
-							PersistentEntity.class.getSimpleName());
+							NonVolatileEntity.class.getSimpleName());
 				}
 
 				// We can cast it, because we know that it of ElementKind.CLASS
 				TypeElement typeelem = (TypeElement) annotatedElement;
 
-				AnnotatedPersistentEntityClass annotatedClass = 
-						new AnnotatedPersistentEntityClass(typeelem, typeUtils, elementUtils, messager);
+				AnnotatedNonVolatileEntityClass annotatedClass = 
+						new AnnotatedNonVolatileEntityClass(typeelem, typeUtils, elementUtils, messager);
 
 				annotatedClass.prepareProcessing();
 				

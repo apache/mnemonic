@@ -18,9 +18,9 @@ public interface Durable {
 
 	public void registerAutoReclaim();
 	
-	public long getPersistentHandler();
+	public long getNonVolatileHandler();
 	
 	public boolean autoReclaim();
 
-	public void destroy() throws RetrievePersistentEntityError;
+	public void destroy() throws RetrieveNonVolatileEntityError;
 }

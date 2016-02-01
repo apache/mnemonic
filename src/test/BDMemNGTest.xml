@@ -3,7 +3,7 @@
 <suite name="Big Memory Library test Suite" verbose="1" parallel="tests" thread-count="1">
 	<test name="Memory Clustering test" >
 		<classes>
-			<class name="com.intel.bigdatamem.PersistentListNGTest" />
+			<class name="com.intel.bigdatamem.NonVolatileListNGTest" />
 		</classes>
 	</test>
 </suite>
@@ -14,7 +14,7 @@
 			<class name="com.intel.bigdatamem.ByteBufferSerializerNGTest" />
 			<class name="com.intel.bigdatamem.MemClusteringNGTest" />
 			<class name="com.intel.bigdatamem.BigDataPMemAllocatorNGTest" />
-			<class name="com.intel.bigdatamem.PersistentPersonNGTest" />
-			<class name="com.intel.bigdatamem.PersistentListNGTest" />
+			<class name="com.intel.bigdatamem.NonVolatilePersonNGTest" />
+			<class name="com.intel.bigdatamem.NonVolatileListNGTest" />
 
  -->

@@ -35,7 +35,7 @@ import sun.misc.Unsafe;
 import com.squareup.javapoet.*;
 import com.squareup.javapoet.MethodSpec.Builder;
 
-public class AnnotatedPersistentEntityClass {
+public class AnnotatedNonVolatileEntityClass {
 	protected class MethodInfo {
 		public ExecutableElement elem;
 		public MethodSpec.Builder specbuilder;
@@ -52,7 +52,7 @@ public class AnnotatedPersistentEntityClass {
 	}
 
 	protected final String FACTORYNAMESUFFIX = "Factory";
-	protected final String PMEMNAMEPREFIX = "PMem_";
+	protected final String PMEMNAMEPREFIX = "NonVolatile_";
 	protected final String FIELDNAMESUFFIX = String.format("_field_%s", Utils.genRandomString());
 	protected final String ALLOCATORFIELDNAME = String.format("alloc_%s", Utils.genRandomString());
 	protected final String AUTORECLAIMFIELDNAME = String.format("autoreclaim_%s", Utils.genRandomString());
@@ -135,7 +135,7 @@ public class AnnotatedPersistentEntityClass {
 		return n;
 	}	
 	
-	public AnnotatedPersistentEntityClass(TypeElement classElement, Types typeUtils, Elements elementUtils,
+	public AnnotatedNonVolatileEntityClass(TypeElement classElement, Types typeUtils, Elements elementUtils,
 			Messager messager) {
 		m_elem = classElement;
 		m_typeutils = typeUtils;
@@ -149,13 +149,13 @@ public class AnnotatedPersistentEntityClass {
 
 		m_durablemtdinfo.put("cancelAutoReclaim", new MethodInfo());
 		m_durablemtdinfo.put("registerAutoReclaim", new MethodInfo());
-		m_durablemtdinfo.put("getPersistentHandler", new MethodInfo());
+		m_durablemtdinfo.put("getNonVolatileHandler", new MethodInfo());
 		m_durablemtdinfo.put("autoReclaim", new MethodInfo());
 		m_durablemtdinfo.put("destroy", new MethodInfo());
 
-		m_entitymtdinfo.put("initializePersistentEntity", new MethodInfo());
-		m_entitymtdinfo.put("createPersistentEntity", new MethodInfo());
-		m_entitymtdinfo.put("restorePersistentEntity", new MethodInfo());
+		m_entitymtdinfo.put("initializeNonVolatileEntity", new MethodInfo());
+		m_entitymtdinfo.put("createNonVolatileEntity", new MethodInfo());
+		m_entitymtdinfo.put("restoreNonVolatileEntity", new MethodInfo());
 
 	}
 
@@ -165,7 +165,7 @@ public class AnnotatedPersistentEntityClass {
 		String methodname;
 		long fieldoff = 0;
 		TypeElement intf_durable = m_elemutils.getTypeElement(Durable.class.getCanonicalName());
-		TypeElement intf_entity = m_elemutils.getTypeElement(MemoryPersistentEntity.class.getCanonicalName());
+		TypeElement intf_entity = m_elemutils.getTypeElement(MemoryNonVolatileEntity.class.getCanonicalName());
 		System.err.printf("<><><><><> %s ======\n", intf_entity.toString());
 
 		boolean valid = false;
@@ -233,14 +233,14 @@ public class AnnotatedPersistentEntityClass {
 			if (elem.getKind() == ElementKind.METHOD) {
 				methodname = elem.getSimpleName().toString();
 				System.err.printf("=========== %s ======\n", methodname);
-				 PersistentGetter[] pgetters = elem.getAnnotationsByType(PersistentGetter.class); 
+				NonVolatileGetter[] pgetters = elem.getAnnotationsByType(NonVolatileGetter.class); 
 				if (pgetters.length == 1) {
 					if (!elem.getModifiers().contains(Modifier.ABSTRACT)) {
 						throw new AnnotationProcessingException(elem,
-								"%s annotated with PersistentGetter is not abstract.", methodname);
+								"%s annotated with NonVolatileGetter is not abstract.", methodname);
 					}
-					if (elem.getAnnotationsByType(PersistentSetter.class).length == 1) {
-						throw new AnnotationProcessingException(elem, "%s is annotated with PersistentSetter as well.",
+					if (elem.getAnnotationsByType(NonVolatileSetter.class).length == 1) {
+						throw new AnnotationProcessingException(elem, "%s is annotated with NonVolatileSetter as well.",
 								methodname);
 					}
 					if (!methodname.startsWith("get")) {
@@ -273,10 +273,10 @@ public class AnnotatedPersistentEntityClass {
 					m_dynfieldsinfo.put(methodname.substring(3), fieldinfo);
 					
 				}
-				if (elem.getAnnotationsByType(PersistentSetter.class).length == 1) {
+				if (elem.getAnnotationsByType(NonVolatileSetter.class).length == 1) {
 					if (!elem.getModifiers().contains(Modifier.ABSTRACT)) {
 						throw new AnnotationProcessingException(elem,
-								"%s annotated with PersistentSetter is not abstract.", methodname);
+								"%s annotated with NonVolatileSetter is not abstract.", methodname);
 					}
 					if (!methodname.startsWith("set")) {
 						throw new AnnotationProcessingException(elem, "%s does not comply name convention of setter.",
@@ -287,9 +287,9 @@ public class AnnotatedPersistentEntityClass {
 					methodinfo.specbuilder = MethodSpec.overriding(methodinfo.elem);
 					m_settersinfo.put(methodname.substring(3), methodinfo);
 				}
-//				if (!methodinfo.elem.getThrownTypes().contains(m_elemutils.getTypeElement(RetrievePersistentEntityError.class.getCanonicalName()).asType())) {
+//				if (!methodinfo.elem.getThrownTypes().contains(m_elemutils.getTypeElement(RetrieveNonVolatileEntityError.class.getCanonicalName()).asType())) {
 //					throw new AnnotationProcessingException(methodinfo.elem, "%s must throw out %s.",
-//							methodname, RetrievePersistentEntityError.class.getName());
+//							methodname, RetrieveNonVolatileEntityError.class.getName());
 //				}
 			}
 		}
@@ -314,16 +314,16 @@ public class AnnotatedPersistentEntityClass {
 //			if (!isUnboxPrimitive(m_dynfieldsinfo.get(name).type)) {
 //				if (m_gettersinfo.containsKey(name)) {
 //					minfo = m_gettersinfo.get(name);
-//					if (!minfo.elem.getThrownTypes().contains(m_elemutils.getTypeElement(RetrievePersistentEntityError.class.getCanonicalName()).asType())) {
+//					if (!minfo.elem.getThrownTypes().contains(m_elemutils.getTypeElement(RetrieveNonVolatileEntityError.class.getCanonicalName()).asType())) {
 //						throw new AnnotationProcessingException(minfo.elem, "%s must throw out %s.",
-//								gsetterName(name, true), RetrievePersistentEntityError.class.getName());
+//								gsetterName(name, true), RetrieveNonVolatileEntityError.class.getName());
 //					}
 //				}
 //				if (m_settersinfo.containsKey(name)) {
 //					minfo = m_settersinfo.get(name);
-//					if (!minfo.elem.getThrownTypes().contains(m_elemutils.getTypeElement(RetrievePersistentEntityError.class.getCanonicalName()).asType())) {
+//					if (!minfo.elem.getThrownTypes().contains(m_elemutils.getTypeElement(RetrieveNonVolatileEntityError.class.getCanonicalName()).asType())) {
 //						throw new AnnotationProcessingException(minfo.elem, "%s must throw out %s.",
-//								gsetterName(name, false), RetrievePersistentEntityError.class.getName());
+//								gsetterName(name, false), RetrieveNonVolatileEntityError.class.getName());
 //					}
 //				}
 //			}
@@ -454,7 +454,7 @@ public class AnnotatedPersistentEntityClass {
 					code.addStatement("$1N = $2N.retrieveBuffer(phandler, $3N)",
 							dynfieldinfo.name, allocname, autoreclaimname);
 					code.beginControlFlow("if (null == $1N)", dynfieldinfo.name);
-					code.addStatement("throw new RetrievePersistentEntityError(\"Retrieve String Buffer Failure.\")");
+					code.addStatement("throw new RetrieveNonVolatileEntityError(\"Retrieve String Buffer Failure.\")");
 					code.endControlFlow();
 					code.endControlFlow();
 					code.endControlFlow();
@@ -471,7 +471,7 @@ public class AnnotatedPersistentEntityClass {
 					code.beginControlFlow("if (null != $1N && $1N.length > gfpidx)", genericfieldname);
 					code.addStatement("gftype = $1L[gfpidx]", genericfieldname);
 					code.nextControlFlow("else");
-					code.addStatement("throw new RetrievePersistentEntityError(\"No Generic Field Type Info.\")");
+					code.addStatement("throw new RetrieveNonVolatileEntityError(\"No Generic Field Type Info.\")");
 					code.endControlFlow();
 					code.addStatement("$1N = new $2T(proxy, gftype, $8L, $9L, $3N, $4N, $5N, $6N.get() + $7L)", 
 							dynfieldinfo.name, dynfieldinfo.type, 
@@ -558,7 +558,7 @@ public class AnnotatedPersistentEntityClass {
 					code.addStatement("$1N = $2N.createBuffer($3L.length() * 2, $4N)", 
 							dynfieldinfo.name, allocname, arg0, autoreclaimname);
 					code.beginControlFlow("if (null == $1N)", dynfieldinfo.name);
-					code.addStatement("throw new OutOfPersistentMemory(\"Create Persistent String Error!\")");
+					code.addStatement("throw new OutOfPersistentMemory(\"Create Non-Volatile String Error!\")");
 					code.endControlFlow();
 					code.addStatement("$1N.get().asCharBuffer().put($2L)", dynfieldinfo.name, arg0);
 					code.addStatement("$1N.putLong($2N.get() + $3L, $4N.getBufferHandler($5N))", 
@@ -575,7 +575,7 @@ public class AnnotatedPersistentEntityClass {
 					code.beginControlFlow("if (null != $1N && $1N.length > gfpidx)", genericfieldname);
 					code.addStatement("gftype = $1L[gfpidx]", genericfieldname);
 					code.nextControlFlow("else");
-					code.addStatement("throw new RetrievePersistentEntityError(\"No Generic Field Type Info.\")");
+					code.addStatement("throw new RetrieveNonVolatileEntityError(\"No Generic Field Type Info.\")");
 					code.endControlFlow();
 					code.addStatement("$1N = new $2T(proxy, gftype, $8L, $9L, $3N, $4N, $5N, $6N.get() + $7L)", 
 							dynfieldinfo.name, dynfieldinfo.type, 
@@ -585,7 +585,7 @@ public class AnnotatedPersistentEntityClass {
 					code.beginControlFlow("if (null != $1L)", dynfieldinfo.name);
 					code.addStatement("$1N.set($2L, $3L)", dynfieldinfo.name, arg0, arg1);
 					code.nextControlFlow("else");
-					code.addStatement("throw new RetrievePersistentEntityError(\"GenericField is null!\")");
+					code.addStatement("throw new RetrieveNonVolatileEntityError(\"GenericField is null!\")");
 					code.endControlFlow();
 				} else {
 					code.beginControlFlow("if ($1L && null != $2L())", arg1, gsetterName(name, true));
@@ -595,7 +595,7 @@ public class AnnotatedPersistentEntityClass {
 							unsafename, holdername, dynfieldinfo.fieldoff);
 					code.endControlFlow();
 					code.addStatement("$1N = $2L", dynfieldinfo.name, arg0);
-					code.addStatement("$1N.putLong($2N.get() + $3L, null == $4N ? 0L : $4N.getPersistentHandler())", 
+					code.addStatement("$1N.putLong($2N.get() + $3L, null == $4N ? 0L : $4N.getNonVolatileHandler())", 
 							unsafename, holdername, dynfieldinfo.fieldoff, dynfieldinfo.name);
 				}
 			}
@@ -638,7 +638,7 @@ public class AnnotatedPersistentEntityClass {
 				}
 				code.addStatement("$1N = true", autoreclaimname);
 				break;
-			case "getPersistentHandler" :
+			case "getNonVolatileHandler" :
 				code.addStatement("return $1N.getChunkHandler($2N)", allocname, holdername);
 				break;
 			case "autoReclaim" :
@@ -682,7 +682,7 @@ public class AnnotatedPersistentEntityClass {
 			arg1 = methodinfo.elem.getParameters().get(1);
 			arg2 = methodinfo.elem.getParameters().get(2);
 			switch(name) {
-			case "initializePersistentEntity" :
+			case "initializeNonVolatileEntity" :
 				arg3 = methodinfo.elem.getParameters().get(3);
 				code.addStatement("$1N = $2L", allocname, arg0);
 				code.addStatement("$1N = $2L", factoryproxyname, arg1);
@@ -694,13 +694,13 @@ public class AnnotatedPersistentEntityClass {
 				code.addStatement("e.printStackTrace()");
 				code.endControlFlow();
 				break;
-			case "createPersistentEntity" :
+			case "createNonVolatileEntity" :
 				arg3 = methodinfo.elem.getParameters().get(3);
-				code.addStatement("initializePersistentEntity($1L, $2L, $3L, $4L)", arg0, arg1, arg2, arg3);
+				code.addStatement("initializeNonVolatileEntity($1L, $2L, $3L, $4L)", arg0, arg1, arg2, arg3);
 				code.addStatement("$1N = $2N.createChunk($3L, $4N)", 
 						holdername, allocname, m_holdersize, autoreclaimname);
 				code.beginControlFlow("if (null == $1N)", holdername);
-				code.addStatement("throw new OutOfPersistentMemory(\"Create Persistent Entity Error!\")");
+				code.addStatement("throw new OutOfPersistentMemory(\"Create Non-Volatile Entity Error!\")");
 				code.endControlFlow();
 //				code.beginControlFlow("try");
 //				for (String fname : m_dynfieldsinfo.keySet()) {
@@ -711,21 +711,21 @@ public class AnnotatedPersistentEntityClass {
 //						code.addStatement("$1N(null, false)", gsetterName(fname, false));
 //					}
 //				}
-//				code.nextControlFlow("catch(RetrievePersistentEntityError ex)");
+//				code.nextControlFlow("catch(RetrieveNonVolatileEntityError ex)");
 //				code.endControlFlow();
 				code.addStatement("initializeAfterCreate()");
 				break;
-			case "restorePersistentEntity" :
+			case "restoreNonVolatileEntity" :
 				arg3 = methodinfo.elem.getParameters().get(3);
 				arg4 = methodinfo.elem.getParameters().get(4);
-				code.addStatement("initializePersistentEntity($1L, $2L, $3L, $4L)", arg0, arg1, arg2, arg4);
+				code.addStatement("initializeNonVolatileEntity($1L, $2L, $3L, $4L)", arg0, arg1, arg2, arg4);
 				code.beginControlFlow("if (0L == $1L)", arg3);
-				code.addStatement("throw new RetrievePersistentEntityError(\"Input handler is null on $1N.\")", name);
+				code.addStatement("throw new RetrieveNonVolatileEntityError(\"Input handler is null on $1N.\")", name);
 				code.endControlFlow();
 				code.addStatement("$1N = $2N.retrieveChunk($3L, $4N)", 
 						holdername, allocname, arg3, autoreclaimname);
 				code.beginControlFlow("if (null == $1N)", holdername);
-				code.addStatement("throw new RetrievePersistentEntityError(\"Retrieve Entity Failure!\")");
+				code.addStatement("throw new RetrieveNonVolatileEntityError(\"Retrieve Entity Failure!\")");
 				code.endControlFlow();
 				code.addStatement("initializeAfterRestore()");
 				break;
@@ -785,7 +785,7 @@ public class AnnotatedPersistentEntityClass {
 		code = CodeBlock.builder()
 				.addStatement("$1T entity = new $1T()", entitytn)
 				.addStatement("entity.setupGenericInfo($1N, $2N)", factoryproxysparam.name, gfieldsparam.name)
-				.addStatement("entity.createPersistentEntity($1L, $2L, $3L, $4L)", 
+				.addStatement("entity.createNonVolatileEntity($1L, $2L, $3L, $4L)", 
 						allocparam.name, factoryproxysparam.name, gfieldsparam.name, autoreclaimparam.name)
 				.addStatement("return entity")
 				.build();
@@ -807,7 +807,7 @@ public class AnnotatedPersistentEntityClass {
 				.build();
 		methodspec = MethodSpec.methodBuilder("restore")
 				.addTypeVariables(entityspec.typeVariables)
-				.addException(RetrievePersistentEntityError.class)
+				.addException(RetrieveNonVolatileEntityError.class)
 				.addModifiers(Modifier.PUBLIC, Modifier.STATIC)
 				.returns(TypeName.get(m_elem.asType()))
 				.addParameter(allocparam)
@@ -820,7 +820,7 @@ public class AnnotatedPersistentEntityClass {
 				.build();
 		methodspec = MethodSpec.methodBuilder("restore")
 				.addTypeVariables(entityspec.typeVariables)
-				.addException(RetrievePersistentEntityError.class)
+				.addException(RetrieveNonVolatileEntityError.class)
 				.addModifiers(Modifier.PUBLIC, Modifier.STATIC)
 				.returns(TypeName.get(m_elem.asType()))
 				.addParameter(allocparam)
@@ -832,13 +832,13 @@ public class AnnotatedPersistentEntityClass {
 		code = CodeBlock.builder()
 				.addStatement("$1T entity = new $1T()", entitytn)
 				.addStatement("entity.setupGenericInfo($1N, $2N)", factoryproxysparam.name, gfieldsparam.name)
-				.addStatement("entity.restorePersistentEntity($1L, $2L, $3L, $4L, $5L)", 
+				.addStatement("entity.restoreNonVolatileEntity($1L, $2L, $3L, $4L, $5L)", 
 						allocparam.name, factoryproxysparam.name, gfieldsparam.name, phandlerparam.name, autoreclaimparam.name)
 				.addStatement("return entity")
 				.build();
 		methodspec = MethodSpec.methodBuilder("restore")
 				.addTypeVariables(entityspec.typeVariables)
-				.addException(RetrievePersistentEntityError.class)
+				.addException(RetrieveNonVolatileEntityError.class)
 				.addModifiers(Modifier.PUBLIC, Modifier.STATIC)
 				.returns(TypeName.get(m_elem.asType()))
 				.addParameter(allocparam)
@@ -858,7 +858,7 @@ public class AnnotatedPersistentEntityClass {
 				.superclass(TypeName.get(m_elem.asType()))
 				.addModifiers(Modifier.PUBLIC).addAnnotation(classannotation)
 				.addSuperinterface(
-						ParameterizedTypeName.get(ClassName.get(MemoryPersistentEntity.class), m_alloctypevarname))
+						ParameterizedTypeName.get(ClassName.get(MemoryNonVolatileEntity.class), m_alloctypevarname))
 				.addTypeVariable(m_alloctypevarname);
 		
 		for (TypeParameterElement tpe : m_elem.getTypeParameters()) {

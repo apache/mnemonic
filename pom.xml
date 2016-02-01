@@ -92,7 +92,7 @@
 						<phase>generate-test-sources</phase>
 						<configuration>
 							<processors>
-								<processor>com.intel.bigdatamem.PersistentEntityProcessor</processor>
+								<processor>com.intel.bigdatamem.NonVolatileEntityProcessor</processor>
 							</processors>
 						</configuration>
 					</execution>

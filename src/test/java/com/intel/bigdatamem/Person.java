@@ -7,7 +7,7 @@ import java.util.List;
  *
  */
 
-@PersistentEntity
+@NonVolatileEntity
 public abstract class Person<E> implements Durable, Comparable<Person<E>> {
 	E element;
 	
@@ -26,7 +26,7 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
 		
 	}
 	
-	public void testOutput() throws RetrievePersistentEntityError {
+	public void testOutput() throws RetrieveNonVolatileEntityError {
 		System.out.printf("Person %s, Age: %d ( %s ) \n", getName(), getAge(), 
 				null == getMother()? "No Recorded Mother" : "Has Recorded Mother");
 	}
@@ -38,24 +38,24 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
 		return ret;
 	}
 
-	@PersistentGetter
+	@NonVolatileGetter
 	abstract public Short getAge();
-	@PersistentSetter
+	@NonVolatileSetter
 	abstract public void setAge(Short age);
 	
-	@PersistentGetter
-	abstract public String getName() throws RetrievePersistentEntityError;
-	@PersistentSetter
-	abstract public void setName(String name, boolean destroy) throws OutOfPersistentMemory, RetrievePersistentEntityError;
+	@NonVolatileGetter
+	abstract public String getName() throws RetrieveNonVolatileEntityError;
+	@NonVolatileSetter
+	abstract public void setName(String name, boolean destroy) throws OutOfPersistentMemory, RetrieveNonVolatileEntityError;
 	
-	@PersistentGetter
-	abstract public Person<E> getMother() throws RetrievePersistentEntityError;
-	@PersistentSetter
-	abstract public void setMother(Person<E> mother, boolean destroy) throws RetrievePersistentEntityError;
+	@NonVolatileGetter
+	abstract public Person<E> getMother() throws RetrieveNonVolatileEntityError;
+	@NonVolatileSetter
+	abstract public void setMother(Person<E> mother, boolean destroy) throws RetrieveNonVolatileEntityError;
 	
-	@PersistentGetter
-	abstract public Person<E> getFather() throws RetrievePersistentEntityError;
-	@PersistentSetter
-	abstract public void setFather(Person<E> mother, boolean destroy) throws RetrievePersistentEntityError;
+	@NonVolatileGetter
+	abstract public Person<E> getFather() throws RetrieveNonVolatileEntityError;
+	@NonVolatileSetter
+	abstract public void setFather(Person<E> mother, boolean destroy) throws RetrieveNonVolatileEntityError;
 }
 

@@ -89,7 +89,7 @@ public class GenericField<A extends CommonPersistAllocator<A>, E> implements Dur
 				m_unsafe.putAddress(m_fpos, 0L);
 			}
 			m_field = (Durable) e;
-			m_unsafe.putAddress(m_fpos, null == m_field ? 0L : m_field.getPersistentHandler());
+			m_unsafe.putAddress(m_fpos, null == m_field ? 0L : m_field.getNonVolatileHandler());
 			break;
 		}
 
@@ -129,7 +129,7 @@ public class GenericField<A extends CommonPersistAllocator<A>, E> implements Dur
 				if (0L != phandler) {
 					m_strfield = m_allocater.retrieveBuffer(phandler, m_autoreclaim);
 					if (null == m_strfield) {
-						throw new RetrievePersistentEntityError("Retrieve String Buffer Failure.");
+						throw new RetrieveNonVolatileEntityError("Retrieve String Buffer Failure.");
 					}
 				}
 			}
@@ -140,7 +140,7 @@ public class GenericField<A extends CommonPersistAllocator<A>, E> implements Dur
 				long phandler = m_unsafe.getAddress(m_fpos);
 				if (0L != phandler) {
 					if (null == m_defproxy) {
-						throw new RetrievePersistentEntityError("Proxy not specified for Durable Generic entity.");
+						throw new RetrieveNonVolatileEntityError("Proxy not specified for Non-Volatile Generic entity.");
 					}
 					m_field = m_defproxy.restore(m_allocater, m_efproxies, m_gftypes, phandler, m_autoreclaim);
 				}
@@ -184,8 +184,8 @@ public class GenericField<A extends CommonPersistAllocator<A>, E> implements Dur
 	}
 
 	@Override
-	public long getPersistentHandler() {
-		throw new UnsupportedOperationException("GenericField.getPersistentHandler()");
+	public long getNonVolatileHandler() {
+		throw new UnsupportedOperationException("GenericField.getNonVolatileHandler()");
 	}
 
 	@Override
@@ -194,7 +194,7 @@ public class GenericField<A extends CommonPersistAllocator<A>, E> implements Dur
 	}
 
 	@Override
-	public void destroy() throws RetrievePersistentEntityError {
+	public void destroy() throws RetrieveNonVolatileEntityError {
 		if (null != m_field) {
 			m_field.destroy();
 		}

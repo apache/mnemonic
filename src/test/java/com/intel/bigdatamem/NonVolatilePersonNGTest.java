@@ -13,11 +13,11 @@ import java.util.UUID;
 
 import org.testng.annotations.Test;
 
-public class PersistentPersonNGTest {
+public class NonVolatilePersonNGTest {
   private long KEYCAPACITY;
 
   @Test(expectedExceptions = { OutOfPersistentMemory.class })
-  public void testGenPeople() throws OutOfPersistentMemory, RetrievePersistentEntityError {
+  public void testGenPeople() throws OutOfPersistentMemory, RetrieveNonVolatileEntityError {
 	Random rand = Utils.createRandom();
 	BigDataPMemAllocator act = new BigDataPMemAllocator(1024 * 1024 * 8, "./pobj_person.dat", true);
 	KEYCAPACITY = act.persistKeyCapacity();
@@ -72,7 +72,7 @@ public class PersistentPersonNGTest {
 			person.setName(String.format("Name: [%s]", UUID.randomUUID().toString()), true);
 			person.setName(String.format("Name: [%s]", UUID.randomUUID().toString()), true);
 			
-			act.setPersistKey(keyidx, person.getPersistentHandler());
+			act.setPersistKey(keyidx, person.getNonVolatileHandler());
 			
 			for (int deep = 0; deep < rand.nextInt(100); ++deep) {
 						
@@ -93,7 +93,7 @@ public class PersistentPersonNGTest {
   }
 
   @Test(dependsOnMethods = {"testGenPeople"})
-  public void testCheckPeople() throws RetrievePersistentEntityError {
+  public void testCheckPeople() throws RetrieveNonVolatileEntityError {
 	BigDataPMemAllocator act = new BigDataPMemAllocator(1024 * 1024 * 8, "./pobj_person.dat", true);
 	act.setBufferReclaimer(new Reclaim<ByteBuffer>() {
 		@Override
