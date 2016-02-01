@@ -23,9 +23,9 @@ A hybrid memory resources management library. It is featured with in-place non-v
 
 ```java
 /**
- * a durable class should be abstract and implemented from Durable interface with @PersistentEntity annotation
+ * a durable class should be abstract and implemented from Durable interface with @NonVolatileEntity annotation
  */
-@PersistentEntity
+@NonVolatileEntity
 public abstract class Person<E> implements Durable, Comparable<Person<E>> {
         E element; // Generic Type
 
@@ -54,7 +54,7 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
         }
 
         @Test
-        public void testOutput() throws RetrievePersistentEntityError {
+        public void testOutput() throws RetrieveNonVolatileEntityError {
                 System.out.printf("Person %s, Age: %d ( %s ) \n", getName(), getAge(),
                                 null == getMother()? "No Recorded Mother" : "Has Recorded Mother");
         }
@@ -67,27 +67,27 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
         }
 
         /**
-         * Getters and Setters for persistent fields with @persistentGetter and @PersistentSetter
+         * Getters and Setters for persistent fields with @NonVolatileGetter and @NonVolatileSetter
          */
-        @PersistentGetter
+        @NonVolatileGetter
         abstract public Short getAge();
-        @PersistentSetter
+        @NonVolatileSetter
         abstract public void setAge(Short age);
 
-        @PersistentGetter
-        abstract public String getName() throws RetrievePersistentEntityError;
-        @PersistentSetter
-        abstract public void setName(String name, boolean destroy) throws OutOfPersistentMemory, RetrievePersistentEntityError;
+        @NonVolatileGetter
+        abstract public String getName() throws RetrieveNonVolatileEntityError;
+        @NonVolatileSetter
+        abstract public void setName(String name, boolean destroy) throws OutOfPersistentMemory, RetrieveNonVolatileEntityError;
 
-        @PersistentGetter
-        abstract public Person<E> getMother() throws RetrievePersistentEntityError;
-        @PersistentSetter
-        abstract public void setMother(Person<E> mother, boolean destroy) throws RetrievePersistentEntityError;
+        @NonVolatileGetter
+        abstract public Person<E> getMother() throws RetrieveNonVolatileEntityError;
+        @NonVolatileSetter
+        abstract public void setMother(Person<E> mother, boolean destroy) throws RetrieveNonVolatileEntityError;
 
-        @PersistentGetter
-        abstract public Person<E> getFather() throws RetrievePersistentEntityError;
-        @PersistentSetter
-        abstract public void setFather(Person<E> mother, boolean destroy) throws RetrievePersistentEntityError;
+        @NonVolatileGetter
+        abstract public Person<E> getFather() throws RetrieveNonVolatileEntityError;
+        @NonVolatileSetter
+        abstract public void setFather(Person<E> mother, boolean destroy) throws RetrieveNonVolatileEntityError;
 }
 
 ```
@@ -98,7 +98,7 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
 ```java
         // create an allocator object with parameters ie. capacity and uri
         BigDataPMemAllocator act = new BigDataPMemAllocator(1024 * 1024 * 8, "./pobj_person.dat", true);
-        // fetch underlying capacity of key-value pair store for persistent handler storage
+        // fetch underlying capacity of key-value pair store for Non Volatile handler storage
         KEYCAPACITY = act.persistKeyCapacity();
         ....
         // close it after use
@@ -115,7 +115,7 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
         person.setName(String.format("Name: [%s]", UUID.randomUUID().toString()), true);
 
         // keep this person on persistent key-value pair store
-        act.setPersistKey(keyidx, person.getPersistentHandler());
+        act.setPersistKey(keyidx, person.getNonVolatileHandler());
 
         for (int deep = 0; deep < rand.nextInt(100); ++deep) {
                 // create another person as mother
