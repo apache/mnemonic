@@ -34,4 +34,6 @@ autom4te.cache/
 /*.dat
 *.log
 core.*
+\#*
+.\#*
 

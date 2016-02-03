@@ -3,7 +3,6 @@ package com.intel.bigdatamem.example;
 
 import java.nio.ByteBuffer;
 import java.util.*;
-
 import sun.misc.Unsafe;
 import com.intel.bigdatamem.*;
 

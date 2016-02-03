@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<suite name="Big Memory Library test Suite" verbose="1" parallel="tests" thread-count="1">
+<suite name="Mnenomic Core test Suite" verbose="1" parallel="tests" thread-count="1">
 	<test name="Memory Clustering test" >
 		<classes>
 			<class name="com.intel.bigdatamem.NonVolatileListNGTest" />
