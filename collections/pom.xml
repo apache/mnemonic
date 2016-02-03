@@ -68,7 +68,7 @@
             <configuration>
               <compilerArguments>-XDenableSunApiLintControl</compilerArguments>
               <processors>
-                <processor>com.intel.bigdatamem.NonVolatileEntityProcessor</processor>
+                <processor>${project.groupId}.NonVolatileEntityProcessor</processor>
               </processors>
             </configuration>
           </execution>
@@ -79,7 +79,7 @@
             <configuration>
               <compilerArguments>-XDenableSunApiLintControl</compilerArguments>
               <processors>
-                <processor>com.intel.bigdatamem.NonVolatileEntityProcessor</processor>
+                <processor>${project.groupId}.NonVolatileEntityProcessor</processor>
               </processors>
             </configuration>
           </execution>
