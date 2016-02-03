@@ -1,7 +1,7 @@
-bdmem: Big Data Memory Library
+Mnemonic: Structured Persistent Memory Library
 ================================
 
-A hybrid memory resources management library. It is featured with in-place non-volatile Java object programming model.
+A structured data in-memory persistence & hybrid memory resources management library. It is featured with in-place non-volatile Java object programming model.
 
 ### Features:
 
@@ -175,7 +175,7 @@ To build this library, you may need to install some required packages on the bui
 * **Javapoet** -- the 1.3.1-SNAPSHOT revised for bdmem at https://github.com/wewela/javapoet.git [Required]
 
 
-Once the build system is setup, the Big Memory Library is built using this command at the top level:
+Once the build system is setup, this Library is built using this command at the top level:
 ```bash
   $ mvn clean package
 ```
