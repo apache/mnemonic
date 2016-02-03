@@ -1,5 +1,6 @@
 Mnemonic: Structured Persistent Memory Library
 ================================
+(This project has been manually tranferred from https://github.com/bigdata-memory/bdmem)
 
 A structured data in-memory persistence & hybrid memory resources management library. It is featured with in-place non-volatile Java object programming model.
 
@@ -11,7 +12,7 @@ A structured data in-memory persistence & hybrid memory resources management lib
 * Any map-able device could be used as a non-volatile memory resource
 * Reclaim allocated memory when it is no longer used
 * Hierarchical cache pool for massive data caching
-* A set of persistent data structures is provided by bdmemgeneric project
+* A set of persistent data structures
 * Minimize memory footprint on Java heap
 * Reduce GC Overhead as following data shown (collected from Apache Spark experiments)
 
@@ -19,7 +20,7 @@ A structured data in-memory persistence & hybrid memory resources management lib
 
 ### How to use it ?
 
-#### Define a durable class:
+#### Define a Non-Volatile class:
 
 ```java
 /**
@@ -92,9 +93,9 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
 
 ```
 
-#### Use a durable class:
+#### Use a non-volatile class:
 
-##### Setup an allocator for durable objects.
+##### Setup an allocator for non-volatile objects.
 ```java
         // create an allocator object with parameters ie. capacity and uri
         BigDataPMemAllocator act = new BigDataPMemAllocator(1024 * 1024 * 8, "./pobj_person.dat", true);
@@ -105,7 +106,7 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
         act.close();
 ```
 
-##### Generate structured durable objects.
+##### Generate structured non-volatile objects.
 ```java
         // create a new durable person object from specific allocator
         person = PersonFactory.create(act);
@@ -130,7 +131,7 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
         }
 
 ```
-##### Use the durable objects
+##### Use the non-volatile objects
 ```java
         for (long i = 0; i < KEYCAPACITY; ++i) {
                 System.out.printf("----------Key %d--------------\n", i);
