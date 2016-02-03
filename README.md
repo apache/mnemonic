@@ -183,7 +183,7 @@ Once the build system is setup, the Big Memory Library is built using this comma
 
 To build and run the unit tests:
 ```bash
-  $ mvn clean package -skipTests
+  $ mvn clean package -DskipTests=false
 ```
 
 
