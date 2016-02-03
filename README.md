@@ -177,13 +177,13 @@ To build this library, you may need to install some required packages on the bui
 
 Once the build system is setup, the Big Memory Library is built using this command at the top level:
 ```bash
-	$ mvn clean package -DskipTests -Dmaven.javadoc.skip=true -Dmaven.test.skip=true
+  $ mvn clean package
 ```
 
 
 To build and run the unit tests:
 ```bash
-	$ mvn clean package
+  $ mvn clean package -skipTests
 ```
 
 
@@ -191,15 +191,6 @@ To install this package to local repository:
 ```bash
   $ mvn clean install
 ```
-
-
-To build examples:  
-(Note that the Big Data Memory Library should be installed to local repository at first):
-```bash
-  $ cd examples
-  $ mvn clean package
-```
-
 
 To run an example:
 ```bash
