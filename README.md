@@ -196,6 +196,6 @@ To install this package to local repository:
 To run an example:
 ```bash
   $ cd examples
-  $ java -jar target/examples-X.X.X(-SSSSS).jar
+  $ java -jar target/mnemonic-examples-X.X.X(-SSSSS).jar
 ```
 
