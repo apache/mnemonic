@@ -73,7 +73,7 @@ public class NonVolatileEntityProcessor extends AbstractProcessor {
 
 				String outputstr = String.format("++++++++++%s+++++++++++", annotatedElement.getSimpleName());
 				note(annotatedElement, outputstr);
-				System.err.println(outputstr);
+//				System.err.println(outputstr);
 				
 				if (annotatedElement.getKind() != ElementKind.CLASS) {
 					throw new AnnotationProcessingException(

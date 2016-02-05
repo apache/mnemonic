@@ -166,7 +166,7 @@ public class AnnotatedNonVolatileEntityClass {
 		long fieldoff = 0;
 		TypeElement intf_durable = m_elemutils.getTypeElement(Durable.class.getCanonicalName());
 		TypeElement intf_entity = m_elemutils.getTypeElement(MemoryNonVolatileEntity.class.getCanonicalName());
-		System.err.printf("<><><><><> %s ======\n", intf_entity.toString());
+//		System.err.printf("<><><><><> %s ======\n", intf_entity.toString());
 
 		boolean valid = false;
 		for (TypeMirror tm : m_elem.getInterfaces()) {
@@ -232,7 +232,7 @@ public class AnnotatedNonVolatileEntityClass {
 		for (Element elem : m_elem.getEnclosedElements()) {
 			if (elem.getKind() == ElementKind.METHOD) {
 				methodname = elem.getSimpleName().toString();
-				System.err.printf("=========== %s ======\n", methodname);
+//				System.err.printf("=========== %s ======\n", methodname);
 				NonVolatileGetter[] pgetters = elem.getAnnotationsByType(NonVolatileGetter.class); 
 				if (pgetters.length == 1) {
 					if (!elem.getModifiers().contains(Modifier.ABSTRACT)) {
@@ -333,7 +333,7 @@ public class AnnotatedNonVolatileEntityClass {
 			if (elem.getKind() == ElementKind.METHOD) {
 				methodname = elem.getSimpleName().toString();
 				if (m_durablemtdinfo.containsKey(methodname)) {
-					System.err.printf("**++++++++++ %s ======\n", methodname);
+//					System.err.printf("**++++++++++ %s ======\n", methodname);
 					methodinfo = m_durablemtdinfo.get(methodname);
 					methodinfo.elem = (ExecutableElement) elem;
 					methodinfo.specbuilder = MethodSpec.overriding(methodinfo.elem);
@@ -345,7 +345,7 @@ public class AnnotatedNonVolatileEntityClass {
 			if (elem.getKind() == ElementKind.METHOD) {
 				methodname = elem.getSimpleName().toString();
 				if (m_entitymtdinfo.containsKey(methodname)) {
-					System.err.printf("**------- %s ======\n", elem.toString());
+//					System.err.printf("**------- %s ======\n", elem.toString());
 					methodinfo = m_entitymtdinfo.get(methodname);
 					methodinfo.elem = (ExecutableElement) elem;
 					methodinfo.specbuilder = overriding(methodinfo.elem, ALLOCTYPENAME);
