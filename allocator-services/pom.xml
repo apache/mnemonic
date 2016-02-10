@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.intel.mnemonic</groupId>
-  <artifactId>mnemonic-parent</artifactId>
-  <version>2.0.0-SNAPSHOT</version>
+ 
+  <groupId>com.intel.mnemonic.service.allocatorservice</groupId>
+  <artifactId>allocator-services-parent-project</artifactId>
+  <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>Mnemonic Project Parent POM</name>
+ 
+  <name>Mnemonic Project Allocator Services Parent POM</name>
   <url>https://github.com/NonVolatileComputing</url>
 
   <licenses>
@@ -28,18 +28,18 @@
       <id>Gary</id>
       <name>Gang Wang</name>
       <email>gang1.wang@intel.com</email>
-      <url></url>
-      <organization></organization>
-      <organizationUrl></organizationUrl>
+      <url/>
+      <organization/>
+      <organizationUrl/>
       <timezone>US/Pacific</timezone>
     </developer>
     <developer>
       <id>Yanping</id>
       <name>Yanping Wang</name>
       <email>yanping.wang@intel.com</email>
-      <url></url>
-      <organization></organization>
-      <organizationUrl></organizationUrl>
+      <url/>
+      <organization/>
+      <organizationUrl/>
       <timezone>US/Pacific</timezone>
     </developer>
   </developers>
@@ -48,15 +48,14 @@
   </contributors>
 
   <modules>
-    <module>core</module>
-    <module>collections</module>
-    <module>examples</module>
-    <module>allocator-services</module>
+    <module>nvml-vmem-service</module>
+    <module>pmalloc-service</module>
   </modules>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <mnemonic.core.version>2.0.0-SNAPSHOT</mnemonic.core.version>
     <skipTests>true</skipTests>
   </properties>
 
@@ -97,8 +96,14 @@
       </snapshots>
     </pluginRepository>
   </pluginRepositories>
-
+  
   <dependencies>
+    <dependency>
+      <groupId>com.intel.bigdatamem</groupId>
+      <artifactId>mnemonic-core</artifactId>
+      <version>${mnemonic.core.version}</version>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
 
   <dependencyManagement>
@@ -108,21 +113,6 @@
 	<artifactId>testng</artifactId>
 	<version>6.8.17</version>
 	<scope>test</scope>
-      </dependency>
-      <dependency>
-	<groupId>org.flowcomputing.commons</groupId>
-	<artifactId>commons-resgc</artifactId>
-	<version>0.8.7</version>
-      </dependency>
-      <dependency>
-	<groupId>org.flowcomputing.commons</groupId>
-	<artifactId>commons-primitives</artifactId>
-	<version>0.6.0</version>
-      </dependency>
-      <dependency>
-	<groupId>com.squareup</groupId>
-	<artifactId>javapoet</artifactId>
-	<version>1.3.1-SNAPSHOT</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -142,11 +132,6 @@
             <source>1.7</source>
             <target>1.7</target>
           </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.bsc.maven</groupId>
-          <artifactId>maven-processor-plugin</artifactId>
-          <version>2.2.4</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -176,22 +161,6 @@
           <artifactId>maven-scm-publish-plugin</artifactId>
           <version>1.1</version>
         </plugin>
-        <plugin>
-          <groupId>com.github.wvengen</groupId>
-          <artifactId>proguard-maven-plugin</artifactId>
-          <version>2.0.11</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-shade-plugin</artifactId>
-          <version>1.4</version>
-        </plugin>
-        <plugin>
-          <groupId>org.bsc.maven</groupId>
-          <artifactId>maven-processor-plugin</artifactId>
-          <version>2.2.4</version>
-        </plugin>
-
       </plugins>
     </pluginManagement>
   </build>
