@@ -233,13 +233,13 @@ public class AnnotatedNonVolatileEntityClass {
 			if (elem.getKind() == ElementKind.METHOD) {
 				methodname = elem.getSimpleName().toString();
 //				System.err.printf("=========== %s ======\n", methodname);
-				NonVolatileGetter[] pgetters = elem.getAnnotationsByType(NonVolatileGetter.class); 
-				if (pgetters.length == 1) {
+				NonVolatileGetter pgetter = elem.getAnnotation(NonVolatileGetter.class); 
+				if (pgetter != null) {
 					if (!elem.getModifiers().contains(Modifier.ABSTRACT)) {
 						throw new AnnotationProcessingException(elem,
 								"%s annotated with NonVolatileGetter is not abstract.", methodname);
 					}
-					if (elem.getAnnotationsByType(NonVolatileSetter.class).length == 1) {
+					if (null != elem.getAnnotation(NonVolatileSetter.class)) {
 						throw new AnnotationProcessingException(elem, "%s is annotated with NonVolatileSetter as well.",
 								methodname);
 					}
@@ -268,12 +268,12 @@ public class AnnotatedNonVolatileEntityClass {
 					fieldinfo.fieldsize = computeTypeSize(methodinfo.elem.getReturnType());
 					fieldinfo.fieldoff = fieldoff;
 					fieldoff += fieldinfo.fieldsize;
-					fieldinfo.efproxiesname = pgetters[0].EntityFactoryProxies();
-					fieldinfo.gftypesname = pgetters[0].GenericFieldTypes();
+					fieldinfo.efproxiesname = pgetter.EntityFactoryProxies();
+					fieldinfo.gftypesname = pgetter.GenericFieldTypes();
 					m_dynfieldsinfo.put(methodname.substring(3), fieldinfo);
 					
 				}
-				if (elem.getAnnotationsByType(NonVolatileSetter.class).length == 1) {
+				if (null != elem.getAnnotation(NonVolatileSetter.class)) {
 					if (!elem.getModifiers().contains(Modifier.ABSTRACT)) {
 						throw new AnnotationProcessingException(elem,
 								"%s annotated with NonVolatileSetter is not abstract.", methodname);
