@@ -186,11 +186,6 @@
           <artifactId>maven-shade-plugin</artifactId>
           <version>1.4</version>
         </plugin>
-        <plugin>
-          <groupId>org.bsc.maven</groupId>
-          <artifactId>maven-processor-plugin</artifactId>
-          <version>2.2.4</version>
-        </plugin>
 
       </plugins>
     </pluginManagement>

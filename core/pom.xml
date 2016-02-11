@@ -183,9 +183,9 @@
               <aggregate>true</aggregate>
               <show>public</show>
               <nohelp>true</nohelp>
-              <header>Mnenomic, ${project.version}</header>
-              <footer>Mnenomic, ${project.version}</footer>
-              <doctitle>Mnenomic, ${project.version}</doctitle>
+              <header>Mnenomic-core, ${project.version}</header>
+              <footer>Mnenomic-core, ${project.version}</footer>
+              <doctitle>Mnenomic-core, ${project.version}</doctitle>
               <links>
                 <link>http://static.springsource.org/spring/docs/3.0.x/javadoc-api/</link>
                 <additionalparam>-Xdoclint:all -Xdoclint:-missing</additionalparam>
