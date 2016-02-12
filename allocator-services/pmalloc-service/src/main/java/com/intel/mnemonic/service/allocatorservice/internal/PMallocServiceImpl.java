@@ -14,6 +14,10 @@ public class PMallocServiceImpl implements NonVolatileMemoryAllocatorService {
         }
     }
 
+    public String getServiceId() {
+        return "pmalloc";
+    }
+    
     public long init(long capacity, String uri, boolean isnew) {
         return ninit(capacity, uri, isnew);
     }

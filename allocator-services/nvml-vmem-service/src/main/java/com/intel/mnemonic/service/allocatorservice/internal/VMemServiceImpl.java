@@ -14,6 +14,10 @@ public class VMemServiceImpl implements VolatileMemoryAllocatorService {
         }
     }
 
+    public String getServiceId() {
+        return "vmem";
+    }
+    
     public long init(long capacity, String uri, boolean isnew) {
         return ninit(capacity, uri, isnew);
     }
