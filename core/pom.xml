@@ -48,6 +48,10 @@
         <artifactId>maven-compiler-plugin</artifactId>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+      </plugin>
+      <plugin>
         <groupId>org.bsc.maven</groupId>
         <artifactId>maven-processor-plugin</artifactId>
         <executions>
@@ -140,6 +144,7 @@
             <configuration>
               <transformers>
               </transformers>
+              <minimizeJar>true</minimizeJar>
             </configuration>
           </execution>
         </executions>
