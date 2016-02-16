@@ -5,6 +5,7 @@ import java.util.Random;
 
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import com.intel.bigdatamem.Utils;
 
 /**
  *
@@ -16,7 +17,7 @@ public class BigDataPMemAllocatorNGTest {
 	@Test
 	public void testPMemByteBuffer() {
 		Random randomGenerator = new Random();
-		BigDataPMemAllocator act = new BigDataPMemAllocator(1024 * 1024 * 1024, "./pmtest.dat", true);
+		BigDataPMemAllocator act = new BigDataPMemAllocator(Utils.getNonVolatileMemoryAllocatorService("pmalloc"), 1024 * 1024 * 1024, "./pmtest.dat", true);
 		act.setBufferReclaimer(new Reclaim<ByteBuffer>() {
 			@Override
 			public boolean reclaim(ByteBuffer mres, Long sz) {
@@ -47,7 +48,7 @@ public class BigDataPMemAllocatorNGTest {
 	
 	@Test
 	public void testGetBufferAddress() {
-		BigDataPMemAllocator act = new BigDataPMemAllocator(1024 * 1024 * 1024, "./pmtest_buffer.dat", true);
+                BigDataPMemAllocator act = new BigDataPMemAllocator(Utils.getNonVolatileMemoryAllocatorService("pmalloc"), 1024 * 1024 * 1024, "./pmtest_buffer.dat", true);
 		MemBufferHolder<BigDataPMemAllocator> mbh;
 		mbh = act.createBuffer(20000);
 		long phandler = act.getBufferHandler(mbh);
@@ -58,7 +59,7 @@ public class BigDataPMemAllocatorNGTest {
 	@Test
 	public void testGenPMemByteBufferWithKey() {
 		Random randomGenerator = Utils.createRandom();
-		BigDataPMemAllocator act = new BigDataPMemAllocator(1024 * 1024 * 1024, "./pmtest_key.dat", true);
+		BigDataPMemAllocator act = new BigDataPMemAllocator(Utils.getNonVolatileMemoryAllocatorService("pmalloc"), 1024 * 1024 * 1024, "./pmtest_key.dat", true);
 		act.setBufferReclaimer(new Reclaim<ByteBuffer>() {
 			@Override
 			public boolean reclaim(ByteBuffer mres, Long sz) {
@@ -71,7 +72,7 @@ public class BigDataPMemAllocatorNGTest {
 		});
 		MemBufferHolder<BigDataPMemAllocator> mbh;
 		Long phandler;
-		long keycount = act.persistKeyCapacity();
+		long keycount = act.handlerCapacity();
 		for (int idx = 0; idx < keycount; ++idx) {
 			int size = randomGenerator.nextInt(1024 * 1024) + 1024 * 1024;
 			mbh = act.createBuffer(size);
@@ -87,7 +88,7 @@ public class BigDataPMemAllocatorNGTest {
 							.capacity() ? "Correct" : "Failed!!!"));
 			phandler = act.getBufferHandler(mbh);
 			System.out.println(String.format("---- 0x%X", phandler));
-			act.setPersistKey(idx, phandler);
+			act.setHandler(idx, phandler);
 			mbh.cancelAutoReclaim();
 		}
 		act.close();
@@ -95,7 +96,7 @@ public class BigDataPMemAllocatorNGTest {
 	
 	@Test(dependsOnMethods = {"testGenPMemByteBufferWithKey"})
 	public void testCheckPMemByteBufferWithKey() {
-		BigDataPMemAllocator act = new BigDataPMemAllocator(1024 * 1024 * 1024, "./pmtest_key.dat", true);
+                BigDataPMemAllocator act = new BigDataPMemAllocator(Utils.getNonVolatileMemoryAllocatorService("pmalloc"), 1024 * 1024 * 1024, "./pmtest_key.dat", true);
 		act.setBufferReclaimer(new Reclaim<ByteBuffer>() {
 			@Override
 			public boolean reclaim(ByteBuffer mres, Long sz) {
@@ -107,8 +108,8 @@ public class BigDataPMemAllocatorNGTest {
 			}
 		});
 		MemBufferHolder<BigDataPMemAllocator> mbh;
-		for (int idx = 0; idx < act.persistKeyCapacity(); ++idx) {
-			long phandler = act.getPersistKey(idx);
+		for (int idx = 0; idx < act.handlerCapacity(); ++idx) {
+			long phandler = act.getHandler(idx);
 			mbh = act.retrieveBuffer(phandler);
 			Assert.assertNotNull(mbh);
 			int val = mbh.get().getInt();

@@ -7,6 +7,7 @@ import org.testng.annotations.Test;
 import com.intel.bigdatamem.BigDataMemAllocator;
 import com.intel.bigdatamem.ByteBufferSerializer;
 import com.intel.bigdatamem.MemBufferHolder;
+import com.intel.bigdatamem.Utils;
 
 import java.nio.ByteBuffer;
 import java.util.Random;
@@ -45,7 +46,7 @@ public class ByteBufferSerializerNGTest {
 	@Test
 	public void testToFromMemBufferHolder() throws IOException,
 			ClassNotFoundException {
-		BigDataMemAllocator act = new BigDataMemAllocator(1024 * 1024 * 1024, ".", true);
+                BigDataMemAllocator act = new BigDataMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"), 1024 * 1024 * 1024, ".", true);
 
 		Random randomGenerator = new Random();
 		for (int idx = 0; idx < 100; idx++) {

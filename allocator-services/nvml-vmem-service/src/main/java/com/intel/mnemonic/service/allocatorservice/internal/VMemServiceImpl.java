@@ -14,49 +14,52 @@ public class VMemServiceImpl implements VolatileMemoryAllocatorService {
         }
     }
 
+    @Override
     public String getServiceId() {
         return "vmem";
     }
-    
+
+    @Override
     public long init(long capacity, String uri, boolean isnew) {
         return ninit(capacity, uri, isnew);
     }
 
-
+    @Override
     public void close(long id) {
         nclose(id);
     }
 
-
+    @Override
     public void sync(long id) {
         nsync(id);
     }
 
-
+    @Override
     public long allocate(long id, long size, boolean initzero) {
         return nallocate(id, size, initzero);
     }
 
-
+    @Override
     public long reallocate(long id, long address, long size, boolean initzero) {
         return nreallocate(id, address, size, initzero);
     }
 
-
+    @Override
     public void free(long id, long address) {
         nfree(id, address);
     }
 
-
+    @Override
     public ByteBuffer createByteBuffer(long id, long size) {
         return ncreateByteBuffer(id, size);
     }
 
-
+    @Override
     public  ByteBuffer resizeByteBuffer(long id, ByteBuffer bytebuf, long size) {
         return nresizeByteBuffer(id, bytebuf, size);
     }
 
+    @Override
     public void destroyByteBuffer(long id, ByteBuffer bytebuf) {
         ndestroyByteBuffer(id, bytebuf);
     }

@@ -8,6 +8,11 @@ import java.util.Random;
 import java.util.UUID;
 
 import sun.misc.Unsafe;
+import java.util.Iterator;
+import java.util.ServiceConfigurationError;
+import java.util.ServiceLoader;
+import com.intel.mnemonic.service.allocatorservice.VolatileMemoryAllocatorService;
+import com.intel.mnemonic.service.allocatorservice.NonVolatileMemoryAllocatorService;
 
 /**
  * <p>
@@ -30,8 +35,50 @@ public class Utils {
 	public static final String ANSI_CYAN = "\u001B[36m";
 	public static final String ANSI_WHITE = "\u001B[37m";
 	
-	private static Unsafe m_unsafe;
-	
+	private static Unsafe m_unsafe = null;
+
+        private static ServiceLoader<VolatileMemoryAllocatorService> m_vmasvcloader = null;
+        private static ServiceLoader<NonVolatileMemoryAllocatorService> m_nvmasvcloader = null;
+
+        public static VolatileMemoryAllocatorService getVolatileMemoryAllocatorService(String id) {
+            return getVolatileMemoryAllocatorService(id, true);
+        }
+    
+        public static VolatileMemoryAllocatorService getVolatileMemoryAllocatorService(String id, boolean allownvmsvc) {
+            VolatileMemoryAllocatorService ret = null;
+            if (null == m_vmasvcloader) {
+                m_vmasvcloader = ServiceLoader.load(VolatileMemoryAllocatorService.class);
+            }
+            Iterator<VolatileMemoryAllocatorService> svcit = m_vmasvcloader.iterator();
+            VolatileMemoryAllocatorService svc = null;
+            while (null == ret && svcit.hasNext()) {
+                svc = svcit.next();
+                if (svc.getServiceId().equals(id)) {
+                    ret = svc;
+                }
+            }
+            if (null == ret && allownvmsvc) {
+                ret = getNonVolatileMemoryAllocatorService(id);
+            }
+            return ret;
+        }
+
+        public static NonVolatileMemoryAllocatorService getNonVolatileMemoryAllocatorService(String id) {
+            NonVolatileMemoryAllocatorService ret = null;
+            if (null == m_nvmasvcloader) {
+                m_nvmasvcloader = ServiceLoader.load(NonVolatileMemoryAllocatorService.class);
+            }
+            Iterator<NonVolatileMemoryAllocatorService> svcit = m_nvmasvcloader.iterator();
+            NonVolatileMemoryAllocatorService svc = null;
+            while (null == ret && svcit.hasNext()) {
+                svc = svcit.next();
+                if (svc.getServiceId().equals(id)) {
+                    ret = svc;
+                }
+            }
+            return ret;
+        }
+
 	/**
 	 * Generates a unique name that contains current timestamp.
 	 * 
@@ -144,5 +191,6 @@ public class Utils {
 	    }
 	    return ret;
 	}
+
 
 }

@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 
 import org.flowcomputing.commons.resgc.*;
 import org.flowcomputing.commons.primitives.*;
+import com.intel.mnemonic.service.allocatorservice.VolatileMemoryAllocatorService;
 
 /**
  * manage a big native memory pool through libvmem.so provied by Intel nvml library.
@@ -11,17 +12,11 @@ import org.flowcomputing.commons.primitives.*;
  *
  */
 public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
-	static {
-		try {
-			NativeLibraryLoader.loadFromJar("bigdatamem");
-		} catch (Exception e) {
-			System.exit(-1);
-		}
-	}
 
 	private boolean m_activegc = true;
 	private long m_gctimeout = 100;
 	private long m_nid = -1;
+        private VolatileMemoryAllocatorService m_vmasvc = null;
 
 	/**
 	 * Constructor, it initialize and allocate a memory pool from specified uri
@@ -37,8 +32,11 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
 	 * @param isnew
 	 *            a place holder, always specify it as true
 	 */
-	public BigDataMemAllocator(long capacity, String uri, boolean isnew) {
-		m_nid = ninit(capacity, uri, isnew);
+         public BigDataMemAllocator(VolatileMemoryAllocatorService vmasvc, long capacity, String uri, boolean isnew) {
+                assert null != vmasvc : "VolatileMemoryAllocatorService object is null";
+                
+                m_vmasvc = vmasvc;
+		m_nid = vmasvc.init(capacity, uri, isnew);
 		
 		/**
 		 * create a resource collector to release specified bytebuffer that backed
@@ -53,7 +51,7 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
 							cb_reclaimed = m_bufferreclaimer.reclaim(mres, Long.valueOf(mres.capacity()));
 						}
 						if (!cb_reclaimed) {
-							ndestroyByteBuffer(m_nid, mres);
+							m_vmasvc.destroyByteBuffer(m_nid, mres);
 							mres = null;
 						}
 					}
@@ -73,7 +71,7 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
 							cb_reclaimed = m_chunkreclaimer.reclaim(mres, null);
 						}
 						if (!cb_reclaimed) {
-							nfree(m_nid, mres);
+							m_vmasvc.free(m_nid, mres);
 							mres = null;
 						}
 					}
@@ -105,21 +103,6 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
 	}
 
 	/**
-	 * Initialize a memory pool through native interface backed by native
-	 * library.
-	 * 
-	 * @param capacity
-	 *            the capacity of memory pool
-	 * 
-	 * @param uri
-	 *            the location of memory pool will be created
-	 * 
-	 * @param isnew
-	 *            a place holder, always specify it as true
-	 */
-	protected native long ninit(long capacity, String uri, boolean isnew);
-
-	/**
 	 * Release the memory pool and close it.
 	 */
 	@Override
@@ -128,110 +111,12 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
 	}
 
 	/**
-	 * close the memory pool through native interface.
-	 * 
-	 */
-	protected native void nclose(long id);
-
-	/**
 	 * force to synchronize uncommitted data to backed memory pool
 	 * (placeholder).
 	 */
 	@Override
 	public void sync() {
 	}
-
-	/**
-	 * force to synchronize uncommitted data to backed memory pool through
-	 * native interface.
-	 */
-	protected native void nsync(long id);
-
-	/**
-	 * allocate specified size of memory block from backed memory pool.
-	 * 
-	 * @param id
-	 *            the identifier of backed memory pool
-	 * 
-	 * @param size
-	 *            specify size of memory block to be allocated
-	 * 
-	 * @return the address of allocated memory block from native memory pool
-	 */
-	protected native long nallocate(long id, long size, boolean initzero);
-
-	/**
-	 * reallocate a specified size of memory block from backed memory pool.
-	 * 
-	 * @param id
-	 *            the identifier of backed memory pool
-	 * 
-	 * @param address
-	 *            the address of previous allocated memory block. it can be
-	 *            null.
-	 * 
-	 * @param size
-	 *            specify new size of memory block to be reallocated
-	 * 
-	 * @return the address of reallocated memory block from native memory pool
-	 */
-	protected native long nreallocate(long id, long address, long size, boolean initzero);
-
-	/**
-	 * free a memory block by specify its address into backed memory pool.
-	 * 
-	 * @param id
-	 *            the identifier of backed memory pool
-	 * 
-	 * @param address
-	 *            the address of allocated memory block.
-	 */
-	protected native void nfree(long id, long address);
-
-	/**
-	 * create a ByteBuffer object which backed buffer is coming from backed
-	 * native memory pool.
-	 * 
-	 * @param id
-	 *            the identifier of backed memory pool
-	 * 
-	 * @param size
-	 *            the size of backed buffer that is managed by created
-	 *            ByteBuffer object.
-	 * 
-	 * @return a created ByteBuffer object with a backed native memory block
-	 */
-	protected native ByteBuffer ncreateByteBuffer(long id, long size);
-
-	/**
-	 * resize a ByteBuffer object which backed buffer is coming from backed
-	 * native memory pool.
-	 * NOTE: the ByteBuffer object will be renewed and lost metadata e.g. position, mark and etc.
-	 * 
-	 * @param id
-	 *            the identifier of backed memory pool
-	 * 
-	 * @param bytebuf
-	 *            the specified ByteBuffer object to be destroyed
-	 *            
-	 * @param size
-	 *            the new size of backed buffer that is managed by created
-	 *            ByteBuffer object.
-	 * 
-	 * @return a created ByteBuffer object with a backed native memory block
-	 */
-	protected native ByteBuffer nresizeByteBuffer(long id, ByteBuffer bytebuf, long size);
-	
-	/**
-	 * destroy a native memory block backed ByteBuffer object.
-	 * 
-	 * @param id
-	 *            the identifier of backed memory pool
-	 * 
-	 * @param bytebuf
-	 *            the specified ByteBuffer object to be destroyed
-	 */
-	protected native void ndestroyByteBuffer(long id, ByteBuffer bytebuf);
 
 	/**
 	 * reallocate a specified size of memory block from backed memory pool.
@@ -250,10 +135,10 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
 		MemChunkHolder<BigDataMemAllocator> ret = null;
 		boolean ac = null != mholder.getRefId();
 		if (size > 0) {
-			Long addr = nreallocate(m_nid, mholder.get(), size, true);
+			Long addr = m_vmasvc.reallocate(m_nid, mholder.get(), size, true);
 			if (0 == addr && m_activegc) {
 				forceGC();
-				addr = nreallocate(m_nid, mholder.get(), size, true);
+				addr = m_vmasvc.reallocate(m_nid, mholder.get(), size, true);
 			}
 			if (0 != addr) {
 				mholder.clear();
@@ -274,10 +159,10 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
 		if (size > 0) {
 			int bufpos = mholder.get().position();
 			int buflimit = mholder.get().limit();
-			ByteBuffer buf = nresizeByteBuffer(m_nid, mholder.get(), size);
+			ByteBuffer buf = m_vmasvc.resizeByteBuffer(m_nid, mholder.get(), size);
 			if (null == buf && m_activegc) {
 				forceGC();
-				buf = nresizeByteBuffer(m_nid, mholder.get(), size);
+				buf = m_vmasvc.resizeByteBuffer(m_nid, mholder.get(), size);
 			}
 			if (null != buf) {
 				mholder.clear();
@@ -305,10 +190,10 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
 	@Override
 	public MemChunkHolder<BigDataMemAllocator> createChunk(long size, boolean autoreclaim) {
 		MemChunkHolder<BigDataMemAllocator> ret = null;
-		Long addr = nallocate(m_nid, size, true);
+		Long addr = m_vmasvc.allocate(m_nid, size, true);
 		if (0 == addr && m_activegc) {
 			forceGC();
-			addr = nallocate(m_nid, size, true);
+			addr = m_vmasvc.allocate(m_nid, size, true);
 		}
 		if (0 != addr) {
 			ret = new MemChunkHolder<BigDataMemAllocator>(this, addr, size);
@@ -332,10 +217,10 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
 	@Override
 	public MemBufferHolder<BigDataMemAllocator> createBuffer(long size, boolean autoreclaim) {
 		MemBufferHolder<BigDataMemAllocator> ret = null;
-		ByteBuffer bb = ncreateByteBuffer(m_nid, size);
+		ByteBuffer bb = m_vmasvc.createByteBuffer(m_nid, size);
 		if (null == bb && m_activegc) {
 			forceGC();
-			bb = ncreateByteBuffer(m_nid, size);
+			bb = m_vmasvc.createByteBuffer(m_nid, size);
 		}
 		if (null != bb) {
 			ret = new MemBufferHolder<BigDataMemAllocator>(this, bb);

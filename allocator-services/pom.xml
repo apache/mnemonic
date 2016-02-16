@@ -104,6 +104,11 @@
       <version>${mnemonic.core.version}</version>
       <scope>compile</scope>
     </dependency>
+    <dependency>
+      <groupId>org.flowcomputing.commons</groupId>
+      <artifactId>commons-primitives</artifactId>
+      <version>0.6.0</version>
+    </dependency>
   </dependencies>
 
   <dependencyManagement>

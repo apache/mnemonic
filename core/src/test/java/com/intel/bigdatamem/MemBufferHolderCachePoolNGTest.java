@@ -11,6 +11,7 @@ import com.intel.bigdatamem.DropEvent;
 import com.intel.bigdatamem.MemBufferHolder;
 import com.intel.bigdatamem.MemBufferHolderCachePool;
 import com.intel.bigdatamem.MemClustering;
+import com.intel.bigdatamem.Utils;
 
 import java.util.Random;
 
@@ -33,7 +34,7 @@ public class MemBufferHolderCachePoolNGTest {
 		Random randomGenerator = new Random();
 		MemClustering.NodeConfig<?> ncs[] = new MemClustering.NodeConfig<?>[] { 
 			new MemClustering.NodeConfig<BigDataMemAllocator>(
-				new BigDataMemAllocator(1024 * 1024 * 200, ".", true)
+                                new BigDataMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"), 1024 * 1024 * 200, ".", true)
 						.disableActiveGC(),
 				MemClustering.PerformanceLevel.FAST),
 		// new MemClustering.NodeConfig(new BigMemAllocator(1024*1024*20, ".",
@@ -96,7 +97,7 @@ public class MemBufferHolderCachePoolNGTest {
 		Random randomGenerator = new Random();
 		MemClustering.NodeConfig<?> ncs[] = new MemClustering.NodeConfig<?>[] { 
 			new MemClustering.NodeConfig<BigDataMemAllocator>(
-				new BigDataMemAllocator(1024 * 1024 * 200, ".", true)
+                                new BigDataMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"), 1024 * 1024 * 200, ".", true)
 						.disableActiveGC(),
 				MemClustering.PerformanceLevel.FAST),
 		// new MemClustering.NodeConfig(new BigMemAllocator(1024*1024*20, ".",

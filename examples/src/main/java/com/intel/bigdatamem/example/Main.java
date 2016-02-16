@@ -42,6 +42,7 @@ public class Main {
 				// true).disableActiveGC(),
 				// MemClustering.PerformanceLevel.NORMAL),
 				new MemClustering.NodeConfig(new BigDataMemAllocator(
+                                                Utils.getVolatileMemoryAllocatorService("vmem"),
 						1024 * 1024 * 20, ".", true),
 						MemClustering.PerformanceLevel.SLOW), 
 				};

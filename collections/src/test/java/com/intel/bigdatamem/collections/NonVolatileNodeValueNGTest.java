@@ -34,8 +34,8 @@ public class NonVolatileNodeValueNGTest {
 	@BeforeClass
 	public void setUp() {
 		m_rand = Utils.createRandom();
-		m_act = new BigDataPMemAllocator(1024 * 1024 * 1024, "./pobj_NodeValue.dat", true);
-		KEYCAPACITY = m_act.persistKeyCapacity();
+		m_act = new BigDataPMemAllocator(Utils.getNonVolatileMemoryAllocatorService("pmalloc"), 1024 * 1024 * 1024, "./pobj_NodeValue.dat", true);
+		KEYCAPACITY = m_act.handlerCapacity();
 		m_act.setBufferReclaimer(new Reclaim<ByteBuffer>() {
 			@Override
 			public boolean reclaim(ByteBuffer mres, Long sz) {
@@ -54,7 +54,7 @@ public class NonVolatileNodeValueNGTest {
 		});
 		
 		for (long i = 0; i < KEYCAPACITY; ++i) {
-			m_act.setPersistKey(i, 0L);
+			m_act.setHandler(i, 0L);
 		}
 	}
 	
@@ -232,9 +232,9 @@ public class NonVolatileNodeValueNGTest {
 			pre_nextnv = nextnv;
 			System.out.printf(" generated an item... \n");
 		}
-		m_act.setPersistKey(slotKeyId, linkhandler);
+		m_act.setHandler(slotKeyId, linkhandler);
 		
-		long handler = m_act.getPersistKey(slotKeyId);
+		long handler = m_act.getHandler(slotKeyId);
 		
 		NonVolatileNodeValue<NonVolatileNodeValue<Double>> linkedvals = NonVolatileNodeValueFactory.restore(m_act, linkedefproxies, linkedgftypes, handler, false);
 		Iterator<NonVolatileNodeValue<Double>> iter = linkedvals.iterator();

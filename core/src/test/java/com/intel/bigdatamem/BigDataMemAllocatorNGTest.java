@@ -7,6 +7,7 @@ import com.intel.bigdatamem.Allocator;
 import com.intel.bigdatamem.BigDataMemAllocator;
 import com.intel.bigdatamem.MemBufferHolder;
 import com.intel.bigdatamem.MemChunkHolder;
+import com.intel.bigdatamem.Utils;
 
 import java.util.Random;
 
@@ -22,7 +23,7 @@ public class BigDataMemAllocatorNGTest {
 	@Test
 	public void testMemByteBuffer() {
 		Random randomGenerator = new Random();
-		Allocator<BigDataMemAllocator> act = new BigDataMemAllocator(1024 * 1024 * 1024, ".", true);
+		Allocator<BigDataMemAllocator> act = new BigDataMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"), 1024 * 1024 * 1024, ".", true);
 		MemBufferHolder<?> mbh;
 		for (int idx = 1; idx <= 5; ++idx) {
 			int size = randomGenerator.nextInt(1024 * 1024) + 1024 * 1024;
@@ -44,7 +45,7 @@ public class BigDataMemAllocatorNGTest {
 	@Test
 	public void testMemChunk() {
 		Random randomGenerator = new Random();
-		Allocator<BigDataMemAllocator> act = new BigDataMemAllocator(1024 * 1024 * 1024, ".", true);
+		Allocator<BigDataMemAllocator> act = new BigDataMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"), 1024 * 1024 * 1024, ".", true);
 		MemChunkHolder<?> mch;
 		for (int idx = 1; idx <= 5; ++idx) {
 			int size = randomGenerator.nextInt(1024 * 1024) + 1024 * 1024;

@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 
 import org.flowcomputing.commons.resgc.*;
 import org.flowcomputing.commons.primitives.*;
+import com.intel.mnemonic.service.allocatorservice.NonVolatileMemoryAllocatorService;
 
 /**
  * manage a big native persistent memory pool through libvmem.so provied by Intel nvml library.
@@ -11,18 +12,12 @@ import org.flowcomputing.commons.primitives.*;
  *
  */
 public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllocator> implements PMAddressTranslator{
-	static {
-		try {
-			NativeLibraryLoader.loadFromJar("bigdatapmem");
-		} catch (Exception e) {
-			System.exit(-1);
-		}
-	}
 
 	private boolean m_activegc = true;
 	private long m_gctimeout = 100;
 	private long m_nid = -1;
 	private long b_addr = 0;
+        private NonVolatileMemoryAllocatorService m_nvmasvc = null;
 
 	/**
 	 * Constructor, it initialize and allocate a memory pool from specified uri
@@ -38,9 +33,12 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 	 * @param isnew
 	 *            a place holder, always specify it as true
 	 */
-	public BigDataPMemAllocator(long capacity, String uri, boolean isnew) {
-		m_nid = ninit(capacity, uri, isnew);
-		b_addr = ngetBaseAddress(m_nid);
+         public BigDataPMemAllocator(NonVolatileMemoryAllocatorService nvmasvc, long capacity, String uri, boolean isnew) {
+                assert null != nvmasvc : "NonVolatileMemoryAllocatorService object is null";
+                m_nvmasvc = nvmasvc;
+             
+		m_nid = m_nvmasvc.init(capacity, uri, isnew);
+		b_addr = m_nvmasvc.getBaseAddress(m_nid);
 		
 		/**
 		 * create a resource collector to release specified chunk that backed by
@@ -55,7 +53,7 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 							cb_reclaimed = m_chunkreclaimer.reclaim(mres, null);
 						}
 						if (!cb_reclaimed) {
-							nfree(m_nid, mres);
+							m_nvmasvc.free(m_nid, mres);
 							mres = null;
 						}
 					}
@@ -74,7 +72,7 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 								cb_reclaimed = m_bufferreclaimer.reclaim(mres, Long.valueOf(mres.capacity()));
 							}
 							if (!cb_reclaimed) {
-								ndestroyByteBuffer(m_nid, mres);
+								m_nvmasvc.destroyByteBuffer(m_nid, mres);
 								mres = null;
 							}
 						}
@@ -106,35 +104,14 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 	}
 
 	/**
-	 * Initialize a memory pool through native interface backed by native
-	 * library.
-	 * 
-	 * @param capacity
-	 *            the capacity of memory pool
-	 * 
-	 * @param uri
-	 *            the location of memory pool will be created
-	 * 
-	 * @param isnew
-	 *            a place holder, always specify it as true
-	 */
-	protected native long ninit(long capacity, String uri, boolean isnew);
-
-	/**
 	 * Release the memory pool and close it.
 	 */
 	@Override
 	public void close() {
 		forceGC();
 		super.close();
-		nclose(m_nid);
+		m_nvmasvc.close(m_nid);
 	}
-
-	/**
-	 * close the memory pool through native interface.
-	 * 
-	 */
-	protected native void nclose(long id);
 
 	/**
 	 * force to synchronize uncommitted data to backed memory pool
@@ -143,163 +120,6 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 	@Override
 	public void sync() {
 	}
-
-	/**
-	 * force to synchronize uncommitted data to backed memory pool through
-	 * native interface.
-	 */
-	protected native void nsync(long id);
-
-	/**
-	 * allocate specified size of memory block from backed memory pool.
-	 * 
-	 * @param id
-	 *            the identifier of backed memory pool
-	 * 
-	 * @param size
-	 *            specify size of memory block to be allocated
-	 * 
-	 * @return the address of allocated memory block from native memory pool
-	 */
-	protected native long nallocate(long id, long size, boolean initzero);
-
-	/**
-	 * reallocate a specified size of memory block from backed memory pool.
-	 * 
-	 * @param id
-	 *            the identifier of backed memory pool
-	 * 
-	 * @param address
-	 *            the address of previous allocated memory block. it can be
-	 *            null.
-	 * 
-	 * @param size
-	 *            specify new size of memory block to be reallocated
-	 * 
-	 * @return the address of reallocated memory block from native memory pool
-	 */
-	protected native long nreallocate(long id, long address, long size, boolean initzero);
-
-	/**
-	 * free a memory block by specify its address into backed memory pool.
-	 * 
-	 * @param id
-	 *            the identifier of backed memory pool
-	 * 
-	 * @param address
-	 *            the address of allocated memory block.
-	 */
-	protected native void nfree(long id, long address);
-
-	/**
-	 * create a ByteBuffer object which backed buffer is coming from backed
-	 * native memory pool.
-	 * 
-	 * @param id
-	 *            the identifier of backed memory pool
-	 * 
-	 * @param size
-	 *            the size of backed buffer that is managed by created
-	 *            ByteBuffer object.
-	 * 
-	 * @return a created ByteBuffer object with a backed native memory block
-	 */
-	protected native ByteBuffer ncreateByteBuffer(long id, long size);
-	
-	/**
-	 * retrieve a persistent ByteBuffer object which backed buffer is coming from backed
-	 * native memory pool.
-	 * 
-	 * @param id
-	 *            the identifier of backed memory pool
-	 * 
-	 * @param eaddr
-	 *            the effective address of persistent
-	 *            ByteBuffer object.
-	 * 
-	 * @return a created ByteBuffer object with a backed native memory block
-	 */
-	protected native ByteBuffer nretrieveByteBuffer(long id, long eaddr);
-
-	protected native long nretrieveSize(long id, long eaddr);
-	
-	protected native long ngetByteBufferAddress(long id, ByteBuffer buf);
-	/**
-	 * resize a ByteBuffer object which backed buffer is coming from backed
-	 * native memory pool.
-	 * NOTE: the ByteBuffer object will be renewed and lost metadata e.g. position, mark and etc.
-	 * 
-	 * @param id
-	 *            the identifier of backed memory pool
-	 * 
-	 * @param bytebuf
-	 *            the specified ByteBuffer object to be destroyed
-	 *            
-	 * @param size
-	 *            the new size of backed buffer that is managed by created
-	 *            ByteBuffer object.
-	 * 
-	 * @return a created ByteBuffer object with a backed native memory block
-	 */
-	protected native ByteBuffer nresizeByteBuffer(long id, ByteBuffer bytebuf, long size);
-	
-	/**
-	 * destroy a native memory block backed ByteBuffer object.
-	 * 
-	 * @param id
-	 *            the identifier of backed memory pool
-	 * 
-	 * @param bytebuf
-	 *            the specified ByteBuffer object to be destroyed
-	 */
-	protected native void ndestroyByteBuffer(long id, ByteBuffer bytebuf);
-	
-	/**
-	 * set a persistent key value.
-	 * 
-	 * @param id
-	 *            the identifier of backed memory pool
-	 * 
-	 * @param key
-	 *            the key to set its value
-	 *            
-	 * @param value
-	 *            the value 
-	 */
-	protected native void nsetPersistKey(long id, long key, long value);
-	
-	/**
-	 * get a persistent key's value.
-	 * 
-	 * @param id
-	 *            the identifier of backed memory pool
-	 * 
-	 * @param key
-	 *            the key to set its value
-	 *            
-	 * @return the value of the specified key
-	 */
-	protected native long ngetPersistKey(long id, long key);
-	
-	/**
-	 * return the number of available keys to use.
-	 * 
-	 * @param id
-	 *            the identifier of backed memory pool
-	 *            
-	 * @return the number of keys
-	 */
-	protected native long npersistKeyCapacity(long id);
-		
-	/**
-	 * return the base address of this persistent memory pool.
-	 * 
-	 * @param id
-	 *            the identifier of backed memory pool
-	 *            
-	 * @return the base address of this pmem pool
-	 */
-	protected native long ngetBaseAddress(long id);
 
 	/**
 	 * reallocate a specified size of memory block from backed memory pool.
@@ -318,10 +138,10 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 		MemChunkHolder<BigDataPMemAllocator> ret = null;
 		boolean ac = null != mholder.getRefId();
 		if (size > 0) {
-			Long addr = nreallocate(m_nid, mholder.get(), size, true);
+			Long addr = m_nvmasvc.reallocate(m_nid, mholder.get(), size, true);
 			if (0 == addr && m_activegc) {
 				forceGC();
-				addr = nreallocate(m_nid, mholder.get(), size, true);
+				addr = m_nvmasvc.reallocate(m_nid, mholder.get(), size, true);
 			}
 			if (0 != addr) {
 				mholder.clear();
@@ -342,10 +162,10 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 		if (size > 0) {
 			int bufpos = mholder.get().position();
 			int buflimit = mholder.get().limit();
-			ByteBuffer buf = nresizeByteBuffer(m_nid, mholder.get(), size);
+			ByteBuffer buf = m_nvmasvc.resizeByteBuffer(m_nid, mholder.get(), size);
 			if (null == buf && m_activegc) {
 				forceGC();
-				buf = nresizeByteBuffer(m_nid, mholder.get(), size);
+				buf = m_nvmasvc.resizeByteBuffer(m_nid, mholder.get(), size);
 			}
 			if (null != buf) {
 				mholder.clear();
@@ -373,10 +193,10 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 	@Override
 	public MemChunkHolder<BigDataPMemAllocator> createChunk(long size, boolean autoreclaim) {
 		MemChunkHolder<BigDataPMemAllocator> ret = null;
-		Long addr = nallocate(m_nid, size, true);
+		Long addr = m_nvmasvc.allocate(m_nid, size, true);
 		if ((null == addr || 0 == addr) && m_activegc) {
 			forceGC();
-			addr = nallocate(m_nid, size, true);
+			addr = m_nvmasvc.allocate(m_nid, size, true);
 		}
 		if (null != addr && 0 != addr) {
 			ret = new MemChunkHolder<BigDataPMemAllocator>(this, addr, size);
@@ -400,10 +220,10 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 	@Override
 	public MemBufferHolder<BigDataPMemAllocator> createBuffer(long size, boolean autoreclaim) {
 		MemBufferHolder<BigDataPMemAllocator> ret = null;
-		ByteBuffer bb = ncreateByteBuffer(m_nid, size);
+		ByteBuffer bb = m_nvmasvc.createByteBuffer(m_nid, size);
 		if (null == bb && m_activegc) {
 			forceGC();
-			bb = ncreateByteBuffer(m_nid, size);
+			bb = m_nvmasvc.createByteBuffer(m_nid, size);
 		}
 		if (null != bb) {
 			ret = new MemBufferHolder<BigDataPMemAllocator>(this, bb);
@@ -418,7 +238,7 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 	@Override
 	public MemBufferHolder<BigDataPMemAllocator> retrieveBuffer(long phandler, boolean autoreclaim) {
 		MemBufferHolder<BigDataPMemAllocator> ret = null;
-		ByteBuffer bb = nretrieveByteBuffer(m_nid, getEffectiveAddress(phandler));
+		ByteBuffer bb = m_nvmasvc.retrieveByteBuffer(m_nid, getEffectiveAddress(phandler));
 		if (null != bb) {
 			ret = new MemBufferHolder<BigDataPMemAllocator>(this, bb);
 			if (autoreclaim) {
@@ -432,7 +252,7 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 	public MemChunkHolder<BigDataPMemAllocator>  retrieveChunk(long phandler, boolean autoreclaim) {
 		MemChunkHolder<BigDataPMemAllocator> ret = null;
 		long eaddr = getEffectiveAddress(phandler);
-		long sz = nretrieveSize(m_nid, eaddr);
+		long sz = m_nvmasvc.retrieveSize(m_nid, eaddr);
 		if (sz > 0L) {
 			ret = new MemChunkHolder<BigDataPMemAllocator>(this, eaddr, sz);
 			if (autoreclaim) {
@@ -444,7 +264,7 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 
 	@Override
 	public long getBufferHandler(MemBufferHolder<BigDataPMemAllocator> mbuf) {
-		return getPortableAddress(ngetByteBufferAddress(m_nid, mbuf.get()));
+		return getPortableAddress(m_nvmasvc.getByteBufferHandler(m_nid, mbuf.get()));
 	}
 
 	@Override
@@ -465,38 +285,38 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 	}
 
 	/**
-	 * set a persistent key value.
+	 * set a handler on key.
 	 * 
 	 * @param key
 	 *            the key to set its value
 	 *            
-	 * @param value
-	 *            the value 
+	 * @param handler
+	 *            the handler 
 	 */
-	public void setPersistKey(long key, long value) {		
-		nsetPersistKey(m_nid, key, value);
+	public void setHandler(long key, long handler) {
+		m_nvmasvc.setHandler(m_nid, key, handler);
 	}
 
 	/**
-	 * get a persistent key's value.
+	 * get a handler value.
 	 * 
 	 * @param key
 	 *            the key to set its value
 	 *            
-	 * @return the value of the specified key
+	 * @return the value of handler
 	 */
-	public long getPersistKey(long key) {
-		return ngetPersistKey(m_nid, key);
+	public long getHandler(long key) {
+		return m_nvmasvc.getHandler(m_nid, key);
 	}
 	
 	/**
-	 * return the number of available keys to use.
+	 * return the number of available handler keys to use.
 	 * 
-	 * @return the number of keys
+	 * @return the number of handler keys
 	 * 
 	 */
-	public long persistKeyCapacity() {
-		return npersistKeyCapacity(m_nid);
+	public long handlerCapacity() {
+		return m_nvmasvc.handlerCapacity(m_nid);
 	}
 	
 	/**

@@ -5,6 +5,7 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import com.intel.bigdatamem.Utils;
 
 import com.intel.bigdatamem.*;
 
@@ -19,8 +20,8 @@ public class NonVolatilePersonNGTest {
   @Test(expectedExceptions = { OutOfPersistentMemory.class })
   public void testGenPeople() throws OutOfPersistentMemory, RetrieveNonVolatileEntityError {
 	Random rand = Utils.createRandom();
-	BigDataPMemAllocator act = new BigDataPMemAllocator(1024 * 1024 * 8, "./pobj_person.dat", true);
-	KEYCAPACITY = act.persistKeyCapacity();
+	BigDataPMemAllocator act = new BigDataPMemAllocator(Utils.getNonVolatileMemoryAllocatorService("pmalloc"), 1024 * 1024 * 8, "./pobj_person.dat", true);
+	KEYCAPACITY = act.handlerCapacity();
 	act.setBufferReclaimer(new Reclaim<ByteBuffer>() {
 		@Override
 		public boolean reclaim(ByteBuffer mres, Long sz) {
@@ -43,7 +44,7 @@ public class NonVolatilePersonNGTest {
 	});
 	
 	for (long i = 0; i < KEYCAPACITY; ++i) {
-		act.setPersistKey(i, 0L);
+		act.setHandler(i, 0L);
 	}
 	
 	Person<Integer> mother;
@@ -60,7 +61,7 @@ public class NonVolatilePersonNGTest {
 			
 			System.out.printf("************ Generating People on Key %d ***********\n", keyidx);
 			
-			val = act.getPersistKey(keyidx);
+			val = act.getHandler(keyidx);
 			if (0L != val) {
 				PersonFactory.restore(act, val, true);
 			}
@@ -72,7 +73,7 @@ public class NonVolatilePersonNGTest {
 			person.setName(String.format("Name: [%s]", UUID.randomUUID().toString()), true);
 			person.setName(String.format("Name: [%s]", UUID.randomUUID().toString()), true);
 			
-			act.setPersistKey(keyidx, person.getNonVolatileHandler());
+			act.setHandler(keyidx, person.getNonVolatileHandler());
 			
 			for (int deep = 0; deep < rand.nextInt(100); ++deep) {
 						
@@ -94,7 +95,7 @@ public class NonVolatilePersonNGTest {
 
   @Test(dependsOnMethods = {"testGenPeople"})
   public void testCheckPeople() throws RetrieveNonVolatileEntityError {
-	BigDataPMemAllocator act = new BigDataPMemAllocator(1024 * 1024 * 8, "./pobj_person.dat", true);
+	BigDataPMemAllocator act = new BigDataPMemAllocator(Utils.getNonVolatileMemoryAllocatorService("pmalloc"), 1024 * 1024 * 8, "./pobj_person.dat", true);
 	act.setBufferReclaimer(new Reclaim<ByteBuffer>() {
 		@Override
 		public boolean reclaim(ByteBuffer mres, Long sz) {
@@ -119,7 +120,7 @@ public class NonVolatilePersonNGTest {
 	long val;
 	for (long i = 0; i < KEYCAPACITY; ++i) {
 		System.out.printf("----------Key %d--------------\n", i);
-		val = act.getPersistKey(i);
+		val = act.getHandler(i);
 		if (0L == val) {
 			break;
 		}

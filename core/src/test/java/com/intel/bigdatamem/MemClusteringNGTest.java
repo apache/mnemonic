@@ -10,6 +10,7 @@ import com.intel.bigdatamem.CommonAllocator;
 import com.intel.bigdatamem.MemBufferHolder;
 import com.intel.bigdatamem.MemClustering;
 import com.intel.bigdatamem.SysMemAllocator;
+import com.intel.bigdatamem.Utils;
 
 import java.util.Random;
 
@@ -33,13 +34,13 @@ public class MemClusteringNGTest {
 				new MemClustering.NodeConfig<SysMemAllocator>(new SysMemAllocator(
 						1024 * 1024 * 20, true).disableActiveGC(),
 						MemClustering.PerformanceLevel.FASTEST),
-				new MemClustering.NodeConfig<BigDataMemAllocator>(new BigDataMemAllocator(
+                                new MemClustering.NodeConfig<BigDataMemAllocator>(new BigDataMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"),
 						1024 * 1024 * 20, ".", true).disableActiveGC(),
 						MemClustering.PerformanceLevel.FAST),
 				// new MemClustering.NodeConfig(new
 				// BigMemAllocator(1024*1024*20, ".", true).disableActiveGC(),
 				// MemClustering.PerformanceLevel.NORMAL),
-				new MemClustering.NodeConfig<BigDataMemAllocator>(new BigDataMemAllocator(
+                                new MemClustering.NodeConfig<BigDataMemAllocator>(new BigDataMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"),
 						1024 * 1024 * 20, ".", true).disableActiveGC(),
 						MemClustering.PerformanceLevel.SLOW), };
 		MemClustering mclst = new MemClustering(ncs);
@@ -62,7 +63,7 @@ public class MemClusteringNGTest {
 	public void testMemByteBufferWithActiveGC() {
 		Random randomGenerator = new Random();
 		MemClustering.NodeConfig<?> ncs[] = new MemClustering.NodeConfig<?>[] { new MemClustering.NodeConfig<BigDataMemAllocator>(
-				new BigDataMemAllocator(1024 * 1024 * 20, ".", true),
+                                new BigDataMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"), 1024 * 1024 * 20, ".", true),
 				MemClustering.PerformanceLevel.NORMAL),
 		// new MemClustering.NodeConfig(new BigMemAllocator(1024*1024*20, ".",
 		// true), MemClustering.PerformanceLevel.SLOW),
@@ -88,12 +89,14 @@ public class MemClusteringNGTest {
 		Random randomGenerator = new Random();
 		MemClustering.NodeConfig<?> ncs[] = new MemClustering.NodeConfig<?>[] {
 				new MemClustering.NodeConfig<BigDataMemAllocator>(new BigDataMemAllocator(
+                                                Utils.getVolatileMemoryAllocatorService("vmem"),
 						1024 * 1024 * 20, ".", true).disableActiveGC(),
 						MemClustering.PerformanceLevel.FAST),
 				// new MemClustering.NodeConfig(new
 				// BigMemAllocator(1024*1024*20, ".", true).disableActiveGC(),
 				// MemClustering.PerformanceLevel.NORMAL),
 				new MemClustering.NodeConfig<BigDataMemAllocator>(new BigDataMemAllocator(
+                                                Utils.getVolatileMemoryAllocatorService("vmem"),
 						1024 * 1024 * 20, ".", true),
 						MemClustering.PerformanceLevel.SLOW), };
 		MemClustering mclst = new MemClustering(ncs);
@@ -126,12 +129,14 @@ public class MemClusteringNGTest {
 						1024 * 1024 * 20, true).disableActiveGC(),
 						MemClustering.PerformanceLevel.FASTEST),
 				new MemClustering.NodeConfig<BigDataMemAllocator>(new BigDataMemAllocator(
+                                                Utils.getVolatileMemoryAllocatorService("vmem"),
 						1024 * 1024 * 20, ".", true).disableActiveGC(),
 						MemClustering.PerformanceLevel.FAST),
 				// new MemClustering.NodeConfig(new
 				// BigMemAllocator(1024*1024*20, ".", true).disableActiveGC(),
 				// MemClustering.PerformanceLevel.NORMAL),
 				new MemClustering.NodeConfig<BigDataMemAllocator>(new BigDataMemAllocator(
+                                                Utils.getVolatileMemoryAllocatorService("vmem"),
 						1024 * 1024 * 20, ".", true),
 						MemClustering.PerformanceLevel.SLOW), };
 		MemClustering mclst = new MemClustering(ncs){};
