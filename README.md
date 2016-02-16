@@ -168,7 +168,7 @@ Please see the file LICENSE for information on how this library is licensed.
 
 To build this library, you may need to install some required packages on the build system:
 
-
+* **Maven** -- the building tool v3.2.1 or above [Required]
 * **NVML** -- the NVM library (Please compile this library that is tagged with 0.1+b16) (http://pmem.io) [Required]
 * **JDK** -- the Java Develop Kit 1.6 or above (please properly configure JAVA_HOME) [Required]
 * **PMFS** -- the PMFS should be properly installed and configured on Linux system if you want to simulate read latency [Optional]
@@ -179,6 +179,10 @@ To build this library, you may need to install some required packages on the bui
 Once the build system is setup, this Library is built using this command at the top level:
 ```bash
   $ mvn clean package
+```
+exclude an allocator service:
+```bash
+  $ mvn -pl '!allocator-services/nvml-vmem-service' clean package
 ```
 
 
