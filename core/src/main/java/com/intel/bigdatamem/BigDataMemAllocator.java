@@ -36,7 +36,7 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
                 assert null != vmasvc : "VolatileMemoryAllocatorService object is null";
                 
                 m_vmasvc = vmasvc;
-		m_nid = vmasvc.init(capacity, uri, isnew);
+		m_nid = m_vmasvc.init(capacity, uri, isnew);
 		
 		/**
 		 * create a resource collector to release specified bytebuffer that backed

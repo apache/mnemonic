@@ -10,7 +10,7 @@ public class VMemServiceImpl implements VolatileMemoryAllocatorService {
         try {
             NativeLibraryLoader.loadFromJar("vmemallocator");
         } catch (Exception e) {
-            System.exit(-1);
+            throw new Error(e);
         }
     }
 

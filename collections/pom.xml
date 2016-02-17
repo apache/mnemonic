@@ -22,6 +22,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.flowcomputing.commons</groupId>
+      <artifactId>commons-primitives</artifactId>
+      <version>0.6.0</version>
+    </dependency>
+    <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
     </dependency>
@@ -150,7 +155,7 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
-              <argLine>-Xmx2g</argLine>
+              <argLine>-Xmx2g -XX:MaxPermSize=1g</argLine>
               <suiteXmlFiles>
                 <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
               </suiteXmlFiles>

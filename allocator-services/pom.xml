@@ -149,6 +149,7 @@
           <version>2.19.1</version>
           <configuration>
             <skipTests>${skipTests}</skipTests>
+	    <enableAssertions>true</enableAssertions>
           </configuration>
         </plugin>
         <plugin>

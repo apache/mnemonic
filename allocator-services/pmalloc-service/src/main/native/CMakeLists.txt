@@ -27,6 +27,7 @@ endif (NOT LIBPMALLOC_LIBRARIES)
 
 add_library(pmallocallocator SHARED common.c com_intel_mnemonic_service_allocatorservice_internal_PMallocServiceImpl.c)
 target_include_directories(pmallocallocator PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(pmallocallocator pmalloc)
 
 include (InstallRequiredSystemLibraries)
 set (CPACK_RESOURCE_FILE_LICENSE

@@ -10,7 +10,7 @@ public class PMallocServiceImpl implements NonVolatileMemoryAllocatorService {
         try {
             NativeLibraryLoader.loadFromJar("pmallocallocator");
         } catch (Exception e) {
-            System.exit(-1);
+            throw new Error(e);
         }
     }
 

@@ -58,6 +58,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <skipTests>true</skipTests>
+    <vmemallocator.classpath>${basedir}/../allocator-services/nvml-vmem-service/target/nvml-vmem-service-1.0-SNAPSHOT.jar</vmemallocator.classpath>
+    <pmallocallocator.classpath>${basedir}/../allocator-services/pmalloc-service/target/pmalloc-service-1.0-SNAPSHOT.jar</pmallocallocator.classpath>
   </properties>
 
   <repositories>
@@ -159,6 +161,11 @@
           <version>2.19.1</version>
           <configuration>
             <skipTests>${skipTests}</skipTests>
+	    <enableAssertions>true</enableAssertions>
+	    <additionalClasspathElements>
+	      <additionalClasspathElement>${vmemallocator.classpath}</additionalClasspathElement>
+	      <additionalClasspathElement>${pmallocallocator.classpath}</additionalClasspathElement>
+	    </additionalClasspathElements>
           </configuration>
         </plugin>
         <plugin>
@@ -194,7 +201,11 @@
             <forceCreation>true</forceCreation>
           </configuration>
         </plugin>
-
+        <plugin>
+	  <groupId>org.codehaus.mojo</groupId>
+	  <artifactId>exec-maven-plugin</artifactId>
+	  <version>1.4.0</version>
+	</plugin>
       </plugins>
     </pluginManagement>
   </build>

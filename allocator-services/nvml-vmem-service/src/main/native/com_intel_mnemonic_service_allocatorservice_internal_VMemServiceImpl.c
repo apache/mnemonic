@@ -18,7 +18,7 @@ static pthread_rwlock_t g_vmem_rwlock = PTHREAD_RWLOCK_INITIALIZER;
  *****************************************************************************/
 
 JNIEXPORT
-jlong JNICALL Java_com_intel_bigdatamem_BigDataMemAllocator_nallocate(
+jlong JNICALL Java_com_intel_mnemonic_service_allocatorservice_internal_VMemServiceImpl_nallocate(
              JNIEnv* env,
              jobject this, jlong id,
              jlong size, jboolean initzero)

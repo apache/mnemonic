@@ -90,6 +90,43 @@
         </plugins>
       </build>
     </profile>
+    <profile>
+      <id>example</id>
+      <activation>
+	<property>
+	  <name>example</name>
+	</property>
+      </activation>
+      <build>
+	<plugins>
+	  <plugin>
+	    <groupId>org.codehaus.mojo</groupId>
+	    <artifactId>exec-maven-plugin</artifactId>
+	    <executions>
+	      <execution>
+		<goals>
+		  <goal>exec</goal>
+		</goals>
+	      </execution>
+	    </executions>
+	    <configuration>
+	      <executable>java</executable>
+	      <arguments>
+		<argument>-ea</argument>
+		<argument>-cp</argument>
+		<argument>${vmemallocator.classpath}</argument>
+		<argument>-cp</argument>
+		<argument>${pmallocallocator.classpath}</argument>
+		<argument>-classpath</argument>
+		<classpath/>
+		<argument>${project.groupId}.Main</argument>
+	      </arguments>
+	    </configuration>
+	  </plugin>
+	</plugins>
+      </build>
+    </profile>
+
   </profiles>
 
 </project>

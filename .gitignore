@@ -31,7 +31,7 @@ config.status
 libtool
 stamp-h1
 autom4te.cache/
-/*.dat
+*.dat
 *.log
 core.*
 \#*
