@@ -123,6 +123,32 @@
   </dependencyManagement>
 
   <build>
+    <plugins>
+      <plugin>
+	<groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-clean-plugin</artifactId>
+	<version>3.0.0</version>
+	<executions>
+	  <execution>
+	    <id>auto-clean</id>
+	    <phase>initialize</phase>
+	    <goals>
+	      <goal>clean</goal>
+	    </goals>
+	  </execution>
+	</executions>
+	<configuration>
+	  <filesets>
+	    <fileset>
+	      <directory>../allocator-services/service-dist</directory>
+	      <includes>
+		<include>*.jar</include>
+	      </includes>
+	    </fileset>
+	  </filesets>
+	</configuration>
+      </plugin>
+    </plugins>
     <pluginManagement>
       <plugins>
         <plugin>
@@ -173,6 +199,7 @@
           <version>2.6</version>
           <configuration>
             <forceCreation>true</forceCreation>
+	    <outputDirectory>${basedir}/../service-dist</outputDirectory>
 	    <archive>
 	      <addMavenDescriptor>false</addMavenDescriptor>
 	    </archive>

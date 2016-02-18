@@ -58,8 +58,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <skipTests>true</skipTests>
-    <vmemallocator.classpath>${basedir}/../allocator-services/nvml-vmem-service/target/nvml-vmem-service-1.0-SNAPSHOT.jar</vmemallocator.classpath>
-    <pmallocallocator.classpath>${basedir}/../allocator-services/pmalloc-service/target/pmalloc-service-1.0-SNAPSHOT.jar</pmallocallocator.classpath>
+    <allocator.service.dir>${basedir}/../allocator-services/service-dist</allocator.service.dir>
   </properties>
 
   <repositories>
@@ -130,6 +129,32 @@
   </dependencyManagement>
 
   <build>
+    <plugins>
+      <plugin>
+	<groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-clean-plugin</artifactId>
+	<version>3.0.0</version>
+	<executions>
+	  <execution>
+	    <id>auto-clean</id>
+	    <phase>initialize</phase>
+	    <goals>
+	      <goal>clean</goal>
+	    </goals>
+	  </execution>
+	</executions>
+	<configuration>
+	  <filesets>
+	    <fileset>
+	      <directory>.</directory>
+	      <includes>
+		<include>*.dat</include>
+	      </includes>
+	    </fileset>
+	  </filesets>
+	</configuration>
+      </plugin>
+    </plugins>
     <pluginManagement>
       <plugins>
         <plugin>
@@ -162,10 +187,7 @@
           <configuration>
             <skipTests>${skipTests}</skipTests>
 	    <enableAssertions>true</enableAssertions>
-	    <additionalClasspathElements>
-	      <additionalClasspathElement>${vmemallocator.classpath}</additionalClasspathElement>
-	      <additionalClasspathElement>${pmallocallocator.classpath}</additionalClasspathElement>
-	    </additionalClasspathElements>
+	    <argLine>-Djava.ext.dirs=${allocator.service.dir}</argLine>
           </configuration>
         </plugin>
         <plugin>

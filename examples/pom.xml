@@ -112,11 +112,8 @@
 	    <configuration>
 	      <executable>java</executable>
 	      <arguments>
+		<argument>-Djava.ext.dirs=${allocator.service.dir}</argument>
 		<argument>-ea</argument>
-		<argument>-cp</argument>
-		<argument>${vmemallocator.classpath}</argument>
-		<argument>-cp</argument>
-		<argument>${pmallocallocator.classpath}</argument>
 		<argument>-classpath</argument>
 		<classpath/>
 		<argument>${project.groupId}.Main</argument>

@@ -37,3 +37,4 @@ core.*
 \#*
 .\#*
 dependency-reduced-pom.xml
+/allocator-services/service-dist/
