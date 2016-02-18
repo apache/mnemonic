@@ -156,15 +156,12 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
 Please see the file LICENSE for information on how this library is licensed.
 
 
-* **src** -- the source for the library
-* **src/main/java** -- the Java source for the library
-* **examples** -- Brief examples for this library
-* **src/main/native** -- the native source for the library
-* **src/test/java** -- the Java test & example source for the library
-* **uml** -- modeling documents for the library
-* **target** -- the generated packages for the library
-* **target/apidocs** -- the generated API documents for the library
-
+* **core** -- the submodule project for core
+* **collections** -- the submodule project for generic collections
+* **examples** -- the submodule project for examples
+* **allocator-services/pmalloc-service** -- the submodule project for pmalloc allocator service
+* **allocator-services/nvml-vmem-service** -- the submodule project for vmem allocator service
+* **allocator-services/service-dist** -- the location of pluggable allocator services
 
 To build this library, you may need to install some required packages on the build system:
 
@@ -180,7 +177,9 @@ Once the build system is setup, this Library is built using this command at the 
 ```bash
   $ mvn clean package
 ```
-exclude an allocator service:
+
+
+To exclude an customized allocator service for your platform e.g. OSX:
 ```bash
   $ mvn -pl '!allocator-services/nvml-vmem-service' clean package
 ```
@@ -192,14 +191,21 @@ To build and run the unit tests:
 ```
 
 
-To install this package to local repository:
+To install this package to local repository (required to run examples and testcases):
 ```bash
   $ mvn clean install
 ```
 
+
 To run an example:
 ```bash
-  $ cd examples
-  $ java -jar target/mnemonic-examples-X.X.X(-SSSSS).jar
+  $ mvn exec:exec -Pexample -pl examples
 ```
 
+
+To run several test cases:
+```bash
+  $ mvn -Dtest=NonVolatilePersonNGTest test -pl core -DskipTests=false # a testcase for module "core"
+  $ mvn -Dtest=NonVolatileNodeValueNGTest  test -pl collections -DskipTests=false # a testcase for module "collection"
+  $ mvn -Dtest=NonVolatilePersonNGTest  test -pl collections -DskipTests=false # another testcase for module "collection"
+```
