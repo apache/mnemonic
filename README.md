@@ -8,7 +8,7 @@ A structured data in-memory persistence & hybrid memory resources management lib
 
 * In-place data storage on local non-volatile memory
 * In-place generic Java object persistence
-* Lazily data object loading
+* Data objects layz loading
 * Any map-able device could be used as a non-volatile memory resource
 * Reclaim allocated memory when it is no longer used
 * Hierarchical cache pool for massive data caching
@@ -206,6 +206,8 @@ To run an example:
 To run several test cases:
 ```bash
   $ mvn -Dtest=NonVolatilePersonNGTest test -pl core -DskipTests=false # a testcase for module "core"
+  $ mvn -Dtest=BigDataMemAllocatorNGTest test -pl core -DskipTests=false # the second testcase for module "core"
+  $ mvn -Dtest=MemClusteringNGTest test -pl core -DskipTests=false # the third testcase for module "core"
   $ mvn -Dtest=NonVolatileNodeValueNGTest  test -pl collections -DskipTests=false # a testcase for module "collection"
   $ mvn -Dtest=NonVolatilePersonNGTest  test -pl collections -DskipTests=false # another testcase for module "collection"
 ```
