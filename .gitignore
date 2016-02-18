@@ -36,4 +36,4 @@ autom4te.cache/
 core.*
 \#*
 .\#*
-
+dependency-reduced-pom.xml

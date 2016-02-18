@@ -171,7 +171,7 @@ __attribute__((destructor))  void fini(void)
    if (NULL != g_vmp_ptr) {
 	   for (i = 0; i < g_vmp_count; ++i) {
 		   if (NULL != *(g_vmp_ptr + i)){
-				vmem_close(*(g_vmp_ptr + i));
+		     /* vmem_close(*(g_vmp_ptr + i)); undefined function */
 				*(g_vmp_ptr + i) = NULL;
 				pthread_mutex_destroy(g_vmem_mutex_ptr + i);
 		   }
