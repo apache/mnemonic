@@ -166,11 +166,11 @@ Please see the file LICENSE for information on how this library is licensed.
 To build this library, you may need to install some required packages on the build system:
 
 * **Maven** -- the building tool v3.2.1 or above [Required]
-* **NVML** -- the NVM library (Please compile this library that is tagged with 0.1+b16) (http://pmem.io) [Required]
+* **NVML** -- the NVM library (Please compile this library that is tagged with 0.1+b16) (http://pmem.io) [Optional]
 * **JDK** -- the Java Develop Kit 1.6 or above (please properly configure JAVA_HOME) [Required]
 * **PMFS** -- the PMFS should be properly installed and configured on Linux system if you want to simulate read latency [Optional]
-* **PMalloc** -- the supported durable memory native library at https://github.com/bigdata-memory/pmalloc.git [Required]
-* **Javapoet** -- the 1.3.1-SNAPSHOT revised for bdmem at https://github.com/wewela/javapoet.git [Required]
+* **PMalloc** -- a supported durable memory native library at https://github.com/bigdata-memory/pmalloc.git [Optional]
+* **Javapoet** -- a dependant project v1.3.1-SNAPSHOT revised for this project at https://github.com/wewela/javapoet.git [Required]
 
 
 Once the build system is setup, this Library is built using this command at the top level:
