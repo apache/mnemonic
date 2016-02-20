@@ -1,0 +1,5 @@
+com.intel.bigdatamem
+com.intel.bigdatamem.collections
+com.intel.bigdatamem.example
+com.intel.mnemonic.service.allocatorservice
+com.intel.mnemonic.service.allocatorservice.internal
