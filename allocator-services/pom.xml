@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.intel.mnemonic</groupId>
+    <artifactId>mnemonic-parent</artifactId>
+    <version>2.0.0-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
  
   <groupId>com.intel.mnemonic.service.allocatorservice</groupId>
   <artifactId>allocator-services-parent-project</artifactId>
@@ -8,44 +14,7 @@
   <packaging>pom</packaging>
  
   <name>Mnemonic Project Allocator Services Parent POM</name>
-  <url>https://github.com/NonVolatileComputing</url>
-
-  <licenses>
-    <license>
-      <name>Apache 2.0 License</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-
-  <organization>
-    <name>Non-Volatile Computing Technologies</name>
-    <url>https://github.com/NonVolatileComputing</url>
-  </organization>
-
-  <developers>
-    <developer>
-      <id>Gary</id>
-      <name>Gang Wang</name>
-      <email>gang1.wang@intel.com</email>
-      <url/>
-      <organization/>
-      <organizationUrl/>
-      <timezone>US/Pacific</timezone>
-    </developer>
-    <developer>
-      <id>Yanping</id>
-      <name>Yanping Wang</name>
-      <email>yanping.wang@intel.com</email>
-      <url/>
-      <organization/>
-      <organizationUrl/>
-      <timezone>US/Pacific</timezone>
-    </developer>
-  </developers>
-
-  <contributors>
-  </contributors>
+  <url>https://github.com/NonVolatileComputing/Mnemonic</url>
 
   <modules>
     <module>nvml-vmem-service</module>
@@ -53,50 +22,9 @@
   </modules>
 
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <mnemonic.core.version>2.0.0-SNAPSHOT</mnemonic.core.version>
-    <skipTests>true</skipTests>
   </properties>
 
-  <repositories>
-    <repository>
-      <id>central</id>
-      <!-- This should be at top, it makes maven try the central repo first and then others and hence faster dep resolution -->
-      <name>Maven Repository</name>
-      <url>https://repo1.maven.org/maven2</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>bintray</id>
-      <name>bintray</name>
-      <url>http://dl.bintray.com/flowcomputing/commons</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>central</id>
-      <url>https://repo1.maven.org/maven2</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </pluginRepository>
-  </pluginRepositories>
-  
   <dependencies>
     <dependency>
       <groupId>com.intel.bigdatamem</groupId>
@@ -107,27 +35,14 @@
     <dependency>
       <groupId>org.flowcomputing.commons</groupId>
       <artifactId>commons-primitives</artifactId>
-      <version>0.6.0</version>
     </dependency>
   </dependencies>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-	<groupId>org.testng</groupId>
-	<artifactId>testng</artifactId>
-	<version>6.8.17</version>
-	<scope>test</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <build>
     <plugins>
       <plugin>
 	<groupId>org.apache.maven.plugins</groupId>
 	<artifactId>maven-clean-plugin</artifactId>
-	<version>3.0.0</version>
 	<executions>
 	  <execution>
 	    <id>auto-clean</id>
@@ -151,48 +66,6 @@
     </plugins>
     <pluginManagement>
       <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.3</version>
-          <configuration>
-            <compilerArgs>
-              <arg>-XDignore.symbol.file</arg>
-              <arg>-XDenableSunApiLintControl</arg>
-            </compilerArgs>
-            <source>1.7</source>
-            <target>1.7</target>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-antrun-plugin</artifactId>
-          <version>1.8</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.19.1</version>
-          <configuration>
-            <skipTests>${skipTests}</skipTests>
-	    <enableAssertions>true</enableAssertions>
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-source-plugin</artifactId>
-          <version>2.2.1</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <version>2.9.1</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-scm-publish-plugin</artifactId>
-          <version>1.1</version>
-        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>

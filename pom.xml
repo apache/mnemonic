@@ -8,7 +8,7 @@
   <version>2.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Mnemonic Project Parent POM</name>
-  <url>https://github.com/NonVolatileComputing</url>
+  <url>https://github.com/NonVolatileComputing/Mnemonic</url>
 
   <licenses>
     <license>
@@ -47,6 +47,20 @@
   <contributors>
   </contributors>
 
+  <distributionManagement>
+    <site>
+      <id>gh-pages</id>
+      <name>${project.artifactId} Github Pages</name>
+      <url>http://nonvolatilecomputing.github.io/Mnemonic/</url>
+    </site>
+  </distributionManagement>
+
+  <scm>
+    <connection>scm:git:https://bigdata-memory@github.com/NonVolatileComputing/Mnemonic.git</connection>
+    <developerConnection>scm:git:https://bigdata-memory@github.com/NonVolatileComputing/Mnemonic.git</developerConnection>
+    <url>https://github.com/NonVolatileComputing/Mnemonic</url>
+  </scm>
+
   <modules>
     <module>core</module>
     <module>collections</module>
@@ -59,6 +73,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <skipTests>true</skipTests>
     <allocator.service.dir>${basedir}/../allocator-services/service-dist</allocator.service.dir>
+    <github.global.server>github</github.global.server>
   </properties>
 
   <repositories>
@@ -133,7 +148,6 @@
       <plugin>
 	<groupId>org.apache.maven.plugins</groupId>
 	<artifactId>maven-clean-plugin</artifactId>
-	<version>3.0.0</version>
 	<executions>
 	  <execution>
 	    <id>auto-clean</id>
@@ -154,9 +168,45 @@
 	  </filesets>
 	</configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.4</version>
+        <dependencies>
+	  <dependency>
+	    <!--
+		| allows markdown syntax for site generation. To use it place files below
+		| src/site/markdown/[filename].md
+	    -->
+	    <groupId>org.apache.maven.doxia</groupId>
+	    <artifactId>doxia-module-markdown</artifactId>
+	    <version>1.7</version>
+	  </dependency>
+	</dependencies>
+        <configuration>
+	  <skipDeploy>true</skipDeploy>
+	</configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-scm-publish-plugin</artifactId>
+        <configuration>
+	  <checkoutDirectory>${project.build.directory}/scmpublish</checkoutDirectory>
+	  <checkinComment>Publishing site for ${project.artifactId}:${project.version}</checkinComment>
+	  <content>${project.reporting.outputDirectory}/../staging</content>
+	  <skipDeletedFiles>true</skipDeletedFiles>
+	  <pubScmUrl>scm:git:https://github.com/NonVolatileComputing/Mnemonic.git</pubScmUrl>
+	  <scmBranch>gh-pages</scmBranch> <!-- branch with static site -->
+	</configuration>
+      </plugin>
     </plugins>
     <pluginManagement>
       <plugins>
+	<plugin>
+	  <groupId>org.apache.maven.plugins</groupId>
+	  <artifactId>maven-clean-plugin</artifactId>
+	  <version>3.0.0</version>
+	</plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
@@ -198,7 +248,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
-          <version>2.9.1</version>
+          <version>2.10.3</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -234,5 +284,44 @@
       </plugins>
     </pluginManagement>
   </build>
+
+  <reporting>
+    <plugins>
+      <plugin>
+	<groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-project-info-reports-plugin</artifactId>
+	<version>2.6</version>
+	<reportSets>
+	  <reportSet>
+	    <reports>
+	      <report>index</report>
+	    </reports>
+	  </reportSet>
+	</reportSets>
+      </plugin>
+      <plugin>
+	<groupId>org.apache.maven.plugins</groupId>
+	<artifactId>maven-javadoc-plugin</artifactId>
+	<configuration>
+	  <additionalparam>-Xdoclint:none</additionalparam>
+	</configuration>
+	<reportSets>
+	  <reportSet>
+	    <reports>
+	      <report>javadoc</report>
+	      <report>test-javadoc</report>
+	    </reports>
+	  </reportSet>
+	  <reportSet>
+	    <id>aggregate</id>
+	    <inherited>false</inherited>
+	    <reports>
+	      <report>aggregate</report>
+	    </reports>
+	  </reportSet>
+	</reportSets>
+      </plugin>
+    </plugins>
+  </reporting>
 
 </project>

@@ -82,18 +82,6 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-scm-publish-plugin</artifactId>
-        <configuration>
-          <checkoutDirectory>${project.build.directory}/scmpublish</checkoutDirectory>
-          <checkinComment>Publishing javadoc for ${project.artifactId}:${project.version}</checkinComment>
-          <content>${project.reporting.outputDirectory}/apidocs</content>
-          <skipDeletedFiles>true</skipDeletedFiles>
-          <pubScmUrl>scm:git:https://github.com/bigdata-memory/mnenomic-project.git</pubScmUrl>
-          <scmBranch>gh-pages</scmBranch> <!-- branch with static site -->
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
         <executions>
           <execution>
