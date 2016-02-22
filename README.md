@@ -8,7 +8,7 @@ A structured data in-memory persistence & hybrid memory resources management lib
 
 * In-place data storage on local non-volatile memory
 * In-place generic Java object persistence
-* Data objects layz loading
+* Data objects lazy loading
 * Any map-able device could be used as a non-volatile memory resource
 * Reclaim allocated memory when it is no longer used
 * Hierarchical cache pool for massive data caching
