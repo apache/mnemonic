@@ -25,7 +25,7 @@ public interface Durable {
      * this function will be invoked by its factory to setup generic related info to avoid expensive operations from reflection
      *
      * @param efproxies
-     *           specify a array of factory to proxy the creation of its generic field objects
+     *           specify a array of factory to proxy the restoring of its generic field objects
      *
      * @param gftypes
      *           specify a array of types corresponding to efproxies
