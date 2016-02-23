@@ -128,16 +128,16 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
     }
 
     /**
-     * reallocate a specified size of memory block from backed memory pool.
+     * re-size a specified chunk on its backed memory pool.
      * 
-     * @param address
-     *            the address of previous allocated memory block. it can be
+     * @param mholder
+     *            the holder of memory chunk. it can be
      *            null.
      * 
      * @param size
-     *            specify new size of memory block to be reallocated
+     *            specify a new size of memory chunk
      * 
-     * @return the address of reallocated memory block from native memory pool
+     * @return the resized memory chunk handler
      */
     @Override
     public MemChunkHolder<BigDataMemAllocator> resizeChunk(MemChunkHolder<BigDataMemAllocator> mholder, long size){
@@ -164,7 +164,7 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
     /**
      * resize a specified buffer on its backed memory pool.
      *
-     * @param holder
+     * @param mholder
      *            the holder of memory buffer. it can be
      *            null.
      * 
@@ -201,13 +201,16 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
     }
 
     /**
-     * create a MemChunkHolder object along with a memory chunk that is
-     * allocated from backed native memory pool.
+     * create a memory chunk that is managed by its holder.
      * 
      * @param size
      *            specify the size of memory chunk
      * 
-     * @return a created MemChunkHolder object
+     * @param autoreclaim
+     * 	          specify whether or not to reclaim this
+     *            chunk automatically
+     *
+     * @return a holder contains a memory chunk
      */
     @Override
     public MemChunkHolder<BigDataMemAllocator> createChunk(long size, boolean autoreclaim) {
@@ -233,6 +236,10 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
      * @param size
      *            specify the size of memory buffer
      * 
+     * @param autoreclaim
+     * 	          specify whether or not to reclaim this
+     *            buffer automatically
+     *
      * @return a holder contains a memory buffer
      */
     @Override

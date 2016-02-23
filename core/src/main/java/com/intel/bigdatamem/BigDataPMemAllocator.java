@@ -130,7 +130,7 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
     /**
      * re-size a specified chunk on its backed memory pool.
      * 
-     * @param holder
+     * @param mholder
      *            the holder of memory chunk. it can be
      *            null.
      * 
@@ -164,7 +164,7 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
     /**
      * resize a specified buffer on its backed memory pool.
      *
-     * @param holder
+     * @param mholder
      *            the holder of memory buffer. it can be
      *            null.
      * 
