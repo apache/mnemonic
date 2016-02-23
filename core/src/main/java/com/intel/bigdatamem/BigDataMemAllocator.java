@@ -7,7 +7,7 @@ import org.flowcomputing.commons.primitives.*;
 import com.intel.mnemonic.service.allocatorservice.VolatileMemoryAllocatorService;
 
 /**
- * manage a big native memory pool through libvmem.so provied by Intel nvml library.
+ * manage a big native memory pool through libvmem.so that is provied by Intel nvml library.
  * 
  *
  */
@@ -19,10 +19,14 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
         private VolatileMemoryAllocatorService m_vmasvc = null;
 
 	/**
-	 * Constructor, it initialize and allocate a memory pool from specified uri
-	 * location with specified capacity. usually, the uri points to a mounted
-	 * non-volatile memory device or a location of file system.
+	 * Constructor, it initializes and allocate a memory pool from specified uri
+	 * location with specified capacity and an allocator service instance. 
+	 * usually, the uri points to a mounted
+	 * memory device or a location of file system.
 	 * 
+	 * @param vmasvc
+	 *            the volatile memory allocation service instance
+	 *
 	 * @param capacity
 	 *            the capacity of memory pool
 	 * 
@@ -78,14 +82,14 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
 				});
 	}
 
-	/**
-	 * enable active garbage collection. the GC will be forced to perform when
-	 * there is no more space to allocate.
-	 * 
-	 * @param timeout
-	 *            the timeout is used to yield for GC performing
-	 */
-	@Override
+        /**
+         * enable active garbage collection. the GC will be forced to collect garbages when
+         * there is no more space for current allocation request.
+         *
+         * @param timeout
+         *            the timeout is used to yield for GC performing
+         */
+        @Override
 	public BigDataMemAllocator enableActiveGC(long timeout) {
 		m_activegc = true;
 		m_gctimeout = timeout;
@@ -112,7 +116,8 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
 
 	/**
 	 * force to synchronize uncommitted data to backed memory pool
-	 * (placeholder).
+	 * (this is placeholder).
+	 *
 	 */
 	@Override
 	public void sync() {
@@ -152,6 +157,19 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
 		return ret;
 	}
 	
+        /**
+	 * resize a specified buffer on its backed memory pool.
+	 *
+	 * @param holder
+	 *            the holder of memory buffer. it can be
+	 *            null.
+	 * 
+	 * @param size
+	 *            specify a new size of memory chunk
+	 * 
+	 * @return the resized memory buffer handler
+	 *
+	 */
 	@Override
 	public MemBufferHolder<BigDataMemAllocator> resizeBuffer(MemBufferHolder<BigDataMemAllocator> mholder, long size) {
 		MemBufferHolder<BigDataMemAllocator> ret = null;
@@ -206,13 +224,12 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
 	}
 
 	/**
-	 * create a MemBufferHolder object along with a ByteBuffer which is backed
-	 * with a buffer allocated from backed native memory pool.
+	 * create a memory buffer that is managed by its holder.
 	 * 
 	 * @param size
-	 *            specify the size of backed memory buffer
+	 *            specify the size of memory buffer
 	 * 
-	 * @return a created MemBufferHolder object
+	 * @return a holder contains a memory buffer
 	 */
 	@Override
 	public MemBufferHolder<BigDataMemAllocator> createBuffer(long size, boolean autoreclaim) {

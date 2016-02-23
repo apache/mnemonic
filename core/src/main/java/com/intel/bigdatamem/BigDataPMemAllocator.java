@@ -7,7 +7,7 @@ import org.flowcomputing.commons.primitives.*;
 import com.intel.mnemonic.service.allocatorservice.NonVolatileMemoryAllocatorService;
 
 /**
- * manage a big native persistent memory pool through libvmem.so provied by Intel nvml library.
+ * manage a big native persistent memory pool through libpmalloc.so provided by pmalloc project.
  * 
  *
  */
@@ -20,10 +20,14 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
         private NonVolatileMemoryAllocatorService m_nvmasvc = null;
 
 	/**
-	 * Constructor, it initialize and allocate a memory pool from specified uri
-	 * location with specified capacity. usually, the uri points to a mounted
+	 * Constructor, it initializes and allocate a memory pool from specified uri
+	 * location with specified capacity and an allocator service instance. 
+	 * usually, the uri points to a mounted
 	 * non-volatile memory device or a location of file system.
 	 * 
+	 * @param nvmasvc
+	 *            the non-volatile memory allocation service instance
+	 *
 	 * @param capacity
 	 *            the capacity of memory pool
 	 * 
@@ -80,8 +84,8 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 	}
 
 	/**
-	 * enable active garbage collection. the GC will be forced to perform when
-	 * there is no more space to allocate.
+	 * enable active garbage collection. the GC will be forced to collect garbages when
+	 * there is no more space for current allocation request.
 	 * 
 	 * @param timeout
 	 *            the timeout is used to yield for GC performing
@@ -105,6 +109,7 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 
 	/**
 	 * Release the memory pool and close it.
+	 *
 	 */
 	@Override
 	public void close() {
@@ -115,23 +120,24 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 
 	/**
 	 * force to synchronize uncommitted data to backed memory pool
-	 * (placeholder).
+	 * (this is a placeholder).
+	 *
 	 */
 	@Override
 	public void sync() {
 	}
 
 	/**
-	 * reallocate a specified size of memory block from backed memory pool.
+	 * re-size a specified chunk on its backed memory pool.
 	 * 
-	 * @param address
-	 *            the address of previous allocated memory block. it can be
+	 * @param holder
+	 *            the holder of memory chunk. it can be
 	 *            null.
 	 * 
 	 * @param size
-	 *            specify new size of memory block to be reallocated
+	 *            specify a new size of memory chunk
 	 * 
-	 * @return the address of reallocated memory block from native memory pool
+	 * @return the resized memory chunk handler
 	 */
 	@Override
 	public MemChunkHolder<BigDataPMemAllocator> resizeChunk(MemChunkHolder<BigDataPMemAllocator> mholder, long size){
@@ -155,7 +161,20 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 		return ret;
 	}
 	
-	@Override
+        /**
+	 * resize a specified buffer on its backed memory pool.
+	 *
+	 * @param holder
+	 *            the holder of memory buffer. it can be
+	 *            null.
+	 * 
+	 * @param size
+	 *            specify a new size of memory chunk
+	 * 
+	 * @return the resized memory buffer handler
+	 *
+	 */
+        @Override
 	public MemBufferHolder<BigDataPMemAllocator> resizeBuffer(MemBufferHolder<BigDataPMemAllocator> mholder, long size) {
 		MemBufferHolder<BigDataPMemAllocator> ret = null;
 		boolean ac = null != mholder.getRefId();
@@ -182,13 +201,12 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 	}
 
 	/**
-	 * create a MemChunkHolder object along with a memory chunk that is
-	 * allocated from backed native memory pool.
+	 * create a memory chunk that is managed by its holder.
 	 * 
 	 * @param size
 	 *            specify the size of memory chunk
 	 * 
-	 * @return a created MemChunkHolder object
+	 * @return a holder contains a memory chunk
 	 */
 	@Override
 	public MemChunkHolder<BigDataPMemAllocator> createChunk(long size, boolean autoreclaim) {
@@ -209,13 +227,12 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 	}
 
 	/**
-	 * create a MemBufferHolder object along with a ByteBuffer which is backed
-	 * with a buffer allocated from backed native memory pool.
+	 * create a memory buffer that is managed by its holder.
 	 * 
 	 * @param size
-	 *            specify the size of backed memory buffer
+	 *            specify the size of memory buffer
 	 * 
-	 * @return a created MemBufferHolder object
+	 * @return a holder contains a memory buffer
 	 */
 	@Override
 	public MemBufferHolder<BigDataPMemAllocator> createBuffer(long size, boolean autoreclaim) {
@@ -234,7 +251,18 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 		}
 		return ret;
 	}
-	
+
+	/**
+	 * retrieve a memory buffer from its backed memory allocator.
+	 * 
+	 * @param phandler
+	 *            specify the handler of memory buffer to retrieve
+	 *
+	 * @param autoreclaim
+	 *            specify whether this retrieved memory buffer can be reclaimed automatically or not
+	 * 
+	 * @return a holder contains the retrieved memory buffer
+	 */
 	@Override
 	public MemBufferHolder<BigDataPMemAllocator> retrieveBuffer(long phandler, boolean autoreclaim) {
 		MemBufferHolder<BigDataPMemAllocator> ret = null;
@@ -248,6 +276,17 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 		return ret;
 	}
 
+	/**
+	 * retrieve a memory chunk from its backed memory allocator.
+	 * 
+	 * @param phandler
+	 *            specify the handler of memory chunk to retrieve
+	 *
+	 * @param autoreclaim
+	 *            specify whether this retrieved memory chunk can be reclaimed automatically or not
+	 * 
+	 * @return a holder contains the retrieved memory chunk
+	 */
 	@Override
 	public MemChunkHolder<BigDataPMemAllocator>  retrieveChunk(long phandler, boolean autoreclaim) {
 		MemChunkHolder<BigDataPMemAllocator> ret = null;
@@ -262,24 +301,55 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 		return ret;
 	}
 
+	/**
+	 * get the handler from a memory buffer holder.
+	 * 
+	 * @param mbuf
+	 *            specify the memory buffer holder
+	 *
+	 * @return a handler that could be used to retrieve its memory buffer
+	 */
 	@Override
 	public long getBufferHandler(MemBufferHolder<BigDataPMemAllocator> mbuf) {
 		return getPortableAddress(m_nvmasvc.getByteBufferHandler(m_nid, mbuf.get()));
 	}
 
+	/**
+	 * get the handler from a memory chunk holder.
+	 * 
+	 * @param mbuf
+	 *            specify the memory chunk holder
+	 *
+	 * @return a handler that could be used to retrieve its memory chunk
+	 */
 	@Override
 	public long getChunkHandler(MemChunkHolder<BigDataPMemAllocator> mchunk) {
 		return getPortableAddress(mchunk.get());
 	}
 
-	public boolean supportPersistKey() {
+        /**
+	 * determine whether this allocator supports to store non-volatile handler or not.
+	 * (it is a placeholder)
+	 *
+	 */
+	public boolean hasNonVolatileHandlerStore() {
 		return true;
 	}
 
+        /**
+	 * start a application level transaction on this allocator.
+	 * (it is a place holder)
+	 *
+	 */
 	public void beginTransaction() {
 		throw new UnsupportedOperationException("Transaction Unsupported.");
 	}
 
+        /**
+	 * end a application level transaction on this allocator.
+	 * (it is a place holder)
+	 *
+	 */
 	public void endTransaction() {
 		throw new UnsupportedOperationException("Transaction Unsupported.");
 	}
@@ -310,9 +380,9 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 	}
 	
 	/**
-	 * return the number of available handler keys to use.
+	 * return the capacity of non-volatile handler store.
 	 * 
-	 * @return the number of handler keys
+	 * @return the capacity of handler store
 	 * 
 	 */
 	public long handlerCapacity() {
@@ -320,8 +390,9 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 	}
 	
 	/**
-	 * force to perform GC that is used to release unused backed memory
-	 * resources.
+	 * force to perform GC that is used to re-claim garbages objects 
+	 * as well as memory resources managed by this allocator.
+	 *
 	 */
 	private void forceGC() {
 		System.gc();
@@ -330,22 +401,50 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 		} catch (Exception ex) {
 		}
 	}
-	
+
+        /**
+	 * calculate the portable address
+	 *
+	 * @param addr 
+	 *           the address to be calculated
+	 *
+	 * @return the portable address
+         */
 	@Override
 	public long getPortableAddress(long addr) {
 		return addr - b_addr;
 	}
 
+        /**
+	 * calculate the effective address
+	 *
+	 * @param addr 
+	 *           the address to be calculated
+	 *
+	 * @return the effective address
+         */
 	@Override
 	public long getEffectiveAddress(long addr) {
 		return addr + b_addr;
 	}
 
+        /**
+	 * get the base address
+	 *
+	 * @return the base address
+         */
 	@Override
 	public long getBaseAddress() {
 		return b_addr;
 	}
-	
+
+        /**
+	 * set the base address for calculation
+	 *
+	 * @param addr 
+	 *           the base address
+	 *
+         */
 	@Override
 	public long setBaseAddress(long addr) {
 		return b_addr = addr;
