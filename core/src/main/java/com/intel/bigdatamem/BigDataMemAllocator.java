@@ -88,6 +88,8 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
      *
      * @param timeout
      *            the timeout is used to yield for GC performing
+     *
+     * @return this allocator
      */
     @Override
     public BigDataMemAllocator enableActiveGC(long timeout) {
@@ -98,7 +100,8 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
 
     /**
      * disable active garbage collection.
-     * 
+     *
+     * @return this allocator 
      */
     @Override
     public BigDataMemAllocator disableActiveGC() {
@@ -107,7 +110,8 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
     }
 
     /**
-     * Release the memory pool and close it.
+     * release the memory pool and close it.
+     *
      */
     @Override
     public void close() {
@@ -116,7 +120,7 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
 
     /**
      * force to synchronize uncommitted data to backed memory pool
-     * (this is placeholder).
+     * (this is a placeholder).
      *
      */
     @Override
