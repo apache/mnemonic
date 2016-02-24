@@ -325,7 +325,7 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
     /**
      * get the handler from a memory chunk holder.
      * 
-     * @param mbuf
+     * @param mchunk
      *            specify the memory chunk holder
      *
      * @return a handler that could be used to retrieve its memory chunk
@@ -339,7 +339,9 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
      * determine whether this allocator supports to store non-volatile handler or not.
      * (it is a placeholder)
      *
+     * @return true if there is
      */
+    @Override
     public boolean hasNonVolatileHandlerStore() {
 	return true;
     }
@@ -349,6 +351,7 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
      * (it is a place holder)
      *
      */
+    @Override
     public void beginTransaction() {
 	throw new UnsupportedOperationException("Transaction Unsupported.");
     }
@@ -358,6 +361,7 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
      * (it is a place holder)
      *
      */
+    @Override
     public void endTransaction() {
 	throw new UnsupportedOperationException("Transaction Unsupported.");
     }
