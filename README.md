@@ -1,4 +1,4 @@
-Mnemonic: Structured Persistent Memory Library
+Mnemonic: A Structured Persistent Memory Library
 ================================
 (This project has been manually tranferred from https://github.com/bigdata-memory/bdmem)
 
@@ -211,3 +211,10 @@ To run several test cases:
   $ mvn -Dtest=NonVolatileNodeValueNGTest  test -pl collections -DskipTests=false # a testcase for module "collection"
   $ mvn -Dtest=NonVolatilePersonNGTest  test -pl collections -DskipTests=false # another testcase for module "collection"
 ```
+
+### Where is the document ?
+ * [API Documentation](http://nonvolatilecomputing.github.io/Mnemonic/apidocs/index.html)
+ * [Mnemonic Presentation (.pdf)](https://wiki.apache.org/incubator/MnemonicProposal?action=AttachFile&do=get&target=Project_Mnemonic_Pub1.0.pdf)
+
+### How to apply it for other projects ?
+ * [Apache Spark Integration Demo](https://github.com/NonVolatileComputing/spark)
