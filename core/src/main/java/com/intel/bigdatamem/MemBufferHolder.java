@@ -3,50 +3,58 @@ package com.intel.bigdatamem;
 import java.nio.ByteBuffer;
 
 /**
- * hold a ByteBuffer object.
+ * holder for a ByteBuffer instance.
  * 
- *
  */
 public class MemBufferHolder<A extends CommonAllocator<A>> extends MemHolder<A, ByteBuffer, MemBufferHolder<A>> {
 
 	
-	/**
-	 * instantialise a ByteBuffer object.
-	 * 
-	 * @param ar
-	 *            specify an Allocator for this holder
-	 * 
-	 * @param bb
-	 *            specify the ByteBuffer object to be holden
-	 */
-	public MemBufferHolder(A ar, ByteBuffer bb) {
-		super(bb, ar);
-	}
+    /**
+     * Constructor: initialize with a bytebuffer.
+     * 
+     * @param <A> the type of allocator
+     *
+     * @param ar
+     *            specify an Allocator for this holder
+     *            
+     * @param mres
+     *            specify a chunk to be holden
+     *            
+     */
+    public MemBufferHolder(A ar, ByteBuffer mres) {
+	super(mres, ar);
+    }
 
-	/**
-	 * @see MemHolder#getSize()
-	 */
-	@Override
-	public long getSize() {
-		return m_mres.capacity();
-	}
+    /**
+     * get the size of its held bytebuffer
+     * 
+     * @return the size
+     */
+    @Override
+    public long getSize() {
+	return m_mres.capacity();
+    }
 	
-	/**
-	 * reallocate its managed buffer.
-	 * 
-	 * @param size
-	 *            specify a new size of memory chunk
-	 * 
-	 * @return true if success
-	 */
-	@Override
-	public MemBufferHolder<A> resize(long size) {
-		return m_allocator.resizeBuffer(this, size);
-	}
+    /**
+     * resize its held buffer
+     *
+     * @param <A> the type of allocator
+     *
+     * @param size
+     *          specify the new size for its held buffer 
+     */
+    @Override
+    public MemBufferHolder<A> resize(long size) {
+	return m_allocator.resizeBuffer(this, size);
+    }
 
-	@Override
-	public void registerAutoReclaim() {
-		m_allocator.registerBufferAutoReclaim(this);
-	}
+    /**
+     * register its held buffer for auto-reclaim
+     *
+     */
+    @Override
+    public void registerAutoReclaim() {
+	m_allocator.registerBufferAutoReclaim(this);
+    }
 
 }
