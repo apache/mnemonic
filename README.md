@@ -16,7 +16,11 @@ A structured data in-memory persistence & hybrid memory resources management lib
 * Minimize memory footprint on Java heap
 * Reduce GC Overhead as following data shown (collected from Apache Spark experiments)
 
-![BDML_GC_Footprint](http://bigdata-memory.github.io/images/BDML_GC_impact.png)
+![Mnemonic_GC_stats](http://nonvolatilecomputing.github.io/Mnemonic/images/mnemonic_GC_stats.png)
+
+### Mnemonic Way
+
+![Mnemonic_Way](http://nonvolatilecomputing.github.io/Mnemonic/images/mnemonic_way.png)
 
 ### How to use it ?
 
