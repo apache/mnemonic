@@ -52,8 +52,6 @@ public abstract class NonVolatileNodeValue<E>
     /**
      * get the item value of this node
      *
-     * @param <E> the type of item value
-     *
      * @return the item value of this node
      */
     @NonVolatileGetter(EntityFactoryProxies = "m_node_efproxies", GenericFieldTypes = "m_node_gftypes")
@@ -62,8 +60,6 @@ public abstract class NonVolatileNodeValue<E>
     /**
      * set a value to this node item
      * 
-     * @param <E> the type of item value
-     *
      * @param value
      *          the value to be set
      *
@@ -77,8 +73,6 @@ public abstract class NonVolatileNodeValue<E>
     /**
      * get next node
      *
-     * @param <E> the type of item value
-     *
      * @return the next node
      *
      */
@@ -87,8 +81,6 @@ public abstract class NonVolatileNodeValue<E>
 
     /**
      * set next node
-     *
-     * @param <E> the type of item value
      *
      * @param next
      *          specify the next node
@@ -102,8 +94,6 @@ public abstract class NonVolatileNodeValue<E>
 	
     /**
      * get an iterator instance of this list
-     *
-     * @param <E> the type of item value
      *
      * @return an iterator of this list
      */
@@ -123,8 +113,6 @@ public abstract class NonVolatileNodeValue<E>
 	/**
 	 * Constructor
 	 *
-         * @param <E> the type of item value
-         *
 	 * @param head
 	 *          the start point for this iterator
 	 *
@@ -147,8 +135,6 @@ public abstract class NonVolatileNodeValue<E>
 	/**
 	 * get next node
 	 *
-         * @param <E> the type of item value
-         *
 	 * @return the next node
 	 */
 	@Override

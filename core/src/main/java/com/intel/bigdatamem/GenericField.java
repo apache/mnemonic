@@ -32,18 +32,16 @@ public class GenericField<A extends CommonPersistAllocator<A>, E> implements Dur
     /**
      * Constructor: initialize this generic field
      *
-     * @param <A> the type of allocator
-     *
      * @param defproxy
      *           specify its entity factory proxy
      *
      * @param dgftype
      *           specify its type
      *
-     * @param dfproxies
+     * @param efproxies
      *           specify an array of containing entity factory proxies
      *
-     * @param dftypes
+     * @param gftypes
      *           specify an array of containing types corresponding to dfproxies
      *
      * @param allocator
@@ -73,8 +71,6 @@ public class GenericField<A extends CommonPersistAllocator<A>, E> implements Dur
 
     /**
      * set a value to this field
-     *
-     * @param <E> the type of field value type
      *
      * @param e
      *        specify a value to set
@@ -142,8 +138,6 @@ public class GenericField<A extends CommonPersistAllocator<A>, E> implements Dur
 
     /**
      * get the value of this field
-     *
-     * @param <E> the type of this field value
      *
      * @return the field value
      */

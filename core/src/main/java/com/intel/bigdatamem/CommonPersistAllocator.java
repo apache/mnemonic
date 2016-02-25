@@ -38,8 +38,6 @@ public abstract class CommonPersistAllocator<A extends CommonAllocator<A>> exten
     /**
      * retrieve a memory buffer from its backed memory allocator.
      * 
-     * @param <A> the type of allocator
-     *
      * @param phandler
      *            specify the handler of memory buffer to retrieve
      *
@@ -52,8 +50,6 @@ public abstract class CommonPersistAllocator<A extends CommonAllocator<A>> exten
     /**
      * retrieve a memory chunk from its backed memory allocator.
      * 
-     * @param <A> the type of allocator
-     *
      * @param phandler
      *            specify the handler of memory chunk to retrieve
      *
@@ -66,8 +62,6 @@ public abstract class CommonPersistAllocator<A extends CommonAllocator<A>> exten
     /**
      * retrieve a memory buffer from its backed memory allocator.
      * 
-     * @param <A> the type of allocator
-     *
      * @param phandler
      *            specify the handler of memory buffer to retrieve
      *
@@ -81,8 +75,6 @@ public abstract class CommonPersistAllocator<A extends CommonAllocator<A>> exten
     /**
      * retrieve a memory chunk from its backed memory allocator.
      * 
-     * @param <A> the type of allocator
-     *
      * @param phandler
      *            specify the handler of memory chunk to retrieve
      *
@@ -96,8 +88,6 @@ public abstract class CommonPersistAllocator<A extends CommonAllocator<A>> exten
     /**
      * get the handler from a memory buffer holder.
      * 
-     * @param <A> the type of allocator
-     *
      * @param mbuf
      *            specify the memory buffer holder
      *
@@ -108,8 +98,6 @@ public abstract class CommonPersistAllocator<A extends CommonAllocator<A>> exten
     /**
      * get the handler from a memory chunk holder.
      * 
-     * @param <A> the type of allocator
-     *
      * @param mchunk
      *            specify the memory chunk holder
      *

@@ -9,8 +9,6 @@ public interface Reclaim<MRES> {
     /**
      * reclaim specified resources.
      * 
-     * @param <MRES> the type of resource
-     *
      * @param mres
      *            a resource to be reclaimed
      *            

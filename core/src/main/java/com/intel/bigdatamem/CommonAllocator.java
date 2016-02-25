@@ -40,8 +40,6 @@ public abstract class CommonAllocator<A extends CommonAllocator<A>> implements A
     /**
      * create a memory chunk that is managed by its holder.
      * 
-     * @param <A> the type of bound allocator 
-     * 
      * @param size
      *            specify the size of memory chunk
      * 
@@ -54,8 +52,6 @@ public abstract class CommonAllocator<A extends CommonAllocator<A>> implements A
 
     /**
      * create a memory buffer that is managed by its holder.
-     * 
-     * @param <A> the type of bound allocator 
      * 
      * @param size
      *            specify the size of memory buffer
@@ -70,8 +66,6 @@ public abstract class CommonAllocator<A extends CommonAllocator<A>> implements A
     /**
      * register a memory chunk for auto-reclaim
      *
-     * @param <A> the type of bound allocator 
-     * 
      * @param mholder
      *           specify a chunk holder to register
      */
@@ -83,8 +77,6 @@ public abstract class CommonAllocator<A extends CommonAllocator<A>> implements A
     /**
      * register a memory buffer for auto-reclaim
      *
-     * @param <A> the type of bound allocator 
-     * 
      * @param mholder
      *           specify a buffer holder to register
      */

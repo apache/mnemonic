@@ -10,8 +10,6 @@ public interface Allocatable<A extends CommonAllocator<A>> {
     /**
      * create a memory chunk that is managed by its holder.
      * 
-     * @param <A> the type of bound allocator 
-     * 
      * @param size
      *            specify the size of memory chunk
      * 
@@ -26,8 +24,6 @@ public interface Allocatable<A extends CommonAllocator<A>> {
     /**
      * create a memory chunk that is managed by its holder.
      * 
-     * @param <A> the type of bound allocator 
-     * 
      * @param size
      *            specify the size of memory chunk
      * 
@@ -37,8 +33,6 @@ public interface Allocatable<A extends CommonAllocator<A>> {
 
     /**
      * create a memory buffer that is managed by its holder.
-     * 
-     * @param <A> the type of bound allocator 
      * 
      * @param size
      *            specify the size of memory buffer
@@ -54,8 +48,6 @@ public interface Allocatable<A extends CommonAllocator<A>> {
     /**
      * create a memory buffer that is managed by its holder.
      * 
-     * @param <A> the type of bound allocator 
-     * 
      * @param size
      *            specify the size of memory buffer
      * 
@@ -66,8 +58,6 @@ public interface Allocatable<A extends CommonAllocator<A>> {
     /**
      * register a memory chunk for auto-reclaim
      *
-     * @param <A> the type of bound allocator 
-     * 
      * @param mholder
      *           specify a chunk holder to register
      */
@@ -76,8 +66,6 @@ public interface Allocatable<A extends CommonAllocator<A>> {
     /**
      * register a memory buffer for auto-reclaim
      *
-     * @param <A> the type of bound allocator 
-     * 
      * @param mholder
      *           specify a buffer holder to register
      */
@@ -85,8 +73,6 @@ public interface Allocatable<A extends CommonAllocator<A>> {
 
     /**
      * resize a memory chunk.
-     * 
-     * @param <A> the type of bound allocator 
      * 
      * @param mholder
      *           specify a chunk holder for resizing
@@ -101,8 +87,6 @@ public interface Allocatable<A extends CommonAllocator<A>> {
 	
     /**
      * resize a memory buffer.
-     * 
-     * @param <A> the type of bound allocator 
      * 
      * @param mholder
      *           specify a buffer holder for resizing

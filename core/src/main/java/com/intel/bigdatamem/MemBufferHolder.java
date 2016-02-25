@@ -12,8 +12,6 @@ public class MemBufferHolder<A extends CommonAllocator<A>> extends MemHolder<A, 
     /**
      * Constructor: initialize with a bytebuffer.
      * 
-     * @param <A> the type of allocator
-     *
      * @param ar
      *            specify an Allocator for this holder
      *            
@@ -37,8 +35,6 @@ public class MemBufferHolder<A extends CommonAllocator<A>> extends MemHolder<A, 
 	
     /**
      * resize its held buffer
-     *
-     * @param <A> the type of allocator
      *
      * @param size
      *          specify the new size for its held buffer 

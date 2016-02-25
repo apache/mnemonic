@@ -28,8 +28,6 @@ public abstract class MemHolder<A extends CommonAllocator<A>, T, H extends MemHo
     /**
      * get its allocator
      *
-     * @param <A> the type of allocator
-     *
      * @return the allocator
      */
     public A getAllocator() {
@@ -38,12 +36,6 @@ public abstract class MemHolder<A extends CommonAllocator<A>, T, H extends MemHo
 
     /**
      * resize its held resource
-     *
-     * @param <A> the type of allocator
-     *
-     * @param <T> the type of resource
-     * 
-     * @param <H> the type of holder
      *
      * @param size
      *          specify the new size for its held resource
