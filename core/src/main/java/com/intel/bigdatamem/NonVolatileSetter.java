@@ -1,10 +1,9 @@
 package com.intel.bigdatamem;
 
 /**
- *
+ * this class defines an annotation for setter methods of non-volatile entity
  *
  */
-
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

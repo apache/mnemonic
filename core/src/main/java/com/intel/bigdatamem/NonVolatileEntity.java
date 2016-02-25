@@ -1,10 +1,9 @@
 package com.intel.bigdatamem;
 
 /**
- *
+ * this class defines a annotation for non-volatile entity
  *
  */
-
 
 import java.lang.annotation.*;
 
