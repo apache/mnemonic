@@ -28,14 +28,14 @@ This library comes up with a new programming model we call it non-volatile objec
 
 ```java
 /**
- * a durable class should be abstract and implemented from Durable interface with @NonVolatileEntity annotation
+ * a non-volatile class should be abstract, implement Durable interface and marked with @NonVolatileEntity annotation
  */
 @NonVolatileEntity
 public abstract class Person<E> implements Durable, Comparable<Person<E>> {
         E element; // Generic Type
 
         /**
-         * callback for brand new durable object creation
+         * callback for this non-volatile object creation
          */
         @Override
         public void initializeAfterCreate() { 
@@ -43,7 +43,7 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
         }
         
         /**
-         * callback for durable object recovery
+         * callback for this non-valatile object recovery
          */
         @Override
         public void initializeAfterRestore() { 
@@ -72,7 +72,7 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
         }
 
         /**
-         * Getters and Setters for persistent fields with @NonVolatileGetter and @NonVolatileSetter
+         * Getters and Setters for non-volatile fields marked with @NonVolatileGetter and @NonVolatileSetter
          */
         @NonVolatileGetter
         abstract public Short getAge();
@@ -99,12 +99,13 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
 
 #### Use a non-volatile class:
 
-##### Setup an allocator for non-volatile objects.
+##### Setup an allocator for non-volatile object graphs.
 ```java
-        // create an allocator object with parameters ie. capacity and uri
+        // create an allocator instance
         BigDataPMemAllocator act = new BigDataPMemAllocator(1024 * 1024 * 8, "./pobj_person.dat", true);
-        // fetch underlying capacity of key-value pair store for Non Volatile handler storage
-        KEYCAPACITY = act.persistKeyCapacity();
+        
+        // fetch handler store capacity from this non-volatile storage managed by this allocator
+        KEYCAPACITY = act.handlerCapacity();
         ....
         // close it after use
         act.close();
@@ -112,17 +113,18 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
 
 ##### Generate structured non-volatile objects.
 ```java
-        // create a new durable person object from specific allocator
+        // create a new non-volatile person object from this specific allocator
         person = PersonFactory.create(act);
         
         // set attributes
         person.setAge((short)rand.nextInt(50));
         person.setName(String.format("Name: [%s]", UUID.randomUUID().toString()), true);
 
-        // keep this person on persistent key-value pair store
-        act.setPersistKey(keyidx, person.getNonVolatileHandler());
+        // keep this person on non-volatile handler store
+        act.setHandler(keyidx, person.getNonVolatileHandler());
 
         for (int deep = 0; deep < rand.nextInt(100); ++deep) {
+        
                 // create another person as mother
                 mother = PersonFactory.create(act);
                 mother.setAge((short)(50 + rand.nextInt(50)));
@@ -138,14 +140,17 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
 ##### Use the non-volatile objects
 ```java
         for (long i = 0; i < KEYCAPACITY; ++i) {
+        
                 System.out.printf("----------Key %d--------------\n", i);
-                // iterate persistent handlers from key-value store of specific allocator
-                val = act.getPersistKey(i);
+                // iterate non-volatile handlers from handler store of this specific allocator
+                val = act.getHandler(i);
                 if (0L == val) {
                         break;
                 }
-                // restore person objects from specific allocator
+                
+                // restore person objects from this specific allocator
                 Person<Integer> person = PersonFactory.restore(act, val, true);
+                
                 while (null != person) {
                         person.testOutput();
                         // iterate all mother's ancestors
