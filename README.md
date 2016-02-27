@@ -1,4 +1,5 @@
-Mnemonic: A Structured Persistent Memory Library
+<img src="http://nonvolatilecomputing.github.io/Mnemonic/images/mnemonic_logo.png" width=200 />
+A Structured Persistent Memory Library
 ================================
 (This project has been manually tranferred from https://github.com/bigdata-memory/bdmem)
 
