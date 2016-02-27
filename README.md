@@ -1,21 +1,20 @@
 <img src="http://nonvolatilecomputing.github.io/Mnemonic/images/mnemonic_logo.png" width=200 />
-A Structured Persistent Memory Library
 ================================
 (This project has been manually tranferred from https://github.com/bigdata-memory/bdmem)
 
-A structured data in-memory persistence & hybrid memory resources management library. It is featured with in-place non-volatile Java object programming model.
+This library comes up with a new programming model we call it non-volatile object programming model, this model directly offloads object graphs into a variety of memory-like devices e.g. SSD, NVMe, Off-heap, in this way, it brings some promising features for massive data processing and high performance computing.
 
 ### Features:
 
 * In-place data storage on local non-volatile memory
 * In-place generic Java object persistence
-* Data objects lazy loading
-* Any map-able device could be used as a non-volatile memory resource
-* Reclaim allocated memory when it is no longer used
+* Object graphs lazy loading
+* Auto-reclaim memory resources and Mnemonic objects
 * Hierarchical cache pool for massive data caching
-* A set of persistent data structures
+* Pluggable allocator services for extension & optimization
+* A set of non-volatile data structures (WIP)
 * Minimize memory footprint on Java heap
-* Reduce GC Overhead as following data shown (collected from Apache Spark experiments)
+* Reduce GC Overheads as the following chart shown (collected from Apache Spark experiments)
 
 ![Mnemonic_GC_stats](http://nonvolatilecomputing.github.io/Mnemonic/images/mnemonic_GC_stats.png)
 
