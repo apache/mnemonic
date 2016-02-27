@@ -8,7 +8,7 @@ This library comes up with a new programming model we call it non-volatile objec
 
 * In-place data storage on local non-volatile memory
 * In-place generic Java object persistence
-* Object graphs lazy loading
+* Object graphs lazy loading & multi-process sharing
 * Auto-reclaim memory resources and Mnemonic objects
 * Hierarchical cache pool for massive data caching
 * Pluggable allocator services for extension & optimization
