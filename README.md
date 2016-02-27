@@ -15,6 +15,8 @@ This library comes up with a new programming model we call it non-volatile objec
 * A set of non-volatile data structures (WIP)
 * Minimize memory footprint on Java heap
 * Reduce GC Overheads as the following chart shown (collected from Apache Spark experiments)
+* [Coming major feature]: Distributed Object Graphs (DOG)
+* [Coming major feature]: Columnar-aware object graphs & collections (Apache Arrow based optimization)
 
 ![Mnemonic_GC_stats](http://nonvolatilecomputing.github.io/Mnemonic/images/mnemonic_GC_stats.png)
 
