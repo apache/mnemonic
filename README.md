@@ -203,17 +203,22 @@ To install this package to local repository (required to run examples and testca
 
 To run an example:
 ```bash
-  $ mvn exec:exec -Pexample -pl examples
+  $ mvn exec:exec -Pexample -pl examples # requires 'vmem' allocator service to run
 ```
 
 
 To run several test cases:
 ```bash
-  $ mvn -Dtest=NonVolatilePersonNGTest test -pl core -DskipTests=false # a testcase for module "core"
-  $ mvn -Dtest=BigDataMemAllocatorNGTest test -pl core -DskipTests=false # the second testcase for module "core"
-  $ mvn -Dtest=MemClusteringNGTest test -pl core -DskipTests=false # the third testcase for module "core"
-  $ mvn -Dtest=NonVolatileNodeValueNGTest  test -pl collections -DskipTests=false # a testcase for module "collection"
-  $ mvn -Dtest=NonVolatilePersonNGTest  test -pl collections -DskipTests=false # another testcase for module "collection"
+  
+  $ mvn -Dtest=NonVolatilePersonNGTest test -pl core -DskipTests=false # a testcase for module "core" that requires 'pmalloc' allocator service to pass
+  
+  $ mvn -Dtest=BigDataMemAllocatorNGTest test -pl core -DskipTests=false # the second testcase for module "core" that requires 'vmem' allocator service to pass
+  
+  $ mvn -Dtest=MemClusteringNGTest test -pl core -DskipTests=false # the third testcase for module "core" that requires 'vmem allocator service to pass
+  
+  $ mvn -Dtest=NonVolatileNodeValueNGTest  test -pl collections -DskipTests=false # a testcase for module "collection" that requires 'pmalloc' allocator service to pass
+  
+  $ mvn -Dtest=NonVolatilePersonNGTest  test -pl collections -DskipTests=false # another testcase for module "collection" that requires 'pmalloc' allocator service to pass
 ```
 
 ### Where is the document ?

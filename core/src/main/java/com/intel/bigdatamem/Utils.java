@@ -78,6 +78,7 @@ public class Utils {
 	if (null == ret && allownvmsvc) {
 	    ret = getNonVolatileMemoryAllocatorService(id);
 	}
+	assert null != ret : "VolatileMemoryAllocatorService \'" + id + "\' not found!";
 	return ret;
     }
 
@@ -102,6 +103,7 @@ public class Utils {
 		ret = svc;
 	    }
 	}
+	assert null != ret : "NonVolatileMemoryAllocatorService \'" + id + "\' not found!";
 	return ret;
     }
 

@@ -13,7 +13,7 @@ import com.intel.bigdatamem.*;
 public class Main {
 
     /**
-     * Run example code to demonstrate functionalities.
+     * Run a example code to demonstrate some basic functionalities.
      *
      * @param argv
      *            array of commandline parameters
@@ -21,10 +21,10 @@ public class Main {
     public static void main(String[] argv) throws Exception {
 	Random randomGenerator = new Random();
 
-	/* Generate configuration of each node */
+	/* Generate configuration for each node */
 	/*
-	 * Currently only one node supported due to null to be return from
-	 * native level
+	 * Currently only one node is supported due to the external native code 'vmem'
+	 * returns null for multiple 'vmem' allocator instantialization
 	 */
 	MemClustering.NodeConfig ncs[] = new MemClustering.NodeConfig[] {
 	    new MemClustering.NodeConfig(new SysMemAllocator(
@@ -47,7 +47,7 @@ public class Main {
 
 	for (MemClustering.NodeConfig nc : ncs) {
 	    /**
-	     * set a reclaimer to reclaim memory buffers
+	     * set a reclaimer for memory buffers
 	     */
 	    nc.getAllocator().setBufferReclaimer(new Reclaim<ByteBuffer>() {
 		    @Override
@@ -60,7 +60,7 @@ public class Main {
 		    }
 		});
 	    /**
-	     * set a reclaimer to reclaim memory chunks
+	     * set a reclaimer for memory chunks
 	     */
 	    nc.getAllocator().setChunkReclaimer(new Reclaim<Long>() {
 		    @Override
@@ -79,7 +79,7 @@ public class Main {
 	/**
 	 * Set event callback for allocator changing. this callback is used to
 	 * trace the event of spilling out of allocation when previous allocator
-	 * is unable to meet the allocation requirement and trying to switch to
+	 * is unable to meet the allocation requirement so trying to switch to
 	 * next allocator.
 	 */
 	mclst.setAllocatorChange(new MemClustering.AllocatorChange() {
@@ -95,7 +95,7 @@ public class Main {
 
 	/**
 	 * Set event callback for performance level changing. this callback is
-	 * used to trace the event of downgrading performance allocation.
+	 * used to trace the event of downgrading to low level performance allocation.
 	 */
 	mclst.setPerformanceLevelChange(new MemClustering.PerformanceLevelChange() {
 		@Override
@@ -107,7 +107,7 @@ public class Main {
 	    });
 
 	/**
-	 * Start to create a big memory backed ByteBuffer and then automatically
+	 * Start to create a piece of memory resource backed ByteBuffer and then automatically
 	 * release it or manually release it every six objects.
 	 */
 	System.out.println(Utils.ANSI_GREEN + "[[Demo Allocation, Auto Destruction "
@@ -123,7 +123,7 @@ public class Main {
 		/**
 		 * Manipulate the ByteBuffer backed by external memory resource.
 		 * Note: Do not assigned internal ByteBuffer object to any
-		 * variable, only using function get() to access it in all time.
+		 * variable, only use function get() to access it all time.
 		 */
 		mbh.get().put((byte) randomGenerator.nextInt(255));
 	    }
@@ -144,7 +144,7 @@ public class Main {
 	//Utils.collectGarbage();
 
 	/**
-	 * Start to create big memory backed chunk and then automatically
+	 * Start to create a piece of memory resource backed chunk and then automatically
 	 * release it or manually release it every six chunks.
 	 */
 	System.out.println(Utils.ANSI_GREEN + "[[Demo Allocation, Auto Destruction "
@@ -162,9 +162,9 @@ public class Main {
 	    System.out.printf("chunk size is %d \n", mch.getSize());
 	    for (int i = 0; i < mch.getSize(); i++) {
 		/**
-		 * Manipulate the Chunk memory space. resource. Note: Do not
-		 * assigned the internal ByteBuffer object to any variable, please always
-		 * using function get() to access it at all time.
+		 * Manipulate the chunk data. Note: Do not
+		 * assigned the internal memory space to any variable, please always
+		 * use function get() to access it at all time.
 		 */
 		unsafe.putByte(mch.get() + i,
 			       (byte) randomGenerator.nextInt(255));
