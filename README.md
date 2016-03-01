@@ -210,7 +210,7 @@ To install this package to local repository (required to run examples and testca
 
 To run an example:
 ```bash
-  $ mvn exec:exec -Pexample -pl examples # requires 'vmem' allocator service to run
+  $ mvn exec:exec -Pexample -pl examples # requires 'vmem' allocator service to run, please refer to the code of test cases for more examples.
 ```
 
 
