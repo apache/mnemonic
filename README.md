@@ -1,20 +1,22 @@
-Mnemonic: A Structured Persistent Memory Library
+<img src="http://nonvolatilecomputing.github.io/Mnemonic/images/mnemonic_logo.png" width=200 />
 ================================
 (This project has been manually tranferred from https://github.com/bigdata-memory/bdmem)
 
-A structured data in-memory persistence & hybrid memory resources management library. It is featured with in-place non-volatile Java object programming model.
+This library comes up with a new programming model we call it non-volatile object programming model, this model directly offloads object graphs into a variety of memory-like devices e.g. SSD, NVMe, Off-heap, in this way, it brings some promising features for massive data processing and high performance computing.
 
 ### Features:
 
 * In-place data storage on local non-volatile memory
 * In-place generic Java object persistence
-* Data objects lazy loading
-* Any map-able device could be used as a non-volatile memory resource
-* Reclaim allocated memory when it is no longer used
+* Object graphs lazy loading & multi-process sharing
+* Auto-reclaim memory resources and Mnemonic objects
 * Hierarchical cache pool for massive data caching
-* A set of persistent data structures
+* Pluggable allocator services for extension & optimization
+* A set of non-volatile data structures (WIP)
 * Minimize memory footprint on Java heap
-* Reduce GC Overhead as following data shown (collected from Apache Spark experiments)
+* Reduce GC Overheads as the following chart shown (collected from Apache Spark experiments)
+* [Coming major feature]: Distributed Object Graphs (DOG)
+* [Coming major feature]: Columnar-aware object graphs & collections (Apache Arrow based optimization)
 
 ![Mnemonic_GC_stats](http://nonvolatilecomputing.github.io/Mnemonic/images/mnemonic_GC_stats.png)
 
@@ -28,14 +30,14 @@ A structured data in-memory persistence & hybrid memory resources management lib
 
 ```java
 /**
- * a durable class should be abstract and implemented from Durable interface with @NonVolatileEntity annotation
+ * a non-volatile class should be abstract, implement Durable interface and marked with @NonVolatileEntity annotation
  */
 @NonVolatileEntity
 public abstract class Person<E> implements Durable, Comparable<Person<E>> {
         E element; // Generic Type
 
         /**
-         * callback for brand new durable object creation
+         * callback for this non-volatile object creation
          */
         @Override
         public void initializeAfterCreate() { 
@@ -43,7 +45,7 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
         }
         
         /**
-         * callback for durable object recovery
+         * callback for this non-valatile object recovery
          */
         @Override
         public void initializeAfterRestore() { 
@@ -72,7 +74,7 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
         }
 
         /**
-         * Getters and Setters for persistent fields with @NonVolatileGetter and @NonVolatileSetter
+         * Getters and Setters for non-volatile fields marked with @NonVolatileGetter and @NonVolatileSetter
          */
         @NonVolatileGetter
         abstract public Short getAge();
@@ -99,12 +101,13 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
 
 #### Use a non-volatile class:
 
-##### Setup an allocator for non-volatile objects.
+##### Setup an allocator for non-volatile object graphs.
 ```java
-        // create an allocator object with parameters ie. capacity and uri
+        // create an allocator instance
         BigDataPMemAllocator act = new BigDataPMemAllocator(1024 * 1024 * 8, "./pobj_person.dat", true);
-        // fetch underlying capacity of key-value pair store for Non Volatile handler storage
-        KEYCAPACITY = act.persistKeyCapacity();
+        
+        // fetch handler store capacity from this non-volatile storage managed by this allocator
+        KEYCAPACITY = act.handlerCapacity();
         ....
         // close it after use
         act.close();
@@ -112,17 +115,18 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
 
 ##### Generate structured non-volatile objects.
 ```java
-        // create a new durable person object from specific allocator
+        // create a new non-volatile person object from this specific allocator
         person = PersonFactory.create(act);
         
         // set attributes
         person.setAge((short)rand.nextInt(50));
         person.setName(String.format("Name: [%s]", UUID.randomUUID().toString()), true);
 
-        // keep this person on persistent key-value pair store
-        act.setPersistKey(keyidx, person.getNonVolatileHandler());
+        // keep this person on non-volatile handler store
+        act.setHandler(keyidx, person.getNonVolatileHandler());
 
         for (int deep = 0; deep < rand.nextInt(100); ++deep) {
+        
                 // create another person as mother
                 mother = PersonFactory.create(act);
                 mother.setAge((short)(50 + rand.nextInt(50)));
@@ -138,14 +142,17 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
 ##### Use the non-volatile objects
 ```java
         for (long i = 0; i < KEYCAPACITY; ++i) {
+        
                 System.out.printf("----------Key %d--------------\n", i);
-                // iterate persistent handlers from key-value store of specific allocator
-                val = act.getPersistKey(i);
+                // iterate non-volatile handlers from handler store of this specific allocator
+                val = act.getHandler(i);
                 if (0L == val) {
                         break;
                 }
-                // restore person objects from specific allocator
+                
+                // restore person objects from this specific allocator
                 Person<Integer> person = PersonFactory.restore(act, val, true);
+                
                 while (null != person) {
                         person.testOutput();
                         // iterate all mother's ancestors
