@@ -172,7 +172,7 @@ Please see the file LICENSE for information on how this library is licensed.
 * **examples** -- the submodule project for examples
 * **allocator-services/pmalloc-service** -- the submodule project for pmalloc allocator service
 * **allocator-services/nvml-vmem-service** -- the submodule project for vmem allocator service
-* **allocator-services/service-dist** -- the location of pluggable allocator services
+* **allocator-services/service-dist** -- the location of pluggable allocator services (auto-generated)
 
 To build this library, you may need to install some required packages on the build system:
 
