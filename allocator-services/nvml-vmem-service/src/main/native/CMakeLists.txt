@@ -7,6 +7,7 @@ configure_file (
     )
 include_directories(${PROJECT_BINARY_DIR})
 
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/../dist/native")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/")
 set(vmemallocator_VERSION_MAJOR 0)
 set(vmemallocator_VERSION_MINOR 0)

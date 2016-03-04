@@ -57,7 +57,6 @@
                 <exec dir="src/main/native/build" executable="make" failonerror="true">
                   <env key="JAVA_HOME" value="${java.home}/.." />
                 </exec>
-                <copy file="src/main/native/build/libvmemallocator.so" tofile="src/main/native/dist/native/libvmemallocator.so" />
               </target>
             </configuration>
           </execution>
