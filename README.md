@@ -24,6 +24,10 @@ This library comes up with a new programming model we call it non-volatile objec
 
 ![Mnemonic_Way](http://nonvolatilecomputing.github.io/Mnemonic/images/mnemonic_way.png)
 
+
+![Mnemonic_Modes](http://nonvolatilecomputing.github.io/Mnemonic/images/mnemonic_modes.png)
+
+
 ### How to use it ?
 
 #### Define a Non-Volatile class:
