@@ -39,6 +39,10 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
      */
     public BigDataPMemAllocator(NonVolatileMemoryAllocatorService nvmasvc, long capacity, String uri, boolean isnew) {
 	assert null != nvmasvc : "NonVolatileMemoryAllocatorService object is null";
+	if (capacity <= 0) {
+	    throw new IllegalArgumentException("BigDataPMemAllocator cannot be initialized with capacity <= 0.");
+	}
+
 	m_nvmasvc = nvmasvc;
              
 	m_nid = m_nvmasvc.init(capacity, uri, isnew);

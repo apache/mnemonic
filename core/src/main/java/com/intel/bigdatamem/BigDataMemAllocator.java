@@ -38,6 +38,9 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
      */
     public BigDataMemAllocator(VolatileMemoryAllocatorService vmasvc, long capacity, String uri, boolean isnew) {
 	assert null != vmasvc : "VolatileMemoryAllocatorService object is null";
+	if (capacity <= 0) {
+	    throw new IllegalArgumentException("BigDataMemAllocator cannot be initialized with capacity <= 0.");
+	}
                 
 	m_vmasvc = vmasvc;
 	m_nid = m_vmasvc.init(capacity, uri, isnew);
