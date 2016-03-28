@@ -1,6 +1,5 @@
 <img src="http://nonvolatilecomputing.github.io/Mnemonic/images/mnemonic_logo.png" width=200 />
 ================================
-(This project has been manually tranferred from https://github.com/bigdata-memory/bdmem)
 
 This library comes up with a new programming model we call it non-volatile object programming model, this model directly offloads object graphs into a variety of memory-like devices e.g. SSD, NVMe, Off-heap, in this way, it brings some promising features for massive data processing and high performance computing.
 
