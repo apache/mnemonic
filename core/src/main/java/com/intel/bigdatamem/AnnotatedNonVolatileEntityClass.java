@@ -79,6 +79,7 @@ public class AnnotatedNonVolatileEntityClass {
     private Map<String, MethodInfo> m_gettersinfo = new HashMap<String, MethodInfo>();
     private Map<String, MethodInfo> m_settersinfo = new HashMap<String, MethodInfo>();
     private Map<String, FieldInfo> m_dynfieldsinfo = new HashMap<String, FieldInfo>();
+    private Map<String, FieldInfo> m_gofffieldsinfo = new HashMap<String, FieldInfo>();
     private Map<String, FieldInfo> m_fieldsinfo = new HashMap<String, FieldInfo>();
 
     private Map<String, MethodInfo> m_durablemtdinfo = new HashMap<String, MethodInfo>();
@@ -419,6 +420,29 @@ public class AnnotatedNonVolatileEntityClass {
 	return ret;
     }
 	
+    protected void buildGFieldsSpecs() throws AnnotationProcessingException {
+        FieldInfo dynfieldinfo, fieldinfo;
+        for (String name : m_gettersinfo.keySet()) {
+            dynfieldinfo = m_dynfieldsinfo.get(name);
+
+            fieldinfo = new FieldInfo();
+            fieldinfo.name = String.format("MNEMONIC_%s_OFF",
+                               name.toUpperCase());
+            fieldinfo.type = TypeName.get(m_typeutils.getPrimitiveType(TypeKind.LONG));
+            fieldinfo.specbuilder = FieldSpec.builder(fieldinfo.type,
+                                  fieldinfo.name, Modifier.PUBLIC, Modifier.FINAL, Modifier.STATIC).initializer("$LL", dynfieldinfo.fieldoff);
+            m_gofffieldsinfo.put(fieldinfo.name, fieldinfo);
+
+            fieldinfo = new FieldInfo();
+            fieldinfo.name = String.format("MNEMONIC_%s_SZ",
+                               name.toUpperCase());
+            fieldinfo.type = TypeName.get(m_typeutils.getPrimitiveType(TypeKind.LONG));
+            fieldinfo.specbuilder = FieldSpec.builder(fieldinfo.type,
+                                  fieldinfo.name, Modifier.PUBLIC, Modifier.FINAL, Modifier.STATIC).initializer("$LL", dynfieldinfo.fieldsize);
+            m_gofffieldsinfo.put(fieldinfo.name, fieldinfo);
+        }
+    }
+
     protected void buildGettersSpecs(TypeSpec.Builder typespecbuilder) throws AnnotationProcessingException {
 	MethodInfo methodinfo;
 	TypeName ftname;
@@ -862,10 +886,13 @@ public class AnnotatedNonVolatileEntityClass {
 	for (TypeParameterElement tpe : m_elem.getTypeParameters()) {
 	    entitybuilder.addTypeVariable(TypeVariableName.get(tpe));
 	}
-		
+
 	buildFieldSpecs(entitybuilder, m_dynfieldsinfo); 
 	buildFieldSpecs(entitybuilder, m_fieldsinfo);
-		
+
+	buildGFieldsSpecs();
+	buildFieldSpecs(entitybuilder, m_gofffieldsinfo);
+
 	buildGettersSpecs(entitybuilder);
 	buildSettersSpecs(entitybuilder);
 
