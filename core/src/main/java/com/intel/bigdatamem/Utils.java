@@ -3,12 +3,15 @@ package com.intel.bigdatamem;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
 
 import sun.misc.Unsafe;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import com.intel.mnemonic.service.allocatorservice.VolatileMemoryAllocatorService;
@@ -271,5 +274,32 @@ public class Utils {
 	return ret;
     }
 
+    /**
+     * convert a long array to a initializer literal string.
+     *
+     * @param larr
+     *          specify a long array to be converted
+     *
+     * @return a literal string represent the initializer
+     */
+    public static String toInitLiteral(long[] larr) {
+        return Arrays.toString(larr).replaceAll("\\[", "{").replaceAll("\\]", "}");
+    }
+
+    /**
+     * convert a list of long array to a initializer literal string.
+     *
+     * @param llarr
+     *          specify a list of long array to be converted
+     *
+     * @return a literal string represent the initializer
+     */
+    public static String toInitLiteral(List<long[]> llarr) {
+        List<String> slist = new ArrayList<String>();
+        for (long[] larr : llarr) {
+            slist.add(toInitLiteral(larr));
+        }
+        return "{" + String.join(",", slist) + "}";
+    }
 
 }

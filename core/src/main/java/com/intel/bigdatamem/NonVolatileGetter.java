@@ -14,4 +14,5 @@ import java.lang.annotation.Target;
 public @interface NonVolatileGetter {
     String EntityFactoryProxies() default "null";
     String GenericFieldTypes() default "null";
+    long Id() default -1L;
 }

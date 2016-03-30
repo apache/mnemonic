@@ -42,6 +42,7 @@ public class AnnotatedNonVolatileEntityClass {
     protected class FieldInfo {
 	public FieldSpec.Builder specbuilder;
 	public TypeName type;
+    public long id;
 	public String name;
 	public String efproxiesname;
 	public String gftypesname;
@@ -79,7 +80,6 @@ public class AnnotatedNonVolatileEntityClass {
     private Map<String, MethodInfo> m_gettersinfo = new HashMap<String, MethodInfo>();
     private Map<String, MethodInfo> m_settersinfo = new HashMap<String, MethodInfo>();
     private Map<String, FieldInfo> m_dynfieldsinfo = new HashMap<String, FieldInfo>();
-    private Map<String, FieldInfo> m_gofffieldsinfo = new HashMap<String, FieldInfo>();
     private Map<String, FieldInfo> m_fieldsinfo = new HashMap<String, FieldInfo>();
 
     private Map<String, MethodInfo> m_durablemtdinfo = new HashMap<String, MethodInfo>();
@@ -151,6 +151,7 @@ public class AnnotatedNonVolatileEntityClass {
 	m_durablemtdinfo.put("getNonVolatileHandler", new MethodInfo());
 	m_durablemtdinfo.put("autoReclaim", new MethodInfo());
 	m_durablemtdinfo.put("destroy", new MethodInfo());
+	m_durablemtdinfo.put("getNativeFieldInfo", new MethodInfo());
 
 	m_entitymtdinfo.put("initializeNonVolatileEntity", new MethodInfo());
 	m_entitymtdinfo.put("createNonVolatileEntity", new MethodInfo());
@@ -227,7 +228,6 @@ public class AnnotatedNonVolatileEntityClass {
 						  fieldinfo.name, Modifier.PRIVATE);
 	m_fieldsinfo.put("genericfield", fieldinfo);
 
-		
 	for (Element elem : m_elem.getEnclosedElements()) {
 	    if (elem.getKind() == ElementKind.METHOD) {
 		methodname = elem.getSimpleName().toString();
@@ -269,6 +269,7 @@ public class AnnotatedNonVolatileEntityClass {
 		    fieldoff += fieldinfo.fieldsize;
 		    fieldinfo.efproxiesname = pgetter.EntityFactoryProxies();
 		    fieldinfo.gftypesname = pgetter.GenericFieldTypes();
+		    fieldinfo.id = pgetter.Id();
 		    m_dynfieldsinfo.put(methodname.substring(3), fieldinfo);
 					
 		}
@@ -352,6 +353,7 @@ public class AnnotatedNonVolatileEntityClass {
 		}
 	    }
 	}
+	genNFieldInfo();
     }
 
     protected String transTypeToUnsafeMethod(TypeName tname, boolean isget) throws AnnotationProcessingException {
@@ -420,27 +422,24 @@ public class AnnotatedNonVolatileEntityClass {
 	return ret;
     }
 	
-    protected void buildGFieldsSpecs() throws AnnotationProcessingException {
+    protected void genNFieldInfo() {
         FieldInfo dynfieldinfo, fieldinfo;
+        List<long[]> finfo = new ArrayList<long[]>();
         for (String name : m_gettersinfo.keySet()) {
             dynfieldinfo = m_dynfieldsinfo.get(name);
-
-            fieldinfo = new FieldInfo();
-            fieldinfo.name = String.format("MNEMONIC_%s_OFF",
-                               name.toUpperCase());
-            fieldinfo.type = TypeName.get(m_typeutils.getPrimitiveType(TypeKind.LONG));
-            fieldinfo.specbuilder = FieldSpec.builder(fieldinfo.type,
-                                  fieldinfo.name, Modifier.PUBLIC, Modifier.FINAL, Modifier.STATIC).initializer("$LL", dynfieldinfo.fieldoff);
-            m_gofffieldsinfo.put(fieldinfo.name, fieldinfo);
-
-            fieldinfo = new FieldInfo();
-            fieldinfo.name = String.format("MNEMONIC_%s_SZ",
-                               name.toUpperCase());
-            fieldinfo.type = TypeName.get(m_typeutils.getPrimitiveType(TypeKind.LONG));
-            fieldinfo.specbuilder = FieldSpec.builder(fieldinfo.type,
-                                  fieldinfo.name, Modifier.PUBLIC, Modifier.FINAL, Modifier.STATIC).initializer("$LL", dynfieldinfo.fieldsize);
-            m_gofffieldsinfo.put(fieldinfo.name, fieldinfo);
+            if (dynfieldinfo.id > 0) {
+                finfo.add(new long[]{dynfieldinfo.id, dynfieldinfo.fieldoff, dynfieldinfo.fieldsize});
+            }
         }
+
+        fieldinfo = new FieldInfo();
+        fieldinfo.name = String.format("m_nfieldinfo_%s",
+                           Utils.genRandomString());
+        fieldinfo.type = ArrayTypeName.of(ArrayTypeName.of(TypeName.LONG));
+        String initlstr = Utils.toInitLiteral(finfo);
+        fieldinfo.specbuilder = FieldSpec.builder(fieldinfo.type,
+                              fieldinfo.name, Modifier.PRIVATE, Modifier.STATIC).initializer("$1L", initlstr);
+        m_fieldsinfo.put("nfieldinfo", fieldinfo);
     }
 
     protected void buildGettersSpecs(TypeSpec.Builder typespecbuilder) throws AnnotationProcessingException {
@@ -678,6 +677,9 @@ public class AnnotatedNonVolatileEntityClass {
 		    }
 		}				
 		break;
+        case "getNativeFieldInfo" :
+        code.addStatement("return $1N", m_fieldsinfo.get("nfieldinfo").name);
+        break;
 	    default:
 		throw new AnnotationProcessingException(null, "Method %s is not supported.",
 							name);
@@ -889,9 +891,6 @@ public class AnnotatedNonVolatileEntityClass {
 
 	buildFieldSpecs(entitybuilder, m_dynfieldsinfo); 
 	buildFieldSpecs(entitybuilder, m_fieldsinfo);
-
-	buildGFieldsSpecs();
-	buildFieldSpecs(entitybuilder, m_gofffieldsinfo);
 
 	buildGettersSpecs(entitybuilder);
 	buildSettersSpecs(entitybuilder);
