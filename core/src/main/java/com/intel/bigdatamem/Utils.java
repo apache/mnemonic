@@ -302,4 +302,83 @@ public class Utils {
         return "{" + String.join(",", slist) + "}";
     }
 
+    /**
+     * retrieve a set of native field info from a list of object field info according to the field
+     * id info. it forms a value info stack for native code to use as one standardized parameter
+     *
+     * @param objstack
+     *           a stack of object info retrieved from Durable.getNativeFieldInfo(), order matters
+     *
+     * @param fidinfostack
+     *           a stack of field id in the form of (next_fid, next_level_fid) order follows objstack
+     *           the last next_level_fid specifies the value's fid.
+     *           the last item of next_fid could be null if there is no next node
+     *           if it is null that means the last item is a object instead of node
+     *
+     * @return   the stack of native field info
+     *
+     */
+    public static List<long[]> getNativeParamForm(List<long[][]> objstack, long[][] fidinfostack) {
+        List<long[]> ret = new ArrayList<long[]>();
+        if (null == objstack ||
+            null == fidinfostack ||
+            fidinfostack.length != objstack.size()) {
+            throw new IllegalArgumentException("Not the same depth");
+        }
+        for (int idx = 0; idx < fidinfostack.length; ++idx) {
+            ret.add(genNativeStackItem(objstack.get(idx), fidinfostack[idx],
+                    idx == fidinfostack.length - 1));
+        }
+        return ret;
+    }
+
+    /**
+     * generate an item of native stack.
+     *
+     * @param oinfo
+     *           a object field info
+     *
+     * @param fidinfo
+     *           a pair of field id info
+     *
+     * @param allowfidnull
+     *           allow the first field id is null
+     *
+     * @return the native item
+     */
+    public static long[] genNativeStackItem(long[][] oinfo, long[] fidinfo, boolean allowfidnull) {
+        long[] ret = new long[4];
+        long fid;
+        boolean found;
+        if (fidinfo.length != 2) {
+            throw new IllegalArgumentException("the length of field id array is not exactly 2");
+        }
+        for (int idx = 0; idx < fidinfo.length; ++idx) {
+            ret[idx*2] = 0;
+            ret[idx*2 + 1] = 0;
+            fid = fidinfo[idx];
+            if (fid <= 0) {
+                if (allowfidnull && 0 == idx) {
+                    continue;
+                } else {
+                    throw new IllegalArgumentException("the field id is not greater than 0");
+                }
+            }
+            found = false;
+            for (long[] finfo : oinfo) {
+                if (finfo.length != 3) {
+                    throw new IllegalArgumentException("the length of field array is not exactly 3");
+                }
+                if (fid == finfo[0]) {
+                    ret[idx*2] = finfo[1];
+                    ret[idx*2 + 1] = finfo[2];
+                    found = true;
+                }
+            }
+            if (!found) {
+                throw new IllegalArgumentException("field id not found");
+            }
+        }
+        return ret;
+    }
 }
