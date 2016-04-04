@@ -54,7 +54,7 @@ public abstract class NonVolatileNodeValue<E>
      *
      * @return the item value of this node
      */
-    @NonVolatileGetter(EntityFactoryProxies = "m_node_efproxies", GenericFieldTypes = "m_node_gftypes")
+    @NonVolatileGetter(Id = 1L, EntityFactoryProxies = "m_node_efproxies", GenericFieldTypes = "m_node_gftypes")
     abstract public E getItem();
 
     /**
@@ -76,7 +76,7 @@ public abstract class NonVolatileNodeValue<E>
      * @return the next node
      *
      */
-    @NonVolatileGetter(EntityFactoryProxies = "m_node_efproxies", GenericFieldTypes = "m_node_gftypes")
+    @NonVolatileGetter(Id = 2L, EntityFactoryProxies = "m_node_efproxies", GenericFieldTypes = "m_node_gftypes")
     abstract public NonVolatileNodeValue<E> getNext();
 
     /**

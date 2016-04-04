@@ -42,22 +42,22 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
 		return ret;
 	}
 
-	@NonVolatileGetter
+	@NonVolatileGetter(Id = 1L)
 	abstract public Short getAge();
 	@NonVolatileSetter
 	abstract public void setAge(Short age);
 	
-	@NonVolatileGetter
+	@NonVolatileGetter(Id = 2L)
 	abstract public String getName() throws RetrieveNonVolatileEntityError;
 	@NonVolatileSetter
 	abstract public void setName(String name, boolean destroy) throws OutOfPersistentMemory, RetrieveNonVolatileEntityError;
 	
-	@NonVolatileGetter
+	@NonVolatileGetter(Id = 3L)
 	abstract public Person<E> getMother() throws RetrieveNonVolatileEntityError;
 	@NonVolatileSetter
 	abstract public void setMother(Person<E> mother, boolean destroy) throws RetrieveNonVolatileEntityError;
 	
-	@NonVolatileGetter
+	@NonVolatileGetter(Id = 4L)
 	abstract public Person<E> getFather() throws RetrieveNonVolatileEntityError;
 	@NonVolatileSetter
 	abstract public void setFather(Person<E> mother, boolean destroy) throws RetrieveNonVolatileEntityError;

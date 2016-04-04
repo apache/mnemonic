@@ -63,4 +63,12 @@ public interface Durable {
      *
      */
     public void destroy() throws RetrieveNonVolatileEntityError;
+
+    /**
+     * return the native field map info for native processing.
+     *
+     * @return the native field map info
+     *
+     */
+    public long[][] getNativeFieldInfo();
 }

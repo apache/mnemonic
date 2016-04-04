@@ -277,4 +277,12 @@ public class GenericField<A extends CommonPersistAllocator<A>, E> implements Dur
     public void setupGenericInfo(EntityFactoryProxy[] efproxies, GType[] gftypes) {
 	throw new UnsupportedOperationException("GenericField.setupGenericInfo()");
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long[][] getNativeFieldInfo() {
+        throw new UnsupportedOperationException("getNativeFieldInfo() on Generic Field.");
+    }
 }
