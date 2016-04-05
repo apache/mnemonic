@@ -28,7 +28,7 @@ title: Coding Guidelines
 ## Naming
 
 * Packages should be all lowercase.
-  * Java code should be in `org.apache.,metron`, except for compatibility classes 
+  * Java code should be in `org.apache.,mnemonic`, except for compatibility classes
 * Classes should be in mixed case.
 * Variables should be in camel case.
 * Constants should be in upper case.

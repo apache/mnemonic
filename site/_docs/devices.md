@@ -1,5 +1,5 @@
 ---
 layout: docs
-title: Sensor Ecosystem
-permalink: /docs/sensor.html
+title: Device Support
+permalink: /docs/devices.html
 ---

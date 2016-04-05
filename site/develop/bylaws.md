@@ -1,16 +1,16 @@
 ---
 layout: page
-title: Apache Metron Bylaws
+title: Apache Mnemonic Bylaws
 ---
 
 ## Introduction
 
-This document defines the bylaws under which the Apache Metron project
+This document defines the bylaws under which the Apache mnemonic project
 operates. It defines the roles and responsibilities of the project,
 who may vote, how voting works, how conflicts are resolved, etc.
 
-Metron is a project of the Apache Software Foundation (ASF) and the foundation
-holds the trademark on the name "Metron" and copyright on the combined
+mnemonic is a project of the Apache Software Foundation (ASF) and the foundation
+holds the trademark on the name "mnemonic" and copyright on the combined
 code base. The [Apache Foundation
 FAQ](http://www.apache.org/foundation/faq.html) and
 [How-It-Works](http://www.apache.org/foundation/how-it-works.html)
@@ -30,7 +30,7 @@ it expects its members to follow. In particular:
   efforts to work on this project. Please be respectful of everyone
   and their views.
 
-Metron is typical of Apache projects in that it operates under a set of
+mnemonic is typical of Apache projects in that it operates under a set of
 principles, known collectively as the "Apache Way". If you are new to
 Apache development, please refer to the [Incubator
 project](http://incubator.apache.org/) for more
@@ -57,7 +57,7 @@ lists and user support forums.
 
 Contributors include all of the volunteers who donate time, code,
 documentation,
-or resources to the Metron Project. A contributor that makes sustained,
+or resources to the mnemonic Project. A contributor that makes sustained,
 welcome contributions to the project may be invited to become a
 committer, though the exact timing of such invitations depends on many
 factors.
@@ -102,14 +102,14 @@ make a Release Candidate.
 
 ### Project Management Committee
 
-The Project Management Committee (PMC) for Apache Metron was created by
-the Apache Board in December 2015 when Metron moved out of Cisco's OpenSOC  
+The Project Management Committee (PMC) for Apache mnemonic was created by
+the Apache Board in December 2015 when mnemonic moved out of Cisco's OpenSOC  
 project and became an incubated project at Apache.
 The PMC is responsible to the board and
-the ASF for the management and oversight of the Apache Metron
+the ASF for the management and oversight of the Apache mnemonic
 codebase. The responsibilities of the PMC include
 
-  * Deciding what is distributed as products of the Apache Metron
+  * Deciding what is distributed as products of the Apache mnemonic
     project. In particular all releases must be approved by the PMC.
 
   * Maintaining the project's shared resources, including the codebase
@@ -134,9 +134,9 @@ approval of the active PMC members.
 
 The chair of the PMC is appointed by the ASF board. The chair is an
 office holder of the Apache Software Foundation (Vice President,
-Apache Metron) and has primary responsibility to the board for the
-management of the project within the scope of the Metron PMC. The
-chair reports to the board quarterly on developments within the Metron
+Apache mnemonic) and has primary responsibility to the board for the
+management of the project within the scope of the mnemonic PMC. The
+chair reports to the board quarterly on developments within the mnemonic
 project.
 
 When the project desires a new PMC chair, the PMC votes to recommend a
@@ -146,7 +146,7 @@ must be ratified by the Apache board.
 
 ## Decision Making
 
-Within the Metron project, different types of decisions require
+Within the mnemonic project, different types of decisions require
 different forms of approval. For example, the previous section
 describes several decisions which require "consensus approval."
 This section defines how voting is performed, the types of
@@ -155,8 +155,8 @@ approvals, and which types of decision require which type of approval.
 ### Voting
 
 Decisions regarding the project are made by votes on the primary
-project development mailing list (dev@Metron.apache.org). Where
-necessary, PMC voting may take place on the private Metron PMC mailing
+project development mailing list (dev@mnemonic.apache.org). Where
+necessary, PMC voting may take place on the private mnemonic PMC mailing
 list. Votes are clearly indicated by subject line starting with
 [VOTE]. Votes may contain multiple items for approval and these should
 be clearly separated. Voting is carried out by replying to the vote
@@ -182,7 +182,7 @@ mail. Voting may take five flavors:
    void. It may also be appropriate for a -1 vote to include an
    alternative course of action.
 
-All participants in the Metron project are encouraged to show their
+All participants in the mnemonic project are encouraged to show their
 agreement for or against a particular action by voting, regardless of
 whether their vote is binding. Nonbinding votes are useful for
 encouraging discussion and understanding the scope of opinions within
