@@ -3,21 +3,21 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.intel.mnemonic</groupId>
+    <groupId>org.apache.mnemonic</groupId>
     <artifactId>mnemonic-parent</artifactId>
     <version>2.0.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
 
-  <groupId>com.intel.bigdatamem</groupId>
+  <groupId>org.apache.mnemonic.collections</groupId>
   <artifactId>mnemonic-collections</artifactId>
   <packaging>jar</packaging>
   <name>Mnemonic Project Collections</name>
 
   <dependencies>
     <dependency>
-      <groupId>com.intel.bigdatamem</groupId>
+      <groupId>org.apache.mnemonic</groupId>
       <artifactId>mnemonic-core</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -80,7 +80,7 @@
             <configuration>
               <compilerArguments>-XDenableSunApiLintControl</compilerArguments>
               <processors>
-                <processor>${project.groupId}.NonVolatileEntityProcessor</processor>
+                <processor>${project.parent.groupId}.NonVolatileEntityProcessor</processor>
               </processors>
             </configuration>
           </execution>
@@ -91,7 +91,7 @@
             <configuration>
               <compilerArguments>-XDenableSunApiLintControl</compilerArguments>
               <processors>
-                <processor>${project.groupId}.NonVolatileEntityProcessor</processor>
+                <processor>${project.parent.groupId}.NonVolatileEntityProcessor</processor>
               </processors>
             </configuration>
           </execution>

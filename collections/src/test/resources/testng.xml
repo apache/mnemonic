@@ -3,15 +3,15 @@
 <suite name="Suite" verbose="1" parallel="tests" thread-count="1">
   <test name="Test">
     <classes>
-      <class name="com.intel.bigdatamem.collections.NonVolatileNodeValueNGTest"/> 
+      <class name="org.apache.mnemonic.collections.NonVolatileNodeValueNGTest"/> 
     </classes>
   </test> <!-- Test -->
 </suite> <!-- Suite -->
 
 
 <!--
-      <class name="com.intel.bigdatamem.collections.Person"/>
-      <class name="com.intel.bigdatamem.collections.NonVolatilePersonNGTest"/>
-      <class name="com.intel.bigdatamem.collections.NonVolatileListNGTest"/>
-      <class name="com.intel.bigdatamem.collections.NonVolatileNodeValueNGTest"/> 
+      <class name="org.apache.mnemonic.collections.Person"/>
+      <class name="org.apache.mnemonic.collections.NonVolatilePersonNGTest"/>
+      <class name="org.apache.mnemonic.collections.NonVolatileListNGTest"/>
+      <class name="org.apache.mnemonic.collections.NonVolatileNodeValueNGTest"/> 
  -->
