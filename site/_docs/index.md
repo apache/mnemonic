@@ -4,4 +4,4 @@ title: Background
 permalink: /docs/index.html
 ---
 
-Back in December 2015, we created Metron files as part of the transition of the OpenSOC project from Cisco. 
+In February 2016, we created Mnemonic files as part of the transition of the OpenSOC project from Cisco. 

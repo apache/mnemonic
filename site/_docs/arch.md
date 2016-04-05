@@ -1,5 +1,5 @@
 ---
 layout: page
-title: Metron Architecture
+title: Mnemonic Architecture
 permalink: /docs/arch.html
 ---
