@@ -184,7 +184,7 @@ To build this library, you may need to install some required packages on the bui
 * **JDK** -- the Java Develop Kit 1.6 or above (please properly configure JAVA_HOME) [Required]
 * **PMFS** -- the PMFS should be properly installed and configured on Linux system if you want to simulate read latency [Optional]
 * **PMalloc** -- a supported durable memory native library at https://github.com/bigdata-memory/pmalloc.git [Optional if pmalloc-service is excluded]
-* **Javapoet** -- a dependant project v1.3.1-SNAPSHOT revised for this project at https://github.com/wewela/javapoet.git [Required]
+* **Javapoet** -- a dependant project v1.3.1-SNAPSHOT customized for this project at https://github.com/wewela/javapoet.git [Required] [Note that please package & install it using command "mvn package install"]
 
 
 Once the build system is setup, this Library is built using this command at the top level:
