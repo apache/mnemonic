@@ -183,7 +183,7 @@ To build this library, you may need to install some required packages on the bui
 * **NVML** -- the NVM library (Please compile this library that is tagged with 0.1+b16) (http://pmem.io) [Optional if nvml-vmem-service is excluded]
 * **JDK** -- the Java Develop Kit 1.6 or above (please properly configure JAVA_HOME) [Required]
 * **PMFS** -- the PMFS should be properly installed and configured on Linux system if you want to simulate read latency [Optional]
-* **PMalloc** -- a supported durable memory native library at https://github.com/bigdata-memory/pmalloc.git [Optional if pmalloc-service is excluded]
+* **PMalloc** -- a supported durable memory native library at https://github.com/NonVolatileComputing/pmalloc.git [Optional if pmalloc-service is excluded]
 * **Javapoet** -- a dependant project v1.3.1-SNAPSHOT customized for this project at https://github.com/wewela/javapoet.git [Required] [Note that please package & install it using command "mvn package install"]
 
 
