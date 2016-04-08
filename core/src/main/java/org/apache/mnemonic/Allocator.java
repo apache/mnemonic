@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.mnemonic;
 
 /**
@@ -6,34 +23,34 @@ package org.apache.mnemonic;
  */
 public interface Allocator<A extends CommonAllocator<A>> extends Allocatable<A> {
 
-    /**
-     * release the underlying memory pool and close it.
-     * 
-     */
-    public void close();
+  /**
+   * release the underlying memory pool and close it.
+   * 
+   */
+  public void close();
 
-    /**
-     * sync. dirty data to underlying memory-like device
-     *
-     */
-    public void sync();
+  /**
+   * sync. dirty data to underlying memory-like device
+   *
+   */
+  public void sync();
 
-    /**
-     * enable active garbage collection. the GC will be forced to collect garbages when
-     * there is no more space for current allocation request.
-     *
-     * @param timeout
-     *            the timeout is used to yield for GC performing
-     *
-     * @return this allocator
-     */
-    public A enableActiveGC(long timeout);
+  /**
+   * enable active garbage collection. the GC will be forced to collect garbages
+   * when there is no more space for current allocation request.
+   *
+   * @param timeout
+   *          the timeout is used to yield for GC performing
+   *
+   * @return this allocator
+   */
+  public A enableActiveGC(long timeout);
 
-    /**
-     * disable active garbage collection.
-     *
-     * @return this allocator 
-     */
-    public A disableActiveGC();
+  /**
+   * disable active garbage collection.
+   *
+   * @return this allocator
+   */
+  public A disableActiveGC();
 
 }
