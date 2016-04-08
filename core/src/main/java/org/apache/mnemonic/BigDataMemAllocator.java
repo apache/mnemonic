@@ -149,7 +149,7 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
 	if (size > 0) {
 	    Long addr = m_vmasvc.reallocate(m_nid, mholder.get(), size, true);
 	    if (0 == addr && m_activegc) {
-		forceGC();
+	        m_chunkcollector.waitReclaimCoolDown(m_gctimeout);
 		addr = m_vmasvc.reallocate(m_nid, mholder.get(), size, true);
 	    }
 	    if (0 != addr) {
@@ -186,7 +186,7 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
 	    int buflimit = mholder.get().limit();
 	    ByteBuffer buf = m_vmasvc.resizeByteBuffer(m_nid, mholder.get(), size);
 	    if (null == buf && m_activegc) {
-		forceGC();
+	        m_bufcollector.waitReclaimCoolDown(m_gctimeout);
 		buf = m_vmasvc.resizeByteBuffer(m_nid, mholder.get(), size);
 	    }
 	    if (null != buf) {
@@ -220,7 +220,7 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
 	MemChunkHolder<BigDataMemAllocator> ret = null;
 	Long addr = m_vmasvc.allocate(m_nid, size, true);
 	if (0 == addr && m_activegc) {
-	    forceGC();
+	    m_chunkcollector.waitReclaimCoolDown(m_gctimeout);
 	    addr = m_vmasvc.allocate(m_nid, size, true);
 	}
 	if (0 != addr) {
@@ -250,7 +250,7 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
 	MemBufferHolder<BigDataMemAllocator> ret = null;
 	ByteBuffer bb = m_vmasvc.createByteBuffer(m_nid, size);
 	if (null == bb && m_activegc) {
-	    forceGC();
+	    m_bufcollector.waitReclaimCoolDown(m_gctimeout);
 	    bb = m_vmasvc.createByteBuffer(m_nid, size);
 	}
 	if (null != bb) {
@@ -261,18 +261,6 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
 	    }
 	}
 	return ret;
-    }
-	
-    /**
-     * force to perform GC that is used to release unused backed memory
-     * resources.
-     */
-    private void forceGC() {
-	System.gc();
-	try {
-	    Thread.sleep(m_gctimeout);
-	} catch (Exception ex) {
-	}
     }
 
 }

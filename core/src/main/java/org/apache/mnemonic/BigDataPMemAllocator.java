@@ -117,7 +117,6 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
      */
     @Override
     public void close() {
-	forceGC();
 	super.close();
 	m_nvmasvc.close(m_nid);
     }
@@ -150,7 +149,7 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 	if (size > 0) {
 	    Long addr = m_nvmasvc.reallocate(m_nid, mholder.get(), size, true);
 	    if (0 == addr && m_activegc) {
-		forceGC();
+	        m_chunkcollector.waitReclaimCoolDown(m_gctimeout);
 		addr = m_nvmasvc.reallocate(m_nid, mholder.get(), size, true);
 	    }
 	    if (0 != addr) {
@@ -187,7 +186,7 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 	    int buflimit = mholder.get().limit();
 	    ByteBuffer buf = m_nvmasvc.resizeByteBuffer(m_nid, mholder.get(), size);
 	    if (null == buf && m_activegc) {
-		forceGC();
+	        m_bufcollector.waitReclaimCoolDown(m_gctimeout);
 		buf = m_nvmasvc.resizeByteBuffer(m_nid, mholder.get(), size);
 	    }
 	    if (null != buf) {
@@ -221,7 +220,7 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 	MemChunkHolder<BigDataPMemAllocator> ret = null;
 	Long addr = m_nvmasvc.allocate(m_nid, size, true);
 	if ((null == addr || 0 == addr) && m_activegc) {
-	    forceGC();
+	    m_chunkcollector.waitReclaimCoolDown(m_gctimeout);
 	    addr = m_nvmasvc.allocate(m_nid, size, true);
 	}
 	if (null != addr && 0 != addr) {
@@ -251,7 +250,7 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 	MemBufferHolder<BigDataPMemAllocator> ret = null;
 	ByteBuffer bb = m_nvmasvc.createByteBuffer(m_nid, size);
 	if (null == bb && m_activegc) {
-	    forceGC();
+	    m_bufcollector.waitReclaimCoolDown(m_gctimeout);
 	    bb = m_nvmasvc.createByteBuffer(m_nid, size);
 	}
 	if (null != bb) {
@@ -405,19 +404,6 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
 	return m_nvmasvc.handlerCapacity(m_nid);
     }
 	
-    /**
-     * force to perform GC that is used to re-claim garbages objects 
-     * as well as memory resources managed by this allocator.
-     *
-     */
-    private void forceGC() {
-	System.gc();
-	try {
-	    Thread.sleep(m_gctimeout);
-	} catch (Exception ex) {
-	}
-    }
-
     /**
      * calculate the portable address
      *

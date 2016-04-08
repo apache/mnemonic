@@ -163,7 +163,7 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
 	if (size > 0) {
 	    if (currentMemory.get() + size > maxStoreCapacity) {
 		if (m_activegc) {
-		    forceGC();
+		    m_chunkcollector.waitReclaimCoolDown(m_gctimeout);
 		}
 	    }
 	    if (currentMemory.get() + size <= maxStoreCapacity) {
@@ -203,7 +203,7 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
 	    int buflimit = mholder.get().limit();
 	    if (currentMemory.get() + size > maxStoreCapacity) {
 		if (m_activegc) {
-		    forceGC();
+		    m_bufcollector.waitReclaimCoolDown(m_gctimeout);
 		}
 	    }
 	    if (currentMemory.get() + size <= maxStoreCapacity) {
@@ -241,7 +241,7 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
 	Long addr = null;
 	if (currentMemory.get() + size > maxStoreCapacity) {
 	    if (m_activegc) {
-		forceGC();
+	        m_chunkcollector.waitReclaimCoolDown(m_gctimeout);
 	    }
 	}
 	if (currentMemory.get() + size <= maxStoreCapacity) {
@@ -273,7 +273,7 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
 	ByteBuffer bb = null;
 	if (currentMemory.get() + size > maxStoreCapacity) {
 	    if (m_activegc) {
-		forceGC();
+	        m_bufcollector.waitReclaimCoolDown(m_gctimeout);
 	    }
 	}
 	if (currentMemory.get() + size <= maxStoreCapacity) {
@@ -289,17 +289,5 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
 	}
 	return ret;
     }
-	
-    /**
-     * force to perform GC that is used to release unused backed memory
-     * resources.
-     */
-    private void forceGC() {
-	System.gc();
-	try {
-	    Thread.sleep(m_gctimeout);
-	} catch (Exception ex) {
-	}
-    }
-	
+
 }
