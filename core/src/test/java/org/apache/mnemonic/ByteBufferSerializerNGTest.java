@@ -17,12 +17,7 @@
 
 package org.apache.mnemonic;
 
-import static org.testng.Assert.*;
-
-import org.apache.mnemonic.BigDataMemAllocator;
-import org.apache.mnemonic.ByteBufferSerializer;
-import org.apache.mnemonic.MemBufferHolder;
-import org.apache.mnemonic.Utils;
+import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
 
 import java.nio.ByteBuffer;

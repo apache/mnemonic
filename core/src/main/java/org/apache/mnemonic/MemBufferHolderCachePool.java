@@ -203,11 +203,13 @@ public class MemBufferHolderCachePool<KeyT> extends CachePool<KeyT, MemBufferHol
       EvictFilter<KeyT, MemBufferHolder<?>> dfilter) {
     boolean ret = false;
 
-    if (freesz <= freeCapacity())
+    if (freesz <= freeCapacity()) {
       return true;
+    }
 
-    if (freesz > maxStoreCapacity)
+    if (freesz > maxStoreCapacity) {
       return false;
+    }
 
     long selectedMemory = 0L;
     Set<KeyT> selected = new HashSet<KeyT>();

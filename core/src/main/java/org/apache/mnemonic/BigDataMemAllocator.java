@@ -19,9 +19,9 @@ package org.apache.mnemonic;
 
 import java.nio.ByteBuffer;
 
-import org.flowcomputing.commons.resgc.*;
-import org.flowcomputing.commons.primitives.*;
 import org.apache.mnemonic.service.allocatorservice.VolatileMemoryAllocatorService;
+import org.flowcomputing.commons.resgc.ResCollector;
+import org.flowcomputing.commons.resgc.ResReclaim;
 
 /**
  * manage a big native memory pool through libvmem.so that is provied by Intel

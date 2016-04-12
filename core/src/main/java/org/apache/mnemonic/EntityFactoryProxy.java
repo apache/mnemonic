@@ -48,6 +48,6 @@ public interface EntityFactoryProxy {
    * @return the restored non-volatile object from this factory proxy
    *
    */
-  public abstract <A extends CommonPersistAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
+  <A extends CommonPersistAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
       GenericField.GType[] gfields, long phandler, boolean autoreclaim);
 }

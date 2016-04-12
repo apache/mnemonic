@@ -17,16 +17,10 @@
 
 package org.apache.mnemonic;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
-import org.apache.mnemonic.BigDataMemAllocator;
-import org.apache.mnemonic.CommonAllocator;
-import org.apache.mnemonic.MemBufferHolder;
-import org.apache.mnemonic.MemClustering;
-import org.apache.mnemonic.SysMemAllocator;
-import org.apache.mnemonic.Utils;
 import org.testng.annotations.Test;
-
 import java.util.Random;
 
 /**

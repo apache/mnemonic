@@ -17,11 +17,6 @@
 
 package org.apache.mnemonic;
 
-import org.apache.mnemonic.Allocator;
-import org.apache.mnemonic.BigDataMemAllocator;
-import org.apache.mnemonic.MemBufferHolder;
-import org.apache.mnemonic.MemChunkHolder;
-import org.apache.mnemonic.Utils;
 import org.testng.annotations.Test;
 
 import java.util.Random;

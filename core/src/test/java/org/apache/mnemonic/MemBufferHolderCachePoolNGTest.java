@@ -17,19 +17,10 @@
 
 package org.apache.mnemonic;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertEquals;
 
-import org.apache.mnemonic.BigDataMemAllocator;
-import org.apache.mnemonic.CachePool;
-import org.apache.mnemonic.ContainerOverflowException;
-import org.apache.mnemonic.DropEvent;
-import org.apache.mnemonic.EvictFilter;
-import org.apache.mnemonic.MemBufferHolder;
-import org.apache.mnemonic.MemBufferHolderCachePool;
-import org.apache.mnemonic.MemClustering;
-import org.apache.mnemonic.Utils;
 import org.testng.annotations.Test;
-
 import java.util.Random;
 
 /**

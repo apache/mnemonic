@@ -17,11 +17,15 @@
 
 package org.apache.mnemonic.collections;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.apache.mnemonic.*;
+import org.apache.mnemonic.Durable;
+import org.apache.mnemonic.EntityFactoryProxy;
+import org.apache.mnemonic.GenericField;
+import org.apache.mnemonic.NonVolatileEntity;
+import org.apache.mnemonic.NonVolatileGetter;
+import org.apache.mnemonic.NonVolatileSetter;
 
 /**
  * this class defines a non-volatile node for a generic value to form a
@@ -74,7 +78,7 @@ public abstract class NonVolatileNodeValue<E> implements Durable, Iterable<E> {
    * @return the item value of this node
    */
   @NonVolatileGetter(Id = 1L, EntityFactoryProxies = "m_node_efproxies", GenericFieldTypes = "m_node_gftypes")
-  abstract public E getItem();
+  public abstract E getItem();
 
   /**
    * set a value to this node item
@@ -87,7 +91,7 @@ public abstract class NonVolatileNodeValue<E> implements Durable, Iterable<E> {
    *
    */
   @NonVolatileSetter
-  abstract public void setItem(E value, boolean destroy);
+  public abstract void setItem(E value, boolean destroy);
 
   /**
    * get next node
@@ -96,7 +100,7 @@ public abstract class NonVolatileNodeValue<E> implements Durable, Iterable<E> {
    *
    */
   @NonVolatileGetter(Id = 2L, EntityFactoryProxies = "m_node_efproxies", GenericFieldTypes = "m_node_gftypes")
-  abstract public NonVolatileNodeValue<E> getNext();
+  public abstract NonVolatileNodeValue<E> getNext();
 
   /**
    * set next node
@@ -108,7 +112,7 @@ public abstract class NonVolatileNodeValue<E> implements Durable, Iterable<E> {
    *          true if want to destroy the exist node
    */
   @NonVolatileSetter
-  abstract public void setNext(NonVolatileNodeValue<E> next, boolean destroy);
+  public abstract void setNext(NonVolatileNodeValue<E> next, boolean destroy);
 
   /**
    * get an iterator instance of this list

@@ -17,7 +17,6 @@
 
 package org.apache.mnemonic.service.allocatorservice;
 
-import org.flowcomputing.commons.primitives.*;
 import java.nio.ByteBuffer;
 
 public interface VolatileMemoryAllocatorService {
@@ -27,7 +26,7 @@ public interface VolatileMemoryAllocatorService {
    *
    * @return the service identifer of this allocator
    */
-  public String getServiceId();
+  String getServiceId();
 
   /**
    * Initialize a memory pool through native interface backed by native library.
@@ -43,19 +42,19 @@ public interface VolatileMemoryAllocatorService {
    *
    * @return the identifier of created memory pool
    */
-  public long init(long capacity, String uri, boolean isnew);
+  long init(long capacity, String uri, boolean isnew);
 
   /**
    * close the memory pool through native interface.
    * 
    */
-  public void close(long id);
+  void close(long id);
 
   /**
    * force to synchronize uncommitted data to backed memory pool through native
    * interface.
    */
-  public void sync(long id);
+  void sync(long id);
 
   /**
    * allocate specified size of memory block from backed memory pool.
@@ -68,7 +67,7 @@ public interface VolatileMemoryAllocatorService {
    * 
    * @return the address of allocated memory block from native memory pool
    */
-  public long allocate(long id, long size, boolean initzero);
+  long allocate(long id, long size, boolean initzero);
 
   /**
    * reallocate a specified size of memory block from backed memory pool.
@@ -84,7 +83,7 @@ public interface VolatileMemoryAllocatorService {
    * 
    * @return the address of reallocated memory block from native memory pool
    */
-  public long reallocate(long id, long address, long size, boolean initzero);
+  long reallocate(long id, long address, long size, boolean initzero);
 
   /**
    * free a memory block by specify its address into backed memory pool.
@@ -95,7 +94,7 @@ public interface VolatileMemoryAllocatorService {
    * @param address
    *          the address of allocated memory block.
    */
-  public void free(long id, long address);
+  void free(long id, long address);
 
   /**
    * create a ByteBuffer object which backed buffer is coming from backed native
@@ -110,7 +109,7 @@ public interface VolatileMemoryAllocatorService {
    * 
    * @return a created ByteBuffer object with a backed native memory block
    */
-  public ByteBuffer createByteBuffer(long id, long size);
+  ByteBuffer createByteBuffer(long id, long size);
 
   /**
    * resize a ByteBuffer object which backed buffer is coming from backed native
@@ -129,7 +128,7 @@ public interface VolatileMemoryAllocatorService {
    * 
    * @return a created ByteBuffer object with a backed native memory block
    */
-  public ByteBuffer resizeByteBuffer(long id, ByteBuffer bytebuf, long size);
+  ByteBuffer resizeByteBuffer(long id, ByteBuffer bytebuf, long size);
 
   /**
    * destroy a native memory block backed ByteBuffer object.
@@ -140,5 +139,5 @@ public interface VolatileMemoryAllocatorService {
    * @param bytebuf
    *          the specified ByteBuffer object to be destroyed
    */
-  public void destroyByteBuffer(long id, ByteBuffer bytebuf);
+  void destroyByteBuffer(long id, ByteBuffer bytebuf);
 }

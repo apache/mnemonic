@@ -17,13 +17,14 @@
 
 package org.apache.mnemonic;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.flowcomputing.commons.resgc.*;
+import org.flowcomputing.commons.resgc.ResCollector;
+import org.flowcomputing.commons.resgc.ResReclaim;
 
 import sun.misc.Unsafe;
 import sun.misc.Cleaner;

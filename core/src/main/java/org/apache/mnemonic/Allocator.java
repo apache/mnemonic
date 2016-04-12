@@ -27,13 +27,13 @@ public interface Allocator<A extends CommonAllocator<A>> extends Allocatable<A> 
    * release the underlying memory pool and close it.
    * 
    */
-  public void close();
+  void close();
 
   /**
    * sync. dirty data to underlying memory-like device
    *
    */
-  public void sync();
+  void sync();
 
   /**
    * enable active garbage collection. the GC will be forced to collect garbages
@@ -44,13 +44,13 @@ public interface Allocator<A extends CommonAllocator<A>> extends Allocatable<A> 
    *
    * @return this allocator
    */
-  public A enableActiveGC(long timeout);
+  A enableActiveGC(long timeout);
 
   /**
    * disable active garbage collection.
    *
    * @return this allocator
    */
-  public A disableActiveGC();
+  A disableActiveGC();
 
 }

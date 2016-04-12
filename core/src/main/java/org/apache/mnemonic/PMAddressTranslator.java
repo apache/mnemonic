@@ -31,7 +31,7 @@ public interface PMAddressTranslator {
    *
    * @return the portable address
    */
-  public long getPortableAddress(long addr);
+  long getPortableAddress(long addr);
 
   /**
    * calculate the effective address
@@ -41,14 +41,14 @@ public interface PMAddressTranslator {
    *
    * @return the effective address
    */
-  public long getEffectiveAddress(long addr);
+  long getEffectiveAddress(long addr);
 
   /**
    * get the base address
    *
    * @return the base address
    */
-  public long getBaseAddress();
+  long getBaseAddress();
 
   /**
    * set the base address for calculation
@@ -57,5 +57,5 @@ public interface PMAddressTranslator {
    *          the base address
    *
    */
-  public long setBaseAddress(long addr);
+  long setBaseAddress(long addr);
 }

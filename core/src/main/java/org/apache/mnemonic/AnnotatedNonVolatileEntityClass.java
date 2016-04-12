@@ -18,7 +18,6 @@
 package org.apache.mnemonic;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -26,7 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.processing.*;
+import javax.annotation.processing.Filer;
+import javax.annotation.processing.Messager;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -35,22 +35,34 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-import sun.misc.Unsafe;
 
-import com.squareup.javapoet.*;
+import com.squareup.javapoet.AnnotationSpec;
+import com.squareup.javapoet.ArrayTypeName;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.CodeBlock;
+import com.squareup.javapoet.FieldSpec;
+import com.squareup.javapoet.JavaFile;
+import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.MethodSpec.Builder;
+import com.squareup.javapoet.ParameterSpec;
+import com.squareup.javapoet.ParameterizedTypeName;
+import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.TypeVariableName;
+
+import sun.misc.Unsafe;
 
 /**
  * this class managed to generate generic non-volatile concrete object and their
  * corresponding factory.
  *
  */
+@SuppressWarnings("restriction")
 public class AnnotatedNonVolatileEntityClass {
   protected class MethodInfo {
     public ExecutableElement elem;
@@ -69,18 +81,17 @@ public class AnnotatedNonVolatileEntityClass {
     public long fieldsize;
   }
 
-  protected final String FACTORYNAMESUFFIX = "Factory";
-  protected final String PMEMNAMEPREFIX = "NonVolatile_";
-  protected final String FIELDNAMESUFFIX = String.format("_field_%s", Utils.genRandomString());
-  protected final String ALLOCATORFIELDNAME = String.format("alloc_%s", Utils.genRandomString());
-  protected final String AUTORECLAIMFIELDNAME = String.format("autoreclaim_%s", Utils.genRandomString());
-  protected final String UNSAFEFIELDNAME = String.format("unsafe_%s", Utils.genRandomString());
-  protected final String HOLDERFIELDNAME = String.format("holder_%s", Utils.genRandomString());
-  protected final String ALLOCTYPENAME = String.format("ALLOC_PMem3C93D24F59");
+  protected final String cFACTORYNAMESUFFIX = "Factory";
+  protected final String cPMEMNAMEPREFIX = "NonVolatile_";
+  protected final String cFIELDNAMESUFFIX = String.format("_field_%s", Utils.genRandomString());
+  protected final String cALLOCATORFIELDNAME = String.format("alloc_%s", Utils.genRandomString());
+  protected final String cAUTORECLAIMFIELDNAME = String.format("autoreclaim_%s", Utils.genRandomString());
+  protected final String cUNSAFEFIELDNAME = String.format("unsafe_%s", Utils.genRandomString());
+  protected final String cHOLDERFIELDNAME = String.format("holder_%s", Utils.genRandomString());
+  protected final String cALLOCTYPENAME = String.format("ALLOC_PMem3C93D24F59");
 
   private Types m_typeutils;
   private Elements m_elemutils;
-  private Messager m_msgr;
   private TypeElement m_elem;
 
   private String m_factoryname;
@@ -90,11 +101,11 @@ public class AnnotatedNonVolatileEntityClass {
 
   private String m_packagename;
 
-  private TypeName m_alloctypename = TypeVariableName.get(ALLOCTYPENAME);
+  private TypeName m_alloctypename = TypeVariableName.get(cALLOCTYPENAME);
   private TypeName m_factoryproxystypename = TypeName.get(EntityFactoryProxy[].class);
   private TypeName m_gfieldstypename = TypeName.get(GenericField.GType[].class);
-  private TypeVariableName m_alloctypevarname = TypeVariableName.get(ALLOCTYPENAME,
-      ParameterizedTypeName.get(ClassName.get(CommonPersistAllocator.class), TypeVariableName.get(ALLOCTYPENAME)));
+  private TypeVariableName m_alloctypevarname = TypeVariableName.get(cALLOCTYPENAME,
+      ParameterizedTypeName.get(ClassName.get(CommonPersistAllocator.class), TypeVariableName.get(cALLOCTYPENAME)));
 
   private Map<String, MethodInfo> m_gettersinfo = new HashMap<String, MethodInfo>();
   private Map<String, MethodInfo> m_settersinfo = new HashMap<String, MethodInfo>();
@@ -160,12 +171,11 @@ public class AnnotatedNonVolatileEntityClass {
     m_elem = classElement;
     m_typeutils = typeUtils;
     m_elemutils = elementUtils;
-    m_msgr = messager;
 
     m_packagename = m_elemutils.getPackageOf(m_elem).getQualifiedName().toString();
 
-    m_factoryname = String.format("%s%s", m_elem.getSimpleName(), FACTORYNAMESUFFIX);
-    m_entityname = String.format("%s%s_%s", PMEMNAMEPREFIX, m_elem.getSimpleName(), Utils.genRandomString());
+    m_factoryname = String.format("%s%s", m_elem.getSimpleName(), cFACTORYNAMESUFFIX);
+    m_entityname = String.format("%s%s_%s", cPMEMNAMEPREFIX, m_elem.getSimpleName(), Utils.genRandomString());
 
     m_durablemtdinfo.put("cancelAutoReclaim", new MethodInfo());
     m_durablemtdinfo.put("registerAutoReclaim", new MethodInfo());
@@ -292,13 +302,6 @@ public class AnnotatedNonVolatileEntityClass {
           methodinfo.specbuilder = MethodSpec.overriding(methodinfo.elem);
           m_settersinfo.put(methodname.substring(3), methodinfo);
         }
-        // if
-        // (!methodinfo.elem.getThrownTypes().contains(m_elemutils.getTypeElement(RetrieveNonVolatileEntityError.class.getCanonicalName()).asType()))
-        // {
-        // throw new AnnotationProcessingException(methodinfo.elem, "%s must
-        // throw out %s.",
-        // methodname, RetrieveNonVolatileEntityError.class.getName());
-        // }
       }
     }
 
@@ -309,45 +312,7 @@ public class AnnotatedNonVolatileEntityClass {
       if (!m_gettersinfo.containsKey(name)) {
         throw new AnnotationProcessingException(null, "%s has no getter.", name);
       }
-      // if
-      // (m_dynfieldsinfo.get(name).type.toString().equals(String.class.getCanonicalName()))
-      // {
-      // minfo = m_settersinfo.get(name);
-      // if
-      // (!minfo.elem.getThrownTypes().contains(m_elemutils.getTypeElement(OutOfPersistentMemory.class.getCanonicalName()).asType()))
-      // {
-      // throw new AnnotationProcessingException(minfo.elem, "%s must throw out
-      // %s.",
-      // gsetterName(name, false), OutOfPersistentMemory.class.getName());
-      // }
-      // }
     }
-
-    // for (String name : m_dynfieldsinfo.keySet()) {
-    // if (!isUnboxPrimitive(m_dynfieldsinfo.get(name).type)) {
-    // if (m_gettersinfo.containsKey(name)) {
-    // minfo = m_gettersinfo.get(name);
-    // if
-    // (!minfo.elem.getThrownTypes().contains(m_elemutils.getTypeElement(RetrieveNonVolatileEntityError.class.getCanonicalName()).asType()))
-    // {
-    // throw new AnnotationProcessingException(minfo.elem, "%s must throw out
-    // %s.",
-    // gsetterName(name, true), RetrieveNonVolatileEntityError.class.getName());
-    // }
-    // }
-    // if (m_settersinfo.containsKey(name)) {
-    // minfo = m_settersinfo.get(name);
-    // if
-    // (!minfo.elem.getThrownTypes().contains(m_elemutils.getTypeElement(RetrieveNonVolatileEntityError.class.getCanonicalName()).asType()))
-    // {
-    // throw new AnnotationProcessingException(minfo.elem, "%s must throw out
-    // %s.",
-    // gsetterName(name, false),
-    // RetrieveNonVolatileEntityError.class.getName());
-    // }
-    // }
-    // }
-    // }
 
     for (Element elem : intf_durable.getEnclosedElements()) {
       if (elem.getKind() == ElementKind.METHOD) {
@@ -368,7 +333,7 @@ public class AnnotatedNonVolatileEntityClass {
           // System.err.printf("**------- %s ======\n", elem.toString());
           methodinfo = m_entitymtdinfo.get(methodname);
           methodinfo.elem = (ExecutableElement) elem;
-          methodinfo.specbuilder = overriding(methodinfo.elem, ALLOCTYPENAME);
+          methodinfo.specbuilder = overriding(methodinfo.elem, cALLOCTYPENAME);
 
         }
       }
@@ -380,22 +345,30 @@ public class AnnotatedNonVolatileEntityClass {
     String ret = null;
     if (isUnboxPrimitive(tname)) {
       TypeName tn = unboxTypeName(tname);
-      if (tn.equals(TypeName.BOOLEAN))
+      if (tn.equals(TypeName.BOOLEAN)) {
         ret = isget ? "getByte" : "putByte";
-      if (tn.equals(TypeName.BYTE))
+      }
+      if (tn.equals(TypeName.BYTE)) {
         ret = isget ? "getByte" : "putByte";
-      if (tn.equals(TypeName.CHAR))
+      }
+      if (tn.equals(TypeName.CHAR)) {
         ret = isget ? "getChar" : "putChar";
-      if (tn.equals(TypeName.DOUBLE))
+      }
+      if (tn.equals(TypeName.DOUBLE)) {
         ret = isget ? "getDouble" : "putDouble";
-      if (tn.equals(TypeName.FLOAT))
+      }
+      if (tn.equals(TypeName.FLOAT)) {
         ret = isget ? "getFloat" : "putFloat";
-      if (tn.equals(TypeName.INT))
+      }
+      if (tn.equals(TypeName.INT)) {
         ret = isget ? "getInt" : "putInt";
-      if (tn.equals(TypeName.LONG))
+      }
+      if (tn.equals(TypeName.LONG)) {
         ret = isget ? "getLong" : "putLong";
-      if (tn.equals(TypeName.SHORT))
+      }
+      if (tn.equals(TypeName.SHORT)) {
         ret = isget ? "getShort" : "putShort";
+      }
     } else {
       ret = isget ? "getAddress" : "putAddress";
     }
@@ -409,22 +382,30 @@ public class AnnotatedNonVolatileEntityClass {
     String ret = null;
     if (isUnboxPrimitive(tname)) {
       TypeName tn = unboxTypeName(tname);
-      if (tn.equals(TypeName.BOOLEAN))
+      if (tn.equals(TypeName.BOOLEAN)) {
         ret = "false";
-      if (tn.equals(TypeName.BYTE))
+      }
+      if (tn.equals(TypeName.BYTE)) {
         ret = "(byte)0";
-      if (tn.equals(TypeName.CHAR))
+      }
+      if (tn.equals(TypeName.CHAR)) {
         ret = "(char)0";
-      if (tn.equals(TypeName.DOUBLE))
+      }
+      if (tn.equals(TypeName.DOUBLE)) {
         ret = "(double)0.0";
-      if (tn.equals(TypeName.FLOAT))
+      }
+      if (tn.equals(TypeName.FLOAT)) {
         ret = "(float)0.0";
-      if (tn.equals(TypeName.INT))
+      }
+      if (tn.equals(TypeName.INT)) {
         ret = "(int)0";
-      if (tn.equals(TypeName.LONG))
+      }
+      if (tn.equals(TypeName.LONG)) {
         ret = "(long)0";
-      if (tn.equals(TypeName.SHORT))
+      }
+      if (tn.equals(TypeName.SHORT)) {
         ret = "(short)0";
+      }
     } else {
       ret = null;
     }
@@ -463,7 +444,7 @@ public class AnnotatedNonVolatileEntityClass {
     for (String name : m_gettersinfo.keySet()) {
       dynfieldinfo = m_dynfieldsinfo.get(name);
       if (dynfieldinfo.id > 0) {
-        finfo.add(new long[] { dynfieldinfo.id, dynfieldinfo.fieldoff, dynfieldinfo.fieldsize });
+        finfo.add(new long[]{dynfieldinfo.id, dynfieldinfo.fieldoff, dynfieldinfo.fieldsize});
       }
     }
 
@@ -539,7 +520,7 @@ public class AnnotatedNonVolatileEntityClass {
           code.beginControlFlow("if (0L != phandler)");
           code.addStatement("$1N = $4N.restore($2N, $5L, $6L, phandler, $3N)", dynfieldinfo.name, allocname,
               autoreclaimname, String.format("%s%s",
-                  m_typeutils.asElement(methodinfo.elem.getReturnType()).getSimpleName(), FACTORYNAMESUFFIX),
+                  m_typeutils.asElement(methodinfo.elem.getReturnType()).getSimpleName(), cFACTORYNAMESUFFIX),
               dynfieldinfo.efproxiesname, dynfieldinfo.gftypesname);
           code.endControlFlow();
           code.endControlFlow();
@@ -720,7 +701,6 @@ public class AnnotatedNonVolatileEntityClass {
   protected void buildEntityMethodSpecs(TypeSpec.Builder typespecbuilder) throws AnnotationProcessingException {
     MethodInfo methodinfo;
     CodeBlock.Builder code;
-    FieldInfo dynfieldinfo;
     VariableElement arg0, arg1, arg2, arg3, arg4;
     String unsafename = m_fieldsinfo.get("unsafe").name;
     String holdername = m_fieldsinfo.get("holder").name;
@@ -916,8 +896,9 @@ public class AnnotatedNonVolatileEntityClass {
     methodBuilder.addAnnotation(Override.class);
     for (AnnotationMirror mirror : method.getAnnotationMirrors()) {
       AnnotationSpec annotationSpec = AnnotationSpec.get(mirror);
-      if (annotationSpec.type.equals(Override.class))
+      if (annotationSpec.type.equals(Override.class)) {
         continue;
+      }
       methodBuilder.addAnnotation(annotationSpec);
     }
 

@@ -29,7 +29,6 @@ import java.util.UUID;
 import sun.misc.Unsafe;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import org.apache.mnemonic.service.allocatorservice.VolatileMemoryAllocatorService;
 import org.apache.mnemonic.service.allocatorservice.NonVolatileMemoryAllocatorService;
@@ -42,8 +41,6 @@ import org.apache.mnemonic.service.allocatorservice.NonVolatileMemoryAllocatorSe
  */
 @SuppressWarnings("restriction")
 public class Utils {
-  private static long fSLEEP_INTERVAL = 100;
-
   public static final String ANSI_RESET = "\u001B[0m";
   public static final String ANSI_BLACK = "\u001B[30m";
   public static final String ANSI_RED = "\u001B[31m";
@@ -149,10 +146,10 @@ public class Utils {
    * 
    * @return the size of memory has been occupied
    */
-  public static long getMemoryUse() {
-    putOutTheGarbage();
+  public static long getMemoryUse(long timeout) {
+    putOutTheGarbage(timeout);
     long totalMemory = Runtime.getRuntime().totalMemory();
-    putOutTheGarbage();
+    putOutTheGarbage(timeout);
     long freeMemory = Runtime.getRuntime().freeMemory();
     return (totalMemory - freeMemory);
   }
@@ -160,20 +157,20 @@ public class Utils {
   /**
    * run garbage collections.
    */
-  private static void putOutTheGarbage() {
-    collectGarbage();
-    collectGarbage();
+  private static void putOutTheGarbage(long timeout) {
+    collectGarbage(timeout);
+    collectGarbage(timeout);
   }
 
   /**
    * run a garbage collection.
    */
-  public static void collectGarbage() {
+  public static void collectGarbage(long timeout) {
     try {
       System.gc();
-      Thread.sleep(fSLEEP_INTERVAL);
+      Thread.sleep(timeout);
       System.runFinalization();
-      Thread.sleep(fSLEEP_INTERVAL);
+      Thread.sleep(timeout);
     } catch (InterruptedException ex) {
       ex.printStackTrace();
     }

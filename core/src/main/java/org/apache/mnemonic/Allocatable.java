@@ -35,7 +35,7 @@ public interface Allocatable<A extends CommonAllocator<A>> {
    *
    * @return a holder contains a memory chunk
    */
-  public MemChunkHolder<A> createChunk(long size, boolean autoreclaim);
+  MemChunkHolder<A> createChunk(long size, boolean autoreclaim);
 
   /**
    * create a memory chunk that is managed by its holder.
@@ -45,7 +45,7 @@ public interface Allocatable<A extends CommonAllocator<A>> {
    * 
    * @return a holder contains a memory chunk
    */
-  public MemChunkHolder<A> createChunk(long size);
+  MemChunkHolder<A> createChunk(long size);
 
   /**
    * create a memory buffer that is managed by its holder.
@@ -58,7 +58,7 @@ public interface Allocatable<A extends CommonAllocator<A>> {
    *
    * @return a holder contains a memory buffer
    */
-  public MemBufferHolder<A> createBuffer(long size, boolean autoreclaim);
+  MemBufferHolder<A> createBuffer(long size, boolean autoreclaim);
 
   /**
    * create a memory buffer that is managed by its holder.
@@ -68,7 +68,7 @@ public interface Allocatable<A extends CommonAllocator<A>> {
    * 
    * @return a holder contains a memory buffer
    */
-  public MemBufferHolder<A> createBuffer(long size);
+  MemBufferHolder<A> createBuffer(long size);
 
   /**
    * register a memory chunk for auto-reclaim
@@ -76,7 +76,7 @@ public interface Allocatable<A extends CommonAllocator<A>> {
    * @param mholder
    *          specify a chunk holder to register
    */
-  public void registerChunkAutoReclaim(MemChunkHolder<A> mholder);
+  void registerChunkAutoReclaim(MemChunkHolder<A> mholder);
 
   /**
    * register a memory buffer for auto-reclaim
@@ -84,7 +84,7 @@ public interface Allocatable<A extends CommonAllocator<A>> {
    * @param mholder
    *          specify a buffer holder to register
    */
-  public void registerBufferAutoReclaim(MemBufferHolder<A> mholder);
+  void registerBufferAutoReclaim(MemBufferHolder<A> mholder);
 
   /**
    * resize a memory chunk.
@@ -98,7 +98,7 @@ public interface Allocatable<A extends CommonAllocator<A>> {
    * @return the resized memory chunk holder
    * 
    */
-  public MemChunkHolder<A> resizeChunk(MemChunkHolder<A> mholder, long size);
+  MemChunkHolder<A> resizeChunk(MemChunkHolder<A> mholder, long size);
 
   /**
    * resize a memory buffer.
@@ -112,6 +112,6 @@ public interface Allocatable<A extends CommonAllocator<A>> {
    * @return the resized memory buffer holder
    * 
    */
-  public MemBufferHolder<A> resizeBuffer(MemBufferHolder<A> mholder, long size);
+  MemBufferHolder<A> resizeBuffer(MemBufferHolder<A> mholder, long size);
 
 }

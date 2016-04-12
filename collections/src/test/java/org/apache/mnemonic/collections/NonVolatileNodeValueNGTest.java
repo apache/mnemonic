@@ -42,7 +42,7 @@ import org.testng.annotations.Test;
  */
 
 public class NonVolatileNodeValueNGTest {
-  private long KEYCAPACITY;
+  private long cKEYCAPACITY;
   private Random m_rand;
   private BigDataPMemAllocator m_act;
 
@@ -51,7 +51,7 @@ public class NonVolatileNodeValueNGTest {
     m_rand = Utils.createRandom();
     m_act = new BigDataPMemAllocator(Utils.getNonVolatileMemoryAllocatorService("pmalloc"), 1024 * 1024 * 1024,
         "./pobj_NodeValue.dat", true);
-    KEYCAPACITY = m_act.handlerCapacity();
+    cKEYCAPACITY = m_act.handlerCapacity();
     m_act.setBufferReclaimer(new Reclaim<ByteBuffer>() {
       @Override
       public boolean reclaim(ByteBuffer mres, Long sz) {
@@ -69,7 +69,7 @@ public class NonVolatileNodeValueNGTest {
       }
     });
 
-    for (long i = 0; i < KEYCAPACITY; ++i) {
+    for (long i = 0; i < cKEYCAPACITY; ++i) {
       m_act.setHandler(i, 0L);
     }
   }
@@ -82,7 +82,7 @@ public class NonVolatileNodeValueNGTest {
   @Test(enabled = false)
   public void testSingleNodeValueWithInteger() {
     int val = m_rand.nextInt();
-    GenericField.GType gtypes[] = { GenericField.GType.INTEGER };
+    GenericField.GType gtypes[] = {GenericField.GType.INTEGER};
     NonVolatileNodeValue<Integer> plln = NonVolatileNodeValueFactory.create(m_act, null, gtypes, false);
     plln.setItem(val, false);
     Long handler = plln.getNonVolatileHandler();
@@ -94,7 +94,7 @@ public class NonVolatileNodeValueNGTest {
   @Test(enabled = false)
   public void testNodeValueWithString() {
     String val = Utils.genRandomString();
-    GenericField.GType gtypes[] = { GenericField.GType.STRING };
+    GenericField.GType gtypes[] = {GenericField.GType.STRING};
     NonVolatileNodeValue<String> plln = NonVolatileNodeValueFactory.create(m_act, null, gtypes, false);
     plln.setItem(val, false);
     Long handler = plln.getNonVolatileHandler();
@@ -109,8 +109,8 @@ public class NonVolatileNodeValueNGTest {
     Person<Long> person = PersonFactory.create(m_act);
     person.setAge((short) 31);
 
-    GenericField.GType gtypes[] = { GenericField.GType.DURABLE };
-    EntityFactoryProxy efproxies[] = { new EntityFactoryProxy() {
+    GenericField.GType gtypes[] = {GenericField.GType.DURABLE};
+    EntityFactoryProxy efproxies[] = {new EntityFactoryProxy() {
       @Override
       public <A extends CommonPersistAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
           GenericField.GType[] gfields, long phandler, boolean autoreclaim) {
@@ -134,8 +134,8 @@ public class NonVolatileNodeValueNGTest {
     int elem_count = 10;
     List<Long> referlist = new ArrayList();
 
-    GenericField.GType listgftypes[] = { GenericField.GType.DURABLE };
-    EntityFactoryProxy listefproxies[] = { new EntityFactoryProxy() {
+    GenericField.GType listgftypes[] = {GenericField.GType.DURABLE};
+    EntityFactoryProxy listefproxies[] = {new EntityFactoryProxy() {
       @Override
       public <A extends CommonPersistAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
           GenericField.GType[] gfields, long phandler, boolean autoreclaim) {
@@ -166,8 +166,9 @@ public class NonVolatileNodeValueNGTest {
     while (null != iternv) {
       System.out.printf(" Stage 1 --->\n");
       eval = iternv.getItem();
-      if (null != eval)
+      if (null != eval) {
         eval.testOutput();
+      }
       iternv = iternv.getNext();
     }
 
@@ -178,8 +179,9 @@ public class NonVolatileNodeValueNGTest {
 
     for (Person<Long> eval2 : firstnv2) {
       System.out.printf(" Stage 2 ---> \n");
-      if (null != eval2)
+      if (null != eval2) {
         eval2.testOutput();
+      }
     }
 
     // Assert.assert, expected);(plist, plist2);
@@ -192,11 +194,11 @@ public class NonVolatileNodeValueNGTest {
     int elem_count = 10;
     long slotKeyId = 10;
 
-    GenericField.GType[] elem_gftypes = { GenericField.GType.DOUBLE };
+    GenericField.GType[] elem_gftypes = {GenericField.GType.DOUBLE};
     EntityFactoryProxy[] elem_efproxies = null;
 
-    GenericField.GType linkedgftypes[] = { GenericField.GType.DURABLE, GenericField.GType.DOUBLE };
-    EntityFactoryProxy linkedefproxies[] = { new EntityFactoryProxy() {
+    GenericField.GType linkedgftypes[] = {GenericField.GType.DURABLE, GenericField.GType.DOUBLE};
+    EntityFactoryProxy linkedefproxies[] = {new EntityFactoryProxy() {
       @Override
       public <A extends CommonPersistAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
           GenericField.GType[] gfields, long phandler, boolean autoreclaim) {

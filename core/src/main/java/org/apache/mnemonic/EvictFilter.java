@@ -37,5 +37,5 @@ public interface EvictFilter<KeyT, ValueT> {
    * @return <tt>true</tt> if the entry is allowed to be dropped from its cache
    *         pool.
    */
-  public boolean validate(CachePool<KeyT, ValueT> pool, KeyT k, ValueT v);
+  boolean validate(CachePool<KeyT, ValueT> pool, KeyT k, ValueT v);
 }

@@ -89,7 +89,7 @@ public abstract class CommonPersistAllocator<A extends CommonAllocator<A>> exten
    * 
    * @return a holder contains the retrieved memory buffer
    */
-  abstract public MemBufferHolder<A> retrieveBuffer(long phandler, boolean autoreclaim);
+  public abstract MemBufferHolder<A> retrieveBuffer(long phandler, boolean autoreclaim);
 
   /**
    * retrieve a memory chunk from its backed memory allocator.
@@ -103,7 +103,7 @@ public abstract class CommonPersistAllocator<A extends CommonAllocator<A>> exten
    * 
    * @return a holder contains the retrieved memory chunk
    */
-  abstract public MemChunkHolder<A> retrieveChunk(long phandler, boolean autoreclaim);
+  public abstract MemChunkHolder<A> retrieveChunk(long phandler, boolean autoreclaim);
 
   /**
    * get the handler from a memory buffer holder.
@@ -113,7 +113,7 @@ public abstract class CommonPersistAllocator<A extends CommonAllocator<A>> exten
    *
    * @return a handler that could be used to retrieve its memory buffer
    */
-  abstract public long getBufferHandler(MemBufferHolder<A> mbuf);
+  public abstract long getBufferHandler(MemBufferHolder<A> mbuf);
 
   /**
    * get the handler from a memory chunk holder.
@@ -123,18 +123,18 @@ public abstract class CommonPersistAllocator<A extends CommonAllocator<A>> exten
    *
    * @return a handler that could be used to retrieve its memory chunk
    */
-  abstract public long getChunkHandler(MemChunkHolder<A> mchunk);
+  public abstract long getChunkHandler(MemChunkHolder<A> mchunk);
 
   /**
    * start a application level transaction on this allocator.
    *
    */
-  abstract public void beginTransaction();
+  public abstract void beginTransaction();
 
   /**
    * end a application level transaction on this allocator.
    *
    */
-  abstract public void endTransaction();
+  public abstract void endTransaction();
 
 }

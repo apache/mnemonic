@@ -37,5 +37,5 @@ public interface DropEvent<KeyT, ValueT> {
    * @param v
    *          the value of an entry that has been evicted
    */
-  public void drop(CachePool<KeyT, ValueT> pool, KeyT k, ValueT v);
+  void drop(CachePool<KeyT, ValueT> pool, KeyT k, ValueT v);
 }

@@ -17,12 +17,15 @@
 
 package org.apache.mnemonic;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.RetentionPolicy;
+
 /**
  * this class defines a annotation for non-volatile entity
  *
  */
-
-import java.lang.annotation.*;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.CLASS)

@@ -36,5 +36,5 @@ public interface Reclaim<MRES> {
    *         <tt>false</tt> if this resource needs to be claimed by default
    *         reclaimer
    */
-  public boolean reclaim(MRES mres, Long size);
+  boolean reclaim(MRES mres, Long size);
 }

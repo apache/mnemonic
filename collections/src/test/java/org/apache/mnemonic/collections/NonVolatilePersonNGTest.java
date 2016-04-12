@@ -17,10 +17,13 @@
 
 package org.apache.mnemonic.collections;
 
-import org.apache.mnemonic.*;
+import org.apache.mnemonic.BigDataPMemAllocator;
+import org.apache.mnemonic.OutOfPersistentMemory;
+import org.apache.mnemonic.Reclaim;
+import org.apache.mnemonic.RetrieveNonVolatileEntityError;
+import org.apache.mnemonic.Utils;
 import org.testng.annotations.Test;
 import java.nio.ByteBuffer;
-import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
@@ -30,14 +33,14 @@ import java.util.UUID;
  */
 
 public class NonVolatilePersonNGTest {
-  private long KEYCAPACITY;
+  private long cKEYCAPACITY;
 
   @Test(expectedExceptions = { OutOfPersistentMemory.class })
   public void testGenPeople() throws OutOfPersistentMemory, RetrieveNonVolatileEntityError {
     Random rand = Utils.createRandom();
     BigDataPMemAllocator act = new BigDataPMemAllocator(Utils.getNonVolatileMemoryAllocatorService("pmalloc"),
         1024 * 1024 * 8, "./pobj_person.dat", true);
-    KEYCAPACITY = act.handlerCapacity();
+    cKEYCAPACITY = act.handlerCapacity();
     act.setBufferReclaimer(new Reclaim<ByteBuffer>() {
       @Override
       public boolean reclaim(ByteBuffer mres, Long sz) {
@@ -55,7 +58,7 @@ public class NonVolatilePersonNGTest {
       }
     });
 
-    for (long i = 0; i < KEYCAPACITY; ++i) {
+    for (long i = 0; i < cKEYCAPACITY; ++i) {
       act.setHandler(i, 0L);
     }
 
@@ -69,7 +72,7 @@ public class NonVolatilePersonNGTest {
       while (true) {
         // if (keyidx >= KEYCAPACITY) break;
 
-        keyidx %= KEYCAPACITY;
+        keyidx %= cKEYCAPACITY;
 
         System.out.printf("************ Generating People on Key %d ***********\n", keyidx);
 
@@ -127,7 +130,7 @@ public class NonVolatilePersonNGTest {
     });
 
     long val;
-    for (long i = 0; i < KEYCAPACITY; ++i) {
+    for (long i = 0; i < cKEYCAPACITY; ++i) {
       System.out.printf("----------Key %d--------------\n", i);
       val = act.getHandler(i);
       if (0L == val) {

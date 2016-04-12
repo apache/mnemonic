@@ -18,7 +18,8 @@
 package org.apache.mnemonic.service.allocatorservice.internal;
 
 import org.apache.mnemonic.service.allocatorservice.VolatileMemoryAllocatorService;
-import org.flowcomputing.commons.primitives.*;
+import org.flowcomputing.commons.primitives.NativeLibraryLoader;
+
 import java.nio.ByteBuffer;
 
 public class VMemServiceImpl implements VolatileMemoryAllocatorService {

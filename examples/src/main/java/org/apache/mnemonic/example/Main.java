@@ -18,9 +18,16 @@
 package org.apache.mnemonic.example;
 
 import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.Random;
 
-import org.apache.mnemonic.*;
+import org.apache.mnemonic.BigDataMemAllocator;
+import org.apache.mnemonic.CommonAllocator;
+import org.apache.mnemonic.MemBufferHolder;
+import org.apache.mnemonic.MemChunkHolder;
+import org.apache.mnemonic.MemClustering;
+import org.apache.mnemonic.Reclaim;
+import org.apache.mnemonic.SysMemAllocator;
+import org.apache.mnemonic.Utils;
 
 import sun.misc.Unsafe;
 

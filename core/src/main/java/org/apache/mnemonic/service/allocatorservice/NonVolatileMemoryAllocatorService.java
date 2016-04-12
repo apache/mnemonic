@@ -17,7 +17,6 @@
 
 package org.apache.mnemonic.service.allocatorservice;
 
-import org.flowcomputing.commons.primitives.*;
 import java.nio.ByteBuffer;
 
 public interface NonVolatileMemoryAllocatorService extends VolatileMemoryAllocatorService {
@@ -34,7 +33,7 @@ public interface NonVolatileMemoryAllocatorService extends VolatileMemoryAllocat
    * @return the nonvolatile bytebuffer
    *
    */
-  public ByteBuffer retrieveByteBuffer(long id, long handler);
+  ByteBuffer retrieveByteBuffer(long id, long handler);
 
   /**
    * retrieve the size of a nonvolatile memory object
@@ -48,7 +47,7 @@ public interface NonVolatileMemoryAllocatorService extends VolatileMemoryAllocat
    * @return the size of nonvolatile object
    *
    */
-  public long retrieveSize(long id, long handler);
+  long retrieveSize(long id, long handler);
 
   /**
    * get the handler of a nonvolatile bytebuffer
@@ -62,7 +61,7 @@ public interface NonVolatileMemoryAllocatorService extends VolatileMemoryAllocat
    * @return the handler of this specified nonvolatile bytebuffer
    *
    */
-  public long getByteBufferHandler(long id, ByteBuffer buf);
+  long getByteBufferHandler(long id, ByteBuffer buf);
 
   /**
    * set a handler to a key.
@@ -76,7 +75,7 @@ public interface NonVolatileMemoryAllocatorService extends VolatileMemoryAllocat
    * @param handler
    *          the handler
    */
-  public void setHandler(long id, long key, long handler);
+  void setHandler(long id, long key, long handler);
 
   /**
    * get a handler from specified key.
@@ -89,7 +88,7 @@ public interface NonVolatileMemoryAllocatorService extends VolatileMemoryAllocat
    * 
    * @return the handler of the specified key
    */
-  public long getHandler(long id, long key);
+  long getHandler(long id, long key);
 
   /**
    * return the number of available keys to use.
@@ -99,7 +98,7 @@ public interface NonVolatileMemoryAllocatorService extends VolatileMemoryAllocat
    * 
    * @return the number of keys
    */
-  public long handlerCapacity(long id);
+  long handlerCapacity(long id);
 
   /**
    * return the base address of this persistent memory pool.
@@ -109,6 +108,6 @@ public interface NonVolatileMemoryAllocatorService extends VolatileMemoryAllocat
    * 
    * @return the base address of this pmem pool
    */
-  public long getBaseAddress(long id);
+  long getBaseAddress(long id);
 
 }

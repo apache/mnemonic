@@ -17,8 +17,6 @@
 
 package org.apache.mnemonic;
 
-import java.util.List;
-
 /**
  *
  *
@@ -50,35 +48,37 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
 
   public int compareTo(Person<E> anotherPerson) {
     int ret = 0;
-    if (0 == ret)
+    if (0 == ret) {
       ret = getAge().compareTo(anotherPerson.getAge());
-    if (0 == ret)
+    }
+    if (0 == ret) {
       ret = getName().compareTo(anotherPerson.getName());
+    }
     return ret;
   }
 
   @NonVolatileGetter
-  abstract public Short getAge();
+  public abstract Short getAge();
 
   @NonVolatileSetter
-  abstract public void setAge(Short age);
+  public abstract void setAge(Short age);
 
   @NonVolatileGetter
-  abstract public String getName() throws RetrieveNonVolatileEntityError;
+  public abstract String getName() throws RetrieveNonVolatileEntityError;
 
   @NonVolatileSetter
-  abstract public void setName(String name, boolean destroy)
+  public abstract void setName(String name, boolean destroy)
       throws OutOfPersistentMemory, RetrieveNonVolatileEntityError;
 
   @NonVolatileGetter
-  abstract public Person<E> getMother() throws RetrieveNonVolatileEntityError;
+  public abstract Person<E> getMother() throws RetrieveNonVolatileEntityError;
 
   @NonVolatileSetter
-  abstract public void setMother(Person<E> mother, boolean destroy) throws RetrieveNonVolatileEntityError;
+  public abstract void setMother(Person<E> mother, boolean destroy) throws RetrieveNonVolatileEntityError;
 
   @NonVolatileGetter
-  abstract public Person<E> getFather() throws RetrieveNonVolatileEntityError;
+  public abstract Person<E> getFather() throws RetrieveNonVolatileEntityError;
 
   @NonVolatileSetter
-  abstract public void setFather(Person<E> mother, boolean destroy) throws RetrieveNonVolatileEntityError;
+  public abstract void setFather(Person<E> mother, boolean destroy) throws RetrieveNonVolatileEntityError;
 }

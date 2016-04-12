@@ -17,7 +17,11 @@
 
 package org.apache.mnemonic;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * clustering different kind of memory-like media and combine them as a larger
@@ -43,7 +47,7 @@ public class MemClustering {
      *          the perf. level after change
      *
      */
-    public void changed(PerformanceLevel prevlvl, PerformanceLevel tgtlvl);
+    void changed(PerformanceLevel prevlvl, PerformanceLevel tgtlvl);
   }
 
   /**
@@ -64,7 +68,7 @@ public class MemClustering {
      * @param tgtallocator
      *          the allocator after change
      */
-    public void changed(PerformanceLevel lvl, CommonAllocator<?> prevallocator, CommonAllocator<?> tgtallocator);
+    void changed(PerformanceLevel lvl, CommonAllocator<?> prevallocator, CommonAllocator<?> tgtallocator);
   }
 
   /**
@@ -82,7 +86,7 @@ public class MemClustering {
    * @return the holder created
    */
   private interface MemCreate<H extends MemHolder<? extends CommonAllocator<?>, ?, ?>> {
-    public H create(CommonAllocator<?> bma, long size);
+    H create(CommonAllocator<?> bma, long size);
   }
 
   private MemCreate<MemChunkHolder<?>> m_memchunkcreate = new MemCreate<MemChunkHolder<?>>() {
@@ -103,7 +107,7 @@ public class MemClustering {
    * performance level categories.
    *
    */
-  public static enum PerformanceLevel {
+  public enum PerformanceLevel {
     FASTEST, FAST, NORMAL, SLOW, SLOWEST
   }
 
