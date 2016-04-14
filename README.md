@@ -222,7 +222,9 @@ To run several test cases:
   
   $ mvn -Dtest=DurablePersonNGTest test -pl core -DskipTests=false # a testcase for module "core" that requires 'pmalloc' allocator service to pass
   
-  $ mvn -Dtest=NonVolatileMemAllocatorNGTest test -pl core -DskipTests=false # the second testcase for module "core" that requires 'vmem' allocator service to pass
+  $ mvn -Dtest=NonVolatileMemAllocatorNGTest test -pl core -DskipTests=false # the second testcase for module "core" that requires 'pmalloc' allocator service to pass
+  
+  $ mvn -Dtest=VolatileMemAllocatorNGTest test -pl core -DskipTests=false # the second testcase for module "core" that requires 'vmem' allocator service to pass
   
   $ mvn -Dtest=MemClusteringNGTest test -pl core -DskipTests=false # the third testcase for module "core" that requires 'vmem allocator service to pass
   

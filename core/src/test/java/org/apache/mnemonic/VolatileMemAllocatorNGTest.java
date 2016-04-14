@@ -25,7 +25,7 @@ import java.util.Random;
  * test the functionality of VolatileMemAllocator class.
  * 
  */
-public class VolatileAllocatorNGTest {
+public class VolatileMemAllocatorNGTest {
   /**
    * test to allocate MemBufferHolder objects and then verify them.
    */
