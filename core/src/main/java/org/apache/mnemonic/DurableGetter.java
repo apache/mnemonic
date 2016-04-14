@@ -18,19 +18,21 @@
 package org.apache.mnemonic;
 
 /**
- *
+ * this class defines an annotation for getter methods of non-volatile entity
  *
  */
 
-public interface MemoryNonVolatileEntity<ALLOC_PMem3C93D24F59 extends CommonPersistAllocator<ALLOC_PMem3C93D24F59>> {
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-  void initializeNonVolatileEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-      GenericField.GType[] gfields, boolean autoreclaim);
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.CLASS)
+public @interface DurableGetter {
+  String EntityFactoryProxies() default "null";
 
-  void createNonVolatileEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-      GenericField.GType[] gfields, boolean autoreclaim) throws OutOfPersistentMemory;
+  String GenericFieldTypes() default "null";
 
-  void restoreNonVolatileEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-      GenericField.GType[] gfields, long phandler, boolean autoreclaim) throws RetrieveNonVolatileEntityError;
-
+  long Id() default -1L;
 }

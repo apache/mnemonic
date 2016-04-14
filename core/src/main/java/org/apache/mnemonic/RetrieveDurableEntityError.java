@@ -18,21 +18,18 @@
 package org.apache.mnemonic;
 
 /**
- * this class defines an annotation for getter methods of non-volatile entity
+ *
  *
  */
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public class RetrieveDurableEntityError extends RuntimeException {
 
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.CLASS)
-public @interface NonVolatileGetter {
-  String EntityFactoryProxies() default "null";
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 3985459401986971131L;
 
-  String GenericFieldTypes() default "null";
-
-  long Id() default -1L;
+  public RetrieveDurableEntityError(String s) {
+    super(s);
+  }
 }

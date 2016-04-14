@@ -39,8 +39,8 @@ public class MemBufferHolderCachePoolNGTest {
     MemBufferHolderCachePool<Integer> mbhcpool = new MemBufferHolderCachePool<Integer>(1024 * 1024 * 10);
     Random randomGenerator = new Random();
     MemClustering.NodeConfig<?> ncs[] = new MemClustering.NodeConfig<?>[] {
-        new MemClustering.NodeConfig<BigDataMemAllocator>(
-            new BigDataMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"), 1024 * 1024 * 200, ".", true)
+        new MemClustering.NodeConfig<VolatileMemAllocator>(
+            new VolatileMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"), 1024 * 1024 * 200, ".", true)
                 .disableActiveGC(),
             MemClustering.PerformanceLevel.FAST),
         // new MemClustering.NodeConfig(new BigMemAllocator(1024*1024*20, ".",
@@ -97,8 +97,8 @@ public class MemBufferHolderCachePoolNGTest {
     MemBufferHolderCachePool<Integer> mbhcpool = new MemBufferHolderCachePool<Integer>(1024 * 1024 * 10);
     Random randomGenerator = new Random();
     MemClustering.NodeConfig<?> ncs[] = new MemClustering.NodeConfig<?>[] {
-        new MemClustering.NodeConfig<BigDataMemAllocator>(
-            new BigDataMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"), 1024 * 1024 * 200, ".", true)
+        new MemClustering.NodeConfig<VolatileMemAllocator>(
+            new VolatileMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"), 1024 * 1024 * 200, ".", true)
                 .disableActiveGC(),
             MemClustering.PerformanceLevel.FAST),
         // new MemClustering.NodeConfig(new BigMemAllocator(1024*1024*20, ".",

@@ -17,10 +17,10 @@
 
 package org.apache.mnemonic.collections;
 
-import org.apache.mnemonic.BigDataPMemAllocator;
-import org.apache.mnemonic.OutOfPersistentMemory;
+import org.apache.mnemonic.NonVolatileMemAllocator;
+import org.apache.mnemonic.OutOfHybridMemory;
 import org.apache.mnemonic.Reclaim;
-import org.apache.mnemonic.RetrieveNonVolatileEntityError;
+import org.apache.mnemonic.RetrieveDurableEntityError;
 import org.apache.mnemonic.Utils;
 import org.testng.annotations.Test;
 import java.nio.ByteBuffer;
@@ -32,13 +32,13 @@ import java.util.UUID;
  *
  */
 
-public class NonVolatilePersonNGTest {
+public class DurablePersonNGTest {
   private long cKEYCAPACITY;
 
-  @Test(expectedExceptions = { OutOfPersistentMemory.class })
-  public void testGenPeople() throws OutOfPersistentMemory, RetrieveNonVolatileEntityError {
+  @Test(expectedExceptions = { OutOfHybridMemory.class })
+  public void testGenPeople() throws OutOfHybridMemory, RetrieveDurableEntityError {
     Random rand = Utils.createRandom();
-    BigDataPMemAllocator act = new BigDataPMemAllocator(Utils.getNonVolatileMemoryAllocatorService("pmalloc"),
+    NonVolatileMemAllocator act = new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService("pmalloc"),
         1024 * 1024 * 8, "./pobj_person.dat", true);
     cKEYCAPACITY = act.handlerCapacity();
     act.setBufferReclaimer(new Reclaim<ByteBuffer>() {
@@ -88,7 +88,7 @@ public class NonVolatilePersonNGTest {
         person.setName(String.format("Name: [%s]", UUID.randomUUID().toString()), true);
         person.setName(String.format("Name: [%s]", UUID.randomUUID().toString()), true);
 
-        act.setHandler(keyidx, person.getNonVolatileHandler());
+        act.setHandler(keyidx, person.getHandler());
 
         for (int deep = 0; deep < rand.nextInt(100); ++deep) {
 
@@ -109,8 +109,8 @@ public class NonVolatilePersonNGTest {
   }
 
   @Test(dependsOnMethods = { "testGenPeople" })
-  public void testCheckPeople() throws RetrieveNonVolatileEntityError {
-    BigDataPMemAllocator act = new BigDataPMemAllocator(Utils.getNonVolatileMemoryAllocatorService("pmalloc"),
+  public void testCheckPeople() throws RetrieveDurableEntityError {
+    NonVolatileMemAllocator act = new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService("pmalloc"),
         1024 * 1024 * 8, "./pobj_person.dat", true);
     act.setBufferReclaimer(new Reclaim<ByteBuffer>() {
       @Override

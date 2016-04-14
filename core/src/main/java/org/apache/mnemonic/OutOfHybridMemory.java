@@ -18,44 +18,15 @@
 package org.apache.mnemonic;
 
 /**
- * translate persistent memory address for allocator
+ * this is an exception that should be throw once out of persistent memory
  *
  */
-public interface PMAddressTranslator {
 
-  /**
-   * calculate the portable address
-   *
-   * @param addr
-   *          the address to be calculated
-   *
-   * @return the portable address
-   */
-  long getPortableAddress(long addr);
+public class OutOfHybridMemory extends RuntimeException {
 
-  /**
-   * calculate the effective address
-   *
-   * @param addr
-   *          the address to be calculated
-   *
-   * @return the effective address
-   */
-  long getEffectiveAddress(long addr);
+  private static final long serialVersionUID = -6315943783592441148L;
 
-  /**
-   * get the base address
-   *
-   * @return the base address
-   */
-  long getBaseAddress();
-
-  /**
-   * set the base address for calculation
-   *
-   * @param addr
-   *          the base address
-   *
-   */
-  long setBaseAddress(long addr);
+  public OutOfHybridMemory(String s) {
+    super(s);
+  }
 }

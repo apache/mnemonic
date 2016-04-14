@@ -20,7 +20,7 @@ package org.apache.mnemonic.example;
 import java.nio.ByteBuffer;
 import java.util.Random;
 
-import org.apache.mnemonic.BigDataMemAllocator;
+import org.apache.mnemonic.VolatileMemAllocator;
 import org.apache.mnemonic.CommonAllocator;
 import org.apache.mnemonic.MemBufferHolder;
 import org.apache.mnemonic.MemChunkHolder;
@@ -65,7 +65,7 @@ public class Main {
         // true).disableActiveGC(),
         // MemClustering.PerformanceLevel.NORMAL),
         new MemClustering.NodeConfig(
-            new BigDataMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"), 1024 * 1024 * 20, ".", true),
+            new VolatileMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"), 1024 * 1024 * 20, ".", true),
             // Utils.getVolatileMemoryAllocatorService("pmalloc"),
             // 1024 * 1024 * 20, "./example.dat", true),
             MemClustering.PerformanceLevel.SLOW), };

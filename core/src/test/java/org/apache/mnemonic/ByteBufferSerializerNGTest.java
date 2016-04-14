@@ -52,14 +52,14 @@ public class ByteBufferSerializerNGTest {
    */
   @Test
   public void testToFromMemBufferHolder() throws IOException, ClassNotFoundException {
-    BigDataMemAllocator act = new BigDataMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"),
+    VolatileMemAllocator act = new VolatileMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"),
         1024 * 1024 * 1024, ".", true);
 
     Random randomGenerator = new Random();
     for (int idx = 0; idx < 100; idx++) {
       Payload pl = new Payload(randomGenerator.nextInt(1024 * 1024),
           String.format("Str is %d", randomGenerator.nextInt(1024 * 1024)), randomGenerator.nextDouble());
-      MemBufferHolder<BigDataMemAllocator> mbh = ByteBufferSerializer.toMemBufferHolder(act, pl);
+      MemBufferHolder<VolatileMemAllocator> mbh = ByteBufferSerializer.toMemBufferHolder(act, pl);
       Payload rpl = ByteBufferSerializer.fromMemBufferHolder(mbh);
       mbh.destroy();
       assertTrue(pl.compareTo(rpl) == 0);

@@ -80,7 +80,7 @@
             <configuration>
               <compilerArguments>-XDenableSunApiLintControl</compilerArguments>
               <processors>
-                <processor>${project.parent.groupId}.NonVolatileEntityProcessor</processor>
+                <processor>${project.parent.groupId}.DurableEntityProcessor</processor>
               </processors>
             </configuration>
           </execution>
@@ -91,7 +91,7 @@
             <configuration>
               <compilerArguments>-XDenableSunApiLintControl</compilerArguments>
               <processors>
-                <processor>${project.parent.groupId}.NonVolatileEntityProcessor</processor>
+                <processor>${project.parent.groupId}.DurableEntityProcessor</processor>
               </processors>
             </configuration>
           </execution>

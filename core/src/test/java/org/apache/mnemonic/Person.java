@@ -22,7 +22,7 @@ package org.apache.mnemonic;
  *
  */
 
-@NonVolatileEntity
+@DurableEntity
 public abstract class Person<E> implements Durable, Comparable<Person<E>> {
   E element;
 
@@ -41,7 +41,7 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
 
   }
 
-  public void testOutput() throws RetrieveNonVolatileEntityError {
+  public void testOutput() throws RetrieveDurableEntityError {
     System.out.printf("Person %s, Age: %d ( %s ) \n", getName(), getAge(),
         null == getMother() ? "No Recorded Mother" : "Has Recorded Mother");
   }
@@ -57,28 +57,28 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
     return ret;
   }
 
-  @NonVolatileGetter
+  @DurableGetter
   public abstract Short getAge();
 
-  @NonVolatileSetter
+  @DurableSetter
   public abstract void setAge(Short age);
 
-  @NonVolatileGetter
-  public abstract String getName() throws RetrieveNonVolatileEntityError;
+  @DurableGetter
+  public abstract String getName() throws RetrieveDurableEntityError;
 
-  @NonVolatileSetter
+  @DurableSetter
   public abstract void setName(String name, boolean destroy)
-      throws OutOfPersistentMemory, RetrieveNonVolatileEntityError;
+      throws OutOfHybridMemory, RetrieveDurableEntityError;
 
-  @NonVolatileGetter
-  public abstract Person<E> getMother() throws RetrieveNonVolatileEntityError;
+  @DurableGetter
+  public abstract Person<E> getMother() throws RetrieveDurableEntityError;
 
-  @NonVolatileSetter
-  public abstract void setMother(Person<E> mother, boolean destroy) throws RetrieveNonVolatileEntityError;
+  @DurableSetter
+  public abstract void setMother(Person<E> mother, boolean destroy) throws RetrieveDurableEntityError;
 
-  @NonVolatileGetter
-  public abstract Person<E> getFather() throws RetrieveNonVolatileEntityError;
+  @DurableGetter
+  public abstract Person<E> getFather() throws RetrieveDurableEntityError;
 
-  @NonVolatileSetter
-  public abstract void setFather(Person<E> mother, boolean destroy) throws RetrieveNonVolatileEntityError;
+  @DurableSetter
+  public abstract void setFather(Person<E> mother, boolean destroy) throws RetrieveDurableEntityError;
 }

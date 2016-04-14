@@ -29,7 +29,8 @@ import org.flowcomputing.commons.resgc.ResReclaim;
  * 
  *
  */
-public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllocator> implements PMAddressTranslator {
+public class NonVolatileMemAllocator extends CommonDurableAllocator<NonVolatileMemAllocator>
+    implements NVMAddressTranslator {
 
   private boolean m_activegc = true;
   private long m_gctimeout = 100;
@@ -55,7 +56,7 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
    * @param isnew
    *          a place holder, always specify it as true
    */
-  public BigDataPMemAllocator(NonVolatileMemoryAllocatorService nvmasvc, long capacity, String uri, boolean isnew) {
+  public NonVolatileMemAllocator(NonVolatileMemoryAllocatorService nvmasvc, long capacity, String uri, boolean isnew) {
     assert null != nvmasvc : "NonVolatileMemoryAllocatorService object is null";
     if (capacity <= 0) {
       throw new IllegalArgumentException("BigDataPMemAllocator cannot be initialized with capacity <= 0.");
@@ -70,7 +71,7 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
      * create a resource collector to release specified chunk that backed by
      * underlying big memory pool.
      */
-    m_chunkcollector = new ResCollector<MemChunkHolder<BigDataPMemAllocator>, Long>(new ResReclaim<Long>() {
+    m_chunkcollector = new ResCollector<MemChunkHolder<NonVolatileMemAllocator>, Long>(new ResReclaim<Long>() {
       @Override
       public void reclaim(Long mres) {
         // System.out.println(String.format("Reclaim: %X", mres));
@@ -89,19 +90,20 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
      * create a resource collector to release specified bytebuffer that backed
      * by underlying big memory pool.
      */
-    m_bufcollector = new ResCollector<MemBufferHolder<BigDataPMemAllocator>, ByteBuffer>(new ResReclaim<ByteBuffer>() {
-      @Override
-      public void reclaim(ByteBuffer mres) {
-        boolean cb_reclaimed = false;
-        if (null != m_bufferreclaimer) {
-          cb_reclaimed = m_bufferreclaimer.reclaim(mres, Long.valueOf(mres.capacity()));
-        }
-        if (!cb_reclaimed) {
-          m_nvmasvc.destroyByteBuffer(m_nid, mres);
-          mres = null;
-        }
-      }
-    });
+    m_bufcollector = new ResCollector<MemBufferHolder<NonVolatileMemAllocator>, ByteBuffer>(
+        new ResReclaim<ByteBuffer>() {
+          @Override
+          public void reclaim(ByteBuffer mres) {
+            boolean cb_reclaimed = false;
+            if (null != m_bufferreclaimer) {
+              cb_reclaimed = m_bufferreclaimer.reclaim(mres, Long.valueOf(mres.capacity()));
+            }
+            if (!cb_reclaimed) {
+              m_nvmasvc.destroyByteBuffer(m_nid, mres);
+              mres = null;
+            }
+          }
+        });
   }
 
   /**
@@ -112,7 +114,7 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
    *          the timeout is used to yield for GC performing
    */
   @Override
-  public BigDataPMemAllocator enableActiveGC(long timeout) {
+  public NonVolatileMemAllocator enableActiveGC(long timeout) {
     m_activegc = true;
     m_gctimeout = timeout;
     return this;
@@ -123,7 +125,7 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
    * 
    */
   @Override
-  public BigDataPMemAllocator disableActiveGC() {
+  public NonVolatileMemAllocator disableActiveGC() {
     m_activegc = false;
     return this;
   }
@@ -159,8 +161,9 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
    * @return the resized memory chunk handler
    */
   @Override
-  public MemChunkHolder<BigDataPMemAllocator> resizeChunk(MemChunkHolder<BigDataPMemAllocator> mholder, long size) {
-    MemChunkHolder<BigDataPMemAllocator> ret = null;
+  public MemChunkHolder<NonVolatileMemAllocator> resizeChunk(MemChunkHolder<NonVolatileMemAllocator> mholder,
+      long size) {
+    MemChunkHolder<NonVolatileMemAllocator> ret = null;
     boolean ac = null != mholder.getRefId();
     if (size > 0) {
       Long addr = m_nvmasvc.reallocate(m_nid, mholder.get(), size, true);
@@ -171,7 +174,7 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
       if (0 != addr) {
         mholder.clear();
         mholder.destroy();
-        ret = new MemChunkHolder<BigDataPMemAllocator>(this, addr, size);
+        ret = new MemChunkHolder<NonVolatileMemAllocator>(this, addr, size);
         if (ac) {
           m_chunkcollector.register(ret);
         }
@@ -193,8 +196,9 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
    *
    */
   @Override
-  public MemBufferHolder<BigDataPMemAllocator> resizeBuffer(MemBufferHolder<BigDataPMemAllocator> mholder, long size) {
-    MemBufferHolder<BigDataPMemAllocator> ret = null;
+  public MemBufferHolder<NonVolatileMemAllocator> resizeBuffer(MemBufferHolder<NonVolatileMemAllocator> mholder,
+      long size) {
+    MemBufferHolder<NonVolatileMemAllocator> ret = null;
     boolean ac = null != mholder.getRefId();
     if (size > 0) {
       int bufpos = mholder.get().position();
@@ -209,7 +213,7 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
         mholder.destroy();
         buf.position(bufpos <= size ? bufpos : 0);
         buf.limit(buflimit <= size ? buflimit : (int) size);
-        ret = new MemBufferHolder<BigDataPMemAllocator>(this, buf);
+        ret = new MemBufferHolder<NonVolatileMemAllocator>(this, buf);
         if (ac) {
           m_bufcollector.register(ret);
         }
@@ -230,15 +234,15 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
    * @return a holder contains a memory chunk
    */
   @Override
-  public MemChunkHolder<BigDataPMemAllocator> createChunk(long size, boolean autoreclaim) {
-    MemChunkHolder<BigDataPMemAllocator> ret = null;
+  public MemChunkHolder<NonVolatileMemAllocator> createChunk(long size, boolean autoreclaim) {
+    MemChunkHolder<NonVolatileMemAllocator> ret = null;
     Long addr = m_nvmasvc.allocate(m_nid, size, true);
     if ((null == addr || 0 == addr) && m_activegc) {
       m_chunkcollector.waitReclaimCoolDown(m_gctimeout);
       addr = m_nvmasvc.allocate(m_nid, size, true);
     }
     if (null != addr && 0 != addr) {
-      ret = new MemChunkHolder<BigDataPMemAllocator>(this, addr, size);
+      ret = new MemChunkHolder<NonVolatileMemAllocator>(this, addr, size);
       ret.setCollector(m_chunkcollector);
       if (autoreclaim) {
         m_chunkcollector.register(ret);
@@ -259,15 +263,15 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
    * @return a holder contains a memory buffer
    */
   @Override
-  public MemBufferHolder<BigDataPMemAllocator> createBuffer(long size, boolean autoreclaim) {
-    MemBufferHolder<BigDataPMemAllocator> ret = null;
+  public MemBufferHolder<NonVolatileMemAllocator> createBuffer(long size, boolean autoreclaim) {
+    MemBufferHolder<NonVolatileMemAllocator> ret = null;
     ByteBuffer bb = m_nvmasvc.createByteBuffer(m_nid, size);
     if (null == bb && m_activegc) {
       m_bufcollector.waitReclaimCoolDown(m_gctimeout);
       bb = m_nvmasvc.createByteBuffer(m_nid, size);
     }
     if (null != bb) {
-      ret = new MemBufferHolder<BigDataPMemAllocator>(this, bb);
+      ret = new MemBufferHolder<NonVolatileMemAllocator>(this, bb);
       ret.setCollector(m_bufcollector);
       if (autoreclaim) {
         m_bufcollector.register(ret);
@@ -289,11 +293,11 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
    * @return a holder contains the retrieved memory buffer
    */
   @Override
-  public MemBufferHolder<BigDataPMemAllocator> retrieveBuffer(long phandler, boolean autoreclaim) {
-    MemBufferHolder<BigDataPMemAllocator> ret = null;
+  public MemBufferHolder<NonVolatileMemAllocator> retrieveBuffer(long phandler, boolean autoreclaim) {
+    MemBufferHolder<NonVolatileMemAllocator> ret = null;
     ByteBuffer bb = m_nvmasvc.retrieveByteBuffer(m_nid, getEffectiveAddress(phandler));
     if (null != bb) {
-      ret = new MemBufferHolder<BigDataPMemAllocator>(this, bb);
+      ret = new MemBufferHolder<NonVolatileMemAllocator>(this, bb);
       if (autoreclaim) {
         m_bufcollector.register(ret);
       }
@@ -314,12 +318,12 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
    * @return a holder contains the retrieved memory chunk
    */
   @Override
-  public MemChunkHolder<BigDataPMemAllocator> retrieveChunk(long phandler, boolean autoreclaim) {
-    MemChunkHolder<BigDataPMemAllocator> ret = null;
+  public MemChunkHolder<NonVolatileMemAllocator> retrieveChunk(long phandler, boolean autoreclaim) {
+    MemChunkHolder<NonVolatileMemAllocator> ret = null;
     long eaddr = getEffectiveAddress(phandler);
     long sz = m_nvmasvc.retrieveSize(m_nid, eaddr);
     if (sz > 0L) {
-      ret = new MemChunkHolder<BigDataPMemAllocator>(this, eaddr, sz);
+      ret = new MemChunkHolder<NonVolatileMemAllocator>(this, eaddr, sz);
       if (autoreclaim) {
         m_chunkcollector.register(ret);
       }
@@ -336,7 +340,7 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
    * @return a handler that could be used to retrieve its memory buffer
    */
   @Override
-  public long getBufferHandler(MemBufferHolder<BigDataPMemAllocator> mbuf) {
+  public long getBufferHandler(MemBufferHolder<NonVolatileMemAllocator> mbuf) {
     return getPortableAddress(m_nvmasvc.getByteBufferHandler(m_nid, mbuf.get()));
   }
 
@@ -349,7 +353,7 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
    * @return a handler that could be used to retrieve its memory chunk
    */
   @Override
-  public long getChunkHandler(MemChunkHolder<BigDataPMemAllocator> mchunk) {
+  public long getChunkHandler(MemChunkHolder<NonVolatileMemAllocator> mchunk) {
     return getPortableAddress(mchunk.get());
   }
 
@@ -360,7 +364,7 @@ public class BigDataPMemAllocator extends CommonPersistAllocator<BigDataPMemAllo
    * @return true if there is
    */
   @Override
-  public boolean hasNonVolatileHandlerStore() {
+  public boolean hasDurableHandlerStore() {
     return true;
   }
 

@@ -22,14 +22,15 @@ package org.apache.mnemonic;
  *
  */
 
-public class RetrieveNonVolatileEntityError extends RuntimeException {
+public interface MemoryDurableEntity<ALLOC_PMem3C93D24F59 extends CommonDurableAllocator<ALLOC_PMem3C93D24F59>> {
 
-  /**
-   * 
-   */
-  private static final long serialVersionUID = 3985459401986971131L;
+  void initializeDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
+      GenericField.GType[] gfields, boolean autoreclaim);
 
-  public RetrieveNonVolatileEntityError(String s) {
-    super(s);
-  }
+  void createDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
+      GenericField.GType[] gfields, boolean autoreclaim) throws OutOfHybridMemory;
+
+  void restoreDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
+      GenericField.GType[] gfields, long phandler, boolean autoreclaim) throws RetrieveDurableEntityError;
+
 }

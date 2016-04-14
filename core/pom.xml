@@ -62,7 +62,7 @@
             <configuration>
               <compilerArguments>-XDenableSunApiLintControl</compilerArguments>
               <processors>
-                <processor>${project.groupId}.NonVolatileEntityProcessor</processor>
+                <processor>${project.groupId}.DurableEntityProcessor</processor>
               </processors>
             </configuration>
           </execution>

@@ -20,11 +20,11 @@ package org.apache.mnemonic.collections;
 import org.apache.mnemonic.Durable;
 import org.apache.mnemonic.EntityFactoryProxy;
 import org.apache.mnemonic.GenericField;
-import org.apache.mnemonic.NonVolatileEntity;
-import org.apache.mnemonic.NonVolatileGetter;
-import org.apache.mnemonic.NonVolatileSetter;
-import org.apache.mnemonic.OutOfPersistentMemory;
-import org.apache.mnemonic.RetrieveNonVolatileEntityError;
+import org.apache.mnemonic.DurableEntity;
+import org.apache.mnemonic.DurableGetter;
+import org.apache.mnemonic.DurableSetter;
+import org.apache.mnemonic.OutOfHybridMemory;
+import org.apache.mnemonic.RetrieveDurableEntityError;
 import org.testng.annotations.Test;
 
 /**
@@ -32,7 +32,7 @@ import org.testng.annotations.Test;
  *
  */
 
-@NonVolatileEntity
+@DurableEntity
 public abstract class Person<E> implements Durable, Comparable<Person<E>> {
   E element;
 
@@ -52,7 +52,7 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
   }
 
   @Test
-  public void testOutput() throws RetrieveNonVolatileEntityError {
+  public void testOutput() throws RetrieveDurableEntityError {
     System.out.printf("Person %s, Age: %d ( %s ) \n", getName(), getAge(),
         null == getMother() ? "No Recorded Mother" : "Has Recorded Mother");
   }
@@ -68,28 +68,28 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
     return ret;
   }
 
-  @NonVolatileGetter(Id = 1L)
+  @DurableGetter(Id = 1L)
   public abstract Short getAge();
 
-  @NonVolatileSetter
+  @DurableSetter
   public abstract void setAge(Short age);
 
-  @NonVolatileGetter(Id = 2L)
-  public abstract String getName() throws RetrieveNonVolatileEntityError;
+  @DurableGetter(Id = 2L)
+  public abstract String getName() throws RetrieveDurableEntityError;
 
-  @NonVolatileSetter
+  @DurableSetter
   public abstract void setName(String name, boolean destroy)
-      throws OutOfPersistentMemory, RetrieveNonVolatileEntityError;
+      throws OutOfHybridMemory, RetrieveDurableEntityError;
 
-  @NonVolatileGetter(Id = 3L)
-  public abstract Person<E> getMother() throws RetrieveNonVolatileEntityError;
+  @DurableGetter(Id = 3L)
+  public abstract Person<E> getMother() throws RetrieveDurableEntityError;
 
-  @NonVolatileSetter
-  public abstract void setMother(Person<E> mother, boolean destroy) throws RetrieveNonVolatileEntityError;
+  @DurableSetter
+  public abstract void setMother(Person<E> mother, boolean destroy) throws RetrieveDurableEntityError;
 
-  @NonVolatileGetter(Id = 4L)
-  public abstract Person<E> getFather() throws RetrieveNonVolatileEntityError;
+  @DurableGetter(Id = 4L)
+  public abstract Person<E> getFather() throws RetrieveDurableEntityError;
 
-  @NonVolatileSetter
-  public abstract void setFather(Person<E> mother, boolean destroy) throws RetrieveNonVolatileEntityError;
+  @DurableSetter
+  public abstract void setFather(Person<E> mother, boolean destroy) throws RetrieveDurableEntityError;
 }

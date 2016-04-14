@@ -3,18 +3,18 @@
 <suite name="Mnenomic Core test Suite" verbose="1" parallel="tests" thread-count="1">
 	<test name="Memory Clustering test" >
 		<classes>
-			<class name="org.apache.mnemonic.NonVolatileListNGTest" />
+			<class name="org.apache.mnemonic.DurableListNGTest" />
 		</classes>
 	</test>
 </suite>
 
 <!--
 			<class name="org.apache.mnemonic.MemBufferHolderCachePoolNGTest" />
-			<class name="org.apache.mnemonic.BigDataMemAllocatorNGTest" />
+			<class name="org.apache.mnemonic.NonVolatileMemAllocatorNGTest" />
 			<class name="org.apache.mnemonic.ByteBufferSerializerNGTest" />
 			<class name="org.apache.mnemonic.MemClusteringNGTest" />
-			<class name="org.apache.mnemonic.BigDataPMemAllocatorNGTest" />
-			<class name="org.apache.mnemonic.NonVolatilePersonNGTest" />
-			<class name="org.apache.mnemonic.NonVolatileListNGTest" />
+			<class name="org.apache.mnemonic.NonVolatileMemAllocatorNGTest" />
+			<class name="org.apache.mnemonic.DurablePersonNGTest" />
+			<class name="org.apache.mnemonic.DurableListNGTest" />
 
  -->

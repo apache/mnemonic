@@ -40,7 +40,7 @@ import javax.lang.model.util.Types;
 
 import javax.tools.Diagnostic;
 
-public class NonVolatileEntityProcessor extends AbstractProcessor {
+public class DurableEntityProcessor extends AbstractProcessor {
   private Types typeUtils;
   private Elements elementUtils;
   private Filer filer;
@@ -66,7 +66,7 @@ public class NonVolatileEntityProcessor extends AbstractProcessor {
   @Override
   public Set<String> getSupportedAnnotationTypes() {
     Set<String> annotataions = new LinkedHashSet<String>();
-    annotataions.add(NonVolatileEntity.class.getCanonicalName());
+    annotataions.add(DurableEntity.class.getCanonicalName());
     return annotataions;
   }
 
@@ -112,7 +112,7 @@ public class NonVolatileEntityProcessor extends AbstractProcessor {
 
     try {
 
-      for (Element annotatedElement : roundEnv.getElementsAnnotatedWith(NonVolatileEntity.class)) {
+      for (Element annotatedElement : roundEnv.getElementsAnnotatedWith(DurableEntity.class)) {
 
         String outputstr = String.format("++++++++++%s+++++++++++", annotatedElement.getSimpleName());
         note(annotatedElement, outputstr);
@@ -120,13 +120,13 @@ public class NonVolatileEntityProcessor extends AbstractProcessor {
 
         if (annotatedElement.getKind() != ElementKind.CLASS) {
           throw new AnnotationProcessingException(annotatedElement, "Only classes can be annotated with @%s",
-              NonVolatileEntity.class.getSimpleName());
+              DurableEntity.class.getSimpleName());
         }
 
         // We can cast it, because we know that it of ElementKind.CLASS
         TypeElement typeelem = (TypeElement) annotatedElement;
 
-        AnnotatedNonVolatileEntityClass annotatedClass = new AnnotatedNonVolatileEntityClass(typeelem, typeUtils,
+        AnnotatedDurableEntityClass annotatedClass = new AnnotatedDurableEntityClass(typeelem, typeUtils,
             elementUtils, messager);
 
         annotatedClass.prepareProcessing();

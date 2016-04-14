@@ -24,8 +24,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-import org.apache.mnemonic.BigDataPMemAllocator;
-import org.apache.mnemonic.CommonPersistAllocator;
+import org.apache.mnemonic.NonVolatileMemAllocator;
+import org.apache.mnemonic.CommonDurableAllocator;
 import org.apache.mnemonic.Durable;
 import org.apache.mnemonic.EntityFactoryProxy;
 import org.apache.mnemonic.GenericField;
@@ -41,15 +41,15 @@ import org.testng.annotations.Test;
  *
  */
 
-public class NonVolatileNodeValueNGTest {
+public class DurableNodeValueNGTest {
   private long cKEYCAPACITY;
   private Random m_rand;
-  private BigDataPMemAllocator m_act;
+  private NonVolatileMemAllocator m_act;
 
   @BeforeClass
   public void setUp() {
     m_rand = Utils.createRandom();
-    m_act = new BigDataPMemAllocator(Utils.getNonVolatileMemoryAllocatorService("pmalloc"), 1024 * 1024 * 1024,
+    m_act = new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService("pmalloc"), 1024 * 1024 * 1024,
         "./pobj_NodeValue.dat", true);
     cKEYCAPACITY = m_act.handlerCapacity();
     m_act.setBufferReclaimer(new Reclaim<ByteBuffer>() {
@@ -83,11 +83,11 @@ public class NonVolatileNodeValueNGTest {
   public void testSingleNodeValueWithInteger() {
     int val = m_rand.nextInt();
     GenericField.GType gtypes[] = {GenericField.GType.INTEGER};
-    NonVolatileNodeValue<Integer> plln = NonVolatileNodeValueFactory.create(m_act, null, gtypes, false);
+    DurableNodeValue<Integer> plln = DurableNodeValueFactory.create(m_act, null, gtypes, false);
     plln.setItem(val, false);
-    Long handler = plln.getNonVolatileHandler();
+    Long handler = plln.getHandler();
     System.err.println("-------------Start to Restore Integer -----------");
-    NonVolatileNodeValue<Integer> plln2 = NonVolatileNodeValueFactory.restore(m_act, null, gtypes, handler, false);
+    DurableNodeValue<Integer> plln2 = DurableNodeValueFactory.restore(m_act, null, gtypes, handler, false);
     AssertJUnit.assertEquals(val, (int) plln2.getItem());
   }
 
@@ -95,11 +95,11 @@ public class NonVolatileNodeValueNGTest {
   public void testNodeValueWithString() {
     String val = Utils.genRandomString();
     GenericField.GType gtypes[] = {GenericField.GType.STRING};
-    NonVolatileNodeValue<String> plln = NonVolatileNodeValueFactory.create(m_act, null, gtypes, false);
+    DurableNodeValue<String> plln = DurableNodeValueFactory.create(m_act, null, gtypes, false);
     plln.setItem(val, false);
-    Long handler = plln.getNonVolatileHandler();
+    Long handler = plln.getHandler();
     System.err.println("-------------Start to Restore String-----------");
-    NonVolatileNodeValue<String> plln2 = NonVolatileNodeValueFactory.restore(m_act, null, gtypes, handler, false);
+    DurableNodeValue<String> plln2 = DurableNodeValueFactory.restore(m_act, null, gtypes, handler, false);
     AssertJUnit.assertEquals(val, plln2.getItem());
   }
 
@@ -112,17 +112,17 @@ public class NonVolatileNodeValueNGTest {
     GenericField.GType gtypes[] = {GenericField.GType.DURABLE};
     EntityFactoryProxy efproxies[] = {new EntityFactoryProxy() {
       @Override
-      public <A extends CommonPersistAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
+      public <A extends CommonDurableAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
           GenericField.GType[] gfields, long phandler, boolean autoreclaim) {
         return PersonFactory.restore(allocator, factoryproxys, gfields, phandler, autoreclaim);
       }
     } };
 
-    NonVolatileNodeValue<Person<Long>> plln = NonVolatileNodeValueFactory.create(m_act, efproxies, gtypes, false);
+    DurableNodeValue<Person<Long>> plln = DurableNodeValueFactory.create(m_act, efproxies, gtypes, false);
     plln.setItem(person, false);
-    Long handler = plln.getNonVolatileHandler();
+    Long handler = plln.getHandler();
 
-    NonVolatileNodeValue<Person<Long>> plln2 = NonVolatileNodeValueFactory.restore(m_act, efproxies, gtypes, handler,
+    DurableNodeValue<Person<Long>> plln2 = DurableNodeValueFactory.restore(m_act, efproxies, gtypes, handler,
         false);
     AssertJUnit.assertEquals(31, (int) plln2.getItem().getAge());
 
@@ -137,32 +137,32 @@ public class NonVolatileNodeValueNGTest {
     GenericField.GType listgftypes[] = {GenericField.GType.DURABLE};
     EntityFactoryProxy listefproxies[] = {new EntityFactoryProxy() {
       @Override
-      public <A extends CommonPersistAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
+      public <A extends CommonDurableAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
           GenericField.GType[] gfields, long phandler, boolean autoreclaim) {
         return PersonFactory.restore(allocator, factoryproxys, gfields, phandler, autoreclaim);
       }
     } };
 
-    NonVolatileNodeValue<Person<Long>> firstnv = NonVolatileNodeValueFactory.create(m_act, listefproxies, listgftypes,
+    DurableNodeValue<Person<Long>> firstnv = DurableNodeValueFactory.create(m_act, listefproxies, listgftypes,
         false);
 
-    NonVolatileNodeValue<Person<Long>> nextnv = firstnv;
+    DurableNodeValue<Person<Long>> nextnv = firstnv;
 
     Person<Long> person;
     long val;
-    NonVolatileNodeValue<Person<Long>> newnv;
+    DurableNodeValue<Person<Long>> newnv;
     for (int i = 0; i < elem_count; ++i) {
       person = PersonFactory.create(m_act);
       person.setAge((short) m_rand.nextInt(50));
       person.setName(String.format("Name: [%s]", Utils.genRandomString()), true);
       nextnv.setItem(person, false);
-      newnv = NonVolatileNodeValueFactory.create(m_act, listefproxies, listgftypes, false);
+      newnv = DurableNodeValueFactory.create(m_act, listefproxies, listgftypes, false);
       nextnv.setNext(newnv, false);
       nextnv = newnv;
     }
 
     Person<Long> eval;
-    NonVolatileNodeValue<Person<Long>> iternv = firstnv;
+    DurableNodeValue<Person<Long>> iternv = firstnv;
     while (null != iternv) {
       System.out.printf(" Stage 1 --->\n");
       eval = iternv.getItem();
@@ -172,9 +172,9 @@ public class NonVolatileNodeValueNGTest {
       iternv = iternv.getNext();
     }
 
-    long handler = firstnv.getNonVolatileHandler();
+    long handler = firstnv.getHandler();
 
-    NonVolatileNodeValue<Person<Long>> firstnv2 = NonVolatileNodeValueFactory.restore(m_act, listefproxies, listgftypes,
+    DurableNodeValue<Person<Long>> firstnv2 = DurableNodeValueFactory.restore(m_act, listefproxies, listgftypes,
         handler, false);
 
     for (Person<Long> eval2 : firstnv2) {
@@ -200,7 +200,7 @@ public class NonVolatileNodeValueNGTest {
     GenericField.GType linkedgftypes[] = {GenericField.GType.DURABLE, GenericField.GType.DOUBLE};
     EntityFactoryProxy linkedefproxies[] = {new EntityFactoryProxy() {
       @Override
-      public <A extends CommonPersistAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
+      public <A extends CommonDurableAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
           GenericField.GType[] gfields, long phandler, boolean autoreclaim) {
         EntityFactoryProxy[] val_efproxies = null;
         GenericField.GType[] val_gftypes = null;
@@ -210,12 +210,12 @@ public class NonVolatileNodeValueNGTest {
         if (null != gfields && gfields.length >= 2) {
           val_gftypes = Arrays.copyOfRange(gfields, 1, gfields.length);
         }
-        return NonVolatileNodeValueFactory.restore(allocator, val_efproxies, val_gftypes, phandler, autoreclaim);
+        return DurableNodeValueFactory.restore(allocator, val_efproxies, val_gftypes, phandler, autoreclaim);
       }
     } };
 
-    NonVolatileNodeValue<NonVolatileNodeValue<Double>> nextnv = null, pre_nextnv = null;
-    NonVolatileNodeValue<Double> elem = null, pre_elem = null, first_elem = null;
+    DurableNodeValue<DurableNodeValue<Double>> nextnv = null, pre_nextnv = null;
+    DurableNodeValue<Double> elem = null, pre_elem = null, first_elem = null;
 
     Long linkhandler = 0L;
 
@@ -227,7 +227,7 @@ public class NonVolatileNodeValueNGTest {
       first_elem = null;
       pre_elem = null;
       for (int v = 0; v < 3; ++v) {
-        elem = NonVolatileNodeValueFactory.create(m_act, elem_efproxies, elem_gftypes, false);
+        elem = DurableNodeValueFactory.create(m_act, elem_efproxies, elem_gftypes, false);
         val = m_rand.nextDouble();
         elem.setItem(val, false);
         if (null == pre_elem) {
@@ -239,10 +239,10 @@ public class NonVolatileNodeValueNGTest {
         System.out.printf("%f ", val);
       }
 
-      nextnv = NonVolatileNodeValueFactory.create(m_act, linkedefproxies, linkedgftypes, false);
+      nextnv = DurableNodeValueFactory.create(m_act, linkedefproxies, linkedgftypes, false);
       nextnv.setItem(first_elem, false);
       if (null == pre_nextnv) {
-        linkhandler = nextnv.getNonVolatileHandler();
+        linkhandler = nextnv.getHandler();
       } else {
         pre_nextnv.setNext(nextnv, false);
       }
@@ -253,9 +253,9 @@ public class NonVolatileNodeValueNGTest {
 
     long handler = m_act.getHandler(slotKeyId);
 
-    NonVolatileNodeValue<NonVolatileNodeValue<Double>> linkedvals = NonVolatileNodeValueFactory.restore(m_act,
+    DurableNodeValue<DurableNodeValue<Double>> linkedvals = DurableNodeValueFactory.restore(m_act,
         linkedefproxies, linkedgftypes, handler, false);
-    Iterator<NonVolatileNodeValue<Double>> iter = linkedvals.iterator();
+    Iterator<DurableNodeValue<Double>> iter = linkedvals.iterator();
     Iterator<Double> elemiter = null;
 
     System.out.printf(" Stage 2 -testLinkedNodeValueWithLinkedNodeValue--> \n");
