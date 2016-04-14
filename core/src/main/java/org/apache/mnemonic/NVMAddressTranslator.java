@@ -18,15 +18,44 @@
 package org.apache.mnemonic;
 
 /**
- * this is an exception that should be throw once out of persistent memory
+ * translate persistent memory address for allocator
  *
  */
+public interface NVMAddressTranslator {
 
-public class OutOfPersistentMemory extends RuntimeException {
+  /**
+   * calculate the portable address
+   *
+   * @param addr
+   *          the address to be calculated
+   *
+   * @return the portable address
+   */
+  long getPortableAddress(long addr);
 
-  private static final long serialVersionUID = -6315943783592441148L;
+  /**
+   * calculate the effective address
+   *
+   * @param addr
+   *          the address to be calculated
+   *
+   * @return the effective address
+   */
+  long getEffectiveAddress(long addr);
 
-  public OutOfPersistentMemory(String s) {
-    super(s);
-  }
+  /**
+   * get the base address
+   *
+   * @return the base address
+   */
+  long getBaseAddress();
+
+  /**
+   * set the base address for calculation
+   *
+   * @param addr
+   *          the base address
+   *
+   */
+  long setBaseAddress(long addr);
 }

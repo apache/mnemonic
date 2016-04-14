@@ -23,17 +23,17 @@ import java.util.NoSuchElementException;
 import org.apache.mnemonic.Durable;
 import org.apache.mnemonic.EntityFactoryProxy;
 import org.apache.mnemonic.GenericField;
-import org.apache.mnemonic.NonVolatileEntity;
-import org.apache.mnemonic.NonVolatileGetter;
-import org.apache.mnemonic.NonVolatileSetter;
+import org.apache.mnemonic.DurableEntity;
+import org.apache.mnemonic.DurableGetter;
+import org.apache.mnemonic.DurableSetter;
 
 /**
  * this class defines a non-volatile node for a generic value to form a
  * unidirectional link
  *
  */
-@NonVolatileEntity
-public abstract class NonVolatileNodeValue<E> implements Durable, Iterable<E> {
+@DurableEntity
+public abstract class DurableNodeValue<E> implements Durable, Iterable<E> {
   protected transient EntityFactoryProxy[] m_node_efproxies;
   protected transient GenericField.GType[] m_node_gftypes;
 
@@ -77,7 +77,7 @@ public abstract class NonVolatileNodeValue<E> implements Durable, Iterable<E> {
    *
    * @return the item value of this node
    */
-  @NonVolatileGetter(Id = 1L, EntityFactoryProxies = "m_node_efproxies", GenericFieldTypes = "m_node_gftypes")
+  @DurableGetter(Id = 1L, EntityFactoryProxies = "m_node_efproxies", GenericFieldTypes = "m_node_gftypes")
   public abstract E getItem();
 
   /**
@@ -90,7 +90,7 @@ public abstract class NonVolatileNodeValue<E> implements Durable, Iterable<E> {
    *          true if want to destroy exist one
    *
    */
-  @NonVolatileSetter
+  @DurableSetter
   public abstract void setItem(E value, boolean destroy);
 
   /**
@@ -99,8 +99,8 @@ public abstract class NonVolatileNodeValue<E> implements Durable, Iterable<E> {
    * @return the next node
    *
    */
-  @NonVolatileGetter(Id = 2L, EntityFactoryProxies = "m_node_efproxies", GenericFieldTypes = "m_node_gftypes")
-  public abstract NonVolatileNodeValue<E> getNext();
+  @DurableGetter(Id = 2L, EntityFactoryProxies = "m_node_efproxies", GenericFieldTypes = "m_node_gftypes")
+  public abstract DurableNodeValue<E> getNext();
 
   /**
    * set next node
@@ -111,8 +111,8 @@ public abstract class NonVolatileNodeValue<E> implements Durable, Iterable<E> {
    * @param destroy
    *          true if want to destroy the exist node
    */
-  @NonVolatileSetter
-  public abstract void setNext(NonVolatileNodeValue<E> next, boolean destroy);
+  @DurableSetter
+  public abstract void setNext(DurableNodeValue<E> next, boolean destroy);
 
   /**
    * get an iterator instance of this list
@@ -130,7 +130,7 @@ public abstract class NonVolatileNodeValue<E> implements Durable, Iterable<E> {
    */
   private class Intr implements Iterator<E> {
 
-    protected NonVolatileNodeValue<E> next = null;
+    protected DurableNodeValue<E> next = null;
 
     /**
      * Constructor
@@ -139,7 +139,7 @@ public abstract class NonVolatileNodeValue<E> implements Durable, Iterable<E> {
      *          the start point for this iterator
      *
      */
-    Intr(NonVolatileNodeValue<E> head) {
+    Intr(DurableNodeValue<E> head) {
       next = head;
     }
 

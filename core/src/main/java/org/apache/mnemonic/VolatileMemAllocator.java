@@ -29,7 +29,7 @@ import org.flowcomputing.commons.resgc.ResReclaim;
  * 
  *
  */
-public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
+public class VolatileMemAllocator extends CommonAllocator<VolatileMemAllocator> {
 
   private boolean m_activegc = true;
   private long m_gctimeout = 100;
@@ -54,7 +54,7 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
    * @param isnew
    *          a place holder, always specify it as true
    */
-  public BigDataMemAllocator(VolatileMemoryAllocatorService vmasvc, long capacity, String uri, boolean isnew) {
+  public VolatileMemAllocator(VolatileMemoryAllocatorService vmasvc, long capacity, String uri, boolean isnew) {
     assert null != vmasvc : "VolatileMemoryAllocatorService object is null";
     if (capacity <= 0) {
       throw new IllegalArgumentException("BigDataMemAllocator cannot be initialized with capacity <= 0.");
@@ -67,7 +67,7 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
      * create a resource collector to release specified bytebuffer that backed
      * by underlying big memory pool.
      */
-    m_bufcollector = new ResCollector<MemBufferHolder<BigDataMemAllocator>, ByteBuffer>(new ResReclaim<ByteBuffer>() {
+    m_bufcollector = new ResCollector<MemBufferHolder<VolatileMemAllocator>, ByteBuffer>(new ResReclaim<ByteBuffer>() {
       @Override
       public void reclaim(ByteBuffer mres) {
         boolean cb_reclaimed = false;
@@ -85,7 +85,7 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
      * create a resource collector to release specified chunk that backed by
      * underlying big memory pool.
      */
-    m_chunkcollector = new ResCollector<MemChunkHolder<BigDataMemAllocator>, Long>(new ResReclaim<Long>() {
+    m_chunkcollector = new ResCollector<MemChunkHolder<VolatileMemAllocator>, Long>(new ResReclaim<Long>() {
       @Override
       public void reclaim(Long mres) {
         // System.out.println(String.format("Reclaim: %X", mres));
@@ -111,7 +111,7 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
    * @return this allocator
    */
   @Override
-  public BigDataMemAllocator enableActiveGC(long timeout) {
+  public VolatileMemAllocator enableActiveGC(long timeout) {
     m_activegc = true;
     m_gctimeout = timeout;
     return this;
@@ -123,7 +123,7 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
    * @return this allocator
    */
   @Override
-  public BigDataMemAllocator disableActiveGC() {
+  public VolatileMemAllocator disableActiveGC() {
     m_activegc = false;
     return this;
   }
@@ -158,8 +158,8 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
    * @return the resized memory chunk handler
    */
   @Override
-  public MemChunkHolder<BigDataMemAllocator> resizeChunk(MemChunkHolder<BigDataMemAllocator> mholder, long size) {
-    MemChunkHolder<BigDataMemAllocator> ret = null;
+  public MemChunkHolder<VolatileMemAllocator> resizeChunk(MemChunkHolder<VolatileMemAllocator> mholder, long size) {
+    MemChunkHolder<VolatileMemAllocator> ret = null;
     boolean ac = null != mholder.getRefId();
     if (size > 0) {
       Long addr = m_vmasvc.reallocate(m_nid, mholder.get(), size, true);
@@ -170,7 +170,7 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
       if (0 != addr) {
         mholder.clear();
         mholder.destroy();
-        ret = new MemChunkHolder<BigDataMemAllocator>(this, addr, size);
+        ret = new MemChunkHolder<VolatileMemAllocator>(this, addr, size);
         if (ac) {
           m_chunkcollector.register(ret);
         }
@@ -192,8 +192,8 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
    *
    */
   @Override
-  public MemBufferHolder<BigDataMemAllocator> resizeBuffer(MemBufferHolder<BigDataMemAllocator> mholder, long size) {
-    MemBufferHolder<BigDataMemAllocator> ret = null;
+  public MemBufferHolder<VolatileMemAllocator> resizeBuffer(MemBufferHolder<VolatileMemAllocator> mholder, long size) {
+    MemBufferHolder<VolatileMemAllocator> ret = null;
     boolean ac = null != mholder.getRefId();
     if (size > 0) {
       int bufpos = mholder.get().position();
@@ -208,7 +208,7 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
         mholder.destroy();
         buf.position(bufpos <= size ? bufpos : 0);
         buf.limit(buflimit <= size ? buflimit : (int) size);
-        ret = new MemBufferHolder<BigDataMemAllocator>(this, buf);
+        ret = new MemBufferHolder<VolatileMemAllocator>(this, buf);
         if (ac) {
           m_bufcollector.register(ret);
         }
@@ -229,15 +229,15 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
    * @return a holder contains a memory chunk
    */
   @Override
-  public MemChunkHolder<BigDataMemAllocator> createChunk(long size, boolean autoreclaim) {
-    MemChunkHolder<BigDataMemAllocator> ret = null;
+  public MemChunkHolder<VolatileMemAllocator> createChunk(long size, boolean autoreclaim) {
+    MemChunkHolder<VolatileMemAllocator> ret = null;
     Long addr = m_vmasvc.allocate(m_nid, size, true);
     if (0 == addr && m_activegc) {
       m_chunkcollector.waitReclaimCoolDown(m_gctimeout);
       addr = m_vmasvc.allocate(m_nid, size, true);
     }
     if (0 != addr) {
-      ret = new MemChunkHolder<BigDataMemAllocator>(this, addr, size);
+      ret = new MemChunkHolder<VolatileMemAllocator>(this, addr, size);
       ret.setCollector(m_chunkcollector);
       if (autoreclaim) {
         m_chunkcollector.register(ret);
@@ -258,15 +258,15 @@ public class BigDataMemAllocator extends CommonAllocator<BigDataMemAllocator> {
    * @return a holder contains a memory buffer
    */
   @Override
-  public MemBufferHolder<BigDataMemAllocator> createBuffer(long size, boolean autoreclaim) {
-    MemBufferHolder<BigDataMemAllocator> ret = null;
+  public MemBufferHolder<VolatileMemAllocator> createBuffer(long size, boolean autoreclaim) {
+    MemBufferHolder<VolatileMemAllocator> ret = null;
     ByteBuffer bb = m_vmasvc.createByteBuffer(m_nid, size);
     if (null == bb && m_activegc) {
       m_bufcollector.waitReclaimCoolDown(m_gctimeout);
       bb = m_vmasvc.createByteBuffer(m_nid, size);
     }
     if (null != bb) {
-      ret = new MemBufferHolder<BigDataMemAllocator>(this, bb);
+      ret = new MemBufferHolder<VolatileMemAllocator>(this, bb);
       ret.setCollector(m_bufcollector);
       if (autoreclaim) {
         m_bufcollector.register(ret);

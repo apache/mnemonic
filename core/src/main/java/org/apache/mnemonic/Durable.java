@@ -71,7 +71,7 @@ public interface Durable {
    *
    * @return the handler of this object
    */
-  long getNonVolatileHandler();
+  long getHandler();
 
   /**
    * return the setting for auto-reclaim
@@ -84,7 +84,7 @@ public interface Durable {
    * manually destroy this object and release its memory resource
    *
    */
-  void destroy() throws RetrieveNonVolatileEntityError;
+  void destroy() throws RetrieveDurableEntityError;
 
   /**
    * return the native field map info for native processing.

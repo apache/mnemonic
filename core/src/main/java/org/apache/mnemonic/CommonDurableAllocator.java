@@ -22,7 +22,7 @@ package org.apache.mnemonic;
  * functionalities.
  *
  */
-public abstract class CommonPersistAllocator<A extends CommonAllocator<A>> extends CommonAllocator<A> {
+public abstract class CommonDurableAllocator<A extends CommonAllocator<A>> extends CommonAllocator<A> {
 
   /**
    * determine whether the allocator supports transaction feature or not
@@ -44,12 +44,12 @@ public abstract class CommonPersistAllocator<A extends CommonAllocator<A>> exten
   }
 
   /**
-   * determine whether this allocator supports to store non-volatile handler or
+   * determine whether this allocator supports to store durable handler or
    * not
    *
    * @return true if there is
    */
-  public boolean hasNonVolatileHandlerStore() {
+  public boolean hasDurableHandlerStore() {
     return false;
   }
 

@@ -22,17 +22,17 @@ import org.testng.annotations.Test;
 import java.util.Random;
 
 /**
- * test the functionality of BigMemAllocator class.
+ * test the functionality of VolatileMemAllocator class.
  * 
  */
-public class BigDataMemAllocatorNGTest {
+public class VolatileAllocatorNGTest {
   /**
    * test to allocate MemBufferHolder objects and then verify them.
    */
   @Test
   public void testMemByteBuffer() {
     Random randomGenerator = new Random();
-    Allocator<BigDataMemAllocator> act = new BigDataMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"),
+    Allocator<VolatileMemAllocator> act = new VolatileMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"),
         1024 * 1024 * 1024, ".", true);
     MemBufferHolder<?> mbh;
     for (int idx = 1; idx <= 5; ++idx) {
@@ -54,7 +54,7 @@ public class BigDataMemAllocatorNGTest {
   @Test
   public void testMemChunk() {
     Random randomGenerator = new Random();
-    Allocator<BigDataMemAllocator> act = new BigDataMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"),
+    Allocator<VolatileMemAllocator> act = new VolatileMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"),
         1024 * 1024 * 1024, ".", true);
     MemChunkHolder<?> mch;
     for (int idx = 1; idx <= 5; ++idx) {

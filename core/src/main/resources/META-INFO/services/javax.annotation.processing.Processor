@@ -1,1 +1,1 @@
-org.apache.mnemonic.NonVolatileEntityProcessor
+org.apache.mnemonic.DurableEntityProcessor
