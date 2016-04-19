@@ -1,24 +1,30 @@
 ---
 layout: default
-title: Apache Mnemonic &bull; Non-volatile memory
+title: Apache Incubator Mnemonic &bull; Non-volatile memory
 overview: true
 ---
 
 <section class="intro">
   <div class="grid">
     <div class="unit whole center-on-mobiles">
-      <p class="first titlehead">
-        A non-volatile object programming model<br> for memories <br><span class="pitch-add">e.g. NVMe, SSD etc</span>
-        <!-- <span style="padding-left: 50px;">The Big Data</span> <br /><span style="padding-left: 150px;">Security Platform.</span> -->
-      </p>
+      <div class="first titlehead">
+	if <span>(</span> Mnemonic.inUse() <span>)</span> <span>{</span>
+	<div class="ifbody">
+	  assert availMemory &gt;= sysMemory;<br/>
+	  assert nonVolatileObjectModal.takeEffect();<br/>
+	  assert serDe.bypass();<br/>
+	  assert cache.bypass();<br/>
+	</div> 
+	<span>}</span>
+      </div>
     </div>
   </div>
 </section>
 <section class="features">
   <div class="grid">
     <div class="unit one-third">
-      <h2>Multi-Device Support</h2>
-      <p>Supports SSD, NVMe, Off-device etc</p>
+      <h2>Multi-Device</h2>
+      <p>Leverages Off-heap, NVMe, SSD, SpinDisk and etc.</p>
       <a href="/docs/devices.html">Devices &rarr;</a>
     </div>
     <div class="unit one-third">
@@ -28,7 +34,7 @@ overview: true
     </div>
     <div class="unit one-third">
       <h2>Future Work</h2>
-      <p>Future</p>
+      <p>Works on new features</p>
       <a href="/docs/future.html">Future &rarr;</a>
     </div>
     <div class="clear"></div>

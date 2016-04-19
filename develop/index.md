@@ -11,7 +11,17 @@ developers working on the project. The project has created
 
 Name                    | Apache Id      | Role
 :---------------------- | :------------- | :---
-Yanping Wang            | yanpingw      | PMC
+Patrick Hunt            | phunt          | Champion, Mentor
+Andrew Purtell          | apurtell       | Mentor
+James Taylor            | jamestaylor    | Mentor
+Henry Saputra           | hsaputra       | Mentor, Committer
+Yanping Wang            | yanpingw       | Committer
+Gang(Gary) Wang         | garyw          | Committer
+Uma Maheswara Rao G     | umamahesh      | Committer
+Kai Zheng               | drankye        | Committer
+Rakesh Radhakrishnan Potty | rakeshr     | Committer
+Sean Zhong              | seanzhong      | Committer
+Hao Cheng               | chhao01        | Committer
 
 
 ## Mailing Lists
@@ -34,6 +44,10 @@ You can subscribe to the lists by sending email to
 mnemonic uses git for version control. Get the source code:
 
 `% git clone https://git-wip-us.apache.org/repos/asf/incubator-mnemonic.git`
+
+-- or --
+
+`% git clone https://github.com/apache/incubator-mnemonic.git`
 
 The important branches are:
 
