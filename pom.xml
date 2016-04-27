@@ -38,34 +38,26 @@
     </license>
   </licenses>
 
-  <organization>
-    <name>Non-Volatile Computing Technologies</name>
-    <url>https://github.com/NonVolatileComputing</url>
-  </organization>
-
   <developers>
     <developer>
       <id>Gary</id>
       <name>Gang Wang</name>
       <email>gang1.wang@intel.com</email>
-      <url></url>
-      <organization></organization>
-      <organizationUrl></organizationUrl>
+      <url>http://www.intel.com</url>
+      <organization>Intel</organization>
+      <organizationUrl>http://www.intel.com</organizationUrl>
       <timezone>US/Pacific</timezone>
     </developer>
     <developer>
       <id>Yanping</id>
       <name>Yanping Wang</name>
       <email>yanping.wang@intel.com</email>
-      <url></url>
-      <organization></organization>
-      <organizationUrl></organizationUrl>
+      <url>http://www.intel.com</url>
+      <organization>Intel</organization>
+      <organizationUrl>http://www.intel.com</organizationUrl>
       <timezone>US/Pacific</timezone>
     </developer>
   </developers>
-
-  <contributors>
-  </contributors>
 
   <distributionManagement>
     <site>
