@@ -10,7 +10,6 @@
  
   <groupId>org.apache.mnemonic.service.allocatorservice</groupId>
   <artifactId>allocator-services-parent-project</artifactId>
-  <version>0.1.0-incubating-SNAPSHOT</version>
   <packaging>pom</packaging>
  
   <name>Mnemonic Project Allocator Services Parent POM</name>
@@ -21,15 +20,11 @@
     <module>pmalloc-service</module>
   </modules>
 
-  <properties>
-    <mnemonic.core.version>0.1.0-incubating-SNAPSHOT</mnemonic.core.version>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.apache.mnemonic</groupId>
       <artifactId>mnemonic-core</artifactId>
-      <version>${mnemonic.core.version}</version>
+      <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>
     <dependency>

@@ -9,7 +9,6 @@
   </parent>
   <groupId>org.apache.mnemonic.service.allocatorservice</groupId>
   <artifactId>pmalloc-service</artifactId>
-  <version>0.1.0-incubating-SNAPSHOT</version>
   <name>Mnemonic Project PMalloc Allocator</name>
   <url>http://maven.apache.org</url>
 
