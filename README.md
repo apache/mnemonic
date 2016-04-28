@@ -201,7 +201,7 @@ To exclude a customized allocator service for your platform e.g. OSX, note that 
 
 To build and run the unit tests:
 ```bash
-  $ mvn clean package -DskipTests=false
+  $ mvn clean package install -DskipTests=false
 ```
 
 
