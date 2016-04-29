@@ -44,15 +44,48 @@
     </license>
   </licenses>
 
+  <mailingLists>
+    <mailingList>
+      <name>Dev</name>
+      <subscribe>dev-subscribe@mnemonic.incubator.apache.org</subscribe>
+      <unsubscribe>dev-unsubscribe@mnemonic.incubator.apache.org</unsubscribe>
+      <post>dev@mnemonic.incubator.apache.org</post>
+      <archive>http://mail-archives.apache.org/mod_mbox/mnemonic-dev</archive>
+    </mailingList>
+    <mailingList>
+      <name>Users</name>
+      <subscribe>users-subscribe@mnemonic.incubator.apache.org</subscribe>
+      <unsubscribe>users-unsubscribe@mnemonic.incubator.apache.org</unsubscribe>
+      <post>users@mnemonic.incubator.apache.org</post>
+      <archive>http://mail-archives.apache.org/mod_mbox/mnemonic-users</archive>
+    </mailingList>
+    <mailingList>
+      <name>Commits</name>
+      <subscribe>commits-subscribe@mnemonic.incubator.apache.org</subscribe>
+      <unsubscribe>commits-unsubscribe@mnemonic.incubator.apache.org</unsubscribe>
+      <post>commits@mnemonic.incubator.apache.org</post>
+      <archive>http://mail-archives.apache.org/mod_mbox/mnemonic-commits</archive>
+    </mailingList>
+  </mailingLists>
+
+  <prerequisites>
+    <maven>${maven.min-version}</maven>
+  </prerequisites>
+
   <scm>
     <url>https://git-wip-us.apache.org/repos/asf/incubator-mnemonic.git</url>
     <connection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-mnemonic.git</connection>
     <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-mnemonic.git</developerConnection>
   </scm>
 
+  <issueManagement>
+    <system>JIRA</system>
+    <url>https://issues.apache.org/jira/browse/MNEMONIC</url>
+  </issueManagement>
+
   <developers>
     <developer>
-      <id>Gary</id>
+      <id>garyw</id>
       <name>Gang Wang</name>
       <email>gang1.wang@intel.com</email>
       <url>http://www.intel.com</url>
@@ -61,7 +94,7 @@
       <timezone>US/Pacific</timezone>
     </developer>
     <developer>
-      <id>Yanping</id>
+      <id>yanpingw</id>
       <name>Yanping Wang</name>
       <email>yanping.wang@intel.com</email>
       <url>http://www.intel.com</url>
@@ -81,6 +114,7 @@
   </modules>
 
   <properties>
+    <maven.min-version>3.2.1</maven.min-version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <skipTests>true</skipTests>
