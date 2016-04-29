@@ -121,6 +121,7 @@
     <allocator.service.dir>${basedir}/../allocator-services/service-dist</allocator.service.dir>
     <github.global.server>github</github.global.server>
     <buildtools.dir>${basedir}/build-tools</buildtools.dir>
+    <gpg.keyname>apache.org</gpg.keyname>
   </properties>
 
   <repositories>
@@ -352,6 +353,31 @@
 	  <artifactId>exec-maven-plugin</artifactId>
 	  <version>1.4.0</version>
 	</plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <version>2.5.3</version>
+          <configuration>
+            <useReleaseProfile>true</useReleaseProfile>
+            <releaseProfiles>apache-release</releaseProfiles>
+            <autoVersionSubmodules>true</autoVersionSubmodules>
+            <goals>deploy</goals>
+            <tagNameFormat>@{project.artifactId}-@{project.version}</tagNameFormat>
+            <pushChanges>false</pushChanges>
+            <localCheckout>true</localCheckout>
+          </configuration>
+          <executions>
+            <execution>
+              <id>default</id>
+              <goals>
+                <goal>perform</goal>
+              </goals>
+              <configuration>
+                <pomFileName>pom.xml</pomFileName>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
 
       </plugins>
     </pluginManagement>
@@ -410,6 +436,10 @@
 	      <goals>
 		<goal>sign</goal>
 	      </goals>
+              <configuration>
+                <keyname>${gpg.keyname}</keyname>
+                <useAgent>true</useAgent>
+              </configuration>
 	    </execution>
 	  </executions>
 	</plugin>
