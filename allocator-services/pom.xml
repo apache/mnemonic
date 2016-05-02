@@ -15,6 +15,10 @@
   <name>Mnemonic Project Allocator Services Parent POM</name>
   <url>https://github.com/apache/incubator-mnemonic</url>
 
+  <properties>
+    <service.basedir>${project.parent.basedir}</service.basedir>
+  </properties>
+
   <modules>
     <module>nvml-vmem-service</module>
     <module>pmalloc-service</module>
@@ -67,7 +71,7 @@
           <version>2.6</version>
           <configuration>
             <forceCreation>true</forceCreation>
-	    <outputDirectory>${parent.basedir}/service-dist</outputDirectory>
+	    <outputDirectory>${service.basedir}/service-dist</outputDirectory>
 	    <archive>
 	      <addMavenDescriptor>false</addMavenDescriptor>
 	    </archive>
