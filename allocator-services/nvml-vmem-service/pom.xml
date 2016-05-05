@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.apache.mnemonic.service.allocatorservice</groupId>
     <artifactId>allocator-services-parent-project</artifactId>
-    <version>0.1.1-incubating</version>
+    <version>0.1.2-incubating-SNAPSHOT</version>
   </parent>
   <groupId>org.apache.mnemonic.service.allocatorservice</groupId>
   <artifactId>nvml-vmem-service</artifactId>
