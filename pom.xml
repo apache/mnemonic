@@ -83,34 +83,13 @@
     <url>https://issues.apache.org/jira/browse/MNEMONIC</url>
   </issueManagement>
 
-  <developers>
-    <developer>
-      <id>garyw</id>
-      <name>Gang Wang</name>
-      <email>gang1.wang@intel.com</email>
-      <url>http://www.intel.com</url>
-      <organization>Intel</organization>
-      <organizationUrl>http://www.intel.com</organizationUrl>
-      <timezone>US/Pacific</timezone>
-    </developer>
-    <developer>
-      <id>yanpingw</id>
-      <name>Yanping Wang</name>
-      <email>yanping.wang@intel.com</email>
-      <url>http://www.intel.com</url>
-      <organization>Intel</organization>
-      <organizationUrl>http://www.intel.com</organizationUrl>
-      <timezone>US/Pacific</timezone>
-    </developer>
-  </developers>
-
   <inceptionYear>2014</inceptionYear>
 
   <modules>
-    <module>core</module>
-    <module>collections</module>
-    <module>examples</module>
-    <module>allocator-services</module>
+    <module>mnemonic-core</module>
+    <module>mnemonic-collections</module>
+    <module>mnemonic-examples</module>
+    <module>mnemonic-memory-services</module>
   </modules>
 
   <properties>
@@ -118,7 +97,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <skipTests>true</skipTests>
-    <allocator.service.dir>${basedir}/../allocator-services/service-dist</allocator.service.dir>
+    <memory.service.dist.dir>${basedir}/../mnemonic-memory-services/service-dist</memory.service.dist.dir>
     <github.global.server>github</github.global.server>
     <buildtools.dir>${basedir}/build-tools</buildtools.dir>
     <gpg.keyname>apache.org</gpg.keyname>
@@ -309,7 +288,7 @@
           <configuration>
             <skipTests>${skipTests}</skipTests>
 	    <enableAssertions>true</enableAssertions>
-	    <argLine>-Djava.ext.dirs=${allocator.service.dir}</argLine>
+	    <argLine>-Djava.ext.dirs=${memory.service.dist.dir}</argLine>
           </configuration>
         </plugin>
         <plugin>
@@ -427,9 +406,6 @@
           <configuration>
             <finalName>apache-mnemonic-${project.version}</finalName>
             <descriptor>build-tools/source-assembly.xml</descriptor>
-            <formats>
-              <format>tar.gz</format>
-            </formats>
           </configuration>
         </plugin>
         <plugin>

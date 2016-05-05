@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.mnemonic.example;
+package org.apache.mnemonic.examples;
 
 import java.nio.ByteBuffer;
 import java.util.Random;

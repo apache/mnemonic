@@ -10,7 +10,7 @@ This library comes up with a new programming model we call it non-volatile objec
 * Object graphs lazy loading & multi-process sharing
 * Auto-reclaim memory resources and Mnemonic objects
 * Hierarchical cache pool for massive data caching
-* Pluggable allocator services for extension & optimization
+* Extensible memory services for new device adoption and allocation optimization
 * A set of non-volatile data structures (WIP)
 * Minimize memory footprint on Java heap
 * Reduce GC Overheads as the following chart shown (collected from Apache Spark experiments)
@@ -171,20 +171,20 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
 Please see the file LICENSE for information on how this library is licensed.
 
 
-* **core** -- the submodule project for core
-* **collections** -- the submodule project for generic collections
-* **examples** -- the submodule project for examples
-* **allocator-services/pmalloc-service** -- the submodule project for pmalloc allocator service
-* **allocator-services/nvml-vmem-service** -- the submodule project for vmem allocator service
-* **allocator-services/service-dist** -- the location of pluggable allocator services (auto-generated)
+* **mnemonic-core** -- the submodule project for core
+* **mnemonic-collections** -- the submodule project for generic collections
+* **mnemonic-examples** -- the submodule project for examples
+* **mnemonic-memory-services/mnemonic-pmalloc-service** -- the submodule project for pmalloc memory service
+* **mnemonic-memory-services/mnemonic-nvml-vmem-service** -- the submodule project for vmem memory service
+* **mnemonic-memory-services/service-dist** -- the location of extensive memory services (auto-generated)
 
 To build this library, you may need to install some required packages on the build system:
 
 * **Maven** -- the building tool v3.2.1 or above [Required]
-* **NVML** -- the NVM library (Please compile this library that is tagged with 0.1+b16) (http://pmem.io) [Optional if nvml-vmem-service is excluded]
+* **NVML** -- the NVM library (Please compile this library that is tagged with 0.1+b16) (http://pmem.io) [Optional if mnemonic-nvml-vmem-service is excluded]
 * **JDK** -- the Java Develop Kit 1.6 or above (please properly configure JAVA_HOME) [Required]
 * **PMFS** -- the PMFS should be properly installed and configured on Linux system if you want to simulate read latency [Optional]
-* **PMalloc** -- a supported durable memory native library at https://github.com/NonVolatileComputing/pmalloc.git [Optional if pmalloc-service is excluded]
+* **PMalloc** -- a supported durable memory native library at https://github.com/NonVolatileComputing/pmalloc.git [Optional if mnemonic-pmalloc-service is excluded]
 
 
 Once the build system is setup, this Library is built using this command at the top level:
@@ -193,9 +193,9 @@ Once the build system is setup, this Library is built using this command at the 
 ```
 
 
-To exclude a customized allocator service for your platform e.g. OSX, note that if you excluded one or both allocator services, some or all testcases/examples will fail since their allocator is unavailable.
+To exclude a customized memory service for your platform e.g. OSX, note that if you excluded one or both memory services, some or all testcases/examples will fail since their dependent memory services are unavailable.
 ```bash
-  $ mvn -pl '!allocator-services/nvml-vmem-service' clean package
+  $ mvn -pl '!mnemonic-memory-services/mnemonic-nvml-vmem-service' clean package
 ```
 
 
@@ -213,24 +213,24 @@ To install this package to local repository (required to run examples and testca
 
 To run an example:
 ```bash
-  $ mvn exec:exec -Pexample -pl examples # requires 'vmem' allocator service to run, please refer to the code of test cases for more examples.
+  $ mvn exec:exec -Pexample -pl mnemonic-examples # requires 'vmem' memory service to run, please refer to the code of test cases for more examples.
 ```
 
 
 To run several test cases:
 ```bash
   
-  $ mvn -Dtest=DurablePersonNGTest test -pl core -DskipTests=false # a testcase for module "core" that requires 'pmalloc' allocator service to pass
+  $ mvn -Dtest=DurablePersonNGTest test -pl mnemonic-core -DskipTests=false # a testcase for module "mnemonic-core" that requires 'pmalloc' memory service to pass
   
-  $ mvn -Dtest=NonVolatileMemAllocatorNGTest test -pl core -DskipTests=false # the second testcase for module "core" that requires 'pmalloc' allocator service to pass
+  $ mvn -Dtest=NonVolatileMemAllocatorNGTest test -pl mnemonic-core -DskipTests=false # a testcase for module "mnemonic-core" that requires 'pmalloc' memory service to pass
   
-  $ mvn -Dtest=VolatileMemAllocatorNGTest test -pl core -DskipTests=false # the second testcase for module "core" that requires 'vmem' allocator service to pass
+  $ mvn -Dtest=VolatileMemAllocatorNGTest test -pl mnemonic-core -DskipTests=false # a testcase for module "mnemonic-core" that requires 'vmem' memory service to pass
   
-  $ mvn -Dtest=MemClusteringNGTest test -pl core -DskipTests=false # the third testcase for module "core" that requires 'vmem allocator service to pass
+  $ mvn -Dtest=MemClusteringNGTest test -pl mnemonic-core -DskipTests=false # a testcase for module "mnemonic-core" that requires 'vmem memory service to pass
   
-  $ mvn -Dtest=DurableNodeValueNGTest  test -pl collections -DskipTests=false # a testcase for module "collection" that requires 'pmalloc' allocator service to pass
+  $ mvn -Dtest=DurableNodeValueNGTest  test -pl mnemonic-collections -DskipTests=false # a testcase for module "mnemonic-collection" that requires 'pmalloc' memory service to pass
   
-  $ mvn -Dtest=DurablePersonNGTest  test -pl collections -DskipTests=false # another testcase for module "collection" that requires 'pmalloc' allocator service to pass
+  $ mvn -Dtest=DurablePersonNGTest  test -pl mnemonic-collections -DskipTests=false # a testcase for module "mnemonic-collection" that requires 'pmalloc' memory service to pass
 ```
 
 ### Where is the document ?

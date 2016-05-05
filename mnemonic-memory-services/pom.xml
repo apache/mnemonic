@@ -8,11 +8,9 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
  
-  <groupId>org.apache.mnemonic.service.allocatorservice</groupId>
-  <artifactId>allocator-services-parent-project</artifactId>
-  <packaging>pom</packaging>
- 
-  <name>Mnemonic Project Allocator Services Parent POM</name>
+  <artifactId>mnemonic-memory-services</artifactId>
+  <name>mnemonic-memory-services</name>
+  <packaging>pom</packaging> 
   <url>http://mnemonic.incubator.apache.org</url>
 
   <properties>
@@ -20,8 +18,8 @@
   </properties>
 
   <modules>
-    <module>nvml-vmem-service</module>
-    <module>pmalloc-service</module>
+    <module>mnemonic-nvml-vmem-service</module>
+    <module>mnemonic-pmalloc-service</module>
   </modules>
 
   <dependencies>
