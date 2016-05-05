@@ -13,7 +13,7 @@
   <packaging>pom</packaging>
  
   <name>Mnemonic Project Allocator Services Parent POM</name>
-  <url>https://github.com/apache/incubator-mnemonic</url>
+  <url>http://mnemonic.incubator.apache.org</url>
 
   <properties>
     <service.basedir>${project.parent.basedir}</service.basedir>
