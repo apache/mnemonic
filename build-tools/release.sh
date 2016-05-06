@@ -18,8 +18,9 @@
 #
 
 usage(){
-    echo "Usage: $0 Release_Version Next_Release_Version"
-    echo "For example, $0 0.2.0 0.2.1"
+    echo "Usage: $0 Release_Version Next_Release_Version Candidate_Id"
+    echo "e.g. $0 0.2.0 0.2.0 rc2"
+    echo "     $0 0.2.0 0.2.1 rc3"
     exit 1
 }
 
@@ -37,16 +38,29 @@ continueprompt() {
 [[ -n "$(git status --porcelain)" ]] &&
     echo "please commit all changes first." && exit
 
-[[ $# -ne 2 ]]  && usage
+[[ $# -ne 3 ]]  && usage
 
 RELEASE_VERSION="$1"
 NEXT_RELEASE_VERSION="$2"
+RELEASE_CANDIDATE_ID="$3"
+NEXT_VER_COMMIT_PREFIX="Bump version"
 
 echo "You have specified:"
 echo "RELEASE_VERSION = ${RELEASE_VERSION}"
 echo "NEXT_RELEASE_VERSION = ${NEXT_RELEASE_VERSION}"
+echo "RELEASE_CANDIDATE_ID = ${RELEASE_CANDIDATE_ID}"
 
 git checkout master
+
+if [ "${RELEASE_VERSION}" == "${NEXT_RELEASE_VERSION}" ]; then
+    echo "You are trying to prepare a same version candidate so going to clean up existing branch <branch-${RELEASE_VERSION}> and tag <v${RELEASE_VERSION}-incubating> if any"
+    continueprompt
+    git branch -d branch-${RELEASE_VERSION}
+    git push upstream --delete branch-${RELEASE_VERSION}
+    git tag -d v${RELEASE_VERSION}-incubating
+    git push upstream --delete v${RELEASE_VERSION}-incubating
+    NEXT_VER_COMMIT_PREFIX="Stay version"
+fi
 
 echo "Preparing to create a branch branch-${RELEASE_VERSION} for release"
 continueprompt
@@ -54,9 +68,9 @@ continueprompt
 git checkout -b branch-${RELEASE_VERSION} || { echo "Create branch failed"; exit; }
 
 mvn versions:set -DgenerateBackupPoms=false -DnewVersion=${RELEASE_VERSION}-incubating
-git commit . -m "Prepare for releasing ${RELEASE_VERSION}-incubating"
+git commit . -m "Prepare for releasing ${RELEASE_VERSION}-incubating ${RELEASE_CANDIDATE_ID}"
 
-git tag -s v${RELEASE_VERSION}-incubating -m "Releasing ${RELEASE_VERSION}-incubating"
+git tag -s v${RELEASE_VERSION}-incubating -m "Releasing ${RELEASE_VERSION}-incubating ${RELEASE_CANDIDATE_ID}"
 
 rm -rf target/
 
@@ -92,7 +106,7 @@ continueprompt
 git checkout master
 git merge --no-ff branch-${RELEASE_VERSION}
 mvn versions:set -DgenerateBackupPoms=false -DnewVersion=${NEXT_RELEASE_VERSION}-incubating-SNAPSHOT
-git commit . -m "Bump version to ${NEXT_RELEASE_VERSION}-incubating-SNAPSHOT"
+git commit . -m "${NEXT_VER_COMMIT_PREFIX} to ${NEXT_RELEASE_VERSION}-incubating-SNAPSHOT"
 
 echo "Push release merge and new version to upstream."
 continueprompt
