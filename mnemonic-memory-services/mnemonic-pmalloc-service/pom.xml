@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.apache.mnemonic</groupId>
     <artifactId>mnemonic-memory-services</artifactId>
-    <version>0.1.3-incubating-SNAPSHOT</version>
+    <version>0.1.2-incubating</version>
   </parent>
 
   <artifactId>mnemonic-pmalloc-service</artifactId>
