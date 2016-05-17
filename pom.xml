@@ -90,6 +90,7 @@
     <module>mnemonic-collections</module>
     <module>mnemonic-examples</module>
     <module>mnemonic-memory-services</module>
+    <module>mnemonic-computing-services</module>
   </modules>
 
   <properties>

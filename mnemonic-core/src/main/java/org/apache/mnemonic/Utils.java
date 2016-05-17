@@ -337,14 +337,42 @@ public class Utils {
    *
    */
   public static List<long[]> getNativeParamForm(List<long[][]> objstack, long[][] fidinfostack) {
-    List<long[]> ret = new ArrayList<long[]>();
+    List<long[]> ret = null;
     if (null == objstack || null == fidinfostack || fidinfostack.length != objstack.size()) {
       throw new IllegalArgumentException("Not the same depth");
     }
+    ret = new ArrayList<long[]>();
     for (int idx = 0; idx < fidinfostack.length; ++idx) {
       ret.add(genNativeStackItem(objstack.get(idx), fidinfostack[idx], idx == fidinfostack.length - 1));
     }
     return ret;
+  }
+
+  /**
+   * convert list form of native parameters to array form
+   *
+   * @param npf
+   *         a list of native parameters
+   *
+   * @return the 2d array form of native parameter frame
+   */
+  public static long[][] convertTo2DArrayForm(List<long[]> npf) {
+    long[][] ret = null;
+    if (null != npf && npf.size() > 0) {
+      ret = npf.toArray(new long[npf.size()][]);
+    }
+    return ret;
+  }
+
+  /**
+   * generate native form of object stack parameter frame.
+   * 
+   * @see #getNativeParamForm()
+   * 
+   * @return the 2d array form of native parameter frame
+   */
+  public static long[][] genNativeParamForm(List<long[][]> objstack, long[][] fidinfostack) {
+    return convertTo2DArrayForm(getNativeParamForm(objstack, fidinfostack));
   }
 
   /**

@@ -24,7 +24,7 @@ public interface VolatileMemoryAllocatorService {
   /**
    * Provide the service identifier for this allocator
    *
-   * @return the service identifer of this allocator
+   * @return the service identifier of this allocator
    */
   String getServiceId();
 
