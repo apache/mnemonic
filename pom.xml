@@ -99,6 +99,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <skipTests>true</skipTests>
     <memory.service.dist.dir>${basedir}/../mnemonic-memory-services/service-dist</memory.service.dist.dir>
+    <computing.service.dist.dir>${basedir}/../mnemonic-computing-services/service-dist</computing.service.dist.dir>
     <github.global.server>github</github.global.server>
     <buildtools.dir>${basedir}/build-tools</buildtools.dir>
     <gpg.keyname>apache.org</gpg.keyname>
@@ -322,7 +323,7 @@
           <configuration>
             <skipTests>${skipTests}</skipTests>
             <enableAssertions>true</enableAssertions>
-            <argLine>-Djava.ext.dirs=${memory.service.dist.dir}</argLine>
+            <argLine>-Djava.ext.dirs=${memory.service.dist.dir};${computing.service.dist.dir}</argLine>
           </configuration>
         </plugin>
         <plugin>
