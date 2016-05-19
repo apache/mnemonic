@@ -41,10 +41,14 @@ public class HelloWorldServiceImpl implements GeneralComputingService {
    * {@inheritDoc}
    */
   @Override
-  public void perform(long[][] npf) {
-    nperform(npf);
+  public long perform(long handler, long[][] npf) {
+    long ret = 0L;
+    if (0L != handler && null != npf) {
+      nperform(handler, npf);
+    }
+    return ret;
   }
 
-  protected native void nperform(long[][] npf);
+  protected native long nperform(long handler, long[][] npf);
 
 }

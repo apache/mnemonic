@@ -38,10 +38,15 @@ public interface GeneralComputingService {
   /**
    * perform native functionalities according to prepared computing parameters
    *
+   * @param handler
+   *         a handler to a object graph
+   *
    * @param npf
    *         a list of native parameters
+   *
+   * @return the handler to updated object graph if any
    */
-  void perform(long[][] npf);
+  long perform(long handler, long[][] npf);
 
 
 }

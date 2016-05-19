@@ -23,9 +23,9 @@
  *****************************************************************************/
 
 JNIEXPORT
-void JNICALL Java_org_apache_mnemonic_service_computingservice_internal_HelloWorldServiceImpl_nperform(JNIEnv* env,
-    jobject this, jlong id, jlongArray arr) {
-  return;
+jlong JNICALL Java_org_apache_mnemonic_service_computingservice_internal_HelloWorldServiceImpl_nperform(JNIEnv* env,
+    jobject this, jlong hdr, jlongArray arr) {
+  return 0L;
 }
 
 __attribute__((destructor)) void fini(void) {
