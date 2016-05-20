@@ -27,8 +27,8 @@
     <version>0.1.2-incubating-SNAPSHOT</version>
   </parent>
 
-  <artifactId>mnemonic-hello-world-service</artifactId>
-  <name>mnemonic-hello-world-service</name>
+  <artifactId>mnemonic-utilities-service</artifactId>
+  <name>mnemonic-utilities-service</name>
 
   <dependencies>
     <dependency>
@@ -112,8 +112,8 @@
               <aggregate>true</aggregate>
               <show>public</show>
               <nohelp>true</nohelp>
-              <header>Mnenomic-hello-world-service, ${project.version}</header>
-              <footer>Mnenomic-hello-world-service, ${project.version}</footer>
+              <header>Mnenomic-utilities-service, ${project.version}</header>
+              <footer>Mnenomic-utilities-service, ${project.version}</footer>
               <doctitle>Mnenomic, ${project.version}</doctitle>
               <links>
                 <link>http://static.springsource.org/spring/docs/3.0.x/javadoc-api/</link>

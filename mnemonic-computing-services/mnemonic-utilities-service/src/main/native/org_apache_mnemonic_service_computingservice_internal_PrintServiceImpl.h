@@ -17,29 +17,29 @@
  */
 
 #include <jni.h>
-/* Header for class HelloWorldServiceImpl */
+/* Header for class PrintServiceImpl */
 
 #include "common.h"
 
-#ifndef _Included_org_apache_mnemonic_service_computingservice_internal_HelloWorldServiceImpl
-#define _Included_org_apache_mnemonic_service_computingservice_internal_HelloWorldServiceImpl
+#ifndef _Included_org_apache_mnemonic_service_computingservice_internal_PrintServiceImpl
+#define _Included_org_apache_mnemonic_service_computingservice_internal_PrintServiceImpl
 #ifdef __cplusplus
 extern "C" {
 #endif
 /*
- * Class:     org_apache_mnemonic_service_computingservice_internal_HelloWorldServiceImpl
+ * Class:     org_apache_mnemonic_service_computingservice_internal_PrintServiceImpl
  * Method:    jniInit
  * Signature: (II)V
  */
-JNIEXPORT void JNICALL Java_org_apache_mnemonic_service_computingservice_internal_HelloWorldServiceImpl_jniInit
+JNIEXPORT void JNICALL Java_org_apache_mnemonic_service_computingservice_internal_PrintServiceImpl_jniInit
 (JNIEnv *, jobject, jint, jint);
 
 /*
- * Class:     org_apache_mnemonic_service_computingservice_internal_HelloWorldServiceImpl
+ * Class:     org_apache_mnemonic_service_computingservice_internal_PrintServiceImpl
  * Method:    jniTerm
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_PMallocServiceImpl_jniTerm
+JNIEXPORT void JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_PrintServiceImpl_jniTerm
 (JNIEnv *, jobject);
 
 #ifdef __cplusplus

@@ -20,10 +20,10 @@ package org.apache.mnemonic.service.computingservice.internal;
 import org.apache.mnemonic.service.computingservice.GeneralComputingService;
 import org.flowcomputing.commons.primitives.NativeLibraryLoader;
 
-public class HelloWorldServiceImpl implements GeneralComputingService {
+public class PrintServiceImpl implements GeneralComputingService {
   static {
     try {
-      NativeLibraryLoader.loadFromJar("helloworldcomputing");
+      NativeLibraryLoader.loadFromJar("utilitiescomputing");
     } catch (Exception e) {
       throw new Error(e);
     }
@@ -34,7 +34,7 @@ public class HelloWorldServiceImpl implements GeneralComputingService {
    */
   @Override
   public String getServiceId() {
-    return "helloworld";
+    return "print";
   }
 
   /**
@@ -44,11 +44,11 @@ public class HelloWorldServiceImpl implements GeneralComputingService {
   public long perform(long handler, long[][] npf) {
     long ret = 0L;
     if (0L != handler && null != npf) {
-      nperform(handler, npf);
+      nperformPrint(handler, npf);
     }
     return ret;
   }
 
-  protected native long nperform(long handler, long[][] npf);
+  protected native long nperformPrint(long handler, long[][] npf);
 
 }

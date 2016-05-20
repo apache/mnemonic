@@ -16,7 +16,7 @@
 #
 
 cmake_minimum_required(VERSION 2.8.11)
-project(helloworldcomputing)
+project(utilitiescomputing)
 
 configure_file (
   "${PROJECT_SOURCE_DIR}/config.h.in"
@@ -26,8 +26,6 @@ include_directories(${PROJECT_BINARY_DIR})
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/../dist/native")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/")
-set(pmallocallocator_VERSION_MAJOR 0)
-set(pmallocallocator_VERSION_MINOR 0)
 set(CMAKE_BUILD_TYPE "Release")
 set(CMAKE_C_FLAGS_DEBUG "$ENV{CFLAGS} -O0 -Wall -g -ggdb")
 set(CMAKE_C_FLAGS_RELEASE "$ENV{CFLAGS} -O3 -Wall")
@@ -38,8 +36,8 @@ include_directories(${JNI_INCLUDE_DIRS})
 find_package(Threads REQUIRED)
 include_directories(${CMAKE_THREAD_LIBS_INIT})
 
-add_library(helloworldcomputing SHARED common.c org_apache_mnemonic_service_computingservice_internal_HelloWorldServiceImpl.c)
-target_include_directories(helloworldcomputing PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+add_library(utilitiescomputing SHARED common.c org_apache_mnemonic_service_computingservice_internal_PrintServiceImpl.c)
+target_include_directories(utilitiescomputing PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 include (InstallRequiredSystemLibraries)
 set (CPACK_RESOURCE_FILE_LICENSE

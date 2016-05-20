@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-#include "org_apache_mnemonic_service_computingservice_internal_HelloWorldServiceImpl.h"
+#include "org_apache_mnemonic_service_computingservice_internal_PrintServiceImpl.h"
 
 /******************************************************************************
  ** JNI implementations
  *****************************************************************************/
 
 JNIEXPORT
-jlong JNICALL Java_org_apache_mnemonic_service_computingservice_internal_HelloWorldServiceImpl_nperform(JNIEnv* env,
+jlong JNICALL Java_org_apache_mnemonic_service_computingservice_internal_PrintServiceImpl_nperformPrint(JNIEnv* env,
     jobject this, jlong hdr, jlongArray arr) {
   return 0L;
 }

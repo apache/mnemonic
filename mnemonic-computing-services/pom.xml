@@ -31,7 +31,7 @@
   </properties>
 
   <modules>
-    <module>mnemonic-hello-world-service</module>
+    <module>mnemonic-utilities-service</module>
   </modules>
 
   <dependencies>
