@@ -189,13 +189,13 @@ To build this library, you may need to install some required packages on the bui
 
 Once the build system is setup, this Library is built using this command at the top level:
 ```bash
-  $ mvn clean package
+  $ mvn clean package install
 ```
 
 
 To exclude a customized memory service for your platform e.g. OSX, note that if you excluded one or both memory services, some or all testcases/examples will fail since their dependent memory services are unavailable.
 ```bash
-  $ mvn -pl '!mnemonic-memory-services/mnemonic-nvml-vmem-service' clean package
+  $ mvn -pl '!mnemonic-memory-services/mnemonic-nvml-vmem-service' clean package install
 ```
 
 
