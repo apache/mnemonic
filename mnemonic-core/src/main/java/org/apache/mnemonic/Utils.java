@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 import org.apache.mnemonic.service.allocatorservice.VolatileMemoryAllocatorService;
+import org.apache.mnemonic.service.computingservice.GeneralComputingService;
 import org.apache.mnemonic.service.allocatorservice.NonVolatileMemoryAllocatorService;
 
 /**
@@ -55,6 +56,7 @@ public class Utils {
 
   private static ServiceLoader<VolatileMemoryAllocatorService> m_vmasvcloader = null;
   private static ServiceLoader<NonVolatileMemoryAllocatorService> m_nvmasvcloader = null;
+  private static ServiceLoader<GeneralComputingService> m_gcompsvcloader = null;
 
   /**
    * retrieve a volatile memory allocator service
@@ -122,6 +124,31 @@ public class Utils {
       }
     }
     assert null != ret : "NonVolatileMemoryAllocatorService \'" + id + "\' not found!";
+    return ret;
+  }
+
+  /**
+   * retrieve a durable general computing service
+   *
+   * @param id
+   *          specify a name of general computing to retrieve
+   *
+   * @return the durable general computing service instance
+   */
+  public static GeneralComputingService getGeneralComputingService(String id) {
+    GeneralComputingService ret = null;
+    if (null == m_gcompsvcloader) {
+      m_gcompsvcloader = ServiceLoader.load(GeneralComputingService.class);
+    }
+    Iterator<GeneralComputingService> svcit = m_gcompsvcloader.iterator();
+    GeneralComputingService svc = null;
+    while (null == ret && svcit.hasNext()) {
+      svc = svcit.next();
+      if (svc.getServiceId().equals(id)) {
+        ret = svc;
+      }
+    }
+    assert null != ret : "GeneralComputingService \'" + id + "\' not found!";
     return ret;
   }
 
