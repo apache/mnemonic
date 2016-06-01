@@ -67,7 +67,7 @@ public class DurableNodeValueNGPrintTest {
     m_act.close();
   }
 
-  @Test(enabled = false)
+  @Test(enabled = true)
   public void testLinkedNodeValueWithPerson() {
 
     int elem_count = 10;
