@@ -129,6 +129,9 @@ public class DurableNodeValueNGPrintTest {
     long[][] fidinfostack = {{2L, 1L}, {0L, 1L}};
     long[][] npf = Utils.genNativeParamForm(objstack, fidinfostack);
     gcsvr.perform(handler, npf);
+    System.out.printf("ObjStack: %s \n", Arrays.deepToString(objstack.toArray()));
+    System.out.printf("FidStack: %s \n", Arrays.deepToString(fidinfostack));
+    System.out.printf("ParamFrame: %s \n", Arrays.deepToString(npf));
 
   }
 
@@ -218,6 +221,9 @@ public class DurableNodeValueNGPrintTest {
     long[][] fidinfostack = {{2L, 1L}, {2L, 1L}};
     long[][] npf = Utils.genNativeParamForm(objstack, fidinfostack);
     gcsvr.perform(handler, npf);
+    System.out.printf("ObjStack: %s \n", Arrays.deepToString(objstack.toArray()));
+    System.out.printf("FidStack: %s \n", Arrays.deepToString(fidinfostack));
+    System.out.printf("ParamFrame: %s \n", Arrays.deepToString(npf));
 
     // Assert.assert, expected);(plist, plist2);
 
