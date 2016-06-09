@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.mnemonic.NonVolatileMemAllocator;
-import org.apache.mnemonic.CommonDurableAllocator;
+import org.apache.mnemonic.RestorableAllocator;
 import org.apache.mnemonic.Durable;
 import org.apache.mnemonic.EntityFactoryProxy;
 import org.apache.mnemonic.GenericField;
@@ -112,7 +112,7 @@ public class DurableNodeValueNGTest {
     GenericField.GType gtypes[] = {GenericField.GType.DURABLE};
     EntityFactoryProxy efproxies[] = {new EntityFactoryProxy() {
       @Override
-      public <A extends CommonDurableAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
+      public <A extends RestorableAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
           GenericField.GType[] gfields, long phandler, boolean autoreclaim) {
         return PersonFactory.restore(allocator, factoryproxys, gfields, phandler, autoreclaim);
       }
@@ -137,7 +137,7 @@ public class DurableNodeValueNGTest {
     GenericField.GType listgftypes[] = {GenericField.GType.DURABLE};
     EntityFactoryProxy listefproxies[] = {new EntityFactoryProxy() {
       @Override
-      public <A extends CommonDurableAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
+      public <A extends RestorableAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
           GenericField.GType[] gfields, long phandler, boolean autoreclaim) {
         return PersonFactory.restore(allocator, factoryproxys, gfields, phandler, autoreclaim);
       }
@@ -200,7 +200,7 @@ public class DurableNodeValueNGTest {
     GenericField.GType linkedgftypes[] = {GenericField.GType.DURABLE, GenericField.GType.DOUBLE};
     EntityFactoryProxy linkedefproxies[] = {new EntityFactoryProxy() {
       @Override
-      public <A extends CommonDurableAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
+      public <A extends RestorableAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
           GenericField.GType[] gfields, long phandler, boolean autoreclaim) {
         EntityFactoryProxy[] val_efproxies = null;
         GenericField.GType[] val_gftypes = null;

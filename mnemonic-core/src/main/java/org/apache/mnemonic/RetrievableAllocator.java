@@ -17,41 +17,8 @@
 
 package org.apache.mnemonic;
 
-/**
- * an abstract common class for persistent memory allocator to provide common
- * functionalities.
- *
- */
-public abstract class CommonDurableAllocator<A extends CommonAllocator<A>> extends CommonAllocator<A> {
-
-  /**
-   * determine whether the allocator supports transaction feature or not
-   *
-   * @return true if supported
-   */
-  public boolean supportTransaction() {
-    return false;
-  }
-
-  /**
-   * determine whether the allocator does atomic operations on memory pool
-   *
-   * @return true if it is
-   *
-   */
-  public boolean isAtomicOperation() {
-    return false;
-  }
-
-  /**
-   * determine whether this allocator supports to store durable handler or
-   * not
-   *
-   * @return true if there is
-   */
-  public boolean hasDurableHandlerStore() {
-    return false;
-  }
+public abstract class RetrievableAllocator<A extends CommonAllocator<A>> extends CommonAllocator<A>
+  implements AddressTranslator, HandlerStore, Transaction {
 
   /**
    * retrieve a memory buffer from its backed memory allocator.
@@ -105,6 +72,7 @@ public abstract class CommonDurableAllocator<A extends CommonAllocator<A>> exten
    */
   public abstract MemChunkHolder<A> retrieveChunk(long phandler, boolean autoreclaim);
 
+
   /**
    * get the handler from a memory buffer holder.
    * 
@@ -124,17 +92,5 @@ public abstract class CommonDurableAllocator<A extends CommonAllocator<A>> exten
    * @return a handler that could be used to retrieve its memory chunk
    */
   public abstract long getChunkHandler(MemChunkHolder<A> mchunk);
-
-  /**
-   * start a application level transaction on this allocator.
-   *
-   */
-  public abstract void beginTransaction();
-
-  /**
-   * end a application level transaction on this allocator.
-   *
-   */
-  public abstract void endTransaction();
 
 }

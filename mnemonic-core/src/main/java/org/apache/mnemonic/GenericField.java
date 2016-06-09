@@ -25,7 +25,7 @@ package org.apache.mnemonic;
 import sun.misc.Unsafe;
 
 @SuppressWarnings("restriction")
-public class GenericField<A extends CommonDurableAllocator<A>, E> implements Durable {
+public class GenericField<A extends RestorableAllocator<A>, E> implements Durable {
 
   /**
    * defines the types of generic field

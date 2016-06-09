@@ -18,44 +18,22 @@
 package org.apache.mnemonic;
 
 /**
- * translate persistent memory address for allocator
+ *
  *
  */
-public interface NVMAddressTranslator {
+
+public class RestoreDurableEntityError extends RuntimeException {
 
   /**
-   * calculate the portable address
    *
-   * @param addr
-   *          the address to be calculated
-   *
-   * @return the portable address
    */
-  long getPortableAddress(long addr);
+  private static final long serialVersionUID = -2433590448661478594L;
 
   /**
-   * calculate the effective address
    *
-   * @param addr
-   *          the address to be calculated
-   *
-   * @return the effective address
    */
-  long getEffectiveAddress(long addr);
 
-  /**
-   * get the base address
-   *
-   * @return the base address
-   */
-  long getBaseAddress();
-
-  /**
-   * set the base address for calculation
-   *
-   * @param addr
-   *          the base address
-   *
-   */
-  long setBaseAddress(long addr);
+  public RestoreDurableEntityError(String s) {
+    super(s);
+  }
 }

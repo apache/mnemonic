@@ -17,20 +17,19 @@
 
 package org.apache.mnemonic;
 
-/**
- *
- *
- */
+public interface HandlerStore {
 
-public interface MemoryDurableEntity<ALLOC_PMem3C93D24F59 extends RestorableAllocator<ALLOC_PMem3C93D24F59>> {
+  /**
+   * determine whether this allocator supports to store durable handler or
+   * not
+   *
+   * @return true if there is
+   */
+  boolean hasDurableHandlerStore();
 
-  void initializeDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-      GenericField.GType[] gfields, boolean autoreclaim);
+  long handlerCapacity();
 
-  void createDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-      GenericField.GType[] gfields, boolean autoreclaim) throws OutOfHybridMemory;
+  long getHandler(long key);
 
-  void restoreDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-      GenericField.GType[] gfields, long phandler, boolean autoreclaim) throws RestoreDurableEntityError;
-
+  void setHandler(long key, long handler);
 }

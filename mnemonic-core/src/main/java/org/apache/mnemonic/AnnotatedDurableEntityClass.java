@@ -105,7 +105,7 @@ public class AnnotatedDurableEntityClass {
   private TypeName m_factoryproxystypename = TypeName.get(EntityFactoryProxy[].class);
   private TypeName m_gfieldstypename = TypeName.get(GenericField.GType[].class);
   private TypeVariableName m_alloctypevarname = TypeVariableName.get(cALLOCTYPENAME,
-      ParameterizedTypeName.get(ClassName.get(CommonDurableAllocator.class), TypeVariableName.get(cALLOCTYPENAME)));
+      ParameterizedTypeName.get(ClassName.get(RestorableAllocator.class), TypeVariableName.get(cALLOCTYPENAME)));
 
   private Map<String, MethodInfo> m_gettersinfo = new HashMap<String, MethodInfo>();
   private Map<String, MethodInfo> m_settersinfo = new HashMap<String, MethodInfo>();
@@ -751,13 +751,18 @@ public class AnnotatedDurableEntityClass {
       case "restoreDurableEntity":
         arg3 = methodinfo.elem.getParameters().get(3);
         arg4 = methodinfo.elem.getParameters().get(4);
+//        code.beginControlFlow("if ($1L instanceof RestorableAllocator)", arg0);
+//        code.addStatement(
+//               "throw new RestoreDurableEntityError(\"Allocator does not support restore operation in $1N.\")",
+//               name);
+//        code.endControlFlow();
         code.addStatement("initializeDurableEntity($1L, $2L, $3L, $4L)", arg0, arg1, arg2, arg4);
         code.beginControlFlow("if (0L == $1L)", arg3);
-        code.addStatement("throw new RetrieveDurableEntityError(\"Input handler is null on $1N.\")", name);
+        code.addStatement("throw new RestoreDurableEntityError(\"Input handler is null on $1N.\")", name);
         code.endControlFlow();
         code.addStatement("$1N = $2N.retrieveChunk($3L, $4N)", holdername, allocname, arg3, autoreclaimname);
         code.beginControlFlow("if (null == $1N)", holdername);
-        code.addStatement("throw new RetrieveDurableEntityError(\"Retrieve Entity Failure!\")");
+        code.addStatement("throw new RestoreDurableEntityError(\"Retrieve Entity Failure!\")");
         code.endControlFlow();
         code.addStatement("initializeAfterRestore()");
         break;
@@ -819,7 +824,7 @@ public class AnnotatedDurableEntityClass {
     code = CodeBlock.builder().addStatement("return restore($1L, $2L, false)", allocparam.name, phandlerparam.name)
         .build();
     methodspec = MethodSpec.methodBuilder("restore").addTypeVariables(entityspec.typeVariables)
-        .addException(RetrieveDurableEntityError.class).addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+        .addException(RestoreDurableEntityError.class).addModifiers(Modifier.PUBLIC, Modifier.STATIC)
         .returns(TypeName.get(m_elem.asType())).addParameter(allocparam).addParameter(phandlerparam).addCode(code)
         .build();
     typespecbuilder.addMethod(methodspec);
@@ -827,7 +832,7 @@ public class AnnotatedDurableEntityClass {
     code = CodeBlock.builder().addStatement("return restore($1L, null, null, $2L, $3L)", allocparam.name,
         phandlerparam.name, autoreclaimparam.name).build();
     methodspec = MethodSpec.methodBuilder("restore").addTypeVariables(entityspec.typeVariables)
-        .addException(RetrieveDurableEntityError.class).addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+        .addException(RestoreDurableEntityError.class).addModifiers(Modifier.PUBLIC, Modifier.STATIC)
         .returns(TypeName.get(m_elem.asType())).addParameter(allocparam).addParameter(phandlerparam)
         .addParameter(autoreclaimparam).addCode(code).build();
     typespecbuilder.addMethod(methodspec);
@@ -838,7 +843,7 @@ public class AnnotatedDurableEntityClass {
             factoryproxysparam.name, gfieldsparam.name, phandlerparam.name, autoreclaimparam.name)
         .addStatement("return entity").build();
     methodspec = MethodSpec.methodBuilder("restore").addTypeVariables(entityspec.typeVariables)
-        .addException(RetrieveDurableEntityError.class).addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+        .addException(RestoreDurableEntityError.class).addModifiers(Modifier.PUBLIC, Modifier.STATIC)
         .returns(TypeName.get(m_elem.asType())).addParameter(allocparam).addParameter(factoryproxysparam)
         .addParameter(gfieldsparam).addParameter(phandlerparam).addParameter(autoreclaimparam).addCode(code).build();
     typespecbuilder.addMethod(methodspec);

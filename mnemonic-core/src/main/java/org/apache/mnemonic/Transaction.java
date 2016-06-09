@@ -17,20 +17,33 @@
 
 package org.apache.mnemonic;
 
-/**
- *
- *
- */
+public interface Transaction {
 
-public interface MemoryDurableEntity<ALLOC_PMem3C93D24F59 extends RestorableAllocator<ALLOC_PMem3C93D24F59>> {
+  /**
+   * determine whether the allocator supports transaction feature or not
+   *
+   * @return true if supported
+   */
+  boolean supportTransaction();
 
-  void initializeDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-      GenericField.GType[] gfields, boolean autoreclaim);
+  /**
+   * determine whether the allocator does atomic operations on memory pool
+   *
+   * @return true if it does
+   *
+   */
+  boolean isAtomicOperation();
 
-  void createDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-      GenericField.GType[] gfields, boolean autoreclaim) throws OutOfHybridMemory;
+  /**
+   * start a application level transaction on this allocator.
+   *
+   */
+  void beginTransaction();
 
-  void restoreDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-      GenericField.GType[] gfields, long phandler, boolean autoreclaim) throws RestoreDurableEntityError;
+  /**
+   * end a application level transaction on this allocator.
+   *
+   */
+  void endTransaction();
 
 }

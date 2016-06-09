@@ -29,8 +29,8 @@ import org.flowcomputing.commons.resgc.ResReclaim;
  * 
  *
  */
-public class NonVolatileMemAllocator extends CommonDurableAllocator<NonVolatileMemAllocator>
-    implements NVMAddressTranslator {
+public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemAllocator>
+    implements AddressTranslator {
 
   private boolean m_activegc = true;
   private long m_gctimeout = 100;
@@ -369,6 +369,16 @@ public class NonVolatileMemAllocator extends CommonDurableAllocator<NonVolatileM
   }
 
   /**
+   * determine whether the allocator supports transaction feature or not
+   *
+   * @return true if supported
+   */
+  @Override
+  public boolean supportTransaction() {
+    return false;
+  }
+
+  /**
    * start a application level transaction on this allocator. (it is a place
    * holder)
    *
@@ -389,6 +399,17 @@ public class NonVolatileMemAllocator extends CommonDurableAllocator<NonVolatileM
   }
 
   /**
+   * determine whether the allocator does atomic operations on memory pool
+   *
+   * @return true if it does
+   *
+   */
+  @Override
+  public boolean isAtomicOperation() {
+    return false;
+  }
+
+  /**
    * set a handler on key.
    * 
    * @param key
@@ -397,6 +418,7 @@ public class NonVolatileMemAllocator extends CommonDurableAllocator<NonVolatileM
    * @param handler
    *          the handler
    */
+  @Override
   public void setHandler(long key, long handler) {
     m_nvmasvc.setHandler(m_nid, key, handler);
   }
@@ -409,6 +431,7 @@ public class NonVolatileMemAllocator extends CommonDurableAllocator<NonVolatileM
    * 
    * @return the value of handler
    */
+  @Override
   public long getHandler(long key) {
     return m_nvmasvc.getHandler(m_nid, key);
   }

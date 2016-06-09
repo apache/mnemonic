@@ -18,19 +18,44 @@
 package org.apache.mnemonic;
 
 /**
- *
+ * translate persistent memory address for allocator
  *
  */
+public interface AddressTranslator {
 
-public interface MemoryDurableEntity<ALLOC_PMem3C93D24F59 extends RestorableAllocator<ALLOC_PMem3C93D24F59>> {
+  /**
+   * calculate the portable address
+   *
+   * @param addr
+   *          the address to be calculated
+   *
+   * @return the portable address
+   */
+  long getPortableAddress(long addr);
 
-  void initializeDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-      GenericField.GType[] gfields, boolean autoreclaim);
+  /**
+   * calculate the effective address
+   *
+   * @param addr
+   *          the address to be calculated
+   *
+   * @return the effective address
+   */
+  long getEffectiveAddress(long addr);
 
-  void createDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-      GenericField.GType[] gfields, boolean autoreclaim) throws OutOfHybridMemory;
+  /**
+   * get the base address
+   *
+   * @return the base address
+   */
+  long getBaseAddress();
 
-  void restoreDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-      GenericField.GType[] gfields, long phandler, boolean autoreclaim) throws RestoreDurableEntityError;
-
+  /**
+   * set the base address for calculation
+   *
+   * @param addr
+   *          the base address
+   *
+   */
+  long setBaseAddress(long addr);
 }
