@@ -18,43 +18,30 @@
 package org.apache.mnemonic;
 
 /**
- * translate persistent memory address for allocator
+ * defines the types of generic field
  *
  */
-public interface AddressTranslator {
+public enum DurableType {
 
-  /**
-   * calculate the portable address
-   *
-   * @param addr
-   *          the address to be calculated
-   *
-   * @return the portable address
-   */
-  long getPortableAddress(long addr);
+  BOOLEAN(1),
+  CHARACTER(2),
+  BYTE(3),
+  SHORT(4),
+  INTEGER(5),
+  LONG(6),
+  FLOAT(7),
+  DOUBLE(8),
+  STRING(9),
+  DURABLE(10);
 
-  /**
-   * calculate the effective address
-   *
-   * @param addr
-   *          the address to be calculated
-   *
-   * @return the effective address
-   */
-  long getEffectiveAddress(long addr);
+  private int value;
 
-  /**
-   * set address translate table
-   *
-   * @param tbl
-   *         specify a translate table
-   */
-  void setTranslateTable(long[][] tbl);
+  DurableType(int val) {
+    this.value = val;
+  }
 
-  /**
-   * get the address translate table
-   *
-   * @return the translate table
-   */
-  long[][] getTranslateTable();
+  public int getValue() {
+    return value;
+  }
+
 }

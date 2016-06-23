@@ -18,7 +18,6 @@
 package org.apache.mnemonic;
 
 import java.nio.ByteBuffer;
-
 import org.apache.mnemonic.service.allocatorservice.NonVolatileMemoryAllocatorService;
 import org.flowcomputing.commons.resgc.ResCollector;
 import org.flowcomputing.commons.resgc.ResReclaim;
@@ -35,7 +34,7 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
   private boolean m_activegc = true;
   private long m_gctimeout = 100;
   private long m_nid = -1;
-  private long b_addr = 0;
+  private long[][] m_ttable;
   private NonVolatileMemoryAllocatorService m_nvmasvc = null;
 
   /**
@@ -65,7 +64,10 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
     m_nvmasvc = nvmasvc;
 
     m_nid = m_nvmasvc.init(capacity, uri, isnew);
-    b_addr = m_nvmasvc.getBaseAddress(m_nid);
+    m_ttable = new long[1][3];
+    m_ttable[0][0] = 0L;
+    m_ttable[0][1] = m_nvmasvc.capacity(m_nid);
+    m_ttable[0][2] = m_nvmasvc.getBaseAddress(m_nid);
 
     /**
      * create a resource collector to release specified chunk that backed by
@@ -447,51 +449,62 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
   }
 
   /**
-   * calculate the portable address
+   * translate the portable address
    *
    * @param addr
-   *          the address to be calculated
+   *          the address to be translated
    *
    * @return the portable address
    */
   @Override
   public long getPortableAddress(long addr) {
-    return addr - b_addr;
+    int i;
+    for (i = 0; i < m_ttable.length; ++i) {
+      if (addr >= m_ttable[i][2] && addr < m_ttable[i][1] + m_ttable[i][2]) {
+        return addr - m_ttable[i][2];
+      }
+    }
+    throw new AddressTranslateError("Portable Address Translate Error");
   }
 
   /**
-   * calculate the effective address
+   * translate the effective address
    *
    * @param addr
-   *          the address to be calculated
+   *          the address to be translated
    *
    * @return the effective address
    */
   @Override
   public long getEffectiveAddress(long addr) {
-    return addr + b_addr;
+    int i;
+    for (i = 0; i < m_ttable.length; ++i) {
+      if (addr >= m_ttable[i][0] && addr < m_ttable[i][1]) {
+        return addr + m_ttable[i][2];
+      }
+    }
+    throw new AddressTranslateError("Effective Address Translate Error");
   }
 
   /**
-   * get the base address
+   * get the address translate table
    *
-   * @return the base address
+   * @return the translate table
    */
   @Override
-  public long getBaseAddress() {
-    return b_addr;
+  public long[][] getTranslateTable() {
+    return m_ttable;
   }
 
   /**
-   * set the base address for calculation
+   * set address translate table
    *
-   * @param addr
-   *          the base address
-   *
+   * @param tbl
+   *         specify a translate table
    */
   @Override
-  public long setBaseAddress(long addr) {
-    return b_addr = addr;
+  public void setTranslateTable(long[][] tbl) {
+    m_ttable = tbl;
   }
 
 }

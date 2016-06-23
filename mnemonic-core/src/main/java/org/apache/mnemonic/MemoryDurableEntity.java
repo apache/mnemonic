@@ -25,12 +25,12 @@ package org.apache.mnemonic;
 public interface MemoryDurableEntity<ALLOC_PMem3C93D24F59 extends RestorableAllocator<ALLOC_PMem3C93D24F59>> {
 
   void initializeDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-      GenericField.GType[] gfields, boolean autoreclaim);
+      DurableType[] gfields, boolean autoreclaim);
 
   void createDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-      GenericField.GType[] gfields, boolean autoreclaim) throws OutOfHybridMemory;
+      DurableType[] gfields, boolean autoreclaim) throws OutOfHybridMemory;
 
   void restoreDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-      GenericField.GType[] gfields, long phandler, boolean autoreclaim) throws RestoreDurableEntityError;
+      DurableType[] gfields, long phandler, boolean autoreclaim) throws RestoreDurableEntityError;
 
 }

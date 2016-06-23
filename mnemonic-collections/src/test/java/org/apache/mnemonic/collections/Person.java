@@ -19,10 +19,10 @@ package org.apache.mnemonic.collections;
 
 import org.apache.mnemonic.Durable;
 import org.apache.mnemonic.EntityFactoryProxy;
-import org.apache.mnemonic.GenericField;
 import org.apache.mnemonic.DurableEntity;
 import org.apache.mnemonic.DurableGetter;
 import org.apache.mnemonic.DurableSetter;
+import org.apache.mnemonic.DurableType;
 import org.apache.mnemonic.OutOfHybridMemory;
 import org.apache.mnemonic.RetrieveDurableEntityError;
 import org.testng.annotations.Test;
@@ -47,7 +47,7 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
   }
 
   @Override
-  public void setupGenericInfo(EntityFactoryProxy[] efproxies, GenericField.GType[] gftypes) {
+  public void setupGenericInfo(EntityFactoryProxy[] efproxies, DurableType[] gftypes) {
 
   }
 

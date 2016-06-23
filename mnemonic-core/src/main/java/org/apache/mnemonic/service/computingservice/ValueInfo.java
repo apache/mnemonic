@@ -15,41 +15,30 @@
  * limitations under the License.
  */
 
-package org.apache.mnemonic.service.computingservice.internal;
+package org.apache.mnemonic.service.computingservice;
 
-import org.apache.mnemonic.service.computingservice.GeneralComputingService;
-import org.apache.mnemonic.service.computingservice.ValueInfo;
-import org.flowcomputing.commons.primitives.NativeLibraryLoader;
+import org.apache.mnemonic.DurableType;
 
-public class PrintServiceImpl implements GeneralComputingService {
-  static {
-    try {
-      NativeLibraryLoader.loadFromJar("utilitiescomputing");
-    } catch (Exception e) {
-      throw new Error(e);
-    }
-  }
+public class ValueInfo {
 
   /**
-   * {@inheritDoc}
+   * a handler to a object graph
    */
-  @Override
-  public String getServiceId() {
-    return "print";
-  }
+  public long handler;
+  
+  /**
+   * a table for native address mapping
+   */
+  public long[][] transtable;
+  
+  /**
+   * a list of frame of native parameter
+   */
+  public long[][] frames;
 
   /**
-   * {@inheritDoc}
+   * a type of this specified value
    */
-  @Override
-  public long[] perform(ValueInfo[] valinfos) {
-    long[] ret = null;
-    if (null != valinfos) {
-      ret = nperformPrint(valinfos);
-    }
-    return ret;
-  }
-
-  protected native long[] nperformPrint(ValueInfo[] valinfos);
+  public DurableType type;
 
 }

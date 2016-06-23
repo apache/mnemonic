@@ -80,6 +80,13 @@ void JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServ
 }
 
 JNIEXPORT
+void JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServiceImpl_ncapacity(
+    JNIEnv* env,
+    jobject this, jlong id)
+{
+}
+
+JNIEXPORT
 jobject JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServiceImpl_ncreateByteBuffer(
     JNIEnv *env, jobject this, jlong id, jlong size) {
   pthread_rwlock_rdlock(&g_vmem_rwlock);

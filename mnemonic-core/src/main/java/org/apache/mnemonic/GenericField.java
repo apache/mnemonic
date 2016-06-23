@@ -17,34 +17,26 @@
 
 package org.apache.mnemonic;
 
+import sun.misc.Unsafe;
+
 /**
  * this class defines generic field for non-volatile entity
  *
  */
 
-import sun.misc.Unsafe;
-
 @SuppressWarnings("restriction")
 public class GenericField<A extends RestorableAllocator<A>, E> implements Durable {
 
-  /**
-   * defines the types of generic field
-   *
-   */
-  public enum GType {
-    BOOLEAN, CHARACTER, BYTE, SHORT, INTEGER, LONG, FLOAT, DOUBLE, STRING, DURABLE
-  };
-
   private Unsafe m_unsafe;
   private long m_fpos;
-  private GType m_dgftype = null;
+  private DurableType m_dgftype = null;
   private Durable m_field = null;
   private MemBufferHolder<A> m_strfield = null;
   private A m_allocator;
   private boolean m_autoreclaim;
   private EntityFactoryProxy m_defproxy = null;
   private EntityFactoryProxy[] m_efproxies;
-  private GType[] m_gftypes;
+  private DurableType[] m_gftypes;
 
   /**
    * Constructor: initialize this generic field
@@ -74,7 +66,8 @@ public class GenericField<A extends RestorableAllocator<A>, E> implements Durabl
    *          specify the field position
    *
    */
-  public GenericField(EntityFactoryProxy defproxy, GType dgftype, EntityFactoryProxy[] efproxies, GType[] gftypes,
+  public GenericField(EntityFactoryProxy defproxy, DurableType dgftype,
+      EntityFactoryProxy[] efproxies, DurableType[] gftypes,
       A allocator, Unsafe unsafe, boolean autoreclaim, Long fpos) {
     m_unsafe = unsafe;
     m_fpos = fpos;
@@ -291,7 +284,7 @@ public class GenericField<A extends RestorableAllocator<A>, E> implements Durabl
    * {@inheritDoc}
    */
   @Override
-  public void setupGenericInfo(EntityFactoryProxy[] efproxies, GType[] gftypes) {
+  public void setupGenericInfo(EntityFactoryProxy[] efproxies, DurableType[] gftypes) {
     throw new UnsupportedOperationException("GenericField.setupGenericInfo()");
   }
 

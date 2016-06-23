@@ -57,6 +57,11 @@ public interface VolatileMemoryAllocatorService {
   void sync(long id);
 
   /**
+   * get the capacity of its managed memory space
+   */
+  long capacity(long id);
+
+  /**
    * allocate specified size of memory block from backed memory pool.
    * 
    * @param id

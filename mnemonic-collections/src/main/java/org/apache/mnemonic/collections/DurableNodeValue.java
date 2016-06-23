@@ -22,7 +22,7 @@ import java.util.NoSuchElementException;
 
 import org.apache.mnemonic.Durable;
 import org.apache.mnemonic.EntityFactoryProxy;
-import org.apache.mnemonic.GenericField;
+import org.apache.mnemonic.DurableType;
 import org.apache.mnemonic.DurableEntity;
 import org.apache.mnemonic.DurableGetter;
 import org.apache.mnemonic.DurableSetter;
@@ -35,7 +35,7 @@ import org.apache.mnemonic.DurableSetter;
 @DurableEntity
 public abstract class DurableNodeValue<E> implements Durable, Iterable<E> {
   protected transient EntityFactoryProxy[] m_node_efproxies;
-  protected transient GenericField.GType[] m_node_gftypes;
+  protected transient DurableType[] m_node_gftypes;
 
   /**
    * creation callback for initialization
@@ -67,7 +67,7 @@ public abstract class DurableNodeValue<E> implements Durable, Iterable<E> {
    *          specify a array of types corresponding to efproxies
    */
   @Override
-  public void setupGenericInfo(EntityFactoryProxy[] efproxies, GenericField.GType[] gftypes) {
+  public void setupGenericInfo(EntityFactoryProxy[] efproxies, DurableType[] gftypes) {
     m_node_efproxies = efproxies;
     m_node_gftypes = gftypes;
   }

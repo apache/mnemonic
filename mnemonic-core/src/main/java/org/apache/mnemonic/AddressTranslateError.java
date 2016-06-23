@@ -15,41 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.mnemonic.service.computingservice.internal;
+package org.apache.mnemonic;
 
-import org.apache.mnemonic.service.computingservice.GeneralComputingService;
-import org.apache.mnemonic.service.computingservice.ValueInfo;
-import org.flowcomputing.commons.primitives.NativeLibraryLoader;
-
-public class PrintServiceImpl implements GeneralComputingService {
-  static {
-    try {
-      NativeLibraryLoader.loadFromJar("utilitiescomputing");
-    } catch (Exception e) {
-      throw new Error(e);
-    }
-  }
+public class AddressTranslateError extends RuntimeException {
 
   /**
-   * {@inheritDoc}
+   * 
    */
-  @Override
-  public String getServiceId() {
-    return "print";
-  }
+  private static final long serialVersionUID = 1L;
 
   /**
-   * {@inheritDoc}
+   *
    */
-  @Override
-  public long[] perform(ValueInfo[] valinfos) {
-    long[] ret = null;
-    if (null != valinfos) {
-      ret = nperformPrint(valinfos);
-    }
-    return ret;
-  }
 
-  protected native long[] nperformPrint(ValueInfo[] valinfos);
+  public AddressTranslateError(String s) {
+    super(s);
+  }
 
 }

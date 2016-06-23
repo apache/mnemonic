@@ -21,6 +21,9 @@ import org.apache.mnemonic.service.allocatorservice.VolatileMemoryAllocatorServi
 import org.flowcomputing.commons.primitives.NativeLibraryLoader;
 
 import java.nio.ByteBuffer;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class VMemServiceImpl implements VolatileMemoryAllocatorService {
   static {
@@ -31,6 +34,8 @@ public class VMemServiceImpl implements VolatileMemoryAllocatorService {
     }
   }
 
+  protected Map<Long, Long> m_info = Collections.synchronizedMap(new HashMap<Long, Long>());
+
   @Override
   public String getServiceId() {
     return "vmem";
@@ -38,7 +43,9 @@ public class VMemServiceImpl implements VolatileMemoryAllocatorService {
 
   @Override
   public long init(long capacity, String uri, boolean isnew) {
-    return ninit(capacity, uri, isnew);
+    long ret = ninit(capacity, uri, isnew);
+    m_info.put(ret, capacity);
+    return ret;
   }
 
   @Override
@@ -49,6 +56,11 @@ public class VMemServiceImpl implements VolatileMemoryAllocatorService {
   @Override
   public void sync(long id) {
     nsync(id);
+  }
+
+  @Override
+  public long capacity(long id) {
+    return m_info.get(id);
   }
 
   @Override
@@ -86,6 +98,8 @@ public class VMemServiceImpl implements VolatileMemoryAllocatorService {
   protected native void nclose(long id);
 
   protected native void nsync(long id);
+
+  protected native long ncapacity(long id);
 
   protected native long nallocate(long id, long size, boolean initzero);
 

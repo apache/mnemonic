@@ -103,7 +103,7 @@ public class AnnotatedDurableEntityClass {
 
   private TypeName m_alloctypename = TypeVariableName.get(cALLOCTYPENAME);
   private TypeName m_factoryproxystypename = TypeName.get(EntityFactoryProxy[].class);
-  private TypeName m_gfieldstypename = TypeName.get(GenericField.GType[].class);
+  private TypeName m_gfieldstypename = TypeName.get(DurableType[].class);
   private TypeVariableName m_alloctypevarname = TypeVariableName.get(cALLOCTYPENAME,
       ParameterizedTypeName.get(ClassName.get(RestorableAllocator.class), TypeVariableName.get(cALLOCTYPENAME)));
 
@@ -498,7 +498,7 @@ public class AnnotatedDurableEntityClass {
         } else if (dynfieldinfo.type.toString().startsWith(GenericField.class.getCanonicalName())) {
           code.beginControlFlow("if (null == $1N)", dynfieldinfo.name);
           code.addStatement("$1T proxy = null", TypeName.get(EntityFactoryProxy.class));
-          code.addStatement("$1T gftype = null", TypeName.get(GenericField.GType.class));
+          code.addStatement("$1T gftype = null", TypeName.get(DurableType.class));
           code.addStatement("int gfpidx = $1L", getFactoryProxyIndex(methodinfo.rettype));
           code.beginControlFlow("if (null != $1N && $1N.length > gfpidx)", factoryproxyname);
           code.addStatement("proxy = $1L[gfpidx]", factoryproxyname);
@@ -601,7 +601,7 @@ public class AnnotatedDurableEntityClass {
         } else if (dynfieldinfo.type.toString().startsWith(GenericField.class.getCanonicalName())) {
           code.beginControlFlow("if (null == $1N)", dynfieldinfo.name);
           code.addStatement("$1T proxy = null", TypeName.get(EntityFactoryProxy.class));
-          code.addStatement("$1T gftype = null", TypeName.get(GenericField.GType.class));
+          code.addStatement("$1T gftype = null", TypeName.get(DurableType.class));
           code.addStatement("int gfpidx = $1L", getFactoryProxyIndex(valtname));
           code.beginControlFlow("if (null != $1N && $1N.length > gfpidx)", factoryproxyname);
           code.addStatement("proxy = $1L[gfpidx]", factoryproxyname);

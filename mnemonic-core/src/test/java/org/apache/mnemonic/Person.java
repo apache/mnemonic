@@ -37,7 +37,7 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
   }
 
   @Override
-  public void setupGenericInfo(EntityFactoryProxy[] efproxies, GenericField.GType[] gftypes) {
+  public void setupGenericInfo(EntityFactoryProxy[] efproxies, DurableType[] gftypes) {
 
   }
 

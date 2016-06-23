@@ -50,7 +50,7 @@ public interface Durable {
    * @param gftypes
    *          specify a array of types corresponding to efproxies
    */
-  void setupGenericInfo(EntityFactoryProxy[] efproxies, GenericField.GType[] gftypes);
+  void setupGenericInfo(EntityFactoryProxy[] efproxies, DurableType[] gftypes);
 
   /**
    * this function could be called by user code to disable auto-reclaim for this

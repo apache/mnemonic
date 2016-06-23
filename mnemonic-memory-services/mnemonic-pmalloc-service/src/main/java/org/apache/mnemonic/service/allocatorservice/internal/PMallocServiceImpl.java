@@ -52,6 +52,11 @@ public class PMallocServiceImpl implements NonVolatileMemoryAllocatorService {
   }
 
   @Override
+  public long capacity(long id) {
+    return ncapacity(id);
+  }
+
+  @Override
   public long allocate(long id, long size, boolean initzero) {
     return nallocate(id, size, initzero);
   }
@@ -121,6 +126,8 @@ public class PMallocServiceImpl implements NonVolatileMemoryAllocatorService {
   protected native void nclose(long id);
 
   protected native void nsync(long id);
+
+  protected native long ncapacity(long id);
 
   protected native long nallocate(long id, long size, boolean initzero);
 

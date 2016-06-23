@@ -23,27 +23,42 @@
  *****************************************************************************/
 
 JNIEXPORT
-jlong JNICALL Java_org_apache_mnemonic_service_computingservice_internal_PrintServiceImpl_nperformPrint(JNIEnv* env,
-    jobject this, jlong hdr, jobjectArray arr) {
+jlongArray JNICALL Java_org_apache_mnemonic_service_computingservice_internal_PrintServiceImpl_nperformPrint(JNIEnv* env,
+    jobject this, jobjectArray vinfos) {
+  jlongArray ret = NULL;
+  jsize retsz = 1;
+  jsize idx;
+  jlong nret[retsz];
+  for(idx = 0; idx < retsz; ++idx) {
+    nret[idx] = 0L;
+  }
+  ret = (*env)->NewLongArray(env, retsz);
+  if (NULL == ret) {
+    return NULL;
+  }
   printf("----Service Native Parameters----\n");
-  printf("Handler --> %p \n", addr_from_java(hdr));
-  jsize i, j; jlong *vals;
-  jlongArray *larr;
-  jsize len1 = (*env)->GetArrayLength(env, arr);
-  jsize len2;
-  for (i = 0; i < len1; ++i) {
-    larr = (jlongArray)((*env)->GetObjectArrayElement(env, arr, i));
-    len2 = (*env)->GetArrayLength(env, larr);
-    vals = (*env)->GetLongArrayElements(env, larr, 0);
-    printf("Stack Row %d - ", i);
-    for (j = 0; j < len2; ++j) {
-      printf("[%d]:%p ", j, vals[j]);
-    }
-    printf("\n");
-    (*env)->ReleaseLongArrayElements(env, larr, vals, 0);
+  for(idx = 0; idx < (*env)->GetArrayLength(env, vinfos); ++idx) {
+
+//    printf("Handler --> %p \n", addr_from_java(hdr));
+//    jsize i, j; jlong *vals;
+//    jlongArray *larr;
+//    jsize len1 = (*env)->GetArrayLength(env, arr);
+//    jsize len2;
+//    for (i = 0; i < len1; ++i) {
+//      larr = (jlongArray)((*env)->GetObjectArrayElement(env, arr, i));
+//      len2 = (*env)->GetArrayLength(env, larr);
+//      vals = (*env)->GetLongArrayElements(env, larr, 0);
+//      printf("Stack Row %d - ", i);
+//      for (j = 0; j < len2; ++j) {
+//        printf("[%d]:%p ", j, vals[j]);
+//      }
+//      printf("\n");
+//      (*env)->ReleaseLongArrayElements(env, larr, vals, 0);
+//    }
   }
 
-  return 0L;
+  (*env)->SetIntArrayRegion(env, ret, 0, retsz, nret);
+  return ret;
 }
 
 __attribute__((destructor)) void fini(void) {

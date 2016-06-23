@@ -25,13 +25,12 @@ import java.util.List;
 import java.util.Random;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
 import org.apache.mnemonic.NonVolatileMemAllocator;
 import org.apache.mnemonic.RestorableAllocator;
 import org.apache.mnemonic.Durable;
 import org.apache.mnemonic.EntityFactoryProxy;
-import org.apache.mnemonic.GenericField;
 import org.apache.mnemonic.Utils;
+import org.apache.mnemonic.DurableType;
 import org.apache.mnemonic.collections.DurableNodeValue;
 import org.apache.mnemonic.collections.DurableNodeValueFactory;
 
@@ -72,11 +71,11 @@ public class DurableNodeValueNGPrintTest {
 
     int elem_count = 10;
 
-    GenericField.GType listgftypes[] = {GenericField.GType.DURABLE};
+    DurableType listgftypes[] = {DurableType.DURABLE};
     EntityFactoryProxy listefproxies[] = {new EntityFactoryProxy() {
       @Override
       public <A extends RestorableAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
-          GenericField.GType[] gfields, long phandler, boolean autoreclaim) {
+          DurableType[] gfields, long phandler, boolean autoreclaim) {
         return PersonFactory.restore(allocator, factoryproxys, gfields, phandler, autoreclaim);
       }
     } };
@@ -123,15 +122,20 @@ public class DurableNodeValueNGPrintTest {
     }
 
     GeneralComputingService gcsvr = Utils.getGeneralComputingService("print");
+    ValueInfo vinfo = new ValueInfo();
     List<long[][]> objstack = new ArrayList<long[][]>();
     objstack.add(firstnv.getNativeFieldInfo());
     objstack.add(person.getNativeFieldInfo());
     long[][] fidinfostack = {{2L, 1L}, {0L, 1L}};
-    long[][] npf = Utils.genNativeParamForm(objstack, fidinfostack);
-    gcsvr.perform(handler, npf);
+    vinfo.handler = handler;
+    vinfo.transtable = m_act.getTranslateTable();
+    vinfo.type = DurableType.INTEGER;
+    vinfo.frames = Utils.genNativeParamForm(objstack, fidinfostack);
+    ValueInfo[] vinfos = {vinfo};
+    gcsvr.perform(vinfos);
     System.out.printf("ObjStack: %s \n", Arrays.deepToString(objstack.toArray()));
     System.out.printf("FidStack: %s \n", Arrays.deepToString(fidinfostack));
-    System.out.printf("ParamFrame: %s \n", Arrays.deepToString(npf));
+    System.out.printf("ParamFrame: %s \n", Arrays.deepToString(vinfo.frames));
 
   }
 
@@ -141,16 +145,16 @@ public class DurableNodeValueNGPrintTest {
     int elem_count = 10;
     long slotKeyId = 10;
 
-    GenericField.GType[] elem_gftypes = {GenericField.GType.DOUBLE};
+    DurableType[] elem_gftypes = {DurableType.DOUBLE};
     EntityFactoryProxy[] elem_efproxies = null;
 
-    GenericField.GType linkedgftypes[] = {GenericField.GType.DURABLE, GenericField.GType.DOUBLE};
+    DurableType linkedgftypes[] = {DurableType.DURABLE, DurableType.DOUBLE};
     EntityFactoryProxy linkedefproxies[] = {new EntityFactoryProxy() {
       @Override
       public <A extends RestorableAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
-          GenericField.GType[] gfields, long phandler, boolean autoreclaim) {
+          DurableType[] gfields, long phandler, boolean autoreclaim) {
         EntityFactoryProxy[] val_efproxies = null;
-        GenericField.GType[] val_gftypes = null;
+        DurableType[] val_gftypes = null;
         if (null != factoryproxys && factoryproxys.length >= 2) {
           val_efproxies = Arrays.copyOfRange(factoryproxys, 1, factoryproxys.length);
         }
@@ -215,15 +219,20 @@ public class DurableNodeValueNGPrintTest {
     }
 
     GeneralComputingService gcsvr = Utils.getGeneralComputingService("print");
+    ValueInfo vinfo = new ValueInfo();
     List<long[][]> objstack = new ArrayList<long[][]>();
     objstack.add(linkedvals.getNativeFieldInfo());
     objstack.add(linkedvals.getNativeFieldInfo());
     long[][] fidinfostack = {{2L, 1L}, {2L, 1L}};
-    long[][] npf = Utils.genNativeParamForm(objstack, fidinfostack);
-    gcsvr.perform(handler, npf);
+    vinfo.handler = handler;
+    vinfo.transtable = m_act.getTranslateTable();
+    vinfo.type = DurableType.DOUBLE;
+    vinfo.frames = Utils.genNativeParamForm(objstack, fidinfostack);
+    ValueInfo[] vinfos = {vinfo};
+    gcsvr.perform(vinfos);
     System.out.printf("ObjStack: %s \n", Arrays.deepToString(objstack.toArray()));
     System.out.printf("FidStack: %s \n", Arrays.deepToString(fidinfostack));
-    System.out.printf("ParamFrame: %s \n", Arrays.deepToString(npf));
+    System.out.printf("ParamFrame: %s \n", Arrays.deepToString(vinfo.frames));
 
     // Assert.assert, expected);(plist, plist2);
 

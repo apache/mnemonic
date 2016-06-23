@@ -108,6 +108,18 @@ void JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_PMallocS
 }
 
 JNIEXPORT
+jlong JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_PMallocServiceImpl_ncapacity(
+    JNIEnv* env,
+    jobject this, jlong id)
+{
+  pthread_rwlock_rdlock(&g_pmp_rwlock);
+  void *md = *(g_pmp_ptr + id);
+  jlong ret = pmcapacity(md);
+  pthread_rwlock_unlock(&g_pmp_rwlock);
+  return ret;
+}
+
+JNIEXPORT
 jobject JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_PMallocServiceImpl_ncreateByteBuffer(
     JNIEnv *env, jobject this, jlong id, jlong size) {
   pthread_rwlock_rdlock(&g_pmp_rwlock);

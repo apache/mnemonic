@@ -28,9 +28,9 @@ import org.apache.mnemonic.NonVolatileMemAllocator;
 import org.apache.mnemonic.RestorableAllocator;
 import org.apache.mnemonic.Durable;
 import org.apache.mnemonic.EntityFactoryProxy;
-import org.apache.mnemonic.GenericField;
 import org.apache.mnemonic.Reclaim;
 import org.apache.mnemonic.Utils;
+import org.apache.mnemonic.DurableType;
 import org.testng.AssertJUnit;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -82,7 +82,7 @@ public class DurableNodeValueNGTest {
   @Test(enabled = false)
   public void testSingleNodeValueWithInteger() {
     int val = m_rand.nextInt();
-    GenericField.GType gtypes[] = {GenericField.GType.INTEGER};
+    DurableType gtypes[] = {DurableType.INTEGER};
     DurableNodeValue<Integer> plln = DurableNodeValueFactory.create(m_act, null, gtypes, false);
     plln.setItem(val, false);
     Long handler = plln.getHandler();
@@ -94,7 +94,7 @@ public class DurableNodeValueNGTest {
   @Test(enabled = false)
   public void testNodeValueWithString() {
     String val = Utils.genRandomString();
-    GenericField.GType gtypes[] = {GenericField.GType.STRING};
+    DurableType gtypes[] = {DurableType.STRING};
     DurableNodeValue<String> plln = DurableNodeValueFactory.create(m_act, null, gtypes, false);
     plln.setItem(val, false);
     Long handler = plln.getHandler();
@@ -109,11 +109,11 @@ public class DurableNodeValueNGTest {
     Person<Long> person = PersonFactory.create(m_act);
     person.setAge((short) 31);
 
-    GenericField.GType gtypes[] = {GenericField.GType.DURABLE};
+    DurableType gtypes[] = {DurableType.DURABLE};
     EntityFactoryProxy efproxies[] = {new EntityFactoryProxy() {
       @Override
       public <A extends RestorableAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
-          GenericField.GType[] gfields, long phandler, boolean autoreclaim) {
+          DurableType[] gfields, long phandler, boolean autoreclaim) {
         return PersonFactory.restore(allocator, factoryproxys, gfields, phandler, autoreclaim);
       }
     } };
@@ -134,11 +134,11 @@ public class DurableNodeValueNGTest {
     int elem_count = 10;
     List<Long> referlist = new ArrayList();
 
-    GenericField.GType listgftypes[] = {GenericField.GType.DURABLE};
+    DurableType listgftypes[] = {DurableType.DURABLE};
     EntityFactoryProxy listefproxies[] = {new EntityFactoryProxy() {
       @Override
       public <A extends RestorableAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
-          GenericField.GType[] gfields, long phandler, boolean autoreclaim) {
+          DurableType[] gfields, long phandler, boolean autoreclaim) {
         return PersonFactory.restore(allocator, factoryproxys, gfields, phandler, autoreclaim);
       }
     } };
@@ -194,16 +194,16 @@ public class DurableNodeValueNGTest {
     int elem_count = 10;
     long slotKeyId = 10;
 
-    GenericField.GType[] elem_gftypes = {GenericField.GType.DOUBLE};
+    DurableType[] elem_gftypes = {DurableType.DOUBLE};
     EntityFactoryProxy[] elem_efproxies = null;
 
-    GenericField.GType linkedgftypes[] = {GenericField.GType.DURABLE, GenericField.GType.DOUBLE};
+    DurableType linkedgftypes[] = {DurableType.DURABLE, DurableType.DOUBLE};
     EntityFactoryProxy linkedefproxies[] = {new EntityFactoryProxy() {
       @Override
       public <A extends RestorableAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
-          GenericField.GType[] gfields, long phandler, boolean autoreclaim) {
+          DurableType[] gfields, long phandler, boolean autoreclaim) {
         EntityFactoryProxy[] val_efproxies = null;
-        GenericField.GType[] val_gftypes = null;
+        DurableType[] val_gftypes = null;
         if (null != factoryproxys && factoryproxys.length >= 2) {
           val_efproxies = Arrays.copyOfRange(factoryproxys, 1, factoryproxys.length);
         }

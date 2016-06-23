@@ -49,5 +49,5 @@ public interface EntityFactoryProxy {
    *
    */
   <A extends RestorableAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
-      GenericField.GType[] gfields, long phandler, boolean autoreclaim);
+      DurableType[] gfields, long phandler, boolean autoreclaim);
 }

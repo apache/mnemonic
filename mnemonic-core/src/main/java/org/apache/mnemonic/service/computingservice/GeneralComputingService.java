@@ -38,15 +38,11 @@ public interface GeneralComputingService {
   /**
    * perform native functionalities according to prepared computing parameters
    *
-   * @param handler
-   *         a handler to a object graph
+   * @param valinfos
+   *         an array of value info
    *
-   * @param npf
-   *         a list of native parameters
-   *
-   * @return the handler to updated object graph if any
+   * @return the array of handler about updated object graphs if any
    */
-  long perform(long handler, long[][] npf);
-
+  long[] perform(ValueInfo[] valinfos);
 
 }
