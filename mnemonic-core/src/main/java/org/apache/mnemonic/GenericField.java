@@ -32,6 +32,8 @@ public class GenericField<A extends RestorableAllocator<A>, E> implements Durabl
   private DurableType m_dgftype = null;
   private Durable m_field = null;
   private MemBufferHolder<A> m_strfield = null;
+  private MemChunkHolder<A> m_chunkfield = null;
+  private MemBufferHolder<A> m_bufferfield = null;
   private A m_allocator;
   private boolean m_autoreclaim;
   private EntityFactoryProxy m_defproxy = null;
@@ -88,6 +90,7 @@ public class GenericField<A extends RestorableAllocator<A>, E> implements Durabl
    * @param destroy
    *          specify true if want to destroy the original value
    */
+  @SuppressWarnings("unchecked")
   public void set(E e, boolean destroy) {
     boolean isnull = null == e;
     switch (m_dgftype) {
@@ -141,6 +144,36 @@ public class GenericField<A extends RestorableAllocator<A>, E> implements Durabl
       }
       m_field = (Durable) e;
       m_unsafe.putAddress(m_fpos, null == m_field ? 0L : m_field.getHandler());
+      break;
+    case CHUNK:
+      if (destroy && null != get()) {
+        m_chunkfield.destroy();
+        m_chunkfield = null;
+        m_unsafe.putAddress(m_fpos, 0L);
+      }
+      if (e instanceof MemChunkHolder<?> == false) {
+        throw new GenericTypeError("generic type is not mapped to a chunk type!");
+      }
+      if (((MemChunkHolder<A>) e).getAllocator() != m_allocator) {
+        throw new IllegalAllocatorError("This generic chunk is allocated by another allocator!");
+      }
+      m_chunkfield = (MemChunkHolder<A>) e;
+      m_unsafe.putAddress(m_fpos, null == m_chunkfield ? 0L : m_allocator.getChunkHandler(m_chunkfield));
+      break;
+    case BUFFER :
+      if (destroy && null != get()) {
+        m_bufferfield.destroy();
+        m_bufferfield = null;
+        m_unsafe.putAddress(m_fpos, 0L);
+      }
+      if (e instanceof MemBufferHolder<?> == false) {
+        throw new GenericTypeError("generic type is not mapped to a buffer type!");
+      }
+      if (((MemBufferHolder<A>) e).getAllocator() != m_allocator) {
+        throw new IllegalAllocatorError("This generic buffer is allocated by another allocator!");
+      }
+      m_bufferfield = (MemBufferHolder<A>) e;
+      m_unsafe.putAddress(m_fpos, null == m_bufferfield ? 0L : m_allocator.getBufferHandler(m_bufferfield));
       break;
     }
 
@@ -203,6 +236,30 @@ public class GenericField<A extends RestorableAllocator<A>, E> implements Durabl
       }
       ret = (E) m_field;
       break;
+    case CHUNK:
+      if (null == m_chunkfield) {
+        long phandler = m_unsafe.getAddress(m_fpos);
+        if (0L != phandler) {
+          m_chunkfield = m_allocator.retrieveChunk(phandler, m_autoreclaim);
+          if (null == m_chunkfield) {
+            throw new RetrieveDurableEntityError("Retrieve Chunk Failure.");
+          }
+        }
+      }
+      ret = (E) m_chunkfield;
+      break;
+    case BUFFER:
+      if (null == m_bufferfield) {
+        long phandler = m_unsafe.getAddress(m_fpos);
+        if (0L != phandler) {
+          m_bufferfield = m_allocator.retrieveBuffer(phandler, m_autoreclaim);
+          if (null == m_bufferfield) {
+            throw new RetrieveDurableEntityError("Retrieve Buffer Failure.");
+          }
+        }
+      }
+      ret = (E) m_bufferfield;
+      break;
     }
     return ret;
   }
@@ -234,6 +291,12 @@ public class GenericField<A extends RestorableAllocator<A>, E> implements Durabl
     if (null != m_strfield) {
       m_strfield.cancelAutoReclaim();
     }
+    if (null != m_chunkfield) {
+      m_chunkfield.cancelAutoReclaim();
+    }
+    if (null != m_bufferfield) {
+      m_bufferfield.cancelAutoReclaim();
+    }
     m_autoreclaim = false;
   }
 
@@ -247,6 +310,12 @@ public class GenericField<A extends RestorableAllocator<A>, E> implements Durabl
     }
     if (null != m_strfield) {
       m_strfield.registerAutoReclaim();
+    }
+    if (null != m_chunkfield) {
+      m_chunkfield.registerAutoReclaim();
+    }
+    if (null != m_bufferfield) {
+      m_bufferfield.registerAutoReclaim();
     }
     m_autoreclaim = true;
   }
@@ -277,6 +346,12 @@ public class GenericField<A extends RestorableAllocator<A>, E> implements Durabl
     }
     if (null != m_strfield) {
       m_strfield.destroy();
+    }
+    if (null != m_chunkfield) {
+      m_chunkfield.destroy();
+    }
+    if (null != m_bufferfield) {
+      m_bufferfield.destroy();
     }
   }
 

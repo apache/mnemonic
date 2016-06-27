@@ -17,33 +17,14 @@
 
 package org.apache.mnemonic;
 
-/**
- * defines the types of generic field
- *
- */
-public enum DurableType {
+public class GenericTypeError extends RuntimeException {
 
-  BOOLEAN(1),
-  CHARACTER(2),
-  BYTE(3),
-  SHORT(4),
-  INTEGER(5),
-  LONG(6),
-  FLOAT(7),
-  DOUBLE(8),
-  STRING(9),
-  DURABLE(10),
-  BUFFER(11),
-  CHUNK(12);
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
 
-  private int value;
-
-  DurableType(int val) {
-    this.value = val;
+  public GenericTypeError(String s) {
+    super(s);
   }
-
-  public int getValue() {
-    return value;
-  }
-
 }

@@ -58,7 +58,7 @@ import com.squareup.javapoet.TypeVariableName;
 import sun.misc.Unsafe;
 
 /**
- * this class managed to generate generic non-volatile concrete object and their
+ * this class managed to generate generic durable concrete object and their
  * corresponding factory.
  *
  */
@@ -483,7 +483,27 @@ public class AnnotatedDurableEntityClass {
         code.addStatement(codefmt, unsafename, holdername, dynfieldinfo.fieldoff,
             transTypeToUnsafeMethod(ftname, true));
       } else {
-        if (methodinfo.rettype.toString().equals(String.class.getCanonicalName())) {
+        if (methodinfo.rettype.toString().equals(MemChunkHolder.class.getCanonicalName())) {
+          code.beginControlFlow("if (null == $1N)", dynfieldinfo.name);
+          code.addStatement("long phandler = $1N.getAddress($2N.get() + $3L)", unsafename, holdername,
+              dynfieldinfo.fieldoff);
+          code.beginControlFlow("if (0L != phandler)");
+          code.addStatement("$1N = $2N.retrieveChunk(phandler, $3N)",
+              dynfieldinfo.name, allocname, autoreclaimname);
+          code.endControlFlow();
+          code.endControlFlow();
+          code.addStatement("return $1N", dynfieldinfo.name);
+        }  else if (methodinfo.rettype.toString().equals(MemBufferHolder.class.getCanonicalName())) {
+          code.beginControlFlow("if (null == $1N)", dynfieldinfo.name);
+          code.addStatement("long phandler = $1N.getAddress($2N.get() + $3L)", unsafename, holdername,
+              dynfieldinfo.fieldoff);
+          code.beginControlFlow("if (0L != phandler)");
+          code.addStatement("$1N = $2N.retrieveBuffer(phandler, $3N)",
+              dynfieldinfo.name, allocname, autoreclaimname);
+          code.endControlFlow();
+          code.endControlFlow();
+          code.addStatement("return $1N", dynfieldinfo.name);
+        } else if (methodinfo.rettype.toString().equals(String.class.getCanonicalName())) {
           code.beginControlFlow("if (null == $1N)", dynfieldinfo.name);
           code.addStatement("long phandler = $1N.getAddress($2N.get() + $3L)", unsafename, holdername,
               dynfieldinfo.fieldoff);
@@ -580,7 +600,31 @@ public class AnnotatedDurableEntityClass {
           throw new AnnotationProcessingException(null, "%s's setter has no second parameters for non primitive type.",
               name);
         }
-        if (valtname.toString().equals(String.class.getCanonicalName())) {
+        if (valtname.toString().equals(MemChunkHolder.class.getCanonicalName())) {
+          code.beginControlFlow("if ($1L && null != $2L())", arg1, gsetterName(name, true));
+          code.addStatement("$1N.destroy()", dynfieldinfo.name);
+          code.addStatement("$1N = null", dynfieldinfo.name);
+          code.addStatement("$1N.putAddress($2N.get() + $3L, 0L)", unsafename, holdername, dynfieldinfo.fieldoff);
+          code.endControlFlow();
+          code.beginControlFlow("if ($1N.getAllocator() != $2N)", dynfieldinfo.name, allocname);
+          code.addStatement("throw new IllegalAllocatorError(\"This chunk is allocated by another allocator!\")");
+          code.endControlFlow();
+          code.addStatement("$1N = $2L", dynfieldinfo.name, arg0);
+          code.addStatement("$1N.putLong($2N.get() + $3L, null == $4N ? 0L : $5N.getChunkHandler($4N))",
+              unsafename, holdername, dynfieldinfo.fieldoff, dynfieldinfo.name, allocname);
+        } else if (valtname.toString().equals(MemBufferHolder.class.getCanonicalName())) {
+          code.beginControlFlow("if ($1L && null != $2L())", arg1, gsetterName(name, true));
+          code.addStatement("$1N.destroy()", dynfieldinfo.name);
+          code.addStatement("$1N = null", dynfieldinfo.name);
+          code.addStatement("$1N.putAddress($2N.get() + $3L, 0L)", unsafename, holdername, dynfieldinfo.fieldoff);
+          code.endControlFlow();
+          code.beginControlFlow("if ($1N.getAllocator() != $2N)", dynfieldinfo.name, allocname);
+          code.addStatement("throw new IllegalAllocatorError(\"This buffer is allocated by another allocator!\")");
+          code.endControlFlow();
+          code.addStatement("$1N = $2L", dynfieldinfo.name, arg0);
+          code.addStatement("$1N.putLong($2N.get() + $3L, null == $4N ? 0L : $5N.getBufferHandler($4N))",
+              unsafename, holdername, dynfieldinfo.fieldoff, dynfieldinfo.name, allocname);
+        } else if (valtname.toString().equals(String.class.getCanonicalName())) {
           code.beginControlFlow("if ($1L && null != $2L())", arg1, gsetterName(name, true));
           code.addStatement("$1N.destroy()", dynfieldinfo.name);
           code.addStatement("$1N = null", dynfieldinfo.name);
@@ -592,7 +636,7 @@ public class AnnotatedDurableEntityClass {
           code.addStatement("$1N = $2N.createBuffer($3L.length() * 2, $4N)", dynfieldinfo.name, allocname, arg0,
               autoreclaimname);
           code.beginControlFlow("if (null == $1N)", dynfieldinfo.name);
-          code.addStatement("throw new OutOfHybridMemory(\"Create Non-Volatile String Error!\")");
+          code.addStatement("throw new OutOfHybridMemory(\"Create Durable String Error!\")");
           code.endControlFlow();
           code.addStatement("$1N.get().asCharBuffer().put($2L)", dynfieldinfo.name, arg0);
           code.addStatement("$1N.putLong($2N.get() + $3L, $4N.getBufferHandler($5N))", unsafename, holdername,
@@ -732,7 +776,7 @@ public class AnnotatedDurableEntityClass {
         code.addStatement("initializeDurableEntity($1L, $2L, $3L, $4L)", arg0, arg1, arg2, arg3);
         code.addStatement("$1N = $2N.createChunk($3L, $4N)", holdername, allocname, m_holdersize, autoreclaimname);
         code.beginControlFlow("if (null == $1N)", holdername);
-        code.addStatement("throw new OutOfHybridMemory(\"Create Non-Volatile Entity Error!\")");
+        code.addStatement("throw new OutOfHybridMemory(\"Create Durable Entity Error!\")");
         code.endControlFlow();
         // code.beginControlFlow("try");
         // for (String fname : m_dynfieldsinfo.keySet()) {
