@@ -483,7 +483,7 @@ public class AnnotatedDurableEntityClass {
         code.addStatement(codefmt, unsafename, holdername, dynfieldinfo.fieldoff,
             transTypeToUnsafeMethod(ftname, true));
       } else {
-        if (methodinfo.rettype.toString().equals(MemChunkHolder.class.getCanonicalName())) {
+        if (methodinfo.rettype.toString().startsWith(MemChunkHolder.class.getCanonicalName())) {
           code.beginControlFlow("if (null == $1N)", dynfieldinfo.name);
           code.addStatement("long phandler = $1N.getAddress($2N.get() + $3L)", unsafename, holdername,
               dynfieldinfo.fieldoff);
@@ -493,7 +493,7 @@ public class AnnotatedDurableEntityClass {
           code.endControlFlow();
           code.endControlFlow();
           code.addStatement("return $1N", dynfieldinfo.name);
-        }  else if (methodinfo.rettype.toString().equals(MemBufferHolder.class.getCanonicalName())) {
+        }  else if (methodinfo.rettype.toString().startsWith(MemBufferHolder.class.getCanonicalName())) {
           code.beginControlFlow("if (null == $1N)", dynfieldinfo.name);
           code.addStatement("long phandler = $1N.getAddress($2N.get() + $3L)", unsafename, holdername,
               dynfieldinfo.fieldoff);
@@ -600,7 +600,7 @@ public class AnnotatedDurableEntityClass {
           throw new AnnotationProcessingException(null, "%s's setter has no second parameters for non primitive type.",
               name);
         }
-        if (valtname.toString().equals(MemChunkHolder.class.getCanonicalName())) {
+        if (valtname.toString().startsWith(MemChunkHolder.class.getCanonicalName())) {
           code.beginControlFlow("if ($1L && null != $2L())", arg1, gsetterName(name, true));
           code.addStatement("$1N.destroy()", dynfieldinfo.name);
           code.addStatement("$1N = null", dynfieldinfo.name);
@@ -612,7 +612,7 @@ public class AnnotatedDurableEntityClass {
           code.addStatement("$1N = $2L", dynfieldinfo.name, arg0);
           code.addStatement("$1N.putLong($2N.get() + $3L, null == $4N ? 0L : $5N.getChunkHandler($4N))",
               unsafename, holdername, dynfieldinfo.fieldoff, dynfieldinfo.name, allocname);
-        } else if (valtname.toString().equals(MemBufferHolder.class.getCanonicalName())) {
+        } else if (valtname.toString().startsWith(MemBufferHolder.class.getCanonicalName())) {
           code.beginControlFlow("if ($1L && null != $2L())", arg1, gsetterName(name, true));
           code.addStatement("$1N.destroy()", dynfieldinfo.name);
           code.addStatement("$1N = null", dynfieldinfo.name);
