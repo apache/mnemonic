@@ -32,32 +32,15 @@ jlongArray JNICALL Java_org_apache_mnemonic_service_computingservice_internal_Pr
   for(idx = 0; idx < retsz; ++idx) {
     nret[idx] = 0L;
   }
-  ret = (*env)->NewLongArray(env, retsz);
-  if (NULL == ret) {
-    return NULL;
-  }
+  size_t visz;
+  struct NValueInfo **nvinfos = constructNValueInfos(env, vinfos, &visz);
+
+
   printf("----Service Native Parameters----\n");
-  for(idx = 0; idx < (*env)->GetArrayLength(env, vinfos); ++idx) {
+  printNValueInfos(nvinfos, visz);
 
-//    printf("Handler --> %p \n", addr_from_java(hdr));
-//    jsize i, j; jlong *vals;
-//    jlongArray *larr;
-//    jsize len1 = (*env)->GetArrayLength(env, arr);
-//    jsize len2;
-//    for (i = 0; i < len1; ++i) {
-//      larr = (jlongArray)((*env)->GetObjectArrayElement(env, arr, i));
-//      len2 = (*env)->GetArrayLength(env, larr);
-//      vals = (*env)->GetLongArrayElements(env, larr, 0);
-//      printf("Stack Row %d - ", i);
-//      for (j = 0; j < len2; ++j) {
-//        printf("[%d]:%p ", j, vals[j]);
-//      }
-//      printf("\n");
-//      (*env)->ReleaseLongArrayElements(env, larr, vals, 0);
-//    }
-  }
-
-  (*env)->SetIntArrayRegion(env, ret, 0, retsz, nret);
+  ret = constructJLongArray(env, nret, retsz);
+  destructNValueInfos(nvinfos, visz);
   return ret;
 }
 

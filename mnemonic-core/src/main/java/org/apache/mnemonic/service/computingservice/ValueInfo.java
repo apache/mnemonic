@@ -39,6 +39,6 @@ public class ValueInfo {
   /**
    * a type of this specified value
    */
-  public DurableType type;
+  public DurableType dtype;
 
 }

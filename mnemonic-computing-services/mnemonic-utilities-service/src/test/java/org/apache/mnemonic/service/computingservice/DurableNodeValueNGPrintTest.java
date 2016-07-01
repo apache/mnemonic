@@ -129,7 +129,7 @@ public class DurableNodeValueNGPrintTest {
     long[][] fidinfostack = {{2L, 1L}, {0L, 1L}};
     vinfo.handler = handler;
     vinfo.transtable = m_act.getTranslateTable();
-    vinfo.type = DurableType.INTEGER;
+    vinfo.dtype = DurableType.INTEGER;
     vinfo.frames = Utils.genNativeParamForm(objstack, fidinfostack);
     ValueInfo[] vinfos = {vinfo};
     gcsvr.perform(vinfos);
@@ -226,7 +226,7 @@ public class DurableNodeValueNGPrintTest {
     long[][] fidinfostack = {{2L, 1L}, {2L, 1L}};
     vinfo.handler = handler;
     vinfo.transtable = m_act.getTranslateTable();
-    vinfo.type = DurableType.DOUBLE;
+    vinfo.dtype = DurableType.DOUBLE;
     vinfo.frames = Utils.genNativeParamForm(objstack, fidinfostack);
     ValueInfo[] vinfos = {vinfo};
     gcsvr.perform(vinfos);

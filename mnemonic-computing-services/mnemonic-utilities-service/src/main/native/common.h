@@ -42,6 +42,35 @@ void* addr_from_java(jlong addr);
 
 jlong addr_to_java(void* p);
 
+struct transitem {
+  void* hdlbase;
+  long size;
+  void* base;
+};
+
+struct frameitem {
+  long nextoff;
+  long nextsz;
+  long nlvloff;
+  long nlvlsz;
+};
+
+struct NValueInfo {
+  long handler;
+  struct transitem *transtable;
+  size_t transtablesz;
+  struct frameitem *frames;
+  size_t framessz;
+  int dtype;
+};
+
+struct NValueInfo **constructNValueInfos(JNIEnv* env,
+    jobjectArray vinfos, size_t *sz);
+
+void destructNValueInfos(struct NValueInfo **nvalinfos, size_t sz);
+
+jlongArray constructJLongArray(JNIEnv* env, long arr[], size_t sz);
+
 #ifdef __cplusplus
 }
 #endif
