@@ -22,6 +22,45 @@
  ** JNI implementations
  *****************************************************************************/
 
+void valHandler(JNIEnv* env, size_t dims[], size_t dimsz,
+    void *addr, size_t sz, int dtype) {
+  size_t i;
+  if (0 == dims[dimsz - 1]) {
+    printf("\n");
+  }
+  for (i = 0; i < dimsz; ++i) {
+    printf("[%zu]", dims[i]);
+  }
+  switch(dtype) {
+  case DURABLE_BOOLEAN:
+    printf(" %s, ", (0 == *(char*)addr ? "T" : "F"));
+    break;
+  case DURABLE_CHARACTER:
+    printf(" %c, ", *(char*)addr);
+    break;
+  case DURABLE_BYTE:
+    printf(" %d, ", *(char*)addr);
+    break;
+  case DURABLE_SHORT:
+    printf(" %d, ", *(short*)addr);
+    break;
+  case DURABLE_INTEGER:
+    printf(" %d, ", *(int*)addr);
+    break;
+  case DURABLE_LONG:
+    printf(" %ld, ", *(long*)addr);
+    break;
+  case DURABLE_FLOAT:
+    printf(" %f, ", *(float*)addr);
+    break;
+  case DURABLE_DOUBLE:
+    printf(" %f, ", *(double*)addr);
+    break;
+  default:
+    printf(" (NA), ");
+  }
+}
+
 JNIEXPORT
 jlongArray JNICALL Java_org_apache_mnemonic_service_computingservice_internal_PrintServiceImpl_nperformPrint(JNIEnv* env,
     jobject this, jobjectArray vinfos) {
@@ -34,10 +73,15 @@ jlongArray JNICALL Java_org_apache_mnemonic_service_computingservice_internal_Pr
   }
   size_t visz;
   struct NValueInfo **nvinfos = constructNValueInfos(env, vinfos, &visz);
-
-
-  printf("----Service Native Parameters----\n");
   printNValueInfos(nvinfos, visz);
+  for(idx = 0; idx < visz; ++idx) {
+    printf("-- Value Matrix #%u --\n", idx);
+    if (NULL != nvinfos + idx) {
+      handleValueInfo(env, *(nvinfos + idx), valHandler);
+    } else {
+      printf("NULL\n");
+    }
+  }
 
   ret = constructJLongArray(env, nret, retsz);
   destructNValueInfos(nvinfos, visz);

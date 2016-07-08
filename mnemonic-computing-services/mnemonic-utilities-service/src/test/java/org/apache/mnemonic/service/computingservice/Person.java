@@ -57,10 +57,14 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
         null == getMother() ? "No Recorded Mother" : "Has Recorded Mother");
   }
 
+  public void testOutputAge() throws RetrieveDurableEntityError {
+    System.out.printf("(Person %s, Age: %d) ", getName(), getAge());
+  }
+
   public int compareTo(Person<E> anotherPerson) {
     int ret = 0;
     if (0 == ret) {
-      ret = getAge().compareTo(anotherPerson.getAge());
+      ret = ((Short)getAge()).compareTo(anotherPerson.getAge());
     }
     if (0 == ret) {
       ret = getName().compareTo(anotherPerson.getName());
@@ -69,10 +73,10 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
   }
 
   @DurableGetter(Id = 1L)
-  public abstract Short getAge();
+  public abstract short getAge();
 
   @DurableSetter
-  public abstract void setAge(Short age);
+  public abstract void setAge(short age);
 
   @DurableGetter(Id = 2L)
   public abstract String getName() throws RetrieveDurableEntityError;

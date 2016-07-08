@@ -303,4 +303,49 @@ inline long to_p(JNIEnv* env, struct NValueInfo *nvinfo, void *e) {
   return -1L;
 }
 
+void iterMatrix(JNIEnv* env, struct NValueInfo *nvinfo, size_t dims[], long hdls[],
+    size_t dimidx, valueHandler valhandler) {
+  void *addr = NULL;
+  long curoff = (nvinfo->frames + dimidx)->nextoff;
+  long curnloff = (nvinfo->frames + dimidx)->nlvloff;
+  long curnlsz = (nvinfo->frames + dimidx)->nlvlsz;
+  if (dimidx < nvinfo->framessz - 1) {
+    while(0L != hdls[dimidx]) {
+      hdls[dimidx + 1] = *(long*)(to_e(env, nvinfo, hdls[dimidx]) + curnloff);
+      iterMatrix(env, nvinfo, dims, hdls, dimidx + 1, valhandler);
+      hdls[dimidx] = *(long*)(to_e(env, nvinfo, hdls[dimidx]) + curoff);
+      ++dims[dimidx];
+    }
+    dims[dimidx] = 0;
+  } else {
+    if (-1L != curoff) {
+      while(0L != hdls[dimidx]) {
+        addr = to_e(env, nvinfo, hdls[dimidx]) + curnloff;
+        valhandler(env, dims, dimidx + 1, addr, curnlsz, nvinfo->dtype);
+        hdls[dimidx] = *(long*)(to_e(env, nvinfo, hdls[dimidx]) + curoff);
+        ++dims[dimidx];
+      }
+      dims[dimidx] = 0;
+    } else {
+      addr = to_e(env, nvinfo, hdls[dimidx]) + curnloff;
+      valhandler(env, dims, dimidx, addr, curnlsz, nvinfo->dtype);
+    }
+  }
+}
+
+int handleValueInfo(JNIEnv* env, struct NValueInfo *nvinfo, valueHandler valhandler) {
+  if (NULL == nvinfo->frames || 0 == nvinfo->framessz) {
+    return -1;
+  }
+  size_t dims[nvinfo->framessz];
+  long hdls[nvinfo->framessz];
+  size_t i, di = 0;
+  for (i = 0; i < nvinfo->framessz; ++i) {
+    dims[i] = 0;
+    hdls[i] = 0L;
+  }
+  hdls[di] = nvinfo->handler;
+  iterMatrix(env, nvinfo, dims, hdls, 0, valhandler);
+  return 0;
+}
 

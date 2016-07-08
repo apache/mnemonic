@@ -36,6 +36,19 @@ extern "C" {
 #include <pthread.h>
 #include <jni.h>
 
+#define DURABLE_BOOLEAN 1
+#define DURABLE_CHARACTER 2
+#define DURABLE_BYTE 3
+#define DURABLE_SHORT 4
+#define DURABLE_INTEGER 5
+#define DURABLE_LONG 6
+#define DURABLE_FLOAT 7
+#define DURABLE_DOUBLE 8
+#define DURABLE_STRING 9
+#define DURABLE_DURABLE 10
+#define DURABLE_BUFFER 11
+#define DURABLE_CHUNK 12
+
 void throw(JNIEnv* env, const char* msg);
 
 void* addr_from_java(jlong addr);
@@ -64,16 +77,23 @@ struct NValueInfo {
   int dtype;
 };
 
+typedef void (*valueHandler)(JNIEnv* env, size_t dims[], size_t dimsz,
+    void *addr, size_t sz, int dtype);
+
 struct NValueInfo **constructNValueInfos(JNIEnv* env,
     jobjectArray vinfos, size_t *sz);
 
 void destructNValueInfos(struct NValueInfo **nvalinfos, size_t sz);
+
+void printNValueInfos(struct NValueInfo **nvalinfos, size_t sz);
 
 jlongArray constructJLongArray(JNIEnv* env, long arr[], size_t sz);
 
 inline void *to_e(JNIEnv* env, struct NValueInfo *nvinfo, long p);
 
 inline long to_p(JNIEnv* env, struct NValueInfo *nvinfo, void *e);
+
+int handleValueInfo(JNIEnv* env, struct NValueInfo *nvinfo, valueHandler valhandler);
 
 #ifdef __cplusplus
 }

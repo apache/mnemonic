@@ -93,6 +93,9 @@ public class DurableNodeValueNGPrintTest {
       person.setAge((short) m_rand.nextInt(50));
       person.setName(String.format("Name: [%s]", Utils.genRandomString()), true);
       nextnv.setItem(person, false);
+      if (i + 1 == elem_count) {
+        break;
+      }
       newnv = DurableNodeValueFactory.create(m_act, listefproxies, listgftypes, false);
       nextnv.setNext(newnv, false);
       nextnv = newnv;
@@ -100,26 +103,28 @@ public class DurableNodeValueNGPrintTest {
 
     Person<Long> eval;
     DurableNodeValue<Person<Long>> iternv = firstnv;
+    System.out.printf(" -- Stage 1 Generated---\n");
     while (null != iternv) {
-      System.out.printf(" Stage 1 --->\n");
       eval = iternv.getItem();
       if (null != eval) {
-        eval.testOutput();
+        eval.testOutputAge();
       }
       iternv = iternv.getNext();
     }
+    System.out.printf("\n");
 
     long handler = firstnv.getHandler();
 
     DurableNodeValue<Person<Long>> firstnv2 = DurableNodeValueFactory.restore(m_act, listefproxies, listgftypes,
         handler, false);
 
+    System.out.printf("--- Stage 2 Restored--- \n");
     for (Person<Long> eval2 : firstnv2) {
-      System.out.printf(" Stage 2 ---> \n");
       if (null != eval2) {
-        eval2.testOutput();
+        eval2.testOutputAge();
       }
     }
+    System.out.printf("\n");
 
     GeneralComputingService gcsvr = Utils.getGeneralComputingService("print");
     ValueInfo vinfo = new ValueInfo();
@@ -129,13 +134,10 @@ public class DurableNodeValueNGPrintTest {
     long[][] fidinfostack = {{2L, 1L}, {0L, 1L}};
     vinfo.handler = handler;
     vinfo.transtable = m_act.getTranslateTable();
-    vinfo.dtype = DurableType.INTEGER;
+    vinfo.dtype = DurableType.SHORT;
     vinfo.frames = Utils.genNativeParamForm(objstack, fidinfostack);
     ValueInfo[] vinfos = {vinfo};
     gcsvr.perform(vinfos);
-    System.out.printf("ObjStack: %s \n", Arrays.deepToString(objstack.toArray()));
-    System.out.printf("FidStack: %s \n", Arrays.deepToString(fidinfostack));
-    System.out.printf("ParamFrame: %s \n", Arrays.deepToString(vinfo.frames));
 
   }
 
@@ -230,9 +232,6 @@ public class DurableNodeValueNGPrintTest {
     vinfo.frames = Utils.genNativeParamForm(objstack, fidinfostack);
     ValueInfo[] vinfos = {vinfo};
     gcsvr.perform(vinfos);
-    System.out.printf("ObjStack: %s \n", Arrays.deepToString(objstack.toArray()));
-    System.out.printf("FidStack: %s \n", Arrays.deepToString(fidinfostack));
-    System.out.printf("ParamFrame: %s \n", Arrays.deepToString(vinfo.frames));
 
     // Assert.assert, expected);(plist, plist2);
 

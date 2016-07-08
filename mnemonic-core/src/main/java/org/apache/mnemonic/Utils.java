@@ -425,8 +425,8 @@ public class Utils {
       throw new IllegalArgumentException("the length of field id array is not exactly 2");
     }
     for (int idx = 0; idx < fidinfo.length; ++idx) {
-      ret[idx * 2] = 0;
-      ret[idx * 2 + 1] = 0;
+      ret[idx * 2] = -1L;
+      ret[idx * 2 + 1] = 0L;
       fid = fidinfo[idx];
       if (fid <= 0) {
         if (allowfidnull && 0 == idx) {
