@@ -117,7 +117,7 @@ struct NValueInfo *constructNValInfo(JNIEnv* env, jobject vinfoobj) {
           itmarrlen = (*env)->GetArrayLength(env, itmarr);
           if (NULL != itmarr && TRANSTABLEITEMLEN == itmarrlen) {
             itms = (*env)->GetLongArrayElements(env, itmarr, NULL);
-            (ret->transtable + i)->hdlbase = addr_from_java(itms[0]);
+            (ret->transtable + i)->hdlbase = itms[0];
             (ret->transtable + i)->size = itms[1];
             (ret->transtable + i)->base = addr_from_java(itms[2]);
             (*env)->ReleaseLongArrayElements(env, itmarr, itms, JNI_ABORT);
@@ -213,20 +213,20 @@ void printNValueInfos(struct NValueInfo **nvalinfos, size_t sz) {
   struct NValueInfo *itm;
   struct transitem *ttitm;
   struct frameitem *fitm;
-  printf("\n--- Native ValueInfo List, Addr:%p, Size: %d ---\n", nvalinfos, sz);
+  printf("\n--- Native ValueInfo List, Addr:%p, Size: %zu ---\n", nvalinfos, sz);
   if (NULL != nvalinfos) {
     for(idx = 0; idx < sz; ++idx) {
       itm = *(nvalinfos + idx);
-      printf("** Item %2d, Addr:%p ** \n", idx, itm);
+      printf("** Item %2zu, Addr:%p ** \n", idx, itm);
       if (NULL != itm) {
-        printf("Handler:%p, DType Value:%d\n", itm->handler, itm->dtype);
-        printf(">> TransTable: Addr:%p, Size:%d <<\n", itm->transtable, itm->transtablesz);
+        printf("Handler:%ld, DType Value:%d\n", itm->handler, itm->dtype);
+        printf(">> TransTable: Addr:%p, Size:%zu <<\n", itm->transtable, itm->transtablesz);
         if (NULL != itm->transtable && itm->transtablesz > 0) {
           for (i = 0; i < itm->transtablesz; ++i) {
             ttitm = (itm->transtable + i);
-            printf("%2d)", i);
+            printf("%2zu)", i);
             if (NULL != ttitm) {
-              printf("hdlbase:%p, size:%ld, base:%p\n",
+              printf("hdlbase:%ld, size:%ld, base:%p\n",
                   ttitm->hdlbase, ttitm->size, ttitm->base);
             } else {
               printf("NULL\n");
@@ -235,11 +235,11 @@ void printNValueInfos(struct NValueInfo **nvalinfos, size_t sz) {
         } else {
           printf("NULL\n");
         }
-        printf(">> Frames: Addr:%p, Size:%d <<\n", itm->frames, itm->framessz);
+        printf(">> Frames: Addr:%p, Size:%zu <<\n", itm->frames, itm->framessz);
         if (NULL != itm->frames && itm->framessz > 0) {
           for (i = 0; i < itm->framessz; ++i) {
             fitm = (itm->frames + i);
-            printf("%2d)", i);
+            printf("%2zu)", i);
             if (NULL != fitm) {
               printf("nextoff:%ld, nextsz:%ld, nlvloff:%ld, nlvlsz:%ld\n",
                   fitm->nextoff, fitm->nextsz, fitm->nlvloff, fitm->nlvlsz);
@@ -268,3 +268,39 @@ jlongArray constructJLongArray(JNIEnv* env, long arr[], size_t sz) {
   (*env)->SetLongArrayRegion(env, ret, 0, sz, arr);
   return ret;
 }
+
+inline void *to_e(JNIEnv* env, struct NValueInfo *nvinfo, long p) {
+  size_t i;
+  struct transitem * ti;
+  if (NULL != nvinfo || NULL != nvinfo->transtable) {
+    for (i = 0; i < nvinfo->transtablesz; ++i) {
+      ti = nvinfo->transtable + i;
+      if (p >= ti->hdlbase && p < ti->size) {
+        return ti->base + p;
+      }
+    }
+    throw(env, "No item found in Translate Table.");
+  } else {
+    throw(env, "NValueInfo or Translate Table is NULL.");
+  }
+  return NULL;
+}
+
+inline long to_p(JNIEnv* env, struct NValueInfo *nvinfo, void *e) {
+  size_t i;
+  struct transitem * ti;
+  if (NULL != nvinfo || NULL != nvinfo->transtable) {
+    for (i = 0; i < nvinfo->transtablesz; ++i) {
+      ti = nvinfo->transtable + i;
+      if (e >= ti->base && e < ti->base + ti->size) {
+        return e - ti->base;
+      }
+    }
+    throw(env, "No item found in Translate Table.");
+  } else {
+    throw(env, "NValueInfo or Translate Table is NULL.");
+  }
+  return -1L;
+}
+
+

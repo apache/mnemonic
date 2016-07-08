@@ -43,7 +43,7 @@ void* addr_from_java(jlong addr);
 jlong addr_to_java(void* p);
 
 struct transitem {
-  void* hdlbase;
+  long hdlbase;
   long size;
   void* base;
 };
@@ -70,6 +70,10 @@ struct NValueInfo **constructNValueInfos(JNIEnv* env,
 void destructNValueInfos(struct NValueInfo **nvalinfos, size_t sz);
 
 jlongArray constructJLongArray(JNIEnv* env, long arr[], size_t sz);
+
+inline void *to_e(JNIEnv* env, struct NValueInfo *nvinfo, long p);
+
+inline long to_p(JNIEnv* env, struct NValueInfo *nvinfo, void *e);
 
 #ifdef __cplusplus
 }
