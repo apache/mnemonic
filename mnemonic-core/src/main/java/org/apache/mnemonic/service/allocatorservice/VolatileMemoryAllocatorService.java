@@ -46,18 +46,28 @@ public interface VolatileMemoryAllocatorService {
 
   /**
    * close the memory pool through native interface.
-   * 
+   *
+   * @param id
+   *         specify the id of underlying native allocator
    */
   void close(long id);
 
   /**
    * force to synchronize uncommitted data to backed memory pool through native
    * interface.
+   *
+   * @param id
+   *         specify the id of underlying native allocator
    */
   void sync(long id);
 
   /**
    * get the capacity of its managed memory space
+   *
+   * @param id
+   *         specify the id of underlying native allocator
+   *
+   * @return the capacity of this allocator managed memory resource/device
    */
   long capacity(long id);
 
@@ -69,7 +79,10 @@ public interface VolatileMemoryAllocatorService {
    * 
    * @param size
    *          specify size of memory block to be allocated
-   * 
+   *
+   * @param initzero
+   *          indicate if initialize it with zeros
+   *
    * @return the address of allocated memory block from native memory pool
    */
   long allocate(long id, long size, boolean initzero);
@@ -86,6 +99,9 @@ public interface VolatileMemoryAllocatorService {
    * @param size
    *          specify new size of memory block to be reallocated
    * 
+   * @param initzero
+   *          indicate if initialize it with zeros
+   *
    * @return the address of reallocated memory block from native memory pool
    */
   long reallocate(long id, long address, long size, boolean initzero);

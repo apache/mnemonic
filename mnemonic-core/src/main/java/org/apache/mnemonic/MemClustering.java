@@ -190,7 +190,10 @@ public class MemClustering {
 
   /**
    * set a callback of event for allocator change.
-   * 
+   *
+   * @param <A>
+   *          indicates that for this instantiation of the allocator
+   *
    * @param allocatorChange
    *          specify a callback object for allocator change
    */

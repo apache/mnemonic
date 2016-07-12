@@ -28,6 +28,9 @@ public interface EntityFactoryProxy {
    * restore a durable object from persistent allocator using a handler of
    * non-volatile object
    *
+   * @param <A>
+   *          indicates that for this instantiation of the allocator.
+   *
    * @param allocator
    *          specify a persistent allocator instance
    *

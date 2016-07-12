@@ -24,15 +24,13 @@ package org.apache.mnemonic;
 
 public class RestoreDurableEntityError extends RuntimeException {
 
-  /**
-   *
-   */
   private static final long serialVersionUID = -2433590448661478594L;
 
   /**
-   *
+   * construct a error instance
+   * @param s
+   *         specify an error information
    */
-
   public RestoreDurableEntityError(String s) {
     super(s);
   }

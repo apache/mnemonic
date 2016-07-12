@@ -19,15 +19,13 @@ package org.apache.mnemonic;
 
 public class AddressTranslateError extends RuntimeException {
 
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
 
-  /**
-   *
-   */
-
+/**
+ * construct an error instance
+ * @param s
+ *      specify an error information
+ */
   public AddressTranslateError(String s) {
     super(s);
   }
