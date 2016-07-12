@@ -39,7 +39,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
- *
+ * A Test case suit, verify and demo the durable native computing services (DNCS) infra.
  *
  */
 

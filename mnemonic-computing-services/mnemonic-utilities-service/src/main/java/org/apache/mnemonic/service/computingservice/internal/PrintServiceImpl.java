@@ -50,6 +50,11 @@ public class PrintServiceImpl implements GeneralComputingService {
     return ret;
   }
 
+  /**
+   * A native function to fulfill the action of print in native level.
+   * @param valinfos an array of value info, some of them could be set as NULL
+   * @return an array of handler returned by native level
+   */
   protected native long[] nperformPrint(ValueInfo[] valinfos);
 
 }
