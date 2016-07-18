@@ -19,9 +19,10 @@
   under the License.
 -->
 
-<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3 http://maven.apache.org/xsd/assembly-1.1.3.xsd">
+<assembly
+  xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.3 http://maven.apache.org/xsd/assembly-1.1.3.xsd">
   <id>src</id>
   <formats>
     <format>zip</format>
@@ -74,7 +75,7 @@
     <moduleSet>
       <includes>
         <include>org.apache.mnemonic:mnemonic-pmalloc-service</include>
-	<include>org.apache.mnemonic:mnemonic-nvml-vmem-service</include>
+        <include>org.apache.mnemonic:mnemonic-nvml-vmem-service</include>
       </includes>
       <sources>
         <fileSets>
@@ -91,7 +92,49 @@
             </excludes>
           </fileSet>
         </fileSets>
-	<outputDirectoryMapping>mnemonic-memory-services/${module.artifactId}</outputDirectoryMapping>
+        <outputDirectoryMapping>mnemonic-memory-services/${module.artifactId}</outputDirectoryMapping>
+      </sources>
+    </moduleSet>
+    <moduleSet>
+      <includes>
+        <include>org.apache.mnemonic:mnemonic-computing-services</include>
+      </includes>
+      <sources>
+        <fileSets>
+          <fileSet>
+            <directory>.</directory>
+            <outputDirectory>.</outputDirectory>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <excludes>
+              <exclude>**/target/**</exclude>
+              <exclude>**/service-dist/**</exclude>
+              <exclude>dependency-reduced-pom.xml</exclude>
+              <exclude>**/*.dat</exclude>
+            </excludes>
+          </fileSet>
+        </fileSets>
+      </sources>
+    </moduleSet>
+    <moduleSet>
+      <includes>
+        <include>org.apache.mnemonic:mnemonic-utilities-service</include>
+      </includes>
+      <sources>
+        <fileSets>
+          <fileSet>
+            <directory>.</directory>
+            <outputDirectory>.</outputDirectory>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <excludes>
+              <exclude>**/target/**</exclude>
+              <exclude>**/native/build/**</exclude>
+              <exclude>**/native/dist/**</exclude>
+              <exclude>dependency-reduced-pom.xml</exclude>
+              <exclude>**/*.dat</exclude>
+            </excludes>
+          </fileSet>
+        </fileSets>
+        <outputDirectoryMapping>mnemonic-computing-services/${module.artifactId}</outputDirectoryMapping>
       </sources>
     </moduleSet>
   </moduleSets>
@@ -102,10 +145,10 @@
         <include>README*</include>
         <include>LICENSE*</include>
         <include>NOTICE*</include>
-	<include>DISCLAIMER*</include>
-	<include>KEYS</include>
+        <include>DISCLAIMER*</include>
+        <include>KEYS</include>
         <include>pom.xml</include>
-	<include>build-tools/**</include>
+        <include>build-tools/**</include>
       </includes>
       <useDefaultExcludes>true</useDefaultExcludes>
     </fileSet>
