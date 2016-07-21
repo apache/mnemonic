@@ -208,7 +208,7 @@ Please see the file LICENSE for information on how this library is licensed.
 To build this library, you may need to install some required packages on the build system:
 
 * **Maven** -- the building tool v3.2.1 or above [Required]
-* **NVML** -- the NVM library (Please compile this library that is tagged with 0.1+b16) (http://pmem.io) [Optional if mnemonic-nvml-vmem-service is excluded]
+* **NVML** -- the NVM library (Please compile this library that is tagged with 0.1+b16) (http://pmem.io) [Optional if mnemonic-nvml-vmem-service is excluded, e.g. MacOSX]
 * **JDK** -- the Java Develop Kit 1.6 or above (please properly configure JAVA_HOME) [Required]
 * **PMFS** -- the PMFS should be properly installed and configured on Linux system if you want to simulate read latency [Optional]
 * **PMalloc** -- a supported durable memory native library at https://github.com/NonVolatileComputing/pmalloc.git [Optional if mnemonic-pmalloc-service is excluded]
@@ -216,19 +216,15 @@ To build this library, you may need to install some required packages on the bui
 
 Once the build system is setup, this Library is built using this command at the top level:
 ```bash
+  $ git clean -xdf # if pull from a git repo.
   $ mvn clean package install
 ```
 
 
 To exclude a customized memory service for your platform e.g. OSX, note that if you excluded one or both memory services, some or all testcases/examples will fail since their dependent memory services are unavailable.
 ```bash
+  $ git clean -xdf # if pull from a git repo.
   $ mvn -pl '!mnemonic-memory-services/mnemonic-nvml-vmem-service' clean package install
-```
-
-
-To build and run the unit tests:
-```bash
-  $ mvn clean package install -DskipTests=false
 ```
 
 
@@ -240,7 +236,8 @@ To install this package to local repository (required to run examples and testca
 
 To run an example:
 ```bash
-  $ mvn exec:exec -Pexample -pl mnemonic-examples # requires 'vmem' memory service to run, please refer to the code of test cases for more examples.
+  $ # requires 'vmem' memory service to run, please refer to the code of test cases for more examples.
+  $ mvn exec:exec -Pexample -pl mnemonic-examples
 ```
 
 
