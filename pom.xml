@@ -272,6 +272,7 @@
               <exclude>target/**/*</exclude>
               <exclude>**/README*</exclude>
               <exclude>**/LICENSE*</exclude>
+              <exclude>**/*.log</exclude>
               <exclude>**/*.dat</exclude>
               <exclude>**/dependency-reduced-pom.xml</exclude>
               <exclude>**/META-INF/**/*</exclude>

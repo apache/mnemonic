@@ -246,7 +246,7 @@ To run several test cases:
   $ # a testcase for module "mnemonic-core" that requires 'pmalloc' memory service to pass
   $ mvn -Dtest=DurablePersonNGTest test -pl mnemonic-core -DskipTests=false
   
-  $# a testcase for module "mnemonic-core" that requires 'pmalloc' memory service to pass
+  $ # a testcase for module "mnemonic-core" that requires 'pmalloc' memory service to pass
   $ mvn -Dtest=NonVolatileMemAllocatorNGTest test -pl mnemonic-core -DskipTests=false
   
   $ # a testcase for module "mnemonic-core" that requires 'vmem' memory service to pass
