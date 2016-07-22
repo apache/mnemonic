@@ -57,7 +57,7 @@ if [ "${RELEASE_VERSION}" == "${NEXT_RELEASE_VERSION}" ]; then
     continueprompt
     git branch -d branch-${RELEASE_VERSION}
     if [ $? -ne 0 ]; then
-      echo "Trying to forcedly delete existing branch <branch-${RELEASE_VERSION}>"
+      echo "Request to forcedly delete existing branch <branch-${RELEASE_VERSION}> in case of not fully merged"
       continueprompt
       git branch -D branch-${RELEASE_VERSION}
     fi
