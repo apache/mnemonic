@@ -19,7 +19,8 @@
   under the License.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.apache.mnemonic</groupId>
@@ -41,6 +42,13 @@
   </dependencies>
 
   <build>
+    <extensions>
+      <extension>
+        <groupId>kr.motd.maven</groupId>
+        <artifactId>os-maven-plugin</artifactId>
+        <version>1.4.0.Final</version>
+      </extension>
+    </extensions>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -70,6 +78,51 @@
           </execution>
         </executions>
       </plugin>
+      <!-- enable the following plugin in client POM
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.10</version>
+        <executions>
+          <execution>
+            <id>copy</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>mnemonic-nvml-vmem-service</artifactId>
+                  <version>${project.version}</version>
+                  <classifier>${os.detected.classifier}</classifier>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>mnemonic-pmalloc-service</artifactId>
+                  <version>${project.version}</version>
+                  <classifier>${os.detected.classifier}</classifier>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>mnemonic-utilities-service</artifactId>
+                  <version>${project.version}</version>
+                  <classifier>${os.detected.classifier}</classifier>
+                  <type>jar</type>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${project.build.directory}/service-dist</outputDirectory>
+              <overWriteReleases>false</overWriteReleases>
+              <overWriteSnapshots>false</overWriteSnapshots>
+              <overWriteIfNewer>true</overWriteIfNewer>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      -->
     </plugins>
   </build>
 
@@ -99,34 +152,35 @@
     <profile>
       <id>example</id>
       <activation>
-	<property>
-	  <name>example</name>
-	</property>
+        <property>
+          <name>example</name>
+        </property>
       </activation>
       <build>
-	<plugins>
-	  <plugin>
-	    <groupId>org.codehaus.mojo</groupId>
-	    <artifactId>exec-maven-plugin</artifactId>
-	    <executions>
-	      <execution>
-		<goals>
-		  <goal>exec</goal>
-		</goals>
-	      </execution>
-	    </executions>
-	    <configuration>
-	      <executable>java</executable>
-	      <arguments>
-		<argument>-Djava.ext.dirs=${memory.service.dist.dir}</argument>
-		<argument>-ea</argument>
-		<argument>-classpath</argument>
-		<classpath />
-		<argument>${project.groupId}.examples.Main</argument>
-	      </arguments>
-	    </configuration>
-	  </plugin>
-	</plugins>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <executable>java</executable>
+              <arguments>
+                <!-- replace it with ${project.build.directory}/service-dist in client POM -->
+                <argument>-Djava.ext.dirs=${memory.service.dist.dir}</argument>
+                <argument>-ea</argument>
+                <argument>-classpath</argument>
+                <classpath />
+                <argument>${project.groupId}.examples.Main</argument>
+              </arguments>
+            </configuration>
+          </plugin>
+        </plugins>
       </build>
     </profile>
 
