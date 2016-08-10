@@ -168,5 +168,13 @@ public abstract class DurableNodeValue<E> implements Durable, Iterable<E> {
       next = next.getNext();
       return ret;
     }
+
+    /**
+     * override remove()
+     */
+    @Override
+    public void remove() {
+      throw new UnsupportedOperationException();
+    }
   }
 }

@@ -30,6 +30,7 @@ import sun.misc.Unsafe;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.mnemonic.service.allocatorservice.VolatileMemoryAllocatorService;
 import org.apache.mnemonic.service.computingservice.GeneralComputingService;
 import org.apache.mnemonic.service.allocatorservice.NonVolatileMemoryAllocatorService;
@@ -349,7 +350,7 @@ public class Utils {
     for (long[] larr : llarr) {
       slist.add(toInitLiteral(larr));
     }
-    return "{" + String.join(",", slist) + "}";
+    return "{" + StringUtils.join(slist, ",") + "}";
   }
 
   /**
