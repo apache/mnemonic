@@ -41,7 +41,7 @@ import org.testng.annotations.Test;
  *
  */
 
-public class DurableNodeValueNGTest {
+public class DurableSinglyLinkedListNGTest {
   private long cKEYCAPACITY;
   private Random m_rand;
   private NonVolatileMemAllocator m_act;
@@ -83,11 +83,12 @@ public class DurableNodeValueNGTest {
   public void testSingleNodeValueWithInteger() {
     int val = m_rand.nextInt();
     DurableType gtypes[] = {DurableType.INTEGER};
-    DurableNodeValue<Integer> plln = DurableNodeValueFactory.create(m_act, null, gtypes, false);
+    DurableSinglyLinkedList<Integer> plln = DurableSinglyLinkedListFactory.create(m_act, null, gtypes, false);
     plln.setItem(val, false);
     Long handler = plln.getHandler();
     System.err.println("-------------Start to Restore Integer -----------");
-    DurableNodeValue<Integer> plln2 = DurableNodeValueFactory.restore(m_act, null, gtypes, handler, false);
+    DurableSinglyLinkedList<Integer> plln2 = DurableSinglyLinkedListFactory.restore(m_act, null, gtypes, handler, 
+        false);
     AssertJUnit.assertEquals(val, (int) plln2.getItem());
   }
 
@@ -95,11 +96,12 @@ public class DurableNodeValueNGTest {
   public void testNodeValueWithString() {
     String val = Utils.genRandomString();
     DurableType gtypes[] = {DurableType.STRING};
-    DurableNodeValue<String> plln = DurableNodeValueFactory.create(m_act, null, gtypes, false);
+    DurableSinglyLinkedList<String> plln = DurableSinglyLinkedListFactory.create(m_act, null, gtypes, false);
     plln.setItem(val, false);
     Long handler = plln.getHandler();
     System.err.println("-------------Start to Restore String-----------");
-    DurableNodeValue<String> plln2 = DurableNodeValueFactory.restore(m_act, null, gtypes, handler, false);
+    DurableSinglyLinkedList<String> plln2 = DurableSinglyLinkedListFactory.restore(m_act, null, gtypes, handler, 
+        false);
     AssertJUnit.assertEquals(val, plln2.getItem());
   }
 
@@ -118,12 +120,12 @@ public class DurableNodeValueNGTest {
       }
     } };
 
-    DurableNodeValue<Person<Long>> plln = DurableNodeValueFactory.create(m_act, efproxies, gtypes, false);
+    DurableSinglyLinkedList<Person<Long>> plln = DurableSinglyLinkedListFactory.create(m_act, efproxies, gtypes, false);
     plln.setItem(person, false);
     Long handler = plln.getHandler();
 
-    DurableNodeValue<Person<Long>> plln2 = DurableNodeValueFactory.restore(m_act, efproxies, gtypes, handler,
-        false);
+    DurableSinglyLinkedList<Person<Long>> plln2 = DurableSinglyLinkedListFactory.restore(m_act, efproxies, gtypes, 
+        handler, false);
     AssertJUnit.assertEquals(31, (int) plln2.getItem().getAge());
 
   }
@@ -143,26 +145,26 @@ public class DurableNodeValueNGTest {
       }
     } };
 
-    DurableNodeValue<Person<Long>> firstnv = DurableNodeValueFactory.create(m_act, listefproxies, listgftypes,
-        false);
+    DurableSinglyLinkedList<Person<Long>> firstnv = DurableSinglyLinkedListFactory.create(m_act, listefproxies, 
+        listgftypes, false);
 
-    DurableNodeValue<Person<Long>> nextnv = firstnv;
+    DurableSinglyLinkedList<Person<Long>> nextnv = firstnv;
 
     Person<Long> person;
     long val;
-    DurableNodeValue<Person<Long>> newnv;
+    DurableSinglyLinkedList<Person<Long>> newnv;
     for (int i = 0; i < elem_count; ++i) {
       person = PersonFactory.create(m_act);
       person.setAge((short) m_rand.nextInt(50));
       person.setName(String.format("Name: [%s]", Utils.genRandomString()), true);
       nextnv.setItem(person, false);
-      newnv = DurableNodeValueFactory.create(m_act, listefproxies, listgftypes, false);
+      newnv = DurableSinglyLinkedListFactory.create(m_act, listefproxies, listgftypes, false);
       nextnv.setNext(newnv, false);
       nextnv = newnv;
     }
 
     Person<Long> eval;
-    DurableNodeValue<Person<Long>> iternv = firstnv;
+    DurableSinglyLinkedList<Person<Long>> iternv = firstnv;
     while (null != iternv) {
       System.out.printf(" Stage 1 --->\n");
       eval = iternv.getItem();
@@ -174,8 +176,8 @@ public class DurableNodeValueNGTest {
 
     long handler = firstnv.getHandler();
 
-    DurableNodeValue<Person<Long>> firstnv2 = DurableNodeValueFactory.restore(m_act, listefproxies, listgftypes,
-        handler, false);
+    DurableSinglyLinkedList<Person<Long>> firstnv2 = DurableSinglyLinkedListFactory.restore(m_act, listefproxies, 
+        listgftypes, handler, false);
 
     for (Person<Long> eval2 : firstnv2) {
       System.out.printf(" Stage 2 ---> \n");
@@ -210,12 +212,12 @@ public class DurableNodeValueNGTest {
         if (null != gfields && gfields.length >= 2) {
           val_gftypes = Arrays.copyOfRange(gfields, 1, gfields.length);
         }
-        return DurableNodeValueFactory.restore(allocator, val_efproxies, val_gftypes, phandler, autoreclaim);
+        return DurableSinglyLinkedListFactory.restore(allocator, val_efproxies, val_gftypes, phandler, autoreclaim);
       }
     } };
 
-    DurableNodeValue<DurableNodeValue<Double>> nextnv = null, pre_nextnv = null;
-    DurableNodeValue<Double> elem = null, pre_elem = null, first_elem = null;
+    DurableSinglyLinkedList<DurableSinglyLinkedList<Double>> nextnv = null, pre_nextnv = null;
+    DurableSinglyLinkedList<Double> elem = null, pre_elem = null, first_elem = null;
 
     Long linkhandler = 0L;
 
@@ -227,7 +229,7 @@ public class DurableNodeValueNGTest {
       first_elem = null;
       pre_elem = null;
       for (int v = 0; v < 3; ++v) {
-        elem = DurableNodeValueFactory.create(m_act, elem_efproxies, elem_gftypes, false);
+        elem = DurableSinglyLinkedListFactory.create(m_act, elem_efproxies, elem_gftypes, false);
         val = m_rand.nextDouble();
         elem.setItem(val, false);
         if (null == pre_elem) {
@@ -239,7 +241,7 @@ public class DurableNodeValueNGTest {
         System.out.printf("%f ", val);
       }
 
-      nextnv = DurableNodeValueFactory.create(m_act, linkedefproxies, linkedgftypes, false);
+      nextnv = DurableSinglyLinkedListFactory.create(m_act, linkedefproxies, linkedgftypes, false);
       nextnv.setItem(first_elem, false);
       if (null == pre_nextnv) {
         linkhandler = nextnv.getHandler();
@@ -253,9 +255,9 @@ public class DurableNodeValueNGTest {
 
     long handler = m_act.getHandler(slotKeyId);
 
-    DurableNodeValue<DurableNodeValue<Double>> linkedvals = DurableNodeValueFactory.restore(m_act,
+    DurableSinglyLinkedList<DurableSinglyLinkedList<Double>> linkedvals = DurableSinglyLinkedListFactory.restore(m_act,
         linkedefproxies, linkedgftypes, handler, false);
-    Iterator<DurableNodeValue<Double>> iter = linkedvals.iterator();
+    Iterator<DurableSinglyLinkedList<Double>> iter = linkedvals.iterator();
     Iterator<Double> elemiter = null;
 
     System.out.printf(" Stage 2 -testLinkedNodeValueWithLinkedNodeValue--> \n");

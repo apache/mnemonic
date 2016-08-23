@@ -33,7 +33,7 @@ import org.apache.mnemonic.DurableSetter;
  *
  */
 @DurableEntity
-public abstract class DurableNodeValue<E> implements Durable, Iterable<E> {
+public abstract class DurableSinglyLinkedList<E> implements Durable, Iterable<E> {
   protected transient EntityFactoryProxy[] m_node_efproxies;
   protected transient DurableType[] m_node_gftypes;
 
@@ -100,7 +100,7 @@ public abstract class DurableNodeValue<E> implements Durable, Iterable<E> {
    *
    */
   @DurableGetter(Id = 2L, EntityFactoryProxies = "m_node_efproxies", GenericFieldTypes = "m_node_gftypes")
-  public abstract DurableNodeValue<E> getNext();
+  public abstract DurableSinglyLinkedList<E> getNext();
 
   /**
    * set next node
@@ -112,7 +112,7 @@ public abstract class DurableNodeValue<E> implements Durable, Iterable<E> {
    *          true if want to destroy the exist node
    */
   @DurableSetter
-  public abstract void setNext(DurableNodeValue<E> next, boolean destroy);
+  public abstract void setNext(DurableSinglyLinkedList<E> next, boolean destroy);
 
   /**
    * get an iterator instance of this list
@@ -130,7 +130,7 @@ public abstract class DurableNodeValue<E> implements Durable, Iterable<E> {
    */
   private class Intr implements Iterator<E> {
 
-    protected DurableNodeValue<E> next = null;
+    protected DurableSinglyLinkedList<E> next = null;
 
     /**
      * Constructor
@@ -139,7 +139,7 @@ public abstract class DurableNodeValue<E> implements Durable, Iterable<E> {
      *          the start point for this iterator
      *
      */
-    Intr(DurableNodeValue<E> head) {
+    Intr(DurableSinglyLinkedList<E> head) {
       next = head;
     }
 
