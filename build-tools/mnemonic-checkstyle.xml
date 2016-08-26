@@ -31,6 +31,14 @@
 
     <module name="FileLength"/>
 
+    <!-- All source files should end with a unix-style end of line. -->
+    <module name="NewlineAtEndOfFile">
+        <!--
+             Use unix style newlines. When set, the checker ensures the last byte in the file is \n.
+        -->
+        <property name="lineSeparator" value="lf"/>
+    </module>
+
     <!-- Following interprets the header file as regular expressions. -->
     <!-- <module name="RegexpHeader"/>                                -->
 
