@@ -18,7 +18,6 @@
 #
 
 echo [INFO] Cleaning up and re-building...
-cd ..
 git clean -xdf > /dev/null
 
 if [ ! -d "testlog" ]

@@ -18,13 +18,14 @@
 FROM centos
 MAINTAINER Gang Wang (garyw@apache.org)
 
-ENV proxy_host "172.17.42.1"
-ENV proxy_port "8668"
-ENV http_proxy "http://${proxy_host}:${proxy_port}"
-ENV https_proxy ${http_proxy}
-ENV HTTP_PROXY ${http_proxy}
-ENV HTTPS_PROXY ${http_proxy}
-ENV proxy ${http_proxy}
+#set up your proxy below, refer to readme in the Docker folder
+ENV proxy_host ""
+ENV proxy_port ""
+#ENV http_proxy "http://${proxy_host}:${proxy_port}"
+#ENV https_proxy ${http_proxy}
+#ENV HTTP_PROXY ${http_proxy}
+#ENV HTTPS_PROXY ${http_proxy}
+#ENV proxy ${http_proxy}
 
 RUN echo $proxy
 
