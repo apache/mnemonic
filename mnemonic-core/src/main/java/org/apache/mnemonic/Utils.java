@@ -30,6 +30,7 @@ import sun.misc.Unsafe;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.mnemonic.service.allocatorservice.VolatileMemoryAllocatorService;
 import org.apache.mnemonic.service.computingservice.GeneralComputingService;
 import org.apache.mnemonic.service.allocatorservice.NonVolatileMemoryAllocatorService;
@@ -171,7 +172,10 @@ public class Utils {
 
   /**
    * retrieve the usage of memory.
-   * 
+   *
+   * @param timeout
+   *         specify a timeout for this operation
+   *
    * @return the size of memory has been occupied
    */
   public static long getMemoryUse(long timeout) {
@@ -192,6 +196,10 @@ public class Utils {
 
   /**
    * run a garbage collection.
+   *
+   * @param timeout
+   *         specify a timeout for this operation
+   *
    */
   public static void collectGarbage(long timeout) {
     try {
@@ -342,7 +350,7 @@ public class Utils {
     for (long[] larr : llarr) {
       slist.add(toInitLiteral(larr));
     }
-    return "{" + String.join(",", slist) + "}";
+    return "{" + StringUtils.join(slist, ",") + "}";
   }
 
   /**
@@ -395,9 +403,21 @@ public class Utils {
   /**
    * generate native form of object stack parameter frame.
    * 
-   * @see #getNativeParamForm()
-   * 
+   * @param objstack
+   *          a stack of object info retrieved from
+   *          Durable.getNativeFieldInfo(), order matters
+   *
+   * @param fidinfostack
+   *          a stack of field id in the form of (next_fid, next_level_fid)
+   *          order follows objstack the last next_level_fid specifies the
+   *          value's fid. the last item of next_fid could be null if there is
+   *          no next node if it is null that means the last item is a object
+   *          instead of node
+   *
    * @return the 2d array form of native parameter frame
+   *
+   * @see #getNativeParamForm(List, long[][])
+   *
    */
   public static long[][] genNativeParamForm(List<long[][]> objstack, long[][] fidinfostack) {
     return convertTo2DArrayForm(getNativeParamForm(objstack, fidinfostack));

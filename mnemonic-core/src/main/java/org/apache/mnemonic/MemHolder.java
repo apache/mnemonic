@@ -56,6 +56,8 @@ public abstract class MemHolder<A extends CommonAllocator<A>, T, H extends MemHo
    *
    * @param size
    *          specify the new size for its held resource
+   *
+   * @return the holder of resource
    */
   public abstract MemHolder<A, T, H> resize(long size);
 

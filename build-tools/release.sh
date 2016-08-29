@@ -26,7 +26,7 @@ usage(){
 
 continueprompt() {
     while true; do
-	read -p "Do you wish to continue?" yn
+	read -p "Do you wish to continue [y/n] ? " yn
 	case $yn in
 	    [Yy]* ) break;;
 	    [Nn]* ) exit;;
@@ -56,6 +56,11 @@ if [ "${RELEASE_VERSION}" == "${NEXT_RELEASE_VERSION}" ]; then
     echo "You are trying to prepare a same version candidate so going to clean up existing branch <branch-${RELEASE_VERSION}> and tag <v${RELEASE_VERSION}-incubating> if any"
     continueprompt
     git branch -d branch-${RELEASE_VERSION}
+    if [ $? -ne 0 ]; then
+      echo "Request to forcedly delete existing branch <branch-${RELEASE_VERSION}> in case of not fully merged"
+      continueprompt
+      git branch -D branch-${RELEASE_VERSION}
+    fi
     git push upstream --delete branch-${RELEASE_VERSION}
     git tag -d v${RELEASE_VERSION}-incubating
     git push upstream --delete v${RELEASE_VERSION}-incubating

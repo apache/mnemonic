@@ -22,6 +22,10 @@
  ** JNI implementations
  *****************************************************************************/
 
+/**
+ * a customized handler as value handler.
+ * It handles would be used to iteratively callback for each value of a value matrix
+ */
 void valHandler(JNIEnv* env, size_t dims[], size_t dimsz,
     void *addr, size_t sz, int dtype) {
   size_t i;
@@ -61,6 +65,12 @@ void valHandler(JNIEnv* env, size_t dims[], size_t dimsz,
   }
 }
 
+/**
+ * It is invoked by Java side computing service.
+ * a step of computation should be handle in a whole by this function.
+ * param. vinfos contains all relevant value matrixes for this computation.
+ * It could return a set of handlers as results or in-place update the data indicated by value matrixes.
+ */
 JNIEXPORT
 jlongArray JNICALL Java_org_apache_mnemonic_service_computingservice_internal_PrintServiceImpl_nperformPrint(JNIEnv* env,
     jobject this, jobjectArray vinfos) {

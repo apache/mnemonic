@@ -77,22 +77,47 @@ struct NValueInfo {
   int dtype;
 };
 
+/**
+ * a value handler to be callback for each value of a matrix
+ */
 typedef void (*valueHandler)(JNIEnv* env, size_t dims[], size_t dimsz,
     void *addr, size_t sz, int dtype);
 
+/**
+ * construct a list of native value info structure from Java array object.
+ */
 struct NValueInfo **constructNValueInfos(JNIEnv* env,
     jobjectArray vinfos, size_t *sz);
 
+/**
+ * destruct a list of native value info structure.
+ */
 void destructNValueInfos(struct NValueInfo **nvalinfos, size_t sz);
 
+/**
+ * print out all value infos of a list of native value info structure.
+ */
 void printNValueInfos(struct NValueInfo **nvalinfos, size_t sz);
 
+/**
+ * construct a Java long array from an array of handlers
+ */
 jlongArray constructJLongArray(JNIEnv* env, long arr[], size_t sz);
 
+/**
+ * translate portable addr. to effective addr.
+ */
 inline void *to_e(JNIEnv* env, struct NValueInfo *nvinfo, long p);
 
+/**
+ * translate effective addr. to portable addr.
+ */
 inline long to_p(JNIEnv* env, struct NValueInfo *nvinfo, void *e);
 
+/**
+ * handle one native value info.
+ * call-back value handler for each values of a value matrix.
+ */
 int handleValueInfo(JNIEnv* env, struct NValueInfo *nvinfo, valueHandler valhandler);
 
 #ifdef __cplusplus

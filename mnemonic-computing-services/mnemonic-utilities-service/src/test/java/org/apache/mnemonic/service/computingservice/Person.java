@@ -28,7 +28,7 @@ import org.apache.mnemonic.DurableType;
 import org.testng.annotations.Test;
 
 /**
- *
+ * A simple generic object used for testing and demo.
  *
  */
 
