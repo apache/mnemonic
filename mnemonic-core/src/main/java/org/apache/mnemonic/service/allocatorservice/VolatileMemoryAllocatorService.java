@@ -21,6 +21,96 @@ import java.nio.ByteBuffer;
 
 public interface VolatileMemoryAllocatorService {
 
+
+  /**
+   * retrieve a bytebuffer from its handler
+   *
+   * @param id
+   *          the identifier of backed memory pool
+   * 
+   * @param handler
+   *          the handler of a nonvolatile bytebuffer
+   *
+   * @return the nonvolatile bytebuffer
+   *
+   */
+  ByteBuffer retrieveByteBuffer(long id, long handler);
+
+  /**
+   * retrieve the size of a nonvolatile memory object
+   *
+   * @param id
+   *          the identifier of backed memory pool
+   * 
+   * @param handler
+   *          the handler of a nonvolatile object
+   *
+   * @return the size of nonvolatile object
+   *
+   */
+  long retrieveSize(long id, long handler);
+
+  /**
+   * get the handler of a nonvolatile bytebuffer
+   *
+   * @param id
+   *          the identifier of backed memory pool
+   * 
+   * @param buf
+   *          the nonvolatile bytebuffer
+   *
+   * @return the handler of this specified nonvolatile bytebuffer
+   *
+   */
+  long getByteBufferHandler(long id, ByteBuffer buf);
+
+  /**
+   * set a handler to a key.
+   * 
+   * @param id
+   *          the identifier of backed memory pool
+   * 
+   * @param key
+   *          the key to set this handler
+   * 
+   * @param handler
+   *          the handler
+   */
+  void setHandler(long id, long key, long handler);
+
+  /**
+   * get a handler from specified key.
+   * 
+   * @param id
+   *          the identifier of backed memory pool
+   * 
+   * @param key
+   *          the key to get its handler
+   * 
+   * @return the handler of the specified key
+   */
+  long getHandler(long id, long key);
+
+  /**
+   * return the number of available keys to use.
+   * 
+   * @param id
+   *          the identifier of backed memory pool
+   * 
+   * @return the number of keys
+   */
+  long handlerCapacity(long id);
+
+  /**
+   * return the base address of this persistent memory pool.
+   * 
+   * @param id
+   *          the identifier of backed memory pool
+   * 
+   * @return the base address of this pmem pool
+   */
+  long getBaseAddress(long id);
+
   /**
    * Provide the service identifier for this allocator
    *
