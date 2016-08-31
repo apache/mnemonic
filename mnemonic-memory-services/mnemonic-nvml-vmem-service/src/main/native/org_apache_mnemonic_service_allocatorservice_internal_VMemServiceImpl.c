@@ -100,6 +100,38 @@ jobject JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemS
 }
 
 JNIEXPORT
+jobject JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServiceImpl_nretrieveByteBuffer(
+    JNIEnv *env, jobject this, jlong id, jlong e_addr, jlong size) {
+  jobject ret = NULL;
+  void* p = addr_from_java(e_addr);
+  ret = NULL != p ? (*env)->NewDirectByteBuffer(env, p, size) : NULL;
+  return ret;
+}
+
+JNIEXPORT
+jlong JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServiceImpl_nretrieveSize(JNIEnv *env,
+    jobject this, jlong id, jlong e_addr, jlong size) {
+  jlong ret = 0L;
+  void* p = addr_from_java(e_addr);
+  ret = NULL != p ? (*env)->NewDirectByteBuffer(env, p, size) : NULL;
+  return ret;
+}
+
+JNIEXPORT
+jlong JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServiceImpl_ngetByteBufferHandler(
+    JNIEnv *env, jobject this, jlong id, jobject bytebuf) {
+//  fprintf(stderr, "ngetByteBufferAddress Get Called %X, %X\n", env, bytebuf);
+  jlong ret = 0L;
+  if (NULL != bytebuf) {
+    void* nativebuf = (*env)->GetDirectBufferAddress(env, bytebuf);
+//      fprintf(stderr, "ngetByteBufferAddress Get Native address %X\n", nativebuf);
+    ret = addr_to_java(nativebuf);
+  }
+//    fprintf(stderr, "ngetByteBufferAddress returned address %016lx\n", ret);
+  return ret;
+}
+
+JNIEXPORT
 jobject JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServiceImpl_nresizeByteBuffer(
     JNIEnv *env, jobject this, jlong id, jobject bytebuf, jlong size) {
   pthread_rwlock_rdlock(&g_vmem_rwlock);
@@ -131,6 +163,37 @@ void JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServ
   }
   pthread_mutex_unlock(g_vmem_mutex_ptr + id);
   pthread_rwlock_unlock(&g_vmem_rwlock);
+}
+
+
+JNIEXPORT
+void JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServiceImpl_nsetHandler(
+    JNIEnv *env, jobject this, jlong id, jlong key, jlong value)
+{
+  throw(env, "setkey()/getkey() temporarily not suppoted");
+}
+
+JNIEXPORT
+jlong JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServiceImpl_ngetHandler(JNIEnv *env,
+    jobject this, jlong id, jlong key) {
+  throw(env, "setkey()/getkey() temporarily not suppoted");
+}
+
+JNIEXPORT
+jlong JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServiceImpl_nhandlerCapacity(
+    JNIEnv *env, jobject this) {
+  throw(env, "setkey()/getkey() temporarily not suppoted");
+}
+
+
+JNIEXPORT
+jlong JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServiceImpl_ngetBaseAddress(JNIEnv *env,
+    jobject this, jlong id) {
+  pthread_rwlock_rdlock(&g_vmem_rwlock);
+  void *md = *(g_vmp_ptr + id);
+  jlong ret = (long) b_addr(md);
+  pthread_rwlock_unlock(&g_vmem_rwlock);
+  return ret;
 }
 
 JNIEXPORT
