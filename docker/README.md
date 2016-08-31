@@ -14,11 +14,12 @@ This is the "Dockerfile" that will automatically build the environment of this p
 - 3. Install yum default "Development Tools".
 - 4. Install maven.
 - 5. Set up environment variables of paths.
-- 6. Create /ws folder and install pmalloc.
-- 7. Install nvml in /ws.
-- 8. Set up maven proxy mvn.sh.
-- 9. Clone mnemonic code then build/install.  
-- 10. Go to /ws fold and start bash.  
+- 6. Create /ws folder and install nvml dependency pandoc in /ws/pandoc.
+- 7. Install pmalloc in /ws
+- 8. Install nvml in /ws.
+- 9. Set up maven proxy mvn.sh.
+- 10. Clone mnemonic code then build/install.  
+- 11. Go to /ws fold and start bash.  
 
 #### How to set up proxy? 
 
