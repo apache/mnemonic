@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "org_apache_mnemonic_service_allocatorservice_internal_VMemServiceImpl.h"
+#include "org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl.h"
 
 #include <libvmem.h>
 
@@ -32,7 +32,7 @@ static pthread_rwlock_t g_vmem_rwlock = PTHREAD_RWLOCK_INITIALIZER;
  *****************************************************************************/
 
 JNIEXPORT
-jlong JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServiceImpl_nallocate(JNIEnv* env,
+jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_nallocate(JNIEnv* env,
     jobject this, jlong id, jlong size, jboolean initzero) {
   pthread_rwlock_rdlock(&g_vmem_rwlock);
   pthread_mutex_lock(g_vmem_mutex_ptr + id);
@@ -43,7 +43,7 @@ jlong JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemSer
 }
 
 JNIEXPORT
-jlong JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServiceImpl_nreallocate(JNIEnv* env,
+jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_nreallocate(JNIEnv* env,
     jobject this, jlong id, jlong address, jlong size, jboolean initzero) {
   pthread_rwlock_rdlock(&g_vmem_rwlock);
   pthread_mutex_lock(g_vmem_mutex_ptr + id);
@@ -58,7 +58,7 @@ jlong JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemSer
 }
 
 JNIEXPORT
-void JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServiceImpl_nfree(
+void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_nfree(
     JNIEnv* env,
     jobject this, jlong id,
     jlong address)
@@ -73,21 +73,21 @@ void JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServ
 }
 
 JNIEXPORT
-void JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServiceImpl_nsync(
+void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_nsync(
     JNIEnv* env,
     jobject this, jlong id)
 {
 }
 
 JNIEXPORT
-void JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServiceImpl_ncapacity(
+void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_ncapacity(
     JNIEnv* env,
     jobject this, jlong id)
 {
 }
 
 JNIEXPORT
-jobject JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServiceImpl_ncreateByteBuffer(
+jobject JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_ncreateByteBuffer(
     JNIEnv *env, jobject this, jlong id, jlong size) {
   pthread_rwlock_rdlock(&g_vmem_rwlock);
   pthread_mutex_lock(g_vmem_mutex_ptr + id);
@@ -100,7 +100,7 @@ jobject JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemS
 }
 
 JNIEXPORT
-jobject JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServiceImpl_nretrieveByteBuffer(
+jobject JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_nretrieveByteBuffer(
     JNIEnv *env, jobject this, jlong id, jlong e_addr, jlong size) {
   jobject ret = NULL;
   void* p = addr_from_java(e_addr);
@@ -109,7 +109,7 @@ jobject JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemS
 }
 
 JNIEXPORT
-jlong JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServiceImpl_nretrieveSize(JNIEnv *env,
+jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_nretrieveSize(JNIEnv *env,
     jobject this, jlong id, jlong e_addr, jlong size) {
   jlong ret = 0L;
   void* p = addr_from_java(e_addr);
@@ -118,7 +118,7 @@ jlong JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemSer
 }
 
 JNIEXPORT
-jlong JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServiceImpl_ngetByteBufferHandler(
+jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_ngetByteBufferHandler(
     JNIEnv *env, jobject this, jlong id, jobject bytebuf) {
 //  fprintf(stderr, "ngetByteBufferAddress Get Called %X, %X\n", env, bytebuf);
   jlong ret = 0L;
@@ -132,7 +132,7 @@ jlong JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemSer
 }
 
 JNIEXPORT
-jobject JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServiceImpl_nresizeByteBuffer(
+jobject JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_nresizeByteBuffer(
     JNIEnv *env, jobject this, jlong id, jobject bytebuf, jlong size) {
   pthread_rwlock_rdlock(&g_vmem_rwlock);
   pthread_mutex_lock(g_vmem_mutex_ptr + id);
@@ -150,7 +150,7 @@ jobject JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemS
 }
 
 JNIEXPORT
-void JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServiceImpl_ndestroyByteBuffer(
+void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_ndestroyByteBuffer(
     JNIEnv *env, jobject this, jlong id, jobject bytebuf)
 {
   pthread_rwlock_rdlock(&g_vmem_rwlock);
@@ -167,27 +167,27 @@ void JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServ
 
 
 JNIEXPORT
-void JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServiceImpl_nsetHandler(
+void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_nsetHandler(
     JNIEnv *env, jobject this, jlong id, jlong key, jlong value)
 {
   throw(env, "setkey()/getkey() temporarily not suppoted");
 }
 
 JNIEXPORT
-jlong JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServiceImpl_ngetHandler(JNIEnv *env,
+jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_ngetHandler(JNIEnv *env,
     jobject this, jlong id, jlong key) {
   throw(env, "setkey()/getkey() temporarily not suppoted");
 }
 
 JNIEXPORT
-jlong JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServiceImpl_nhandlerCapacity(
+jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_nhandlerCapacity(
     JNIEnv *env, jobject this) {
   throw(env, "setkey()/getkey() temporarily not suppoted");
 }
 
 
 JNIEXPORT
-jlong JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServiceImpl_ngetBaseAddress(JNIEnv *env,
+jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_ngetBaseAddress(JNIEnv *env,
     jobject this, jlong id) {
   pthread_rwlock_rdlock(&g_vmem_rwlock);
   void *md = *(g_vmp_ptr + id);
@@ -197,7 +197,7 @@ jlong JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemSer
 }
 
 JNIEXPORT
-jlong JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServiceImpl_ninit(JNIEnv *env, jclass this,
+jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_ninit(JNIEnv *env, jclass this,
     jlong capacity, jstring pathname, jboolean isnew) {
   pthread_rwlock_wrlock(&g_vmem_rwlock);
   size_t ret = -1;
@@ -227,7 +227,7 @@ jlong JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemSer
 }
 
 JNIEXPORT
-void JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_VMemServiceImpl_nclose
+void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_nclose
 (JNIEnv *env, jobject this, jlong id)
 {
   pthread_rwlock_rdlock(&g_vmem_rwlock);

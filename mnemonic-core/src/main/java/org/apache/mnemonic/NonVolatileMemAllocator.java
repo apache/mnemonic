@@ -18,7 +18,7 @@
 package org.apache.mnemonic;
 
 import java.nio.ByteBuffer;
-import org.apache.mnemonic.service.allocatorservice.NonVolatileMemoryAllocatorService;
+import org.apache.mnemonic.service.memoryservice.NonVolatileMemoryAllocatorService;
 import org.flowcomputing.commons.resgc.ResCollector;
 import org.flowcomputing.commons.resgc.ResReclaim;
 

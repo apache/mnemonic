@@ -31,9 +31,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.mnemonic.service.allocatorservice.VolatileMemoryAllocatorService;
+import org.apache.mnemonic.service.memoryservice.VolatileMemoryAllocatorService;
 import org.apache.mnemonic.service.computingservice.GeneralComputingService;
-import org.apache.mnemonic.service.allocatorservice.NonVolatileMemoryAllocatorService;
+import org.apache.mnemonic.service.memoryservice.NonVolatileMemoryAllocatorService;
 
 /**
  * <p>
