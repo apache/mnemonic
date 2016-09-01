@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.mnemonic.service.allocatorservice;
+package org.apache.mnemonic.service.memoryservice;
 
 import java.nio.ByteBuffer;
 

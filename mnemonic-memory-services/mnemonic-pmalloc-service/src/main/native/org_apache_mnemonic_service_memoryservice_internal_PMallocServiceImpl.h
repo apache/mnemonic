@@ -21,25 +21,25 @@
 
 #include "common.h"
 
-#ifndef _Included_org_apache_mnemonic_service_allocatorservice_internal_PMallocServiceImpl
-#define _Included_org_apache_mnemonic_service_allocatorservice_internal_PMallocServiceImpl
+#ifndef _Included_org_apache_mnemonic_service_memoryservice_internal_PMallocServiceImpl
+#define _Included_org_apache_mnemonic_service_memoryservice_internal_PMallocServiceImpl
 #ifdef __cplusplus
 extern "C" {
 #endif
 /*
- * Class:     org_apache_mnemonic_service_allocatorservice_internal_PMallocServiceImpl
+ * Class:     org_apache_mnemonic_service_memoryservice_internal_PMallocServiceImpl
  * Method:    jniInit
  * Signature: (II)V
  */
-JNIEXPORT void JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_PMallocServiceImpl_jniInit
+JNIEXPORT void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMallocServiceImpl_jniInit
 (JNIEnv *, jobject, jint, jint);
 
 /*
- * Class:     org_apache_mnemonic_service_allocatorservice_internal_PMallocServiceImpl
+ * Class:     org_apache_mnemonic_service_memoryservice_internal_PMallocServiceImpl
  * Method:    jniTerm
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_PMallocServiceImpl_jniTerm
+JNIEXPORT void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMallocServiceImpl_jniTerm
 (JNIEnv *, jobject);
 
 #ifdef __cplusplus

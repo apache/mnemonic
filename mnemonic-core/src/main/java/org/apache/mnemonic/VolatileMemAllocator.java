@@ -19,7 +19,7 @@ package org.apache.mnemonic;
 
 import java.nio.ByteBuffer;
 
-import org.apache.mnemonic.service.allocatorservice.VolatileMemoryAllocatorService;
+import org.apache.mnemonic.service.memoryservice.VolatileMemoryAllocatorService;
 import org.flowcomputing.commons.resgc.ResCollector;
 import org.flowcomputing.commons.resgc.ResReclaim;
 

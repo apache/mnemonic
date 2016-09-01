@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.mnemonic.service.allocatorservice.internal;
+package org.apache.mnemonic.service.memoryservice.internal;
 
-import org.apache.mnemonic.service.allocatorservice.VolatileMemoryAllocatorService;
+import org.apache.mnemonic.service.memoryservice.VolatileMemoryAllocatorService;
 import org.flowcomputing.commons.primitives.NativeLibraryLoader;
 
 import java.nio.ByteBuffer;
