@@ -41,4 +41,5 @@ service-dist/
 .*.html
 testlog/
 .DS_Store
+*.patch
 

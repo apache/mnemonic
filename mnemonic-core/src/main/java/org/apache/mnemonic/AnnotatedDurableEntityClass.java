@@ -606,7 +606,7 @@ public class AnnotatedDurableEntityClass {
           code.addStatement("$1N = null", dynfieldinfo.name);
           code.addStatement("$1N.putAddress($2N.get() + $3L, 0L)", unsafename, holdername, dynfieldinfo.fieldoff);
           code.endControlFlow();
-          code.beginControlFlow("if ($1N.getAllocator() != $2N)", dynfieldinfo.name, allocname);
+          code.beginControlFlow("if ($1L.getAllocator() != $2N)", arg0, allocname);
           code.addStatement("throw new IllegalAllocatorError(\"This chunk is allocated by another allocator!\")");
           code.endControlFlow();
           code.addStatement("$1N = $2L", dynfieldinfo.name, arg0);
@@ -618,7 +618,7 @@ public class AnnotatedDurableEntityClass {
           code.addStatement("$1N = null", dynfieldinfo.name);
           code.addStatement("$1N.putAddress($2N.get() + $3L, 0L)", unsafename, holdername, dynfieldinfo.fieldoff);
           code.endControlFlow();
-          code.beginControlFlow("if ($1N.getAllocator() != $2N)", dynfieldinfo.name, allocname);
+          code.beginControlFlow("if ($1L.getAllocator() != $2N)", arg0, allocname);
           code.addStatement("throw new IllegalAllocatorError(\"This buffer is allocated by another allocator!\")");
           code.endControlFlow();
           code.addStatement("$1N = $2L", dynfieldinfo.name, arg0);
