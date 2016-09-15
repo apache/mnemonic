@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.mnemonic.service.allocatorservice.internal;
+package org.apache.mnemonic.service.memoryservice.internal;
 
-import org.apache.mnemonic.service.allocatorservice.VolatileMemoryAllocatorService;
+import org.apache.mnemonic.service.memoryservice.VolatileMemoryAllocatorService;
 import org.flowcomputing.commons.primitives.NativeLibraryLoader;
 
 import java.nio.ByteBuffer;
@@ -93,6 +93,41 @@ public class VMemServiceImpl implements VolatileMemoryAllocatorService {
     ndestroyByteBuffer(id, bytebuf);
   }
 
+  @Override
+  public ByteBuffer retrieveByteBuffer(long id, long handler) {
+    return nretrieveByteBuffer(id, handler);
+  }
+
+  @Override
+  public long retrieveSize(long id, long handler) {
+    return nretrieveSize(id, handler);
+  }
+
+  @Override
+  public long getByteBufferHandler(long id, ByteBuffer buf) {
+    return ngetByteBufferHandler(id, buf);
+  }
+
+  @Override
+  public void setHandler(long id, long key, long handler) {
+    nsetHandler(id, key, handler);
+  }
+
+  @Override
+  public long getHandler(long id, long key) {
+    return ngetHandler(id, key);
+  }
+
+  @Override
+  public long handlerCapacity(long id) {
+    return nhandlerCapacity(id);
+  }
+
+  @Override
+  public long getBaseAddress(long id) {
+    return ngetBaseAddress(id);
+  }
+
   protected native long ninit(long capacity, String uri, boolean isnew);
 
   protected native void nclose(long id);
@@ -112,5 +147,19 @@ public class VMemServiceImpl implements VolatileMemoryAllocatorService {
   protected native ByteBuffer nresizeByteBuffer(long id, ByteBuffer bytebuf, long size);
 
   protected native void ndestroyByteBuffer(long id, ByteBuffer bytebuf);
+
+  protected native ByteBuffer nretrieveByteBuffer(long id, long handler);
+
+  protected native long nretrieveSize(long id, long handler);
+
+  protected native long ngetByteBufferHandler(long id, ByteBuffer buf);
+
+  protected native void nsetHandler(long id, long key, long handler);
+
+  protected native long ngetHandler(long id, long key);
+
+  protected native long nhandlerCapacity(long id);
+
+  protected native long ngetBaseAddress(long id);
 
 }

@@ -23,7 +23,7 @@
 <suite name="Suite" verbose="1" parallel="tests" thread-count="1">
   <test name="Test">
     <classes>
-      <class name="org.apache.mnemonic.collections.DurableNodeValueNGTest"/> 
+      <class name="org.apache.mnemonic.collections.DurableSinglyLinkedListNGTest"/> 
     </classes>
   </test> <!-- Test -->
 </suite> <!-- Suite -->
@@ -33,5 +33,5 @@
       <class name="org.apache.mnemonic.collections.Person"/>
       <class name="org.apache.mnemonic.collections.DurablePersonNGTest"/>
       <class name="org.apache.mnemonic.collections.DurableListNGTest"/>
-      <class name="org.apache.mnemonic.collections.DurableNodeValueNGTest"/> 
+      <class name="org.apache.mnemonic.collections.DurableSinglyLinkedListNGTest"/> 
  -->

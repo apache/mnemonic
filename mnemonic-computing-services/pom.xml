@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.apache.mnemonic</groupId>
     <artifactId>mnemonic-parent</artifactId>
-    <version>0.2.0-incubating</version>
+    <version>0.2.0-incubating-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -59,9 +59,38 @@
       <groupId>org.flowcomputing.commons</groupId>
       <artifactId>commons-primitives</artifactId>
     </dependency>
+    <!-- logging dependencies -->
+    <!-- assume all APIs will be used -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jul-to-slf4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
+    <extensions>
+      <extension>
+        <groupId>kr.motd.maven</groupId>
+        <artifactId>os-maven-plugin</artifactId>
+        <version>1.4.0.Final</version>
+      </extension>
+    </extensions>
     <plugins>
     </plugins>
     <pluginManagement>
@@ -72,7 +101,6 @@
           <version>2.6</version>
           <configuration>
             <forceCreation>true</forceCreation>
-            <outputDirectory>${service.basedir}/service-dist</outputDirectory>
             <archive>
               <addMavenDescriptor>false</addMavenDescriptor>
             </archive>
@@ -82,28 +110,30 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-shade-plugin</artifactId>
           <version>2.4.3</version>
+          <configuration>
+            <minimizeJar>true</minimizeJar>
+            <filters>
+              <filter>
+                <artifact>*:*</artifact>
+                <includes>
+                </includes>
+                <excludes>
+                  <exclude>META-INFO/**/**</exclude>
+                  <exclude>META-INFO/services/**</exclude>
+                  <exclude>META-INFO/maven/**</exclude>
+                </excludes>
+              </filter>
+            </filters>
+            <outputDirectory>${service.basedir}/service-dist</outputDirectory>
+            <shadedArtifactAttached>true</shadedArtifactAttached>
+            <shadedClassifierName>${os.detected.classifier}</shadedClassifierName>
+          </configuration>
           <executions>
             <execution>
               <phase>package</phase>
               <goals>
                 <goal>shade</goal>
               </goals>
-              <configuration>
-                <minimizeJar>true</minimizeJar>
-                <filters>
-                  <filter>
-                    <artifact>*:*</artifact>
-                    <includes>
-                    </includes>
-                    <excludes>
-                      <exclude>META-INFO/**/**</exclude>
-                      <exclude>META-INFO/services/**</exclude>
-                      <exclude>META-INFO/maven/**</exclude>
-                    </excludes>
-                  </filter>
-
-                </filters>
-              </configuration>
             </execution>
           </executions>
         </plugin>

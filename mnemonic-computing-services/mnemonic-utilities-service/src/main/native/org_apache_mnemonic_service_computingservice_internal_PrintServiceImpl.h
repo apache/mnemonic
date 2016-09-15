@@ -39,7 +39,7 @@ JNIEXPORT void JNICALL Java_org_apache_mnemonic_service_computingservice_interna
  * Method:    jniTerm
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_apache_mnemonic_service_allocatorservice_internal_PrintServiceImpl_jniTerm
+JNIEXPORT void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PrintServiceImpl_jniTerm
 (JNIEnv *, jobject);
 
 #ifdef __cplusplus

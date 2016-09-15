@@ -25,7 +25,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.mnemonic</groupId>
   <artifactId>mnemonic-parent</artifactId>
-  <version>0.2.0-incubating</version>
+  <version>0.2.0-incubating-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>mnemonic-parent</name>
   <url>http://mnemonic.incubator.apache.org</url>
@@ -105,6 +105,8 @@
     <github.global.server>github</github.global.server>
     <buildtools.dir>${basedir}/build-tools</buildtools.dir>
     <gpg.keyname>apache.org</gpg.keyname>
+    <slf4j.version>1.7.21</slf4j.version>
+    <log4j.version>1.2.17</log4j.version>
   </properties>
 
   <repositories>
@@ -170,6 +172,32 @@
         <groupId>com.squareup</groupId>
         <artifactId>javapoet</artifactId>
         <version>1.6.1</version>
+      </dependency>
+      <!-- logging dependencies -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jul-to-slf4j</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jcl-over-slf4j</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>${log4j.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -269,7 +297,7 @@
             <excludes>
               <exclude>.git/**/*</exclude>
               <exclude>**/*.</exclude>
-              <exclude>target/**/*</exclude>
+	      <exclude>**/target/**/*</exclude>
               <exclude>**/README*</exclude>
               <exclude>**/LICENSE*</exclude>
               <exclude>**/*.log</exclude>
@@ -280,6 +308,7 @@
               <exclude>**/native/build/**/*</exclude>
               <exclude>**/native/dist/**/*</exclude>
               <exclude>**/service-dist/**</exclude>
+	      <exclude>**/*.patch</exclude>
             </excludes>
           </configuration>
           <executions>
@@ -300,13 +329,14 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.3</version>
-          <configuration>
+	  <configuration>
+            <source>1.7</source>
+            <target>1.7</target>
             <compilerArgs>
               <arg>-XDignore.symbol.file</arg>
               <arg>-XDenableSunApiLintControl</arg>
             </compilerArgs>
-            <source>1.7</source>
-            <target>1.7</target>
+            <fork>true</fork>
           </configuration>
         </plugin>
         <plugin>
