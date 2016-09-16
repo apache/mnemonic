@@ -16,7 +16,7 @@
 #
 
 cmake_minimum_required(VERSION 2.8.11)
-project(vmemallocator)
+project(pmemallocator)
 
 configure_file (
   "${PROJECT_SOURCE_DIR}/config.h.in"
@@ -26,8 +26,8 @@ include_directories(${PROJECT_BINARY_DIR})
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/../dist/native")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/")
-set(vmemallocator_VERSION_MAJOR 0)
-set(vmemallocator_VERSION_MINOR 0)
+set(pmemallocator_VERSION_MAJOR 0)
+set(pmemallocator_VERSION_MINOR 0)
 set(CMAKE_BUILD_TYPE "Release")
 set(CMAKE_C_FLAGS_DEBUG "$ENV{CFLAGS} -O0 -Wall -rdynamic -g -ggdb")
 set(CMAKE_C_FLAGS_RELEASE "$ENV{CFLAGS} -O3 -Wall")
@@ -38,18 +38,23 @@ include_directories(${JNI_INCLUDE_DIRS})
 find_package(Threads REQUIRED)
 include_directories(${CMAKE_THREAD_LIBS_INIT})
 
-find_library(LIBVMEM_LIBRARIES NAMES libvmem.a)
-if (NOT LIBVMEM_LIBRARIES)
-   message(FATAL_ERROR "not found vmem library")
-endif (NOT LIBVMEM_LIBRARIES)
+find_library(LIBPMEM_LIBRARIES NAMES libpmem.a)
+if (NOT LIBPMEM_LIBRARIES)
+   message(FATAL_ERROR "not found pmem library")
+endif (NOT LIBPMEM_LIBRARIES)
 
-add_library(vmemallocator SHARED common.c org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl.c)
-target_include_directories(vmemallocator PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(vmemallocator ${LIBVMEM_LIBRARIES})
+find_library(LIBPMEMOBJ_LIBRARIES NAMES libpmemobj.a)
+if (NOT LIBPMEMOBJ_LIBRARIES)
+   message(FATAL_ERROR "not found pmemobj library")
+endif (NOT LIBPMEMOBJ_LIBRARIES)
+
+add_library(pmemallocator SHARED common.c org_apache_mnemonic_service_memoryservice_internal_PMemServiceImpl.c)
+target_include_directories(pmemallocator PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(pmemallocator ${LIBPMEMOBJ_LIBRARIES} ${LIBPMEM_LIBRARIES})
 
 include (InstallRequiredSystemLibraries)
 set (CPACK_RESOURCE_FILE_LICENSE
   "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
-set (CPACK_PACKAGE_VERSION_MAJOR "${vmemallocator_VERSION_MAJOR}")
-set (CPACK_PACKAGE_VERSION_MINOR "${vmemallocator_VERSION_MINOR}")
+set (CPACK_PACKAGE_VERSION_MAJOR "${pmemallocator_VERSION_MAJOR}")
+set (CPACK_PACKAGE_VERSION_MINOR "${pmemallocator_VERSION_MINOR}")
 include (CPack)
