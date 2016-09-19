@@ -48,7 +48,12 @@ public class PMemServiceImpl implements NonVolatileMemoryAllocatorService {
 
   @Override
   public void sync(long id) {
-    nsync(id);
+    nsync(id, ngetBaseAddress(id), nhandlerCapacity(id));
+  }
+
+  @Override
+  public void sync(long id, long address, long length) {
+    nsync(id, address, length);
   }
 
   @Override
@@ -117,6 +122,26 @@ public class PMemServiceImpl implements NonVolatileMemoryAllocatorService {
   }
 
   @Override
+  public void persist(long id) {
+    npersist(id, ngetBaseAddress(id), nhandlerCapacity(id));
+  }
+
+  @Override
+  public void persist(long id, long address, long length) {
+    npersist(id, address, length);
+  }
+
+  @Override
+  public void flush(long id, long address, long length) {
+    nflush(id, address, length);
+  }
+
+  @Override
+  public void drain(long id) {
+    ndrain(id);
+  }
+
+  @Override
   public long getBaseAddress(long id) {
     return ngetBaseAddress(id);
   }
@@ -125,7 +150,7 @@ public class PMemServiceImpl implements NonVolatileMemoryAllocatorService {
 
   protected native void nclose(long id);
 
-  protected native void nsync(long id);
+  protected native void nsync(long id, long address, long length);
 
   protected native long ncapacity(long id);
 
@@ -152,6 +177,12 @@ public class PMemServiceImpl implements NonVolatileMemoryAllocatorService {
   protected native long ngetHandler(long id, long key);
 
   protected native long nhandlerCapacity(long id);
+
+  protected native void npersist(long id, long address, long length);
+
+  protected native void nflush(long id, long address, long length);
+
+  protected native void ndrain(long id);
 
   protected native long ngetBaseAddress(long id);
 

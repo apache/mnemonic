@@ -55,7 +55,12 @@ public class VMemServiceImpl implements VolatileMemoryAllocatorService {
 
   @Override
   public void sync(long id) {
-    nsync(id);
+    nsync(id, ngetBaseAddress(id), nhandlerCapacity(id));
+  }
+
+  @Override
+  public void sync(long id, long address, long length) {
+    nsync(id, address, length);
   }
 
   @Override
@@ -132,7 +137,7 @@ public class VMemServiceImpl implements VolatileMemoryAllocatorService {
 
   protected native void nclose(long id);
 
-  protected native void nsync(long id);
+  protected native void nsync(long id, long address, long length);
 
   protected native long ncapacity(long id);
 

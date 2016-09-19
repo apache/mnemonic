@@ -103,6 +103,42 @@ void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMallocServ
 JNIEXPORT
 void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMallocServiceImpl_nsync(
     JNIEnv* env,
+    jobject this, jlong id, jlong address, jlong len)
+{
+  void *md = *(g_pmp_ptr + id);
+  void* nativebuf = addr_from_java(address);
+  if (nativebuf != NULL) {
+    pmsync(md, nativebuf, len);
+  }
+}
+
+JNIEXPORT
+void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMallocServiceImpl_npersist(
+    JNIEnv* env,
+    jobject this, jlong id, jlong address, jlong len)
+{
+  void *md = *(g_pmp_ptr + id);
+  void* nativebuf = addr_from_java(address);
+  if (nativebuf != NULL) {
+    pmsync(md, nativebuf, len);
+  }
+}
+
+JNIEXPORT
+void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMallocServiceImpl_nflush(
+    JNIEnv* env,
+    jobject this, jlong id, jlong address, jlong len)
+{
+  void *md = *(g_pmp_ptr + id);
+  void* nativebuf = addr_from_java(address);
+  if (nativebuf != NULL) {
+    pmsync(md, nativebuf, len);
+  }
+}
+
+JNIEXPORT
+void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMallocServiceImpl_ndrain(
+    JNIEnv* env,
     jobject this, jlong id)
 {
 }

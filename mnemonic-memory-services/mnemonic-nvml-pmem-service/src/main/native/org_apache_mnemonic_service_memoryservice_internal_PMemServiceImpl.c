@@ -17,6 +17,7 @@
  */
 
 #include "org_apache_mnemonic_service_memoryservice_internal_PMemServiceImpl.h"
+#include "libpmem.h"
 
 static PMPool *g_pmpool_arr = NULL;
 static size_t g_pmpool_count = 0;
@@ -79,8 +80,33 @@ void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemService
 JNIEXPORT
 void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemServiceImpl_nsync(
     JNIEnv* env,
+    jobject this, jlong id, jlong address, jlong len)
+{
+  pmem_msync(addr_from_java(address), len);
+}
+
+JNIEXPORT
+void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemServiceImpl_npersist(
+    JNIEnv* env,
+    jobject this, jlong id, jlong address, jlong len)
+{
+  pmem_persist(addr_from_java(address), len);
+}
+
+JNIEXPORT
+void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemServiceImpl_nflush(
+    JNIEnv* env,
+    jobject this, jlong id, jlong address, jlong len)
+{
+  pmem_flush(addr_from_java(address), len);
+}
+
+JNIEXPORT
+void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemServiceImpl_ndrain(
+    JNIEnv* env,
     jobject this, jlong id)
 {
+  pmem_drain();
 }
 
 JNIEXPORT
@@ -90,7 +116,6 @@ jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemServic
 {
   PMPool *pool;
   jlong ret;
-  TOID(struct pmem_root) root;
   pthread_rwlock_rdlock(&g_pmp_rwlock);
   pool = g_pmpool_arr + id;
   ret = pool->capacity;

@@ -143,13 +143,26 @@ public interface VolatileMemoryAllocatorService {
   void close(long id);
 
   /**
-   * force to synchronize uncommitted data to backed memory pool through native
-   * interface.
+   * force to synchronize all uncommitted data to backed memory pool.
    *
    * @param id
    *         specify the id of underlying native allocator
    */
   void sync(long id);
+
+  /**
+   * force to synchronize an uncommitted data to backed memory pool.
+   *
+   * @param id
+   *         specify the id of underlying native allocator
+   * 
+   * @param address
+   *          the address of a memory resource
+   * 
+   * @param handler
+   *          the length of the memory resource
+   */
+  void sync(long id, long address, long length);
 
   /**
    * get the capacity of its managed memory space

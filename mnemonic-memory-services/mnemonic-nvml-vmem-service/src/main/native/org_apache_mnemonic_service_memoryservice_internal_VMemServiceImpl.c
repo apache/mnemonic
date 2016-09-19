@@ -75,15 +75,16 @@ void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemService
 JNIEXPORT
 void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_nsync(
     JNIEnv* env,
-    jobject this, jlong id)
+    jobject this, jlong id, jlong address, jlong len)
 {
 }
 
 JNIEXPORT
-void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_ncapacity(
+jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_ncapacity(
     JNIEnv* env,
     jobject this, jlong id)
 {
+  return 0L;
 }
 
 JNIEXPORT

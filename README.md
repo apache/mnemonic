@@ -211,7 +211,7 @@ To build this library, you may need to install some required packages on the bui
 * **NVML** -- the NVM library (Please compile this library that is tagged with 1.1 release with pandoc dependency) (http://pmem.io) [Optional if mnemonic-nvml-vmem-service is excluded, e.g. MacOSX]
 * **JDK** -- the Java Develop Kit 1.6 or above (please properly configure JAVA_HOME) [Required]
 * **PMFS** -- the PMFS should be properly installed and configured on Linux system if you want to simulate read latency [Optional]
-* **PMalloc** -- a supported durable memory native library at https://github.com/NonVolatileComputing/pmalloc.git [Optional if mnemonic-pmalloc-service is excluded]
+* **PMalloc** -- a supported durable memory native library(Latest) at https://github.com/NonVolatileComputing/pmalloc.git [Optional if mnemonic-pmalloc-service is excluded]
 
 
 Once the build system is setup, this Library is built using this command at the top level:

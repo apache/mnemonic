@@ -101,6 +101,50 @@ public interface NonVolatileMemoryAllocatorService extends VolatileMemoryAllocat
   long handlerCapacity(long id);
 
   /**
+   * Make any cached changes to a whole pool persistent.
+   * 
+   * @param id
+   *          the identifier of backed memory pool
+   */
+  void persist(long id);
+
+  /**
+   * Make any cached changes to a memory resource persistent.
+   * 
+   * @param id
+   *          the identifier of backed memory pool
+   * 
+   * @param address
+   *          the address of a memory resource
+   * 
+   * @param handler
+   *          the length of the memory resource
+   */
+  void persist(long id, long address, long length);
+
+  /**
+   * flush processors cache for a memory resource
+   * 
+   * @param id
+   *          the identifier of backed memory pool
+   * 
+   * @param address
+   *          the address of a memory resource
+   * 
+   * @param handler
+   *          the length of the memory resource
+   */
+  void flush(long id, long address, long length);
+
+  /**
+   * wait for any memory resource stores to drain from HW buffers.
+   * 
+   * @param id
+   *          the identifier of backed memory pool
+   */
+  void drain(long id);
+
+  /**
    * return the base address of this persistent memory pool.
    * 
    * @param id
