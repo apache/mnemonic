@@ -35,12 +35,10 @@ jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemServic
   void *p;
   pthread_rwlock_rdlock(&g_pmp_rwlock);
   pool = g_pmpool_arr + id;
-  pthread_mutex_lock(&pool->mutex);
   p = prealloc(pool, NULL, size, initzero ? 1 : 0);
   if (NULL != p) {
     ret = addr_to_java(p);
   }
-  pthread_mutex_unlock(&pool->mutex);
   pthread_rwlock_unlock(&g_pmp_rwlock);
   return ret;
 }
@@ -53,13 +51,11 @@ jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemServic
   void *p;
   pthread_rwlock_rdlock(&g_pmp_rwlock);
   pool = g_pmpool_arr + id;
-  pthread_mutex_lock(&pool->mutex);
   p = addr_from_java(e_addr);
   p = prealloc(pool, p, size, initzero ? 1 : 0);
   if (NULL != p) {
     ret = addr_to_java(p);
   }
-  pthread_mutex_unlock(&pool->mutex);
   pthread_rwlock_unlock(&g_pmp_rwlock);
   return ret;
 }
@@ -74,11 +70,9 @@ void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemService
   void* nativebuf;
   pthread_rwlock_rdlock(&g_pmp_rwlock);
   pool = g_pmpool_arr + id;
-  pthread_mutex_lock(&pool->mutex);
   //fprintf(stderr, "nfree Get Called %ld, %X\n", id, address);
   nativebuf = addr_from_java(e_addr);
   pfree(pool, nativebuf);
-  pthread_mutex_unlock(&pool->mutex);
   pthread_rwlock_unlock(&g_pmp_rwlock);
 }
 
@@ -112,12 +106,10 @@ jobject JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemServ
   void* nativebuf = NULL;
   pthread_rwlock_rdlock(&g_pmp_rwlock);
   pool = g_pmpool_arr + id;
-  pthread_mutex_lock(&pool->mutex);
   nativebuf = prealloc(pool, NULL, size, 0);
   if (NULL != nativebuf) {
     ret = (*env)->NewDirectByteBuffer(env, nativebuf, size);
   }
-  pthread_mutex_unlock(&pool->mutex);
   pthread_rwlock_unlock(&g_pmp_rwlock);
   return ret;
 }
@@ -169,7 +161,6 @@ jobject JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemServ
   jobject ret = NULL;
   pthread_rwlock_rdlock(&g_pmp_rwlock);
   pool = g_pmpool_arr + id;
-  pthread_mutex_lock(&pool->mutex);
   if (NULL != bytebuf) {
     void* nativebuf = (*env)->GetDirectBufferAddress(env, bytebuf);
     if (nativebuf != NULL) {
@@ -179,7 +170,6 @@ jobject JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemServ
       }
     }
   }
-  pthread_mutex_unlock(&pool->mutex);
   pthread_rwlock_unlock(&g_pmp_rwlock);
   return ret;
 }
@@ -191,12 +181,10 @@ void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemService
   PMPool *pool;
   pthread_rwlock_rdlock(&g_pmp_rwlock);
   pool = g_pmpool_arr + id;
-  pthread_mutex_lock(&pool->mutex);
   if (NULL != bytebuf) {
     void* nativebuf = (*env)->GetDirectBufferAddress(env, bytebuf);
     pfree(pool, nativebuf);
   }
-  pthread_mutex_unlock(&pool->mutex);
   pthread_rwlock_unlock(&g_pmp_rwlock);
 }
 
@@ -208,12 +196,10 @@ void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemService
   TOID(struct pmem_root) root;
   pthread_rwlock_rdlock(&g_pmp_rwlock);
   pool = g_pmpool_arr + id;
-  pthread_mutex_lock(&pool->mutex);
   root = POBJ_ROOT(pool->pop, struct pmem_root);
   if (key < MAX_HANDLER_STORE_LEN && key >= 0) {
     D_RW(root)->hdl_buf[key] = value;
   }
-  pthread_mutex_unlock(&pool->mutex);
   pthread_rwlock_unlock(&g_pmp_rwlock);
 }
 
@@ -224,10 +210,8 @@ jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemServic
   TOID(struct pmem_root) root;
   pthread_rwlock_rdlock(&g_pmp_rwlock);
   pool = g_pmpool_arr + id;
-  pthread_mutex_lock(&pool->mutex);
   root = POBJ_ROOT(pool->pop, struct pmem_root);
   jlong ret = (key < MAX_HANDLER_STORE_LEN && key >= 0) ? D_RO(root)->hdl_buf[key] : 0L;
-  pthread_mutex_unlock(&pool->mutex);
   pthread_rwlock_unlock(&g_pmp_rwlock);
   return ret;
 }
@@ -280,7 +264,6 @@ jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemServic
   if (NULL != g_pmpool_arr) {
     pool = g_pmpool_arr + g_pmpool_count;
     pool->pop = pop;
-    pthread_mutex_init(&pool->mutex, NULL);
     root = POBJ_ROOT(pool->pop, struct pmem_root);
     pool->uuid_lo = root.oid.pool_uuid_lo;
     pool->base = (void*)pop;
@@ -302,14 +285,11 @@ void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemService
   PMPool *pool;
   pthread_rwlock_wrlock(&g_pmp_rwlock);
   pool = g_pmpool_arr + id;
-  pthread_mutex_lock(&pool->mutex);
   pmemobj_close(pool->pop);
   pool->pop = NULL;
   pool->base = NULL;
   pool->uuid_lo = 0;
   pool->capacity = 0;
-  pthread_mutex_unlock(&pool->mutex);
-  pthread_mutex_destroy(&pool->mutex);
   pthread_rwlock_unlock(&g_pmp_rwlock);
 }
 
@@ -325,7 +305,6 @@ __attribute__((destructor)) void fini(void) {
         pool->base = NULL;
         pool->capacity = 0;
         pool->uuid_lo = 0;
-        pthread_mutex_destroy(&pool->mutex);
       }
     }
     free(g_pmpool_arr);

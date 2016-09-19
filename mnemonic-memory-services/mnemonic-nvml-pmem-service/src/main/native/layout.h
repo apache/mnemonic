@@ -43,7 +43,6 @@ typedef struct {
   uint64_t uuid_lo;
   void *base;
   size_t capacity;
-  pthread_mutex_t mutex;
 } PMPool;
 
 #define PMBHSZ (sizeof(PMBHeader))
