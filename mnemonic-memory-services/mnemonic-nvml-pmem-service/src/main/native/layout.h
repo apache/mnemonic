@@ -26,11 +26,13 @@ extern "C" {
 
 struct pmem_root {
   long hdl_buf[MAX_HANDLER_STORE_LEN];
+  size_t capacity;
 };
 
 POBJ_LAYOUT_BEGIN(memory_service);
 POBJ_LAYOUT_ROOT(memory_service, struct pmem_root);
 POBJ_LAYOUT_TOID(memory_service, uint8_t);
+POBJ_LAYOUT_TOID(memory_service, size_t);
 POBJ_LAYOUT_END(memory_service);
 
 typedef struct {

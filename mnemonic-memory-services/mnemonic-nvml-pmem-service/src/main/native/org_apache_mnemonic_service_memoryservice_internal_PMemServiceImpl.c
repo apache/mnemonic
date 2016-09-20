@@ -264,6 +264,7 @@ jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemServic
     jclass this, jlong capacity, jstring pathname, jboolean isnew) {
   PMPool *pool;
   TOID(struct pmem_root) root;
+  int needcreate;
   jlong ret = -1;
   PMEMobjpool *pop = NULL;
   pthread_rwlock_wrlock(&g_pmp_rwlock);
@@ -272,10 +273,11 @@ jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemServic
     pthread_rwlock_unlock(&g_pmp_rwlock);
     throw(env, "Big memory path not specified!");
   }
-  if (capacity < PMEMOBJ_MIN_POOL) {
+  needcreate = access(mpathname, F_OK);
+  if (needcreate && capacity < PMEMOBJ_MIN_POOL) {
     capacity = PMEMOBJ_MIN_POOL;
   }
-  if (access(mpathname, F_OK)) {
+  if (needcreate) {
     pop = pmemobj_create(mpathname, POBJ_LAYOUT_NAME(memory_service), capacity, S_IRUSR | S_IWUSR);
   } else {
     pop = pmemobj_open(mpathname, POBJ_LAYOUT_NAME(memory_service));
@@ -292,7 +294,12 @@ jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemServic
     root = POBJ_ROOT(pool->pop, struct pmem_root);
     pool->uuid_lo = root.oid.pool_uuid_lo;
     pool->base = (void*)pop;
-    pool->capacity = capacity;
+    if (needcreate) {
+      pool->capacity = capacity;
+      D_RW(root)->capacity = capacity;
+    } else {
+      pool->capacity = D_RO(root)->capacity;
+    }
     ret = g_pmpool_count;
     ++g_pmpool_count;
   } else {
