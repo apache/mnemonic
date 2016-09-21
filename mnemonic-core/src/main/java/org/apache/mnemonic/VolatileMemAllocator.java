@@ -328,29 +328,29 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
   }
 
   /**
-   * get the handler from a memory buffer holder.
+   * get the address from a memory buffer holder.
    * 
    * @param mbuf
    *          specify the memory buffer holder
    *
-   * @return a handler that could be used to retrieve its memory buffer
+   * @return an address that could be used to retrieve its memory buffer
    */
   @Override
-  public long getBufferHandler(MemBufferHolder<VolatileMemAllocator> mbuf) {
-    return getPortableAddress(m_vmasvc.getByteBufferHandler(m_nid, mbuf.get()));
+  public long getBufferAddress(MemBufferHolder<VolatileMemAllocator> mbuf) {
+    return m_vmasvc.getByteBufferHandler(m_nid, mbuf.get());
   }
 
   /**
-   * get the handler from a memory chunk holder.
+   * get the address from a memory chunk holder.
    * 
    * @param mchunk
    *          specify the memory chunk holder
    *
-   * @return a handler that could be used to retrieve its memory chunk
+   * @return an address that could be used to retrieve its memory chunk
    */
   @Override
-  public long getChunkHandler(MemChunkHolder<VolatileMemAllocator> mchunk) {
-    return getPortableAddress(mchunk.get());
+  public long getChunkAddress(MemChunkHolder<VolatileMemAllocator> mchunk) {
+    return mchunk.get();
   }
 
   /**
@@ -362,6 +362,33 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
   @Override
   public boolean hasDurableHandlerStore() {
     return true;
+  }
+
+  /**
+   * sync. a buffer to underlying memory device.
+   * 
+   * @param mbuf
+   *         specify a buffer to be sync.
+   */
+  public void sync(MemBufferHolder<VolatileMemAllocator> mbuf) {
+    m_vmasvc.sync(m_nid, getBufferAddress(mbuf), 0L, true);
+  }
+
+  /**
+   * sync. a chunk to underlying memory device.
+   * 
+   * @param mchunk
+   *         specify a chunk to be sync.
+   */
+  public void sync(MemChunkHolder<VolatileMemAllocator> mchunk) {
+    m_vmasvc.sync(m_nid, getChunkAddress(mchunk), 0L, true);
+  }
+
+  /**
+   * sync. the memory pool to underlying memory device.
+   */
+  public void syncAll() {
+    m_vmasvc.sync(m_nid, 0L, 0L, true);
   }
 
   /**

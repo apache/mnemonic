@@ -54,13 +54,8 @@ public class VMemServiceImpl implements VolatileMemoryAllocatorService {
   }
 
   @Override
-  public void sync(long id) {
-    nsync(id, ngetBaseAddress(id), nhandlerCapacity(id));
-  }
-
-  @Override
-  public void sync(long id, long address, long length) {
-    nsync(id, address, length);
+  public void sync(long id, long addr, long length, boolean autodetect) {
+    nsync(id, addr, length, autodetect);
   }
 
   @Override
@@ -74,13 +69,13 @@ public class VMemServiceImpl implements VolatileMemoryAllocatorService {
   }
 
   @Override
-  public long reallocate(long id, long address, long size, boolean initzero) {
-    return nreallocate(id, address, size, initzero);
+  public long reallocate(long id, long addr, long size, boolean initzero) {
+    return nreallocate(id, addr, size, initzero);
   }
 
   @Override
-  public void free(long id, long address) {
-    nfree(id, address);
+  public void free(long id, long addr) {
+    nfree(id, addr);
   }
 
   @Override
@@ -137,15 +132,15 @@ public class VMemServiceImpl implements VolatileMemoryAllocatorService {
 
   protected native void nclose(long id);
 
-  protected native void nsync(long id, long address, long length);
+  protected native void nsync(long id, long addr, long length, boolean autodetect);
 
   protected native long ncapacity(long id);
 
   protected native long nallocate(long id, long size, boolean initzero);
 
-  protected native long nreallocate(long id, long address, long size, boolean initzero);
+  protected native long nreallocate(long id, long addr, long size, boolean initzero);
 
-  protected native void nfree(long id, long address);
+  protected native void nfree(long id, long addr);
 
   protected native ByteBuffer ncreateByteBuffer(long id, long size);
 

@@ -41,13 +41,13 @@ public interface NonVolatileMemoryAllocatorService extends VolatileMemoryAllocat
    * @param id
    *          the identifier of backed memory pool
    * 
-   * @param handler
-   *          the handler of a nonvolatile object
+   * @param addr
+   *          the address of a nonvolatile object
    *
    * @return the size of nonvolatile object
    *
    */
-  long retrieveSize(long id, long handler);
+  long retrieveSize(long id, long addr);
 
   /**
    * get the handler of a nonvolatile bytebuffer
@@ -101,26 +101,22 @@ public interface NonVolatileMemoryAllocatorService extends VolatileMemoryAllocat
   long handlerCapacity(long id);
 
   /**
-   * Make any cached changes to a whole pool persistent.
-   * 
-   * @param id
-   *          the identifier of backed memory pool
-   */
-  void persist(long id);
-
-  /**
    * Make any cached changes to a memory resource persistent.
    * 
    * @param id
    *          the identifier of backed memory pool
    * 
-   * @param address
+   * @param addr
    *          the address of a memory resource
    * 
-   * @param handler
+   * @param length
    *          the length of the memory resource
+   * 
+   * @param autodetect
+   *          NULL == address && autodetect : persist whole pool
+   *          0L == length && autodetect : persist block
    */
-  void persist(long id, long address, long length);
+  void persist(long id, long addr, long length, boolean autodetect);
 
   /**
    * flush processors cache for a memory resource
@@ -128,13 +124,17 @@ public interface NonVolatileMemoryAllocatorService extends VolatileMemoryAllocat
    * @param id
    *          the identifier of backed memory pool
    * 
-   * @param address
+   * @param addr
    *          the address of a memory resource
    * 
-   * @param handler
+   * @param length
    *          the length of the memory resource
+   * 
+   * @param autodetect
+   *          NULL == address && autodetect : flush whole pool
+   *          0L == length && autodetect : flush block
    */
-  void flush(long id, long address, long length);
+  void flush(long id, long addr, long length, boolean autodetect);
 
   /**
    * wait for any memory resource stores to drain from HW buffers.

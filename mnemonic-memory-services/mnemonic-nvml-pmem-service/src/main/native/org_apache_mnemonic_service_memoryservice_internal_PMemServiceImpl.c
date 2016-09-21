@@ -46,13 +46,13 @@ jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemServic
 
 JNIEXPORT
 jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemServiceImpl_nreallocate(JNIEnv* env,
-    jobject this, jlong id, jlong e_addr, jlong size, jboolean initzero) {
+    jobject this, jlong id, jlong addr, jlong size, jboolean initzero) {
   PMPool *pool;
   jlong ret = 0L;
   void *p;
   pthread_rwlock_rdlock(&g_pmp_rwlock);
   pool = g_pmpool_arr + id;
-  p = addr_from_java(e_addr);
+  p = addr_from_java(addr);
   p = prealloc(pool, p, size, initzero ? 1 : 0);
   if (NULL != p) {
     ret = addr_to_java(p);
@@ -65,14 +65,14 @@ JNIEXPORT
 void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemServiceImpl_nfree(
     JNIEnv* env,
     jobject this, jlong id,
-    jlong e_addr)
+    jlong addr)
 {
   PMPool *pool;
   void* nativebuf;
   pthread_rwlock_rdlock(&g_pmp_rwlock);
   pool = g_pmpool_arr + id;
-  //fprintf(stderr, "nfree Get Called %ld, %X\n", id, address);
-  nativebuf = addr_from_java(e_addr);
+  //fprintf(stderr, "nfree Get Called %ld, %X\n", id, addr);
+  nativebuf = addr_from_java(addr);
   pfree(pool, nativebuf);
   pthread_rwlock_unlock(&g_pmp_rwlock);
 }
@@ -80,25 +80,82 @@ void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemService
 JNIEXPORT
 void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemServiceImpl_nsync(
     JNIEnv* env,
-    jobject this, jlong id, jlong address, jlong len)
+    jobject this, jlong id, jlong addr, jlong len, jboolean autodetect)
 {
-  pmem_msync(addr_from_java(address), len);
+  PMPool *pool;
+  size_t capa;
+  void* nativebuf;
+  void* p = addr_from_java(addr);
+  if (autodetect) {
+    if (NULL != p) {
+      nativebuf = p - PMBHSZ;
+      pmem_msync(nativebuf, ((PMBHeader *) nativebuf)->size);
+    } else {
+      pthread_rwlock_rdlock(&g_pmp_rwlock);
+      pool = g_pmpool_arr + id;
+      capa = pool->capacity;
+      pmem_msync(pool->base, capa);
+      pthread_rwlock_unlock(&g_pmp_rwlock);
+    }
+  } else {
+    if (NULL != p && len > 0L) {
+      pmem_msync(p, len);
+    }
+  }
 }
 
 JNIEXPORT
 void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemServiceImpl_npersist(
     JNIEnv* env,
-    jobject this, jlong id, jlong address, jlong len)
+    jobject this, jlong id, jlong addr, jlong len, jboolean autodetect)
 {
-  pmem_persist(addr_from_java(address), len);
+  PMPool *pool;
+  size_t capa;
+  void* nativebuf;
+  void* p = addr_from_java(addr);
+  if (autodetect) {
+    if (NULL != p) {
+      nativebuf = p - PMBHSZ;
+      pmem_persist(nativebuf, ((PMBHeader *) nativebuf)->size);
+    } else {
+      pthread_rwlock_rdlock(&g_pmp_rwlock);
+      pool = g_pmpool_arr + id;
+      capa = pool->capacity;
+      pmem_persist(pool->base, capa);
+      pthread_rwlock_unlock(&g_pmp_rwlock);
+    }
+  } else {
+    if (NULL != p && len > 0L) {
+      pmem_persist(p, len);
+    }
+  }
 }
 
 JNIEXPORT
 void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemServiceImpl_nflush(
     JNIEnv* env,
-    jobject this, jlong id, jlong address, jlong len)
+    jobject this, jlong id, jlong addr, jlong len, jboolean autodetect)
 {
-  pmem_flush(addr_from_java(address), len);
+  PMPool *pool;
+  size_t capa;
+  void* nativebuf;
+  void* p = addr_from_java(addr);
+  if (autodetect) {
+    if (NULL != p) {
+      nativebuf = p - PMBHSZ;
+      pmem_flush(nativebuf, ((PMBHeader *) nativebuf)->size);
+    } else {
+      pthread_rwlock_rdlock(&g_pmp_rwlock);
+      pool = g_pmpool_arr + id;
+      capa = pool->capacity;
+      pmem_flush(pool->base, capa);
+      pthread_rwlock_unlock(&g_pmp_rwlock);
+    }
+  } else {
+    if (NULL != p && len > 0L) {
+      pmem_flush(p, len);
+    }
+  }
 }
 
 JNIEXPORT
@@ -141,9 +198,9 @@ jobject JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemServ
 
 JNIEXPORT
 jobject JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemServiceImpl_nretrieveByteBuffer(
-    JNIEnv *env, jobject this, jlong id, jlong e_addr) {
+    JNIEnv *env, jobject this, jlong id, jlong addr) {
   jobject ret = NULL;
-  void* p = addr_from_java(e_addr);
+  void* p = addr_from_java(addr);
   if (NULL != p) {
     void* nativebuf = p - PMBHSZ;
     ret = (*env)->NewDirectByteBuffer(env, p, ((PMBHeader *) nativebuf)->size - PMBHSZ);
@@ -153,9 +210,9 @@ jobject JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemServ
 
 JNIEXPORT
 jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemServiceImpl_nretrieveSize(JNIEnv *env,
-    jobject this, jlong id, jlong e_addr) {
+    jobject this, jlong id, jlong addr) {
   jlong ret = 0L;
-  void* p = addr_from_java(e_addr);
+  void* p = addr_from_java(addr);
   if (NULL != p) {
     void* nativebuf = p - PMBHSZ;
     ret = ((PMBHeader *) nativebuf)->size - PMBHSZ;
@@ -172,10 +229,10 @@ jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemServic
   jlong ret = 0L;
   if (NULL != bytebuf) {
     void* nativebuf = (*env)->GetDirectBufferAddress(env, bytebuf);
-//    	fprintf(stderr, "ngetByteBufferAddress Get Native address %X\n", nativebuf);
+//    	fprintf(stderr, "ngetByteBufferAddress Get Native addr %X\n", nativebuf);
     ret = addr_to_java(nativebuf);
   }
-//    fprintf(stderr, "ngetByteBufferAddress returned address %016lx\n", ret);
+//    fprintf(stderr, "ngetByteBufferAddress returned addr %016lx\n", ret);
   return ret;
 }
 

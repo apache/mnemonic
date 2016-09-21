@@ -334,29 +334,29 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
   }
 
   /**
-   * get the handler from a memory buffer holder.
+   * get the address from a memory buffer holder.
    * 
    * @param mbuf
    *          specify the memory buffer holder
    *
-   * @return a handler that could be used to retrieve its memory buffer
+   * @return an address that could be used to retrieve its memory buffer
    */
   @Override
-  public long getBufferHandler(MemBufferHolder<NonVolatileMemAllocator> mbuf) {
-    return getPortableAddress(m_nvmasvc.getByteBufferHandler(m_nid, mbuf.get()));
+  public long getBufferAddress(MemBufferHolder<NonVolatileMemAllocator> mbuf) {
+    return m_nvmasvc.getByteBufferHandler(m_nid, mbuf.get());
   }
 
   /**
-   * get the handler from a memory chunk holder.
+   * get the address from a memory chunk holder.
    * 
    * @param mchunk
    *          specify the memory chunk holder
    *
-   * @return a handler that could be used to retrieve its memory chunk
+   * @return an address that could be used to retrieve its memory chunk
    */
   @Override
-  public long getChunkHandler(MemChunkHolder<NonVolatileMemAllocator> mchunk) {
-    return getPortableAddress(mchunk.get());
+  public long getChunkAddress(MemChunkHolder<NonVolatileMemAllocator> mchunk) {
+    return mchunk.get();
   }
 
   /**
@@ -368,6 +368,94 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
   @Override
   public boolean hasDurableHandlerStore() {
     return true;
+  }
+
+  /**
+   * sync. a buffer to underlying memory device.
+   * 
+   * @param mbuf
+   *         specify a buffer to be sync.
+   */
+  public void sync(MemBufferHolder<NonVolatileMemAllocator> mbuf) {
+    m_nvmasvc.sync(m_nid, getBufferAddress(mbuf), 0L, true);
+  }
+
+  /**
+   * sync. a chunk to underlying memory device.
+   * 
+   * @param mchunk
+   *         specify a chunk to be sync.
+   */
+  public void sync(MemChunkHolder<NonVolatileMemAllocator> mchunk) {
+    m_nvmasvc.sync(m_nid, getChunkAddress(mchunk), 0L, true);
+  }
+
+  /**
+   * sync. the memory pool to underlying memory device.
+   */
+  public void syncAll() {
+    m_nvmasvc.sync(m_nid, 0L, 0L, true);
+  }
+
+  /**
+   * persist a buffer to persistent memory.
+   * 
+   * @param mbuf
+   *         specify a buffer to be persisted
+   */
+  public void persist(MemBufferHolder<NonVolatileMemAllocator> mbuf) {
+    m_nvmasvc.persist(m_nid, getBufferAddress(mbuf), 0L, true);
+  }
+
+  /**
+   * persist a chunk to persistent memory.
+   * 
+   * @param mchunk
+   *         specify a chunk to be persisted
+   */
+  public void persist(MemChunkHolder<NonVolatileMemAllocator> mchunk) {
+    m_nvmasvc.persist(m_nid, getChunkAddress(mchunk), 0L, true);
+  }
+
+  /**
+   * persist the memory pool to persistent memory.
+   */
+  public void persistAll() {
+    m_nvmasvc.persist(m_nid, 0L, 0L, true);
+  }
+
+  /**
+   * flush a buffer to persistent memory.
+   * 
+   * @param mbuf
+   *         specify a buffer to be flushed
+   */
+  public void flush(MemBufferHolder<NonVolatileMemAllocator> mbuf) {
+    m_nvmasvc.flush(m_nid, getBufferAddress(mbuf), 0L, true);
+  }
+
+  /**
+   * flush a chunk to persistent memory.
+   * 
+   * @param mchunk
+   *         specify a chunk to be flushed
+   */
+  public void flush(MemChunkHolder<NonVolatileMemAllocator> mchunk) {
+    m_nvmasvc.flush(m_nid, getChunkAddress(mchunk), 0L, true);
+  }
+
+  /**
+   * flush the memory pool to persistent memory.
+   */
+  public void flushAll() {
+    m_nvmasvc.flush(m_nid, 0L, 0L, true);
+  }
+
+  /**
+   * drain memory caches to persistent memory.
+   */
+  public void drain() {
+    m_nvmasvc.drain(m_nid);
   }
 
   /**

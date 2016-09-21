@@ -143,26 +143,22 @@ public interface VolatileMemoryAllocatorService {
   void close(long id);
 
   /**
-   * force to synchronize all uncommitted data to backed memory pool.
-   *
-   * @param id
-   *         specify the id of underlying native allocator
-   */
-  void sync(long id);
-
-  /**
    * force to synchronize an uncommitted data to backed memory pool.
    *
    * @param id
    *         specify the id of underlying native allocator
    * 
-   * @param address
+   * @param addr
    *          the address of a memory resource
    * 
-   * @param handler
+   * @param length
    *          the length of the memory resource
+   * 
+   * @param autodetect
+   *          NULL == address && autodetect : sync. whole pool
+   *          0L == length && autodetect : sync. block
    */
-  void sync(long id, long address, long length);
+  void sync(long id, long addr, long length, boolean autodetect);
 
   /**
    * get the capacity of its managed memory space
@@ -196,7 +192,7 @@ public interface VolatileMemoryAllocatorService {
    * @param id
    *          the identifier of backed memory pool
    * 
-   * @param address
+   * @param addr
    *          the address of previous allocated memory block. it can be null.
    * 
    * @param size
@@ -207,7 +203,7 @@ public interface VolatileMemoryAllocatorService {
    *
    * @return the address of reallocated memory block from native memory pool
    */
-  long reallocate(long id, long address, long size, boolean initzero);
+  long reallocate(long id, long addr, long size, boolean initzero);
 
   /**
    * free a memory block by specify its address into backed memory pool.
@@ -215,10 +211,10 @@ public interface VolatileMemoryAllocatorService {
    * @param id
    *          the identifier of backed memory pool
    * 
-   * @param address
+   * @param addr
    *          the address of allocated memory block.
    */
-  void free(long id, long address);
+  void free(long id, long addr);
 
   /**
    * create a ByteBuffer object which backed buffer is coming from backed native
