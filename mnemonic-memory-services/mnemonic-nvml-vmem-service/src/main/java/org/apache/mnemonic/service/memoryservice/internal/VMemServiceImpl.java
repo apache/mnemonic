@@ -125,7 +125,8 @@ public class VMemServiceImpl implements VolatileMemoryAllocatorService {
 
   @Override
   public long getBaseAddress(long id) {
-    return ngetBaseAddress(id);
+    throw new UnsupportedOperationException("getBaseAddress Operation Unsupported.");
+    //return ngetBaseAddress(id);
   }
 
   protected native long ninit(long capacity, String uri, boolean isnew);
