@@ -190,11 +190,7 @@ jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServic
 JNIEXPORT
 jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_ngetBaseAddress(JNIEnv *env,
     jobject this, jlong id) {
-  pthread_rwlock_rdlock(&g_vmem_rwlock);
-  void *md = *(g_vmp_ptr + id);
-  jlong ret = 0L;
-  pthread_rwlock_unlock(&g_vmem_rwlock);
-  return ret;
+  return 0L;
 }
 
 JNIEXPORT
