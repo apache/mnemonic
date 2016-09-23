@@ -344,7 +344,8 @@ jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMallocSer
     pthread_rwlock_unlock(&g_pmp_rwlock);
     throw(env, "Big memory path not specified!");
   }
-  if ((md = pmopen(mpathname, NULL, capacity)) == NULL) {
+  if ((md = pmopen(mpathname, NULL,
+                   PMALLOC_MIN_POOL_SIZE > capacity ? PMALLOC_MIN_POOL_SIZE : capacity)) == NULL) {
     pthread_rwlock_unlock(&g_pmp_rwlock);
     throw(env, "Big memory init failure!");
   }
