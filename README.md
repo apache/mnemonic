@@ -201,14 +201,32 @@ Please see the file LICENSE for information on how this library is licensed.
 * **mnemonic-examples** -- the submodule project for examples, Please refer to the testcases of respective module as complete examples.
 * **mnemonic-memory-services/mnemonic-pmalloc-service** -- the submodule project for pmalloc memory service
 * **mnemonic-memory-services/mnemonic-nvml-vmem-service** -- the submodule project for vmem memory service
+* **mnemonic-memory-services/mnemonic-nvml-pmem-service** -- the submodule project for pmem memory service
 * **mnemonic-memory-services/service-dist** -- the location of extensive memory services (auto-generated)
 * **mnemonic-computing-services/mnemonic-utilities-service** -- the submodule project for utilities computing service
 * **mnemonic-computing-services/service-dist** -- the location of extensive computing services (auto-generated)
 
+
+#### Durable Memory Service Comparison Table
+
+
+|    Features                     |    NVML-VMEM    |    PMALLOC    |    NVML-PMEM    |
+|---------------------------------|:---------------:|:-------------:|:---------------:|
+|    Fixed   Durable K-V Store    |        NA       |       O       |        O        |
+|    Support DOM                  |        O        |       O       |        O        |
+|    Support DNCM                 |        O        |       O       |        O        |
+|    Support OS X                 |        NA       |       O       |        NA       |
+|    Memory Map Sync.             |        NA       |       O       |        O        |
+|    PM Flush                     |        NA       |       NA      |        O        |
+|    PM Drain                     |        NA       |       NA      |        O        |
+|    PM Persist                   |        NA       |       NA      |        O        |
+|    PM Atomic   Ops.             |        NA       |       NA      |        O        |
+|    Performance                  |       High      |      High     |       Low       |
+
 To build this library, you may need to install some required packages on the build system:
 
 * **Maven** -- the building tool v3.2.1 or above [Required]
-* **NVML** -- the NVM library (Please compile this library that is tagged with 1.1 release with pandoc dependency) (http://pmem.io) [Optional if mnemonic-nvml-vmem-service is excluded, e.g. MacOSX]
+* **NVML** -- the NVM library (Please compile this library that is tagged with 1.1 release with pandoc dependency) (http://pmem.io) [Optional if mnemonic-nvml-vmem-service/mnemonic-nvml-pmem-service are excluded, e.g. on MacOSX]
 * **JDK** -- the Java Develop Kit 1.6 or above (please properly configure JAVA_HOME) [Required]
 * **PMFS** -- the PMFS should be properly installed and configured on Linux system if you want to simulate read latency [Optional]
 * **PMalloc** -- a supported durable memory native library(Latest) at https://github.com/NonVolatileComputing/pmalloc.git [Optional if mnemonic-pmalloc-service is excluded]
