@@ -204,7 +204,8 @@ jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServic
     pthread_rwlock_unlock(&g_vmem_rwlock);
     throw(env, "Big memory path not specified!");
   }
-  if ((vmp = vmem_create(mpathname, capacity)) == NULL) {
+  if ((vmp = vmem_create(mpathname,
+       VMEM_MIN_POOL > capacity ? VMEM_MIN_POOL : capacity)) == NULL) {
     pthread_rwlock_unlock(&g_vmem_rwlock);
     throw(env, "Big memory init failure!");
   }
