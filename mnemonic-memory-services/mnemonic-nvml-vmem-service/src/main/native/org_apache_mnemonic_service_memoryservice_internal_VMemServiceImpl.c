@@ -114,7 +114,7 @@ jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServic
     jobject this, jlong id, jlong addr, jlong size) {
   jlong ret = 0L;
   void* p = addr_from_java(addr);
-  ret = NULL != p ? (*env)->NewDirectByteBuffer(env, p, size) : NULL;
+  ret = NULL != p ? (*env)->NewDirectByteBuffer(env, p, size) : 0L;
   return ret;
 }
 
@@ -178,12 +178,14 @@ JNIEXPORT
 jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_ngetHandler(JNIEnv *env,
     jobject this, jlong id, jlong key) {
   throw(env, "setkey()/getkey() temporarily not suppoted");
+  return 0;
 }
 
 JNIEXPORT
 jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_nhandlerCapacity(
     JNIEnv *env, jobject this) {
   throw(env, "setkey()/getkey() temporarily not suppoted");
+  return 0;
 }
 
 
