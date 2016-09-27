@@ -298,7 +298,7 @@ void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMallocServ
   pthread_rwlock_rdlock(&g_pmp_rwlock);
   pthread_mutex_lock(g_pmalloc_mutex_ptr + id);
   void *md = *(g_pmp_ptr + id);
-  if (id < PMALLOC_KEYS && id >= 0) {
+  if (key < PMALLOC_KEYS && key >= 0) {
     pmalloc_setkey(md, key, (void*)value);
   }
   pthread_mutex_unlock(g_pmalloc_mutex_ptr + id);
@@ -311,7 +311,7 @@ jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMallocSer
   pthread_rwlock_rdlock(&g_pmp_rwlock);
   pthread_mutex_lock(g_pmalloc_mutex_ptr + id);
   void *md = *(g_pmp_ptr + id);
-  jlong ret = (id < PMALLOC_KEYS && id >= 0) ? (long) pmalloc_getkey(md, key) : 0;
+  jlong ret = (key < PMALLOC_KEYS && key >= 0) ? (long) pmalloc_getkey(md, key) : 0;
   pthread_mutex_unlock(g_pmalloc_mutex_ptr + id);
   pthread_rwlock_unlock(&g_pmp_rwlock);
   return ret;
