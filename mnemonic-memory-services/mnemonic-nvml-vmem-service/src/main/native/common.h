@@ -35,12 +35,32 @@ extern "C" {
 #include <assert.h>
 #include <pthread.h>
 #include <jni.h>
+#include <libvmem.h>
 
 void throw(JNIEnv* env, const char* msg);
 
 void* addr_from_java(jlong addr);
 
 jlong addr_to_java(void* p);
+
+typedef struct {
+  //size_t size;
+  jlong size;
+} PMBHeader;
+
+#define PMBHSZ (sizeof(PMBHeader))
+
+typedef struct {
+  VMEM *vmp;
+  size_t capacity;
+  pthread_mutex_t mutex;
+} VMPool;
+
+void *vrealloc(VMPool *pool, void *p, size_t size, int initzero);
+
+void vfree(VMPool *pool, void *p);
+
+size_t vsize(VMPool *pool, void *p);
 
 #ifdef __cplusplus
 }

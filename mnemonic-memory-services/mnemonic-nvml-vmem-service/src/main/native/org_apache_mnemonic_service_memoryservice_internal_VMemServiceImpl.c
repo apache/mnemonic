@@ -18,12 +18,8 @@
 
 #include "org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl.h"
 
-#include <libvmem.h>
-
-static VMEM **g_vmp_ptr = NULL;
-static size_t g_vmp_count = 0;
-
-static pthread_mutex_t *g_vmem_mutex_ptr = NULL;
+static VMPool *g_vmpool_arr = NULL;
+static size_t g_vmpool_count = 0;
 
 static pthread_rwlock_t g_vmem_rwlock = PTHREAD_RWLOCK_INITIALIZER;
 
@@ -34,10 +30,12 @@ static pthread_rwlock_t g_vmem_rwlock = PTHREAD_RWLOCK_INITIALIZER;
 JNIEXPORT
 jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_nallocate(JNIEnv* env,
     jobject this, jlong id, jlong size, jboolean initzero) {
+  VMPool *pool;
   pthread_rwlock_rdlock(&g_vmem_rwlock);
-  pthread_mutex_lock(g_vmem_mutex_ptr + id);
-  void* nativebuf = initzero ? vmem_calloc(*(g_vmp_ptr + id), 1, size) : vmem_malloc(*(g_vmp_ptr + id), size);
-  pthread_mutex_unlock(g_vmem_mutex_ptr + id);
+  pool = g_vmpool_arr + id;
+  pthread_mutex_lock(&pool->mutex);
+  void* nativebuf = vrealloc(pool, NULL, size, initzero);
+  pthread_mutex_unlock(&pool->mutex);
   pthread_rwlock_unlock(&g_vmem_rwlock);
   return addr_to_java(nativebuf);
 }
@@ -45,14 +43,13 @@ jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServic
 JNIEXPORT
 jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_nreallocate(JNIEnv* env,
     jobject this, jlong id, jlong addr, jlong size, jboolean initzero) {
+  VMPool *pool;
   pthread_rwlock_rdlock(&g_vmem_rwlock);
-  pthread_mutex_lock(g_vmem_mutex_ptr + id);
-
+  pool = g_vmpool_arr + id;
+  pthread_mutex_lock(&pool->mutex);
   void* p = addr_from_java(addr);
-
-  void* nativebuf = vmem_realloc(*(g_vmp_ptr + id), p, size);
-
-  pthread_mutex_unlock(g_vmem_mutex_ptr + id);
+  void* nativebuf = vrealloc(pool, p, size, initzero);
+  pthread_mutex_unlock(&pool->mutex);
   pthread_rwlock_unlock(&g_vmem_rwlock);
   return addr_to_java(nativebuf);
 }
@@ -61,14 +58,14 @@ JNIEXPORT
 void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_nfree(
     JNIEnv* env,
     jobject this, jlong id,
-    jlong addr)
-{
+    jlong addr) {
+  VMPool *pool;
   pthread_rwlock_rdlock(&g_vmem_rwlock);
-  pthread_mutex_lock(g_vmem_mutex_ptr + id);
+  pool = g_vmpool_arr + id;
+  pthread_mutex_lock(&pool->mutex);
   void* nativebuf = addr_from_java(addr);
-  if (nativebuf != NULL)
-  vmem_free(*(g_vmp_ptr + id), nativebuf);
-  pthread_mutex_unlock(g_vmem_mutex_ptr + id);
+  vfree(pool, nativebuf);
+  pthread_mutex_unlock(&pool->mutex);
   pthread_rwlock_unlock(&g_vmem_rwlock);
 }
 
@@ -84,38 +81,46 @@ jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServic
     JNIEnv* env,
     jobject this, jlong id)
 {
-  return 0L;
+  VMPool *pool;
+  pool = g_vmpool_arr + id;
+  return pool->capacity;
 }
 
 JNIEXPORT
 jobject JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_ncreateByteBuffer(
     JNIEnv *env, jobject this, jlong id, jlong size) {
-  pthread_rwlock_rdlock(&g_vmem_rwlock);
-  pthread_mutex_lock(g_vmem_mutex_ptr + id);
+  VMPool *pool;
   jobject ret = NULL;
-  void* nativebuf = vmem_malloc(*(g_vmp_ptr + id), size);
+  pthread_rwlock_rdlock(&g_vmem_rwlock);
+  pool = g_vmpool_arr + id;
+  pthread_mutex_lock(&pool->mutex);
+  void* nativebuf = vrealloc(pool, NULL, size, 0);
   ret = NULL != nativebuf ? (*env)->NewDirectByteBuffer(env, nativebuf, size) : NULL;
-  pthread_mutex_unlock(g_vmem_mutex_ptr + id);
+  pthread_mutex_unlock(&pool->mutex);
   pthread_rwlock_unlock(&g_vmem_rwlock);
   return ret;
 }
 
 JNIEXPORT
 jobject JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_nretrieveByteBuffer(
-    JNIEnv *env, jobject this, jlong id, jlong addr, jlong size) {
+    JNIEnv *env, jobject this, jlong id, jlong addr) {
+  VMPool *pool;
   jobject ret = NULL;
   void* p = addr_from_java(addr);
-  ret = NULL != p ? (*env)->NewDirectByteBuffer(env, p, size) : NULL;
+  if (NULL != p) {
+    void* nativebuf = p - PMBHSZ;
+    ret = (*env)->NewDirectByteBuffer(env, p, ((PMBHeader *) nativebuf)->size - PMBHSZ);
+  }
   return ret;
 }
 
 JNIEXPORT
 jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_nretrieveSize(JNIEnv *env,
     jobject this, jlong id, jlong addr) {
-  jlong ret = 0L;
+  VMPool *pool;
+  pool = g_vmpool_arr + id;
   void* p = addr_from_java(addr);
-  ret = NULL != p ? (*env)->GetDirectBufferAddress(env, p) : 0L;
-  return ret;
+  return vsize(pool, p);
 }
 
 JNIEXPORT
@@ -135,34 +140,37 @@ jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServic
 JNIEXPORT
 jobject JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_nresizeByteBuffer(
     JNIEnv *env, jobject this, jlong id, jobject bytebuf, jlong size) {
-  pthread_rwlock_rdlock(&g_vmem_rwlock);
-  pthread_mutex_lock(g_vmem_mutex_ptr + id);
+  VMPool *pool;
   jobject ret = NULL;
+  pthread_rwlock_rdlock(&g_vmem_rwlock);
+  pool = g_vmpool_arr + id;
+  pthread_mutex_lock(&pool->mutex);
   if (NULL != bytebuf) {
     void* nativebuf = (void*) (*env)->GetDirectBufferAddress(env, bytebuf);
     if (nativebuf != NULL) {
-      nativebuf = vmem_realloc(*(g_vmp_ptr + id), nativebuf, size);
-      ret = NULL != nativebuf ? (*env)->NewDirectByteBuffer(env, nativebuf, size) : NULL;
+      nativebuf = vrealloc(pool, nativebuf, size, 0);
+      ret = (*env)->NewDirectByteBuffer(env, nativebuf, size);
     }
   }
-  pthread_mutex_unlock(g_vmem_mutex_ptr + id);
+  pthread_mutex_unlock(&pool->mutex);
   pthread_rwlock_unlock(&g_vmem_rwlock);
   return ret;
 }
 
 JNIEXPORT
 void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_ndestroyByteBuffer(
-    JNIEnv *env, jobject this, jlong id, jobject bytebuf)
-{
+    JNIEnv *env, jobject this, jlong id, jobject bytebuf) {
+  VMPool *pool;
   pthread_rwlock_rdlock(&g_vmem_rwlock);
-  pthread_mutex_lock(g_vmem_mutex_ptr + id);
+  pool = g_vmpool_arr + id;
+  pthread_mutex_lock(&pool->mutex);
   if (NULL != bytebuf) {
-    void* nativebuf = (void*)(*env)->GetDirectBufferAddress(env, bytebuf);
+    void* nativebuf = (*env)->GetDirectBufferAddress(env, bytebuf);
     if (nativebuf != NULL) {
-      vmem_free(*(g_vmp_ptr + id), nativebuf);
+      vfree(pool, nativebuf);
     }
   }
-  pthread_mutex_unlock(g_vmem_mutex_ptr + id);
+  pthread_mutex_unlock(&pool->mutex);
   pthread_rwlock_unlock(&g_vmem_rwlock);
 }
 
@@ -199,6 +207,7 @@ JNIEXPORT
 jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_ninit(JNIEnv *env, jclass this,
     jlong capacity, jstring pathname, jboolean isnew) {
   pthread_rwlock_wrlock(&g_vmem_rwlock);
+  VMPool *pool;
   size_t ret = -1;
   VMEM *vmp = NULL;
   const char* mpathname = (*env)->GetStringUTFChars(env, pathname, NULL);
@@ -211,13 +220,14 @@ jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServic
     pthread_rwlock_unlock(&g_vmem_rwlock);
     throw(env, "Big memory init failure!");
   }
-  g_vmp_ptr = realloc(g_vmp_ptr, (g_vmp_count + 1) * sizeof(VMEM*));
-  g_vmem_mutex_ptr = realloc(g_vmem_mutex_ptr, (g_vmp_count + 1) * sizeof(pthread_mutex_t));
-  if (NULL != g_vmp_ptr && NULL != g_vmem_mutex_ptr) {
-    g_vmp_ptr[g_vmp_count] = vmp;
-    pthread_mutex_init(g_vmem_mutex_ptr + g_vmp_count, NULL);
-    ret = g_vmp_count;
-    g_vmp_count++;
+  g_vmpool_arr = realloc(g_vmpool_arr, (g_vmpool_count + 1) * sizeof(VMPool));
+  if (NULL != g_vmpool_arr) {
+    pool = g_vmpool_arr + g_vmpool_count;
+    pool->vmp = vmp;
+    pool->capacity = capacity;
+    pthread_mutex_init(&pool->mutex, NULL);
+    ret = g_vmpool_count;
+    g_vmpool_count++;
   } else {
     pthread_rwlock_unlock(&g_vmem_rwlock);
     throw(env, "Big memory init Out of memory!");
@@ -230,27 +240,34 @@ JNIEXPORT
 void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_nclose
 (JNIEnv *env, jobject this, jlong id)
 {
+  VMPool *pool;
   pthread_rwlock_rdlock(&g_vmem_rwlock);
-  pthread_mutex_lock(g_vmem_mutex_ptr + id);
-
-  pthread_mutex_unlock(g_vmem_mutex_ptr + id);
+  pool = g_vmpool_arr + id;
+  pthread_mutex_lock(&pool->mutex);
+  if (NULL != pool->vmp) {
+    pool->vmp = NULL;
+    pool->capacity = 0;
+    pthread_mutex_destroy(&pool->mutex);
+  }
+  pthread_mutex_unlock(&pool->mutex);
   pthread_rwlock_unlock(&g_vmem_rwlock);
 }
 
 __attribute__((destructor)) void fini(void) {
   int i;
-  if (NULL != g_vmp_ptr) {
-    for (i = 0; i < g_vmp_count; ++i) {
-      if (NULL != *(g_vmp_ptr + i)) {
-        /* vmem_close(*(g_vmp_ptr + i)); undefined function */
-        *(g_vmp_ptr + i) = NULL;
-        pthread_mutex_destroy(g_vmem_mutex_ptr + i);
+  VMPool *pool;
+  if (NULL != g_vmpool_arr) {
+    for (i = 0; i < g_vmpool_count; ++i) {
+      pool = g_vmpool_arr + i;
+      if (NULL != pool->vmp) {
+        pool->vmp = NULL;
+        pool->capacity = 0;
+        pthread_mutex_destroy(&pool->mutex);
       }
     }
-    free(g_vmp_ptr);
-    g_vmp_ptr = NULL;
-    free(g_vmem_mutex_ptr);
-    g_vmem_mutex_ptr = NULL;
-    g_vmp_count = 0;
+    free(g_vmpool_arr);
+    g_vmpool_arr = NULL;
+    g_vmpool_count = 0;
   }
+  pthread_rwlock_destroy(&g_vmem_rwlock);
 }
