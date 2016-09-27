@@ -111,10 +111,10 @@ jobject JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServ
 
 JNIEXPORT
 jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_nretrieveSize(JNIEnv *env,
-    jobject this, jlong id, jlong addr, jlong size) {
+    jobject this, jlong id, jlong addr) {
   jlong ret = 0L;
   void* p = addr_from_java(addr);
-  ret = NULL != p ? (*env)->NewDirectByteBuffer(env, p, size) : NULL;
+  ret = NULL != p ? (*env)->GetDirectBufferAddress(env, p) : 0L;
   return ret;
 }
 
@@ -171,19 +171,21 @@ JNIEXPORT
 void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_nsetHandler(
     JNIEnv *env, jobject this, jlong id, jlong key, jlong value)
 {
-  throw(env, "setkey()/getkey() temporarily not suppoted");
+  throw(env, "setkey()/getkey() temporarily not supported");
 }
 
 JNIEXPORT
 jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_ngetHandler(JNIEnv *env,
     jobject this, jlong id, jlong key) {
-  throw(env, "setkey()/getkey() temporarily not suppoted");
+  throw(env, "setkey()/getkey() temporarily not supported");
+  return 0;
 }
 
 JNIEXPORT
 jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_nhandlerCapacity(
     JNIEnv *env, jobject this) {
-  throw(env, "setkey()/getkey() temporarily not suppoted");
+  throw(env, "setkey()/getkey() temporarily not supported");
+  return 0;
 }
 
 
