@@ -47,3 +47,39 @@ jlong addr_to_java(void* p) {
   return (long) (uintptr_t) p;
 }
 
+inline void *
+prealloc(PMPool *pool, void *p, size_t size, int initzero) {
+  void *ret = NULL;
+  void *nativebuf = NULL;
+  if (NULL == p) {
+    if (initzero) {
+      nativebuf = pmcalloc(pool->pmp, 1, sizeof(uint8_t) * size + PMBHSZ);
+    } else {
+      nativebuf = pmalloc(pool->pmp, sizeof(uint8_t) * size + PMBHSZ);
+    }
+  } else {
+    nativebuf = pmrealloc(pool->pmp, p, sizeof(uint8_t) * size + PMBHSZ);
+  }
+  if (NULL != nativebuf) {
+    ((PMBHeader *) nativebuf)->size = size + PMBHSZ;
+    ret = nativebuf + PMBHSZ;
+  }
+  return ret;
+}
+
+inline void
+pfree(PMPool *pool, void *p) {
+  if (p != NULL) {
+    pmfree(pool->pmp, p);
+  }
+}
+
+inline size_t
+psize(PMPool *pool, void *p) {
+  size_t ret = 0;
+  void* nativebuf;
+  if (p != NULL) {
+    nativebuf = p - PMBHSZ;
+    ret = ((PMBHeader *) nativebuf)->size - PMBHSZ;
+  }
+}

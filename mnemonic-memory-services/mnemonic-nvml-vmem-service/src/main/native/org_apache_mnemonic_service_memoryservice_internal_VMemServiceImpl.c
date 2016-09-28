@@ -104,7 +104,6 @@ jobject JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServ
 JNIEXPORT
 jobject JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_nretrieveByteBuffer(
     JNIEnv *env, jobject this, jlong id, jlong addr) {
-  VMPool *pool;
   jobject ret = NULL;
   void* p = addr_from_java(addr);
   if (NULL != p) {
@@ -118,9 +117,12 @@ JNIEXPORT
 jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServiceImpl_nretrieveSize(JNIEnv *env,
     jobject this, jlong id, jlong addr) {
   VMPool *pool;
+  pthread_rwlock_rdlock(&g_vmem_rwlock);
   pool = g_vmpool_arr + id;
   void* p = addr_from_java(addr);
-  return vsize(pool, p);
+  jlong ret = vsize(pool, p);
+  pthread_rwlock_unlock(&g_vmem_rwlock);
+  return ret;
 }
 
 JNIEXPORT
@@ -149,7 +151,9 @@ jobject JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemServ
     void* nativebuf = (void*) (*env)->GetDirectBufferAddress(env, bytebuf);
     if (nativebuf != NULL) {
       nativebuf = vrealloc(pool, nativebuf, size, 0);
-      ret = (*env)->NewDirectByteBuffer(env, nativebuf, size);
+      if (NULL != nativebuf) {
+        ret = (*env)->NewDirectByteBuffer(env, nativebuf, size);
+      }
     }
   }
   pthread_mutex_unlock(&pool->mutex);
@@ -247,9 +251,9 @@ void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemService
   if (NULL != pool->vmp) {
     pool->vmp = NULL;
     pool->capacity = 0;
-    pthread_mutex_destroy(&pool->mutex);
   }
   pthread_mutex_unlock(&pool->mutex);
+  pthread_mutex_destroy(&pool->mutex);
   pthread_rwlock_unlock(&g_vmem_rwlock);
 }
 

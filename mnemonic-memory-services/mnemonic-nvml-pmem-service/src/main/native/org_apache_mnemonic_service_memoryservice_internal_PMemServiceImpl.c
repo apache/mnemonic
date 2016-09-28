@@ -374,11 +374,13 @@ void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemService
   PMPool *pool;
   pthread_rwlock_wrlock(&g_pmp_rwlock);
   pool = g_pmpool_arr + id;
-  pmemobj_close(pool->pop);
-  pool->pop = NULL;
-  pool->base = NULL;
-  pool->uuid_lo = 0;
-  pool->capacity = 0;
+  if (NULL != pool->pop) {
+    pmemobj_close(pool->pop);
+    pool->pop = NULL;
+    pool->base = NULL;
+    pool->uuid_lo = 0;
+    pool->capacity = 0;
+  }
   pthread_rwlock_unlock(&g_pmp_rwlock);
 }
 
