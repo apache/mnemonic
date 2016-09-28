@@ -42,4 +42,5 @@ service-dist/
 testlog/
 .DS_Store
 *.patch
+*.swp
 

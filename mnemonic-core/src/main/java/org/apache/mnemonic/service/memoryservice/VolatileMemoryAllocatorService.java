@@ -155,8 +155,8 @@ public interface VolatileMemoryAllocatorService {
    *          the length of the memory resource
    * 
    * @param autodetect
-   *          NULL == address && autodetect : sync. whole pool
-   *          0L == length && autodetect : sync. block
+   *          if NULL == address and autodetect : sync. whole pool
+   *          if 0L == length and autodetect : sync. block
    */
   void sync(long id, long addr, long length, boolean autodetect);
 

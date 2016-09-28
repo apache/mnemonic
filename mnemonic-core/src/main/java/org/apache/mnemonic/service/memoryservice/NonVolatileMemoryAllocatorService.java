@@ -113,8 +113,8 @@ public interface NonVolatileMemoryAllocatorService extends VolatileMemoryAllocat
    *          the length of the memory resource
    * 
    * @param autodetect
-   *          NULL == address && autodetect : persist whole pool
-   *          0L == length && autodetect : persist block
+   *          if NULL == address and autodetect : persist whole pool
+   *          if 0L == length and autodetect : persist block
    */
   void persist(long id, long addr, long length, boolean autodetect);
 
@@ -131,8 +131,8 @@ public interface NonVolatileMemoryAllocatorService extends VolatileMemoryAllocat
    *          the length of the memory resource
    * 
    * @param autodetect
-   *          NULL == address && autodetect : flush whole pool
-   *          0L == length && autodetect : flush block
+   *          if NULL == address and autodetect : flush whole pool
+   *          if 0L == length and autodetect : flush block
    */
   void flush(long id, long addr, long length, boolean autodetect);
 
