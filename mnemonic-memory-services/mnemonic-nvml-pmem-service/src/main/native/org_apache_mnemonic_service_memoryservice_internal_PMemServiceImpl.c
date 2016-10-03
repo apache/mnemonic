@@ -387,6 +387,7 @@ void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemService
 __attribute__((destructor)) void fini(void) {
   int i;
   PMPool *pool;
+  pthread_rwlock_wrlock(&g_pmp_rwlock);
   if (NULL != g_pmpool_arr) {
     for (i = 0; i < g_pmpool_count; ++i) {
       pool = g_pmpool_arr + i;
@@ -402,5 +403,6 @@ __attribute__((destructor)) void fini(void) {
     g_pmpool_arr = NULL;
     g_pmpool_count = 0;
   }
+  pthread_rwlock_unlock(&g_pmp_rwlock);
   pthread_rwlock_destroy(&g_pmp_rwlock);
 }

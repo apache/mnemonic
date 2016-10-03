@@ -26,7 +26,8 @@
  *  Throws a RuntimeException, with either an explicit message or the message
  *  corresponding to the current system error value.
  */
-void throw(JNIEnv* env, const char* msg) {
+inline void
+throw(JNIEnv* env, const char* msg) {
   if (msg == NULL)
     msg = sys_errlist[errno];
 
@@ -34,7 +35,8 @@ void throw(JNIEnv* env, const char* msg) {
   (*env)->ThrowNew(env, xklass, msg);
 }
 
-void* addr_from_java(jlong addr) {
+inline void*
+addr_from_java(jlong addr) {
   // This assert fails in a variety of ways on 32-bit systems.
   // It is impossible to predict whether native code that converts
   // pointers to longs will sign-extend or zero-extend the addresses.
@@ -42,13 +44,14 @@ void* addr_from_java(jlong addr) {
   return (void*) (uintptr_t) addr;
 }
 
-jlong addr_to_java(void* p) {
+inline jlong
+addr_to_java(void* p) {
   assert(p == (void*) (uintptr_t) p);
   return (long) (uintptr_t) p;
 }
 
 inline void *
-prealloc(PMPool *pool, void *p, size_t size, int initzero) {
+pmalrealloc(PMALPool *pool, void *p, size_t size, int initzero) {
   void *ret = NULL;
   void *nativebuf = NULL;
   if (NULL == p) {
@@ -68,14 +71,14 @@ prealloc(PMPool *pool, void *p, size_t size, int initzero) {
 }
 
 inline void
-pfree(PMPool *pool, void *p) {
+pmalfree(PMALPool *pool, void *p) {
   if (p != NULL) {
     pmfree(pool->pmp, p);
   }
 }
 
 inline size_t
-psize(PMPool *pool, void *p) {
+pmalsize(PMALPool *pool, void *p) {
   size_t ret = 0;
   void* nativebuf;
   if (p != NULL) {

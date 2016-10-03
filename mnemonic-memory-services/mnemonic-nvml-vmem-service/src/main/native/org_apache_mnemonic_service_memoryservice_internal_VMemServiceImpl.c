@@ -245,7 +245,7 @@ void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemService
 (JNIEnv *env, jobject this, jlong id)
 {
   VMPool *pool;
-  pthread_rwlock_rdlock(&g_vmem_rwlock);
+  pthread_rwlock_wrlock(&g_vmem_rwlock);
   pool = g_vmpool_arr + id;
   pthread_mutex_lock(&pool->mutex);
   if (NULL != pool->vmp) {
@@ -260,6 +260,7 @@ void JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_VMemService
 __attribute__((destructor)) void fini(void) {
   int i;
   VMPool *pool;
+  pthread_rwlock_wrlock(&g_vmem_rwlock);
   if (NULL != g_vmpool_arr) {
     for (i = 0; i < g_vmpool_count; ++i) {
       pool = g_vmpool_arr + i;
@@ -273,5 +274,6 @@ __attribute__((destructor)) void fini(void) {
     g_vmpool_arr = NULL;
     g_vmpool_count = 0;
   }
+  pthread_rwlock_unlock(&g_vmem_rwlock);
   pthread_rwlock_destroy(&g_vmem_rwlock);
 }

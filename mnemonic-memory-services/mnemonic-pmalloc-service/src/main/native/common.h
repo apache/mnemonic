@@ -54,13 +54,13 @@ typedef struct {
   void *pmp;
   size_t capacity;
   pthread_mutex_t mutex;
-} PMPool;
+} PMALPool;
 
-void *prealloc(PMPool *pool, void *p, size_t size, int initzero);
+void *pmalrealloc(PMALPool *pool, void *p, size_t size, int initzero);
 
-void pfree(PMPool *pool, void *p);
+void pmalfree(PMALPool *pool, void *p);
 
-size_t psize(PMPool *pool, void *p);
+size_t pmalsize(PMALPool *pool, void *p);
 
 #ifdef __cplusplus
 }
