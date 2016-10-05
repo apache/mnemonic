@@ -57,7 +57,7 @@ RUN cd /ws && git clone https://github.com/NonVolatileComputing/pmalloc.git && \
     cd pmalloc && mkdir build && cd build && cmake .. && make && make install
 
 RUN cd /ws && git clone https://github.com/pmem/nvml.git && \
-    cd nvml && git checkout tags/1.1 && make && make install
+    cd nvml && git checkout 630862e82f && make && make install
 
 RUN echo export MAVEN_OPTS="\" $([[ \"x\" != \"x${proxy_host}\" ]] && echo -DproxySet=\\\"true\\\" -DproxyHost=${proxy_host} -DproxyPort=${proxy_port}) \"" \
     > /etc/profile.d/mvn.sh && chmod +x /etc/profile.d/mvn.sh
