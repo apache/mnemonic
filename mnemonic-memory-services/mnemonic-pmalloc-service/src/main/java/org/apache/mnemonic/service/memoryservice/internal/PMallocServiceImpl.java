@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.mnemonic.service.allocatorservice.internal;
+package org.apache.mnemonic.service.memoryservice.internal;
 
-import org.apache.mnemonic.service.allocatorservice.NonVolatileMemoryAllocatorService;
+import org.apache.mnemonic.service.memoryservice.NonVolatileMemoryAllocatorService;
 import org.flowcomputing.commons.primitives.NativeLibraryLoader;
 
 import java.nio.ByteBuffer;
@@ -47,8 +47,8 @@ public class PMallocServiceImpl implements NonVolatileMemoryAllocatorService {
   }
 
   @Override
-  public void sync(long id) {
-    nsync(id);
+  public void sync(long id, long addr, long length, boolean autodetect) {
+    nsync(id, addr, length, autodetect);
   }
 
   @Override
@@ -62,13 +62,13 @@ public class PMallocServiceImpl implements NonVolatileMemoryAllocatorService {
   }
 
   @Override
-  public long reallocate(long id, long address, long size, boolean initzero) {
-    return nreallocate(id, address, size, initzero);
+  public long reallocate(long id, long addr, long size, boolean initzero) {
+    return nreallocate(id, addr, size, initzero);
   }
 
   @Override
-  public void free(long id, long address) {
-    nfree(id, address);
+  public void free(long id, long addr) {
+    nfree(id, addr);
   }
 
   @Override
@@ -117,6 +117,21 @@ public class PMallocServiceImpl implements NonVolatileMemoryAllocatorService {
   }
 
   @Override
+  public void persist(long id, long addr, long length, boolean autodetect) {
+    npersist(id, addr, length, autodetect);
+  }
+
+  @Override
+  public void flush(long id, long addr, long length, boolean autodetect) {
+    nflush(id, addr, length, autodetect);
+  }
+
+  @Override
+  public void drain(long id) {
+    ndrain(id);
+  }
+
+  @Override
   public long getBaseAddress(long id) {
     return ngetBaseAddress(id);
   }
@@ -125,15 +140,15 @@ public class PMallocServiceImpl implements NonVolatileMemoryAllocatorService {
 
   protected native void nclose(long id);
 
-  protected native void nsync(long id);
+  protected native void nsync(long id, long addr, long length, boolean autodetect);
 
   protected native long ncapacity(long id);
 
   protected native long nallocate(long id, long size, boolean initzero);
 
-  protected native long nreallocate(long id, long address, long size, boolean initzero);
+  protected native long nreallocate(long id, long addr, long size, boolean initzero);
 
-  protected native void nfree(long id, long address);
+  protected native void nfree(long id, long addr);
 
   protected native ByteBuffer ncreateByteBuffer(long id, long size);
 
@@ -152,6 +167,12 @@ public class PMallocServiceImpl implements NonVolatileMemoryAllocatorService {
   protected native long ngetHandler(long id, long key);
 
   protected native long nhandlerCapacity(long id);
+
+  protected native void npersist(long id, long addr, long length, boolean autodetect);
+
+  protected native void nflush(long id, long addr, long length, boolean autodetect);
+
+  protected native void ndrain(long id);
 
   protected native long ngetBaseAddress(long id);
 

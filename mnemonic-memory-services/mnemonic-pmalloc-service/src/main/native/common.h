@@ -35,12 +35,32 @@ extern "C" {
 #include <assert.h>
 #include <pthread.h>
 #include <jni.h>
+#include <pmalloc.h>
 
 void throw(JNIEnv* env, const char* msg);
 
 void* addr_from_java(jlong addr);
 
 jlong addr_to_java(void* p);
+
+typedef struct {
+  //size_t size;
+  jlong size;
+} PMBHeader;
+
+#define PMBHSZ (sizeof(PMBHeader))
+
+typedef struct {
+  void *pmp;
+  size_t capacity;
+  pthread_mutex_t mutex;
+} PMALPool;
+
+void *pmalrealloc(PMALPool *pool, void *p, size_t size, int initzero);
+
+void pmalfree(PMALPool *pool, void *p);
+
+size_t pmalsize(PMALPool *pool, void *p);
 
 #ifdef __cplusplus
 }

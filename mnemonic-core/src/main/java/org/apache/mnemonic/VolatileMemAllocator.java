@@ -19,7 +19,7 @@ package org.apache.mnemonic;
 
 import java.nio.ByteBuffer;
 
-import org.apache.mnemonic.service.allocatorservice.VolatileMemoryAllocatorService;
+import org.apache.mnemonic.service.memoryservice.VolatileMemoryAllocatorService;
 import org.flowcomputing.commons.resgc.ResCollector;
 import org.flowcomputing.commons.resgc.ResReclaim;
 
@@ -29,11 +29,12 @@ import org.flowcomputing.commons.resgc.ResReclaim;
  * 
  *
  */
-public class VolatileMemAllocator extends CommonAllocator<VolatileMemAllocator> {
+public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocator> {
 
   private boolean m_activegc = true;
   private long m_gctimeout = 100;
   private long m_nid = -1;
+  private long[][] m_ttable;
   private VolatileMemoryAllocatorService m_vmasvc = null;
 
   /**
@@ -273,6 +274,258 @@ public class VolatileMemAllocator extends CommonAllocator<VolatileMemAllocator> 
       }
     }
     return ret;
+  }
+
+  /**
+   * retrieve a memory buffer from its backed memory allocator.
+   * 
+   * @param phandler
+   *          specify the handler of memory buffer to retrieve
+   *
+   * @param autoreclaim
+   *          specify whether this retrieved memory buffer can be reclaimed
+   *          automatically or not
+   * 
+   * @return a holder contains the retrieved memory buffer
+   */
+  @Override
+  public MemBufferHolder<VolatileMemAllocator> retrieveBuffer(long phandler, boolean autoreclaim) {
+    MemBufferHolder<VolatileMemAllocator> ret = null;
+    ByteBuffer bb = m_vmasvc.retrieveByteBuffer(m_nid, getEffectiveAddress(phandler));
+    if (null != bb) {
+      ret = new MemBufferHolder<VolatileMemAllocator>(this, bb);
+      if (autoreclaim) {
+        m_bufcollector.register(ret);
+      }
+    }
+    return ret;
+  }
+
+  /**
+   * retrieve a memory chunk from its backed memory allocator.
+   * 
+   * @param phandler
+   *          specify the handler of memory chunk to retrieve
+   *
+   * @param autoreclaim
+   *          specify whether this retrieved memory chunk can be reclaimed
+   *          automatically or not
+   * 
+   * @return a holder contains the retrieved memory chunk
+   */
+  @Override
+  public MemChunkHolder<VolatileMemAllocator> retrieveChunk(long phandler, boolean autoreclaim) {
+    MemChunkHolder<VolatileMemAllocator> ret = null;
+    long eaddr = getEffectiveAddress(phandler);
+    long sz = m_vmasvc.retrieveSize(m_nid, eaddr);
+    if (sz > 0L) {
+      ret = new MemChunkHolder<VolatileMemAllocator>(this, eaddr, sz);
+      if (autoreclaim) {
+        m_chunkcollector.register(ret);
+      }
+    }
+    return ret;
+  }
+
+  /**
+   * get the address from a memory buffer holder.
+   * 
+   * @param mbuf
+   *          specify the memory buffer holder
+   *
+   * @return an address that could be used to retrieve its memory buffer
+   */
+  @Override
+  public long getBufferAddress(MemBufferHolder<VolatileMemAllocator> mbuf) {
+    return m_vmasvc.getByteBufferHandler(m_nid, mbuf.get());
+  }
+
+  /**
+   * get the address from a memory chunk holder.
+   * 
+   * @param mchunk
+   *          specify the memory chunk holder
+   *
+   * @return an address that could be used to retrieve its memory chunk
+   */
+  @Override
+  public long getChunkAddress(MemChunkHolder<VolatileMemAllocator> mchunk) {
+    return mchunk.get();
+  }
+
+  /**
+   * determine whether this allocator supports to store non-volatile handler or
+   * not. (it is a placeholder)
+   *
+   * @return true if there is
+   */
+  @Override
+  public boolean hasDurableHandlerStore() {
+    return true;
+  }
+
+  /**
+   * sync. a buffer to underlying memory device.
+   * 
+   * @param mbuf
+   *         specify a buffer to be sync.
+   */
+  public void sync(MemBufferHolder<VolatileMemAllocator> mbuf) {
+    m_vmasvc.sync(m_nid, getBufferAddress(mbuf), 0L, true);
+  }
+
+  /**
+   * sync. a chunk to underlying memory device.
+   * 
+   * @param mchunk
+   *         specify a chunk to be sync.
+   */
+  public void sync(MemChunkHolder<VolatileMemAllocator> mchunk) {
+    m_vmasvc.sync(m_nid, getChunkAddress(mchunk), 0L, true);
+  }
+
+  /**
+   * sync. the memory pool to underlying memory device.
+   */
+  public void syncAll() {
+    m_vmasvc.sync(m_nid, 0L, 0L, true);
+  }
+
+  /**
+   * determine whether the allocator supports transaction feature or not
+   *
+   * @return true if supported
+   */
+  @Override
+  public boolean supportTransaction() {
+    return false;
+  }
+
+  /**
+   * start a application level transaction on this allocator. (it is a place
+   * holder)
+   *
+   */
+  @Override
+  public void beginTransaction() {
+    throw new UnsupportedOperationException("Transaction Unsupported.");
+  }
+
+  /**
+   * end a application level transaction on this allocator. (it is a place
+   * holder)
+   *
+   */
+  @Override
+  public void endTransaction() {
+    throw new UnsupportedOperationException("Transaction Unsupported.");
+  }
+
+  /**
+   * determine whether the allocator does atomic operations on memory pool
+   *
+   * @return true if it does
+   *
+   */
+  @Override
+  public boolean isAtomicOperation() {
+    return false;
+  }
+
+  /**
+   * set a handler on key.
+   * 
+   * @param key
+   *          the key to set its value
+   * 
+   * @param handler
+   *          the handler
+   */
+  @Override
+  public void setHandler(long key, long handler) {
+    m_vmasvc.setHandler(m_nid, key, handler);
+  }
+
+  /**
+   * get a handler value.
+   * 
+   * @param key
+   *          the key to set its value
+   * 
+   * @return the value of handler
+   */
+  @Override
+  public long getHandler(long key) {
+    return m_vmasvc.getHandler(m_nid, key);
+  }
+
+  /**
+   * return the capacity of non-volatile handler store.
+   * 
+   * @return the capacity of handler store
+   * 
+   */
+  public long handlerCapacity() {
+    return m_vmasvc.handlerCapacity(m_nid);
+  }
+
+  /**
+   * translate the portable address
+   *
+   * @param addr
+   *          the address to be translated
+   *
+   * @return the portable address
+   */
+  @Override
+  public long getPortableAddress(long addr) {
+    int i;
+    for (i = 0; i < m_ttable.length; ++i) {
+      if (addr >= m_ttable[i][2] && addr < m_ttable[i][1] + m_ttable[i][2]) {
+        return addr - m_ttable[i][2];
+      }
+    }
+    throw new AddressTranslateError("Portable Address Translate Error");
+  }
+
+  /**
+   * translate the effective address
+   *
+   * @param addr
+   *          the address to be translated
+   *
+   * @return the effective address
+   */
+  @Override
+  public long getEffectiveAddress(long addr) {
+    int i;
+    for (i = 0; i < m_ttable.length; ++i) {
+      if (addr >= m_ttable[i][0] && addr < m_ttable[i][1]) {
+        return addr + m_ttable[i][2];
+      }
+    }
+    throw new AddressTranslateError("Effective Address Translate Error");
+  }
+
+  /**
+   * get the address translate table
+   *
+   * @return the translate table
+   */
+  @Override
+  public long[][] getTranslateTable() {
+    return m_ttable;
+  }
+
+  /**
+   * set address translate table
+   *
+   * @param tbl
+   *         specify a translate table
+   */
+  @Override
+  public void setTranslateTable(long[][] tbl) {
+    m_ttable = tbl;
   }
 
 }

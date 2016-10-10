@@ -26,7 +26,7 @@ import java.io.File;
  * 
  *
  */
-public class MemFile extends File {
+public class MemStream extends File {
 
   private static final long serialVersionUID = 6579668848729471173L;
   private String uri, id;
@@ -40,7 +40,7 @@ public class MemFile extends File {
    * @param id
    *          specify the id of memory file
    */
-  public MemFile(String uri, String id) {
+  public MemStream(String uri, String id) {
     super(uri, id);
     this.uri = uri;
     this.id = id;

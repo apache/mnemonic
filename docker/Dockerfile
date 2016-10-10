@@ -29,8 +29,11 @@ ENV proxy_port ""
 
 RUN echo $proxy
 
+RUN curl -sSL https://s3.amazonaws.com/download.fpcomplete.com/centos/7/fpco.repo | tee /etc/yum.repos.d/fpco.repo
+
 RUN yum -y update && yum -y groupinstall 'Development Tools' && \
-    yum -y install java-devel cmake check check-devel libuuid-devel man && yum clean all
+    yum -y install java-devel cmake check check-devel libuuid-devel man zlib-devel wget stack && yum clean all
+
 RUN curl -O http://apache.mirrors.ionfish.org/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz && \
     tar xvf apache-maven-3.3.9-bin.tar.gz && \
     mv apache-maven-3.3.9 /usr/local/apache-maven
@@ -41,11 +44,20 @@ ENV PATH $M2:$PATH
 ENV JAVA_HOME /usr/lib/jvm/java
 ENV PATH $JAVA_HOME/bin:$PATH
 
-RUN mkdir -p /ws && cd /ws && git clone https://github.com/NonVolatileComputing/pmalloc.git && \
+RUN mkdir -p /ws && cd /ws && wget https://hackage.haskell.org/package/pandoc-1.17.0.3/pandoc-1.17.0.3.tar.gz && \
+    tar xvzf pandoc-1.17.0.3.tar.gz && \
+    mv pandoc-1.17.0.3 pandoc && \
+    rm pandoc-1.17.0.3.tar.gz
+
+RUN cd /ws/pandoc && stack setup && stack install
+ENV PD_HOME /ws/pandoc/.stack-work/install/x86_64-linux/lts-5.8/7.10.3/bin
+ENV PATH $PD_HOME:$PATH
+
+RUN cd /ws && git clone https://github.com/NonVolatileComputing/pmalloc.git && \
     cd pmalloc && mkdir build && cd build && cmake .. && make && make install
 
 RUN cd /ws && git clone https://github.com/pmem/nvml.git && \
-    cd nvml && git checkout tags/0.1+b16 && make && make install
+    cd nvml && git checkout 630862e82f && make && make install
 
 RUN echo export MAVEN_OPTS="\" $([[ \"x\" != \"x${proxy_host}\" ]] && echo -DproxySet=\\\"true\\\" -DproxyHost=${proxy_host} -DproxyPort=${proxy_port}) \"" \
     > /etc/profile.d/mvn.sh && chmod +x /etc/profile.d/mvn.sh
@@ -54,3 +66,4 @@ RUN cd /ws && git clone https://github.com/apache/incubator-mnemonic.git && \
 
 WORKDIR /ws
 CMD ["bash"]
+

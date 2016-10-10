@@ -72,6 +72,25 @@ public abstract class RetrievableAllocator<A extends CommonAllocator<A>> extends
    */
   public abstract MemChunkHolder<A> retrieveChunk(long phandler, boolean autoreclaim);
 
+  /**
+   * get the address from a memory buffer holder.
+   * 
+   * @param mbuf
+   *          specify the memory buffer holder
+   *
+   * @return an address that could be used to retrieve its memory buffer
+   */
+  public abstract long getBufferAddress(MemBufferHolder<A> mbuf);
+
+  /**
+   * get the address from a memory chunk holder.
+   * 
+   * @param mchunk
+   *          specify the memory chunk holder
+   *
+   * @return an address that could be used to retrieve its memory chunk
+   */
+  public abstract long getChunkAddress(MemChunkHolder<A> mchunk);
 
   /**
    * get the handler from a memory buffer holder.
@@ -81,7 +100,9 @@ public abstract class RetrievableAllocator<A extends CommonAllocator<A>> extends
    *
    * @return a handler that could be used to retrieve its memory buffer
    */
-  public abstract long getBufferHandler(MemBufferHolder<A> mbuf);
+  public long getBufferHandler(MemBufferHolder<A> mbuf) {
+    return getPortableAddress(getBufferAddress(mbuf));
+  }
 
   /**
    * get the handler from a memory chunk holder.
@@ -91,6 +112,8 @@ public abstract class RetrievableAllocator<A extends CommonAllocator<A>> extends
    *
    * @return a handler that could be used to retrieve its memory chunk
    */
-  public abstract long getChunkHandler(MemChunkHolder<A> mchunk);
+  public long getChunkHandler(MemChunkHolder<A> mchunk) {
+    return getPortableAddress(getChunkAddress(mchunk));
+  }
 
 }

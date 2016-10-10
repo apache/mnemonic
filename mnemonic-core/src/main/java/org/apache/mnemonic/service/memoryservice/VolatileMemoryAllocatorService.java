@@ -15,11 +15,101 @@
  * limitations under the License.
  */
 
-package org.apache.mnemonic.service.allocatorservice;
+package org.apache.mnemonic.service.memoryservice;
 
 import java.nio.ByteBuffer;
 
 public interface VolatileMemoryAllocatorService {
+
+
+  /**
+   * retrieve a bytebuffer from its handler
+   *
+   * @param id
+   *          the identifier of backed memory pool
+   * 
+   * @param handler
+   *          the handler of a nonvolatile bytebuffer
+   *
+   * @return the nonvolatile bytebuffer
+   *
+   */
+  ByteBuffer retrieveByteBuffer(long id, long handler);
+
+  /**
+   * retrieve the size of a nonvolatile memory object
+   *
+   * @param id
+   *          the identifier of backed memory pool
+   * 
+   * @param handler
+   *          the handler of a nonvolatile object
+   *
+   * @return the size of nonvolatile object
+   *
+   */
+  long retrieveSize(long id, long handler);
+
+  /**
+   * get the handler of a nonvolatile bytebuffer
+   *
+   * @param id
+   *          the identifier of backed memory pool
+   * 
+   * @param buf
+   *          the nonvolatile bytebuffer
+   *
+   * @return the handler of this specified nonvolatile bytebuffer
+   *
+   */
+  long getByteBufferHandler(long id, ByteBuffer buf);
+
+  /**
+   * set a handler to a key.
+   * 
+   * @param id
+   *          the identifier of backed memory pool
+   * 
+   * @param key
+   *          the key to set this handler
+   * 
+   * @param handler
+   *          the handler
+   */
+  void setHandler(long id, long key, long handler);
+
+  /**
+   * get a handler from specified key.
+   * 
+   * @param id
+   *          the identifier of backed memory pool
+   * 
+   * @param key
+   *          the key to get its handler
+   * 
+   * @return the handler of the specified key
+   */
+  long getHandler(long id, long key);
+
+  /**
+   * return the number of available keys to use.
+   * 
+   * @param id
+   *          the identifier of backed memory pool
+   * 
+   * @return the number of keys
+   */
+  long handlerCapacity(long id);
+
+  /**
+   * return the base address of this persistent memory pool.
+   * 
+   * @param id
+   *          the identifier of backed memory pool
+   * 
+   * @return the base address of this pmem pool
+   */
+  long getBaseAddress(long id);
 
   /**
    * Provide the service identifier for this allocator
@@ -53,13 +143,22 @@ public interface VolatileMemoryAllocatorService {
   void close(long id);
 
   /**
-   * force to synchronize uncommitted data to backed memory pool through native
-   * interface.
+   * force to synchronize an uncommitted data to backed memory pool.
    *
    * @param id
    *         specify the id of underlying native allocator
+   * 
+   * @param addr
+   *          the address of a memory resource
+   * 
+   * @param length
+   *          the length of the memory resource
+   * 
+   * @param autodetect
+   *          if NULL == address and autodetect : sync. whole pool
+   *          if 0L == length and autodetect : sync. block
    */
-  void sync(long id);
+  void sync(long id, long addr, long length, boolean autodetect);
 
   /**
    * get the capacity of its managed memory space
@@ -93,7 +192,7 @@ public interface VolatileMemoryAllocatorService {
    * @param id
    *          the identifier of backed memory pool
    * 
-   * @param address
+   * @param addr
    *          the address of previous allocated memory block. it can be null.
    * 
    * @param size
@@ -104,7 +203,7 @@ public interface VolatileMemoryAllocatorService {
    *
    * @return the address of reallocated memory block from native memory pool
    */
-  long reallocate(long id, long address, long size, boolean initzero);
+  long reallocate(long id, long addr, long size, boolean initzero);
 
   /**
    * free a memory block by specify its address into backed memory pool.
@@ -112,10 +211,10 @@ public interface VolatileMemoryAllocatorService {
    * @param id
    *          the identifier of backed memory pool
    * 
-   * @param address
+   * @param addr
    *          the address of allocated memory block.
    */
-  void free(long id, long address);
+  void free(long id, long addr);
 
   /**
    * create a ByteBuffer object which backed buffer is coming from backed native

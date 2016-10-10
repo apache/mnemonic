@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.mnemonic.service.allocatorservice;
+package org.apache.mnemonic.service.memoryservice;
 
 import java.nio.ByteBuffer;
 
@@ -41,13 +41,13 @@ public interface NonVolatileMemoryAllocatorService extends VolatileMemoryAllocat
    * @param id
    *          the identifier of backed memory pool
    * 
-   * @param handler
-   *          the handler of a nonvolatile object
+   * @param addr
+   *          the address of a nonvolatile object
    *
    * @return the size of nonvolatile object
    *
    */
-  long retrieveSize(long id, long handler);
+  long retrieveSize(long id, long addr);
 
   /**
    * get the handler of a nonvolatile bytebuffer
@@ -99,6 +99,50 @@ public interface NonVolatileMemoryAllocatorService extends VolatileMemoryAllocat
    * @return the number of keys
    */
   long handlerCapacity(long id);
+
+  /**
+   * Make any cached changes to a memory resource persistent.
+   * 
+   * @param id
+   *          the identifier of backed memory pool
+   * 
+   * @param addr
+   *          the address of a memory resource
+   * 
+   * @param length
+   *          the length of the memory resource
+   * 
+   * @param autodetect
+   *          if NULL == address and autodetect : persist whole pool
+   *          if 0L == length and autodetect : persist block
+   */
+  void persist(long id, long addr, long length, boolean autodetect);
+
+  /**
+   * flush processors cache for a memory resource
+   * 
+   * @param id
+   *          the identifier of backed memory pool
+   * 
+   * @param addr
+   *          the address of a memory resource
+   * 
+   * @param length
+   *          the length of the memory resource
+   * 
+   * @param autodetect
+   *          if NULL == address and autodetect : flush whole pool
+   *          if 0L == length and autodetect : flush block
+   */
+  void flush(long id, long addr, long length, boolean autodetect);
+
+  /**
+   * wait for any memory resource stores to drain from HW buffers.
+   * 
+   * @param id
+   *          the identifier of backed memory pool
+   */
+  void drain(long id);
 
   /**
    * return the base address of this persistent memory pool.
