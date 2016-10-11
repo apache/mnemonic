@@ -49,6 +49,8 @@ echo "You have specified:"
 echo "RELEASE_VERSION = ${RELEASE_VERSION}"
 echo "NEXT_RELEASE_VERSION = ${NEXT_RELEASE_VERSION}"
 echo "RELEASE_CANDIDATE_ID = ${RELEASE_CANDIDATE_ID}"
+echo "NOTE: Please ensure there are no uncommitted or untracked files in your local workplace/repo. before continue"
+continueprompt
 
 git checkout master
 
@@ -78,6 +80,7 @@ git commit . -m "Prepare for releasing ${RELEASE_VERSION}-incubating ${RELEASE_C
 git tag -s v${RELEASE_VERSION}-incubating -m "Releasing ${RELEASE_VERSION}-incubating ${RELEASE_CANDIDATE_ID}"
 
 rm -rf target/
+git clean -xdf
 
 mvn clean prepare-package -DskipTests -Dremoteresources.skip=true &&
 mvn prepare-package -DskipTests -Dremoteresources.skip=true &&
