@@ -610,6 +610,13 @@ public class AnnotatedDurableEntityClass {
           code.addStatement("throw new IllegalAllocatorError(\"This chunk is allocated by another allocator!\")");
           code.endControlFlow();
           code.addStatement("$1N = $2L", dynfieldinfo.name, arg0);
+          code.beginControlFlow("if (null != $1N)", dynfieldinfo.name);
+          code.beginControlFlow("if ($1N)", autoreclaimname);
+          code.addStatement("$1N.registerAutoReclaim();", dynfieldinfo.name);
+          code.nextControlFlow("else");
+          code.addStatement("$1N.cancelAutoReclaim();", dynfieldinfo.name);
+          code.endControlFlow();
+          code.endControlFlow();
           code.addStatement("$1N.putLong($2N.get() + $3L, null == $4N ? 0L : $5N.getChunkHandler($4N))",
               unsafename, holdername, dynfieldinfo.fieldoff, dynfieldinfo.name, allocname);
         } else if (valtname.toString().startsWith(MemBufferHolder.class.getCanonicalName())) {
@@ -622,6 +629,13 @@ public class AnnotatedDurableEntityClass {
           code.addStatement("throw new IllegalAllocatorError(\"This buffer is allocated by another allocator!\")");
           code.endControlFlow();
           code.addStatement("$1N = $2L", dynfieldinfo.name, arg0);
+          code.beginControlFlow("if (null != $1N)", dynfieldinfo.name);
+          code.beginControlFlow("if ($1N)", autoreclaimname);
+          code.addStatement("$1N.registerAutoReclaim();", dynfieldinfo.name);
+          code.nextControlFlow("else");
+          code.addStatement("$1N.cancelAutoReclaim();", dynfieldinfo.name);
+          code.endControlFlow();
+          code.endControlFlow();
           code.addStatement("$1N.putLong($2N.get() + $3L, null == $4N ? 0L : $5N.getBufferHandler($4N))",
               unsafename, holdername, dynfieldinfo.fieldoff, dynfieldinfo.name, allocname);
         } else if (valtname.toString().equals(String.class.getCanonicalName())) {
