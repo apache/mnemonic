@@ -110,41 +110,8 @@
   </properties>
 
   <repositories>
-    <repository>
-      <id>central</id>
-      <!-- This should be at top, it makes maven try the central repo first and then others and hence faster dep resolution -->
-      <name>Maven Repository</name>
-      <url>https://repo1.maven.org/maven2</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>bintray</id>
-      <name>bintray</name>
-      <url>http://dl.bintray.com/flowcomputing/commons</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
   </repositories>
   <pluginRepositories>
-    <pluginRepository>
-      <id>central</id>
-      <url>https://repo1.maven.org/maven2</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </pluginRepository>
   </pluginRepositories>
 
   <dependencies>
@@ -161,12 +128,12 @@
       <dependency>
         <groupId>org.flowcomputing.commons</groupId>
         <artifactId>commons-resgc</artifactId>
-        <version>0.8.11</version>
+        <version>0.8.12</version>
       </dependency>
       <dependency>
         <groupId>org.flowcomputing.commons</groupId>
         <artifactId>commons-primitives</artifactId>
-        <version>0.6.0</version>
+        <version>0.6.1</version>
       </dependency>
       <dependency>
         <groupId>com.squareup</groupId>
