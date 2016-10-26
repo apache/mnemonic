@@ -303,7 +303,8 @@ inline long to_p(JNIEnv* env, struct NValueInfo *nvinfo, void *e) {
   return -1L;
 }
 
-void iterMatrix(JNIEnv* env, struct NValueInfo *nvinfo, size_t dims[], long hdls[],
+void iterMatrix(JNIEnv* env, struct NValueInfo *nvinfo,
+    size_t dims[], long *itmaddrs[], long hdls[],
     size_t dimidx, valueHandler valhandler) {
   void *addr = NULL;
   long curoff = (nvinfo->frames + dimidx)->nextoff;
@@ -311,9 +312,11 @@ void iterMatrix(JNIEnv* env, struct NValueInfo *nvinfo, size_t dims[], long hdls
   long curnlsz = (nvinfo->frames + dimidx)->nlvlsz;
   if (dimidx < nvinfo->framessz - 1) {
     while(0L != hdls[dimidx]) {
-      hdls[dimidx + 1] = *(long*)(to_e(env, nvinfo, hdls[dimidx]) + curnloff);
-      iterMatrix(env, nvinfo, dims, hdls, dimidx + 1, valhandler);
-      hdls[dimidx] = *(long*)(to_e(env, nvinfo, hdls[dimidx]) + curoff);
+      itmaddrs[dimidx + 1] = (long*)(to_e(env, nvinfo, hdls[dimidx]) + curnloff);
+      hdls[dimidx + 1] = *itmaddrs[dimidx + 1];
+      iterMatrix(env, nvinfo, dims, itmaddrs, hdls, dimidx + 1, valhandler);
+      itmaddrs[dimidx] = (long*)(to_e(env, nvinfo, hdls[dimidx]) + curoff);
+      hdls[dimidx] = *itmaddrs[dimidx];
       ++dims[dimidx];
     }
     dims[dimidx] = 0;
@@ -321,14 +324,15 @@ void iterMatrix(JNIEnv* env, struct NValueInfo *nvinfo, size_t dims[], long hdls
     if (-1L != curoff) {
       while(0L != hdls[dimidx]) {
         addr = to_e(env, nvinfo, hdls[dimidx]) + curnloff;
-        valhandler(env, dims, dimidx + 1, addr, curnlsz, nvinfo->dtype);
-        hdls[dimidx] = *(long*)(to_e(env, nvinfo, hdls[dimidx]) + curoff);
+        valhandler(env, dims, dimidx, itmaddrs, addr, curnlsz, nvinfo->dtype);
+        itmaddrs[dimidx] = (long*)(to_e(env, nvinfo, hdls[dimidx]) + curoff);
+        hdls[dimidx] = *itmaddrs[dimidx];
         ++dims[dimidx];
       }
       dims[dimidx] = 0;
     } else {
       addr = to_e(env, nvinfo, hdls[dimidx]) + curnloff;
-      valhandler(env, dims, dimidx, addr, curnlsz, nvinfo->dtype);
+      valhandler(env, dims, dimidx, itmaddrs, addr, curnlsz, nvinfo->dtype);
     }
   }
 }
@@ -338,14 +342,17 @@ int handleValueInfo(JNIEnv* env, struct NValueInfo *nvinfo, valueHandler valhand
     return -1;
   }
   size_t dims[nvinfo->framessz];
+  long *itmaddrs[nvinfo->framessz];
   long hdls[nvinfo->framessz];
   size_t i, di = 0;
   for (i = 0; i < nvinfo->framessz; ++i) {
     dims[i] = 0;
+    itmaddrs[i] = NULL;
     hdls[i] = 0L;
   }
+  itmaddrs[di] = &nvinfo->handler;
   hdls[di] = nvinfo->handler;
-  iterMatrix(env, nvinfo, dims, hdls, 0, valhandler);
+  iterMatrix(env, nvinfo, dims, itmaddrs, hdls, 0, valhandler);
   return 0;
 }
 

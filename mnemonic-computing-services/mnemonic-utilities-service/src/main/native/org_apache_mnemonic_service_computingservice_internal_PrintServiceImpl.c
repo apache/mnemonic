@@ -26,15 +26,16 @@
  * a customized handler as value handler.
  * It handles would be used to iteratively callback for each value of a value matrix
  */
-void valHandler(JNIEnv* env, size_t dims[], size_t dimsz,
-    void *addr, size_t sz, int dtype) {
+void valHandler(JNIEnv* env, size_t dims[], size_t dimidx,
+    long *itmaddrs[], void *addr, size_t sz, int dtype) {
   size_t i;
-  if (0 == dims[dimsz - 1]) {
+  if (0 == dims[dimidx]) {
     printf("\n");
   }
-  for (i = 0; i < dimsz; ++i) {
+  for (i = 0; i <= dimidx; ++i) {
     printf("[%zu]", dims[i]);
   }
+  printf(" <%p> ", itmaddrs[dimidx]);
   switch(dtype) {
   case DURABLE_BOOLEAN:
     printf(" %s, ", (0 == *(char*)addr ? "T" : "F"));

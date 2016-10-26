@@ -80,8 +80,8 @@ struct NValueInfo {
 /**
  * a value handler to be callback for each value of a matrix
  */
-typedef void (*valueHandler)(JNIEnv* env, size_t dims[], size_t dimsz,
-    void *addr, size_t sz, int dtype);
+typedef void (*valueHandler)(JNIEnv* env, size_t dims[], size_t dimidx,
+    long *itmaddrs[], void *addr, size_t sz, int dtype);
 
 /**
  * construct a list of native value info structure from Java array object.
