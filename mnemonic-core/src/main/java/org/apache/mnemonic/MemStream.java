@@ -17,51 +17,119 @@
 
 package org.apache.mnemonic;
 
-import java.io.File;
-
 /**
- * a memory file that manages its data on native memory storage. Note: this
- * class depends on PMFS, we suggest that NVM library to support this feature in
- * native layer. In addition, the permission of /mnt/pmfs will be set properly.
- * 
+ * This interface to randomly access the in-memory stream. 
  *
  */
-public class MemStream extends File {
-
-  private static final long serialVersionUID = 6579668848729471173L;
-  private String uri, id;
+public interface MemStream {
 
   /**
-   * initialize the memory file.
+   * This function will close the stream and release any 
+   * system resources associated with the stream.
    * 
-   * @param uri
-   *          specify the location of memory file
-   * 
-   * @param id
-   *          specify the id of memory file
    */
-  public MemStream(String uri, String id) {
-    super(uri, id);
-    this.uri = uri;
-    this.id = id;
-  }
+  void close(); 
 
   /**
-   * retrieve the uri of this memory file.
+   * This function retrieves the current offset in this in-memory stream.
    * 
-   * @return the uri of memory file
+   * @return the long-type offset value
    */
-  public String getUri() {
-    return this.uri;
-  }
+  long getPosition(); 
 
   /**
-   * retrieve the id of this memory file.
+   * This function returns the length of this in-memory stream.
    * 
-   * @return the id of memory file
+   * @return the long-type length
    */
-  public String getId() {
-    return this.id;
-  }
+  long length(); 
+
+  /**
+   * This function reads a byte of data from the stream.
+   * 
+   * @return the 1-byte of data, or -1 if reaching the end of stream
+   */
+  int read(); 
+
+  /**
+   * This function reads up to b.length bytes of data from the stream into
+   * an array of bytes
+   * 
+   * @param b
+   *          array of bytes into which data is read
+   * @return the total number of bytes read into the array, or -1 if 
+   *         reaching the end of streamint-type data of one byte
+   */
+  int read(byte[] b);
+
+
+  /**
+   * This function reads up to len bytes of data from the stream into
+   * an array of bytes
+   * 
+   * @param b
+   *          array of bytes into which data is read
+   * @param off 
+   *          the start offset in array b at which the data is written
+   * @param len
+   *          the maximum number of bytes read   
+   * 
+   * @return the total number of bytes read into the array, or -1 if 
+   *         reaching the end of streamint-type data of one byte
+   */
+ 
+  int read(byte[] b, int off, int len); 
+
+  /**
+   * More read functions can be added, such as readDouble, readLine and so on
+   *
+   */
+
+  /**
+   * This function sets the mem-pointer offset, measured from the beginning
+   * of the stream, which is the starting position for the next read
+   * or write
+   *
+   * @param pos
+   *          the offset position, measured from the beginning of the
+   *          mem stream
+   * @return the new offset, or -1 if the offset is longer than the length of the mem stream
+   */
+  long seek(long pos); 
+
+  /**
+   * This function writes b.length bytes from an array of bytes
+   *
+   * @param b
+   *          array of bytes
+   */
+  void write(byte[] b);
+
+  /**
+   * This function writes len bytes from an array of bytes
+   * starting from offset off
+   *
+   * @param b
+   *          array of bytes
+   * @param off
+   *          the starting offset in array b at which the data is read
+   * @param len
+   *          the maximum number of bytes to write
+   */
+  void write(byte[] b, int off, int len);
+
+  /**
+   * This function write byte b into the mem stream
+   *
+   * @param b
+   *          the data
+   * 
+   */
+  void write(int b);
+
+  /**
+   * More write functions can be added
+   *
+   */
 
 }
