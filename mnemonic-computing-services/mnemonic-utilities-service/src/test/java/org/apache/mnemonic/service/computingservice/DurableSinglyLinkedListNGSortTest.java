@@ -37,14 +37,15 @@ import org.apache.mnemonic.collections.DurableSinglyLinkedListFactory;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import org.testng.Assert;
 
 /**
  * A Test case suit, verify and demo the durable native computing services (DNCS) infra.
  *
  */
 
-public class DurableSinglyLinkedListNGPrintTest {
-  public static String uri = "./pobj_NodeValue_print.dat";
+public class DurableSinglyLinkedListNGSortTest {
+  public static String uri = "./pobj_NodeValue_sorting.dat";
   private long cKEYCAPACITY;
   private Random m_rand;
   private NonVolatileMemAllocator m_act;
@@ -69,7 +70,7 @@ public class DurableSinglyLinkedListNGPrintTest {
   @Test(enabled = true)
   public void testDurableSinglyLinkedListWithPerson() {
 
-    int elem_count = 10;
+    int elem_count = 20;
 
     DurableType listgftypes[] = {DurableType.DURABLE};
     EntityFactoryProxy listefproxies[] = {new EntityFactoryProxy() {
@@ -126,7 +127,7 @@ public class DurableSinglyLinkedListNGPrintTest {
     }
     System.out.printf("\n");
 
-    GeneralComputingService gcsvr = Utils.getGeneralComputingService("print");
+    GeneralComputingService gcsvr = Utils.getGeneralComputingService("sort");
     ValueInfo vinfo = new ValueInfo();
     List<long[][]> objstack = new ArrayList<long[][]>();
     objstack.add(firstnv.getNativeFieldInfo());
@@ -137,14 +138,28 @@ public class DurableSinglyLinkedListNGPrintTest {
     vinfo.dtype = DurableType.SHORT;
     vinfo.frames = Utils.genNativeParamForm(objstack, fidinfostack);
     ValueInfo[] vinfos = {vinfo};
-    gcsvr.perform(vinfos);
+    long[] ret = gcsvr.perform(vinfos);
 
+    Assert.assertEquals(1, ret.length);
+    long handler2 = ret[0];
+    Assert.assertNotEquals(0L, handler2);
+
+    DurableSinglyLinkedList<Person<Long>> firstnv3 = DurableSinglyLinkedListFactory.restore(m_act, listefproxies, 
+        listgftypes, handler2, false);
+
+    System.out.printf("--- Stage 3 Sorted--- \n");
+    for (Person<Long> eval3 : firstnv3) {
+      if (null != eval3) {
+        eval3.testOutputAge();
+      }
+    }
+    System.out.printf("\n");
   }
 
   @Test(enabled = true)
   public void testDurableSinglyLinkedListValue() {
 
-    int elem_count = 10;
+    int elem_count = 20;
     long slotKeyId = 10;
 
     DurableType[] elem_gftypes = {DurableType.DOUBLE};
@@ -179,7 +194,7 @@ public class DurableSinglyLinkedListNGPrintTest {
     for (int i = 0; i < elem_count; ++i) {
       first_elem = null;
       pre_elem = null;
-      for (int v = 0; v < 3; ++v) {
+      for (int v = 0; v < 12; ++v) {
         elem = DurableSinglyLinkedListFactory.create(m_act, elem_efproxies, elem_gftypes, false);
         val = m_rand.nextDouble();
         elem.setItem(val, false);
@@ -220,7 +235,7 @@ public class DurableSinglyLinkedListNGPrintTest {
       System.out.printf(" Fetched an item... \n");
     }
 
-    GeneralComputingService gcsvr = Utils.getGeneralComputingService("print");
+    GeneralComputingService gcsvr = Utils.getGeneralComputingService("sort");
     ValueInfo vinfo = new ValueInfo();
     List<long[][]> objstack = new ArrayList<long[][]>();
     objstack.add(linkedvals.getNativeFieldInfo());
@@ -234,6 +249,19 @@ public class DurableSinglyLinkedListNGPrintTest {
     gcsvr.perform(vinfos);
 
     // Assert.assert, expected);(plist, plist2);
+    DurableSinglyLinkedList<DurableSinglyLinkedList<Double>> linkedvals3 = DurableSinglyLinkedListFactory.restore(m_act,
+        linkedefproxies, linkedgftypes, handler, false);
+    Iterator<DurableSinglyLinkedList<Double>> iter3 = linkedvals3.iterator();
+    Iterator<Double> elemiter3 = null;
+
+    System.out.printf(" --- Stage 3 Sorted --- \n");
+    while (iter3.hasNext()) {
+      elemiter3 = iter3.next().iterator();
+      while (elemiter3.hasNext()) {
+        System.out.printf("%f ", elemiter3.next());
+      }
+      System.out.printf(" Fetched an item... \n");
+    }
 
   }
 
