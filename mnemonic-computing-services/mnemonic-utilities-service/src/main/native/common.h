@@ -34,6 +34,8 @@ extern "C" {
 #include <stdint.h>
 #include <assert.h>
 #include <pthread.h>
+#include <float.h>
+#include <math.h>
 #include <jni.h>
 
 #define DURABLE_BOOLEAN 1
@@ -81,7 +83,8 @@ struct NValueInfo {
  * a value handler to be callback for each value of a matrix
  */
 typedef void (*valueHandler)(JNIEnv* env, size_t dims[], size_t dimidx,
-    long *itmaddrs[], void *addr, size_t sz, int dtype);
+    long *itmaddrs[], long *(* const nxtfitmaddrs)[], long (* const pendings)[],
+    void *addr, size_t sz, int dtype);
 
 /**
  * construct a list of native value info structure from Java array object.
@@ -118,7 +121,7 @@ inline long to_p(JNIEnv* env, struct NValueInfo *nvinfo, void *e);
  * handle one native value info.
  * call-back value handler for each values of a value matrix.
  */
-int handleValueInfo(JNIEnv* env, struct NValueInfo *nvinfo, valueHandler valhandler);
+long handleValueInfo(JNIEnv* env, struct NValueInfo *nvinfo, valueHandler valhandler);
 
 #ifdef __cplusplus
 }

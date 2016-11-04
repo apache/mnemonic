@@ -26,8 +26,9 @@
  * a customized handler as value handler.
  * It handles would be used to iteratively callback for each value of a value matrix
  */
-void valHandler(JNIEnv* env, size_t dims[], size_t dimidx,
-    long *itmaddrs[], void *addr, size_t sz, int dtype) {
+void valPrintHandler(JNIEnv* env, size_t dims[], size_t dimidx,
+    long *itmaddrs[], long *(* const nxtfitmaddrs)[], long (* const pendings)[],
+    void *addr, size_t sz, int dtype) {
   size_t i;
   if (0 == dims[dimidx]) {
     printf("\n");
@@ -35,7 +36,7 @@ void valHandler(JNIEnv* env, size_t dims[], size_t dimidx,
   for (i = 0; i <= dimidx; ++i) {
     printf("[%zu]", dims[i]);
   }
-  printf(" <%p> ", itmaddrs[dimidx]);
+  printf(" <%p, %p> ", itmaddrs[dimidx], (*nxtfitmaddrs)[dimidx]);
   switch(dtype) {
   case DURABLE_BOOLEAN:
     printf(" %s, ", (0 == *(char*)addr ? "T" : "F"));
@@ -88,7 +89,7 @@ jlongArray JNICALL Java_org_apache_mnemonic_service_computingservice_internal_Pr
   for(idx = 0; idx < visz; ++idx) {
     printf("-- Value Matrix #%u --\n", idx);
     if (NULL != nvinfos + idx) {
-      handleValueInfo(env, *(nvinfos + idx), valHandler);
+      handleValueInfo(env, *(nvinfos + idx), valPrintHandler);
     } else {
       printf("NULL\n");
     }
@@ -99,5 +100,7 @@ jlongArray JNICALL Java_org_apache_mnemonic_service_computingservice_internal_Pr
   return ret;
 }
 
+/*
 __attribute__((destructor)) void fini(void) {
 }
+*/

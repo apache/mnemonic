@@ -303,56 +303,85 @@ inline long to_p(JNIEnv* env, struct NValueInfo *nvinfo, void *e) {
   return -1L;
 }
 
-void iterMatrix(JNIEnv* env, struct NValueInfo *nvinfo,
-    size_t dims[], long *itmaddrs[], long hdls[],
+void iterTensor(JNIEnv* env, struct NValueInfo *nvinfo,
+    size_t dims[], long *itmaddrs[], long (* const nxtfitmaddrs)[],
+    long *(* const pendings)[], long hdls[],
     size_t dimidx, valueHandler valhandler) {
-  void *addr = NULL;
+  if (++dimidx >= nvinfo->framessz) {
+    return;
+  }
+  long *iatmp;
   long curoff = (nvinfo->frames + dimidx)->nextoff;
   long curnloff = (nvinfo->frames + dimidx)->nlvloff;
   long curnlsz = (nvinfo->frames + dimidx)->nlvlsz;
+  void *addr = NULL;
   if (dimidx < nvinfo->framessz - 1) {
-    while(0L != hdls[dimidx]) {
-      itmaddrs[dimidx + 1] = (long*)(to_e(env, nvinfo, hdls[dimidx]) + curnloff);
-      hdls[dimidx + 1] = *itmaddrs[dimidx + 1];
-      iterMatrix(env, nvinfo, dims, itmaddrs, hdls, dimidx + 1, valhandler);
-      itmaddrs[dimidx] = (long*)(to_e(env, nvinfo, hdls[dimidx]) + curoff);
-      hdls[dimidx] = *itmaddrs[dimidx];
-      ++dims[dimidx];
-    }
-    dims[dimidx] = 0;
-  } else {
-    if (-1L != curoff) {
+    iatmp = itmaddrs[dimidx];
+    while (1) {
+      (*pendings)[dimidx] = 0L;
       while(0L != hdls[dimidx]) {
-        addr = to_e(env, nvinfo, hdls[dimidx]) + curnloff;
-        valhandler(env, dims, dimidx, itmaddrs, addr, curnlsz, nvinfo->dtype);
-        itmaddrs[dimidx] = (long*)(to_e(env, nvinfo, hdls[dimidx]) + curoff);
+        itmaddrs[dimidx + 1] = (long*)(to_e(env, nvinfo, hdls[dimidx]) + curnloff);
+        hdls[dimidx + 1] = *itmaddrs[dimidx + 1];
+        (*nxtfitmaddrs)[dimidx] = (long*)(to_e(env, nvinfo, hdls[dimidx]) + curoff);
+        iterTensor(env, nvinfo, dims, itmaddrs, nxtfitmaddrs, pendings, hdls, dimidx, valhandler);
+        itmaddrs[dimidx] = (*nxtfitmaddrs)[dimidx];
         hdls[dimidx] = *itmaddrs[dimidx];
         ++dims[dimidx];
       }
       dims[dimidx] = 0;
+      if (0L == (*pendings)[dimidx]) {
+        break;
+      }
+      itmaddrs[dimidx] = iatmp;
+      hdls[dimidx] = *iatmp;
+    }
+  } else {
+    if (-1L != curoff) {
+      iatmp = itmaddrs[dimidx];
+      while (1) {
+        (*pendings)[dimidx] = 0L;
+        while(0L != hdls[dimidx]) {
+          addr = to_e(env, nvinfo, hdls[dimidx]) + curnloff;
+          (*nxtfitmaddrs)[dimidx] = (long*)(to_e(env, nvinfo, hdls[dimidx]) + curoff);
+          valhandler(env, dims, dimidx, itmaddrs, nxtfitmaddrs, pendings, addr, curnlsz, nvinfo->dtype);
+          itmaddrs[dimidx] = (*nxtfitmaddrs)[dimidx];
+          hdls[dimidx] = *itmaddrs[dimidx];
+          ++dims[dimidx];
+        }
+        dims[dimidx] = 0;
+        if (0L == (*pendings)[dimidx]) {
+          break;
+        }
+        itmaddrs[dimidx] = iatmp;
+        hdls[dimidx] = *iatmp;
+      }
     } else {
       addr = to_e(env, nvinfo, hdls[dimidx]) + curnloff;
-      valhandler(env, dims, dimidx, itmaddrs, addr, curnlsz, nvinfo->dtype);
+      valhandler(env, dims, dimidx - 1, itmaddrs, nxtfitmaddrs, pendings, addr, curnlsz, nvinfo->dtype);
     }
   }
 }
 
-int handleValueInfo(JNIEnv* env, struct NValueInfo *nvinfo, valueHandler valhandler) {
-  if (NULL == nvinfo->frames || 0 == nvinfo->framessz) {
-    return -1;
+long handleValueInfo(JNIEnv* env, struct NValueInfo *nvinfo, valueHandler valhandler) {
+  if (NULL == nvinfo->frames || 0 >= nvinfo->framessz) {
+    return 0L;
   }
   size_t dims[nvinfo->framessz];
   long *itmaddrs[nvinfo->framessz];
+  long *nxtfitmaddrs[nvinfo->framessz];
+  long pendings[nvinfo->framessz];
   long hdls[nvinfo->framessz];
-  size_t i, di = 0;
+  size_t i;
   for (i = 0; i < nvinfo->framessz; ++i) {
     dims[i] = 0;
     itmaddrs[i] = NULL;
+    nxtfitmaddrs[i] = NULL;
+    pendings[i] = 0L;
     hdls[i] = 0L;
   }
-  itmaddrs[di] = &nvinfo->handler;
-  hdls[di] = nvinfo->handler;
-  iterMatrix(env, nvinfo, dims, itmaddrs, hdls, 0, valhandler);
-  return 0;
+  hdls[0] = nvinfo->handler;
+  itmaddrs[0] = &nvinfo->handler;
+  iterTensor(env, nvinfo, dims, itmaddrs, &nxtfitmaddrs, &pendings, hdls, -1, valhandler);
+  return nvinfo->handler;
 }
 
