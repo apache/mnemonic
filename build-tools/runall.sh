@@ -104,5 +104,15 @@ echo [ERROR] This test case requires \"pmalloc\" memory service to pass, please 
 exit 1
 fi
 echo [SUCCESS] Test case DurableSinglyLinkedListNGPrintTest for \"mnemonic-computing-services/mnemonic-utilities-service\" is completed!
+
+echo [INFO] Running DurableSinglyLinkedListNGSortTest for \"mnemonic-computing-services/mnemonic-utilities-service\"...
+mvn -Dtest=DurableSinglyLinkedListNGSortTest test -pl mnemonic-computing-services/mnemonic-utilities-service -DskipTests=false > testlog/DurableSinglyLinkedListNGSortTest.log
+if [ $? -gt 0 ]
+then
+echo [ERROR] This test case requires \"pmalloc\" memory service to pass, please check if \"pmalloc\" has been configured correctly! If \"pmalloc\" is installed, please refer to testlog/DurableSinglyLinkedListNGSortTest.log for detailed information.
+exit 1
+fi
+echo [SUCCESS] Test case DurableSinglyLinkedListNGSortTest for \"mnemonic-computing-services/mnemonic-utilities-service\" is completed!
+
 echo [DONE] All test cases are completed! Log files are available under folder testlog!
 exit 0
