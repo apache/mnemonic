@@ -104,12 +104,13 @@ public class DurableSinglyLinkedListNGSortTest {
 
     Person<Long> eval;
     DurableSinglyLinkedList<Person<Long>> iternv = firstnv;
-    System.out.printf(" -- Stage 1 Generated---\n");
+    System.out.printf(" --- Stage 1 Generated---\n");
+    long agesum1 = 0L;
     while (null != iternv) {
       eval = iternv.getItem();
-      if (null != eval) {
-        eval.testOutputAge();
-      }
+      Assert.assertNotNull(eval);
+      eval.testOutputAge();
+      agesum1 += eval.getAge();
       iternv = iternv.getNext();
     }
     System.out.printf("\n");
@@ -120,12 +121,14 @@ public class DurableSinglyLinkedListNGSortTest {
         listgftypes, handler, false);
 
     System.out.printf("--- Stage 2 Restored--- \n");
+    long agesum2 = 0L;
     for (Person<Long> eval2 : firstnv2) {
-      if (null != eval2) {
-        eval2.testOutputAge();
-      }
+      Assert.assertNotNull(eval2);
+      eval2.testOutputAge();
+      agesum2 += eval2.getAge();
     }
     System.out.printf("\n");
+    Assert.assertEquals(agesum1, agesum2);
 
     GeneralComputingService gcsvr = Utils.getGeneralComputingService("sort");
     ValueInfo vinfo = new ValueInfo();
@@ -148,12 +151,19 @@ public class DurableSinglyLinkedListNGSortTest {
         listgftypes, handler2, false);
 
     System.out.printf("--- Stage 3 Sorted--- \n");
+    long agesum3 = 0L;
+    int preage = -1;
     for (Person<Long> eval3 : firstnv3) {
-      if (null != eval3) {
-        eval3.testOutputAge();
+      Assert.assertNotNull(eval3);
+      eval3.testOutputAge();
+      agesum3 += eval3.getAge();
+      if (preage >= 0) {
+        Assert.assertTrue(eval3.getAge() >= preage);
       }
+      preage = eval3.getAge();
     }
     System.out.printf("\n");
+    Assert.assertEquals(agesum2, agesum3);
   }
 
   @Test(enabled = true)
@@ -191,6 +201,7 @@ public class DurableSinglyLinkedListNGSortTest {
 
     pre_nextnv = null;
     Double val;
+    double valsum1 = 0.0;
     for (int i = 0; i < elem_count; ++i) {
       first_elem = null;
       pre_elem = null;
@@ -205,6 +216,7 @@ public class DurableSinglyLinkedListNGSortTest {
         }
         pre_elem = elem;
         System.out.printf("%f ", val);
+        valsum1 += val;
       }
 
       nextnv = DurableSinglyLinkedListFactory.create(m_act, linkedefproxies, linkedgftypes, false);
@@ -227,13 +239,17 @@ public class DurableSinglyLinkedListNGSortTest {
     Iterator<Double> elemiter = null;
 
     System.out.printf(" --- Stage 2 Restored --- \n");
+    double val2, valsum2 = 0.0;
     while (iter.hasNext()) {
       elemiter = iter.next().iterator();
       while (elemiter.hasNext()) {
-        System.out.printf("%f ", elemiter.next());
+        val2 = elemiter.next();
+        System.out.printf("%f ", val2);
+        valsum2 += val2;
       }
       System.out.printf(" Fetched an item... \n");
     }
+    Assert.assertEquals(valsum1, valsum2, 0.0001);
 
     GeneralComputingService gcsvr = Utils.getGeneralComputingService("sort");
     ValueInfo vinfo = new ValueInfo();
@@ -255,14 +271,22 @@ public class DurableSinglyLinkedListNGSortTest {
     Iterator<Double> elemiter3 = null;
 
     System.out.printf(" --- Stage 3 Sorted --- \n");
+    double val3, valsum3 = 0.0, preval3;
     while (iter3.hasNext()) {
       elemiter3 = iter3.next().iterator();
+      preval3 = 0.0;
       while (elemiter3.hasNext()) {
-        System.out.printf("%f ", elemiter3.next());
+        val3 = elemiter3.next();
+        System.out.printf("%f ", val3);
+        valsum3 += val3;
+        if (preval3 != 0.0) {
+          Assert.assertTrue(val3 >= preval3);
+        }
+        preval3 = val3;
       }
       System.out.printf(" Fetched an item... \n");
     }
-
+    Assert.assertEquals(valsum2, valsum3, 0.0001);
   }
 
 }
