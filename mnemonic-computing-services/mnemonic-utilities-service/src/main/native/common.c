@@ -304,8 +304,8 @@ inline long to_p(JNIEnv* env, struct NValueInfo *nvinfo, void *e) {
 }
 
 void iterTensor(JNIEnv* env, struct NValueInfo *nvinfo,
-    size_t dims[], long *itmaddrs[], long (* const nxtfitmaddrs)[],
-    long *(* const pendings)[], long hdls[],
+    size_t dims[], long *itmaddrs[], long *(* const nxtfitmaddrs)[],
+    long (* const pendings)[], long hdls[],
     size_t dimidx, valueHandler valhandler) {
   if (++dimidx >= nvinfo->framessz) {
     return;
