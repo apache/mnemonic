@@ -17,8 +17,21 @@
 
 package org.apache.mnemonic.bench;
 
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.ParseException;
 import java.util.Random;
-
+import java.io.File;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.FileNotFoundException;
 
 /**
  * Main is the class of example.
@@ -28,15 +41,94 @@ import java.util.Random;
 public class Sort {
 
   /**
-   * Run a example code to demonstrate some basic functionalities.
+   * Run workloads to bench performance.
    *
-   * @param argv
+   * @param args
    *          array of commandline parameters
    */
-  public static void main(String[] argv) throws Exception {
+  public static void main(String[] args) throws Exception {
     Random randomGenerator = new Random();
 
-    System.out.println("-------------------");
+    Options options = new Options();
+
+    Option mode = new Option("m", "mode", true, "run mode [A|B]");
+    mode.setRequired(true);
+    options.addOption(mode);
+
+    Option input = new Option("i", "input", true, "input file path");
+    input.setRequired(true);
+    options.addOption(input);
+
+    Option output = new Option("o", "output", true, "output file");
+    output.setRequired(true);
+    options.addOption(output);
+
+    CommandLineParser parser = new DefaultParser();
+    HelpFormatter formatter = new HelpFormatter();
+    CommandLine cmd;
+
+    String runMode, inputFilePath, outputFilePath;
+
+    try {
+        cmd = parser.parse(options, args);
+        runMode = cmd.getOptionValue("mode");
+        inputFilePath = cmd.getOptionValue("input");
+        outputFilePath = cmd.getOptionValue("output");
+        if (!runMode.equals("A") && !runMode.equals("B")) {
+          throw new ParseException("Run mode is not specified correctly, Please use A or B as run mode.");
+        }
+    } catch (ParseException e) {
+        System.out.println(e.getMessage());
+        formatter.printHelp("Sort-bench", options);
+        System.exit(1);
+        return;
+    }
+
+    System.out.println(String.format("Run Mode is %s", runMode));
+    System.out.println(String.format("Input file is %s", inputFilePath));
+    System.out.println(String.format("Output file is %s", outputFilePath));
+
+    File inputFile = new File(inputFilePath);
+    File outputFile = new File(outputFilePath);
+
+    BufferedReader reader = null;
+    BufferedWriter writer = null;
+
+    try {
+      reader = new BufferedReader(new FileReader(inputFile));
+      writer = new BufferedWriter(new FileWriter(outputFile));
+      if (runMode.equals("A")) {
+        /* regular way */
+        String text = null;
+        while ((text = reader.readLine()) != null) {
+          System.out.println(text);
+          writer.write(text);
+          writer.newLine();
+        }
+      } else {
+        /* mnemonic way */
+        System.out.println("mnemonic way");
+      }
+    } catch (FileNotFoundException e) {
+      System.err.println(e.getMessage());
+      throw e;
+    } catch (IOException e) {
+      System.err.println(e.getMessage());
+      throw e;
+    } finally {
+      try {
+        if (null != reader) {
+          reader.close();
+        }
+        if (null != writer) {
+          writer.close();
+        }
+      } catch (IOException e) {
+        System.err.println(e.getMessage());
+        throw e;
+      }
+    }
+
   }
 
 }

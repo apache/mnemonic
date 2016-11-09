@@ -32,6 +32,12 @@
   <name>mnemonic-sort-bench</name>
   <packaging>jar</packaging>
 
+  <properties>
+    <mode></mode>
+    <input></input>
+    <output></output>
+  </properties>
+
   <dependencies>
   </dependencies>
 
@@ -134,11 +140,17 @@
             <configuration>
               <executable>java</executable>
               <arguments>
-		<argument>-Djava.ext.dirs=${project.build.directory}/service-dist</argument>
+                <argument>-Djava.ext.dirs=${project.build.directory}/service-dist</argument>
                 <argument>-ea</argument>
                 <argument>-classpath</argument>
                 <classpath />
                 <argument>${project.groupId}.bench.Sort</argument>
+                <argument>-m</argument>
+                <argument>${mode}</argument>
+                <argument>-i</argument>
+                <argument>${input}</argument>
+                <argument>-o</argument>
+                <argument>${output}</argument>
               </arguments>
             </configuration>
           </plugin>
