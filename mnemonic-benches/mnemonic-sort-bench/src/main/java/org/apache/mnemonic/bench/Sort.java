@@ -25,6 +25,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.io.File;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -34,10 +35,9 @@ import java.io.IOException;
 import java.io.FileNotFoundException;
 
 /**
- * Main is the class of example.
+ * Sort is the class of sort-bench.
  * 
  */
-@SuppressWarnings("restriction")
 public class Sort {
 
   /**
@@ -94,21 +94,30 @@ public class Sort {
     BufferedReader reader = null;
     BufferedWriter writer = null;
 
+    TextFileSort tfsorter = null;
+
+    long sttime;
+
     try {
       reader = new BufferedReader(new FileReader(inputFile));
       writer = new BufferedWriter(new FileWriter(outputFile));
       if (runMode.equals("A")) {
         /* regular way */
-        String text = null;
-        while ((text = reader.readLine()) != null) {
-          System.out.println(text);
-          writer.write(text);
-          writer.newLine();
-        }
+        tfsorter = new RegularTestFileSort();
       } else {
         /* mnemonic way */
-        System.out.println("mnemonic way");
+        tfsorter = new DNCSTextFileSort();
       }
+
+      sttime = System.nanoTime();
+      tfsorter.build(reader);
+      reportElapse("Build Time", sttime, System.nanoTime());
+      sttime = System.nanoTime();
+      tfsorter.doSort();
+      reportElapse("Sort Time", sttime, System.nanoTime());
+      sttime = System.nanoTime();
+      tfsorter.save(writer);
+      reportElapse("Save Time", sttime, System.nanoTime());
     } catch (FileNotFoundException e) {
       System.err.println(e.getMessage());
       throw e;
@@ -128,7 +137,10 @@ public class Sort {
         throw e;
       }
     }
-
   }
 
+  static void reportElapse(String msg, long t1, long t2) {
+    System.out.println(String.format("%s : %,d ms.", msg,
+        TimeUnit.NANOSECONDS.toMillis(t2 - t1)));
+  }
 }
