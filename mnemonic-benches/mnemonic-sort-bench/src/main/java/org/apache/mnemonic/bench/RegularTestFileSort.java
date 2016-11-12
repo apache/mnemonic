@@ -24,12 +24,13 @@ import java.io.IOException;
 public class RegularTestFileSort implements TextFileSort {
 
   private Node<Long> head;
+  private long[] sortinfo = new long[3];
   
   public RegularTestFileSort() {
   }
 
   @Override
-  public void build(BufferedReader reader) throws NumberFormatException, IOException {
+  public void load(BufferedReader reader) throws NumberFormatException, IOException {
     String text = null;
     Node<Long> curnode = null;
     Long val;
@@ -44,15 +45,21 @@ public class RegularTestFileSort implements TextFileSort {
       }
     }
   }
+
   @Override
   public void doSort() {
     Node<Long> curnode, tmpnode, prevnode;
+    long cntscan = 0L, cntswap = 0L, cntnoswap = 0L;
     boolean changed;
+    if (null == this.head) {
+      return;
+    }
     do {
+      ++cntscan;
       curnode = this.head;
       prevnode = null;
       changed = false;
-      while (null != curnode) {
+      while (true) {
         tmpnode = curnode.getNext();
         if (null == tmpnode) {
           break;
@@ -67,16 +74,22 @@ public class RegularTestFileSort implements TextFileSort {
           }
           prevnode = tmpnode;
           changed = true;
+          ++cntswap;
         } else {
           prevnode = curnode;
           curnode = tmpnode;
+          ++cntnoswap;
         }
       }
     } while (changed);
+    this.sortinfo[0] = cntscan;
+    this.sortinfo[1] = cntswap;
+    this.sortinfo[2] = cntnoswap;
   }
+
   @Override
-  public void save(BufferedWriter writer) throws IOException {
-    Node<Long> curnode = head;
+  public void store(BufferedWriter writer) throws IOException {
+    Node<Long> curnode = this.head;
     while (null != curnode) {
       writer.write(curnode.getData().toString());
       writer.newLine();
@@ -84,4 +97,13 @@ public class RegularTestFileSort implements TextFileSort {
     }
   }
 
+  @Override
+  public long[] getSortInfo() {
+    return this.sortinfo;
+  }
+
+  @Override
+  public void clear() {
+    this.head = null;
+  }
 }

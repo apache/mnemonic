@@ -23,9 +23,13 @@ import java.io.IOException;
 
 public interface TextFileSort {
 
-  void build(BufferedReader reader) throws NumberFormatException, IOException;
+  void load(BufferedReader reader) throws NumberFormatException, IOException;
 
   void doSort();
 
-  void save(BufferedWriter writer) throws IOException;
+  void store(BufferedWriter writer) throws IOException;
+
+  long[] getSortInfo();
+
+  void clear();
 }

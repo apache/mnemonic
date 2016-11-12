@@ -276,7 +276,7 @@ jlongArray constructJLongArray(JNIEnv* env, long arr[], size_t sz) {
 inline void *to_e(JNIEnv* env, struct NValueInfo *nvinfo, long p) {
   size_t i;
   struct transitem * ti;
-  if (NULL != nvinfo || NULL != nvinfo->transtable) {
+  if (NULL != nvinfo && NULL != nvinfo->transtable) {
     for (i = 0; i < nvinfo->transtablesz; ++i) {
       ti = nvinfo->transtable + i;
       if (p >= ti->hdlbase && p < ti->size) {
@@ -285,7 +285,7 @@ inline void *to_e(JNIEnv* env, struct NValueInfo *nvinfo, long p) {
     }
     throw(env, "No item found in Translate Table.");
   } else {
-    return p;
+    return addr_from_java(p);
   }
   return NULL;
 }
@@ -293,7 +293,7 @@ inline void *to_e(JNIEnv* env, struct NValueInfo *nvinfo, long p) {
 inline long to_p(JNIEnv* env, struct NValueInfo *nvinfo, void *e) {
   size_t i;
   struct transitem * ti;
-  if (NULL != nvinfo || NULL != nvinfo->transtable) {
+  if (NULL != nvinfo && NULL != nvinfo->transtable) {
     for (i = 0; i < nvinfo->transtablesz; ++i) {
       ti = nvinfo->transtable + i;
       if (e >= ti->base && e < ti->base + ti->size) {
@@ -302,7 +302,7 @@ inline long to_p(JNIEnv* env, struct NValueInfo *nvinfo, void *e) {
     }
     throw(env, "No item found in Translate Table.");
   } else {
-    return e;
+    return addr_to_java(e);
   }
   return -1L;
 }

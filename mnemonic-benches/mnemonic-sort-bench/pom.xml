@@ -93,6 +93,20 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>${project.groupId}</groupId>
+                  <artifactId>mnemonic-sys-vmem-service</artifactId>
+                  <version>${project.version}</version>
+                  <classifier>${os.detected.classifier}</classifier>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>mnemonic-nvml-pmem-service</artifactId>
+                  <version>${project.version}</version>
+                  <classifier>${os.detected.classifier}</classifier>
+                  <type>jar</type>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
                   <artifactId>mnemonic-pmalloc-service</artifactId>
                   <version>${project.version}</version>
                   <classifier>${os.detected.classifier}</classifier>

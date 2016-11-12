@@ -110,14 +110,16 @@ public class Sort {
       }
 
       sttime = System.nanoTime();
-      tfsorter.build(reader);
-      reportElapse("Build Time", sttime, System.nanoTime());
+      tfsorter.load(reader);
+      reportElapse("Load Time", sttime, System.nanoTime());
       sttime = System.nanoTime();
       tfsorter.doSort();
       reportElapse("Sort Time", sttime, System.nanoTime());
       sttime = System.nanoTime();
-      tfsorter.save(writer);
-      reportElapse("Save Time", sttime, System.nanoTime());
+      tfsorter.store(writer);
+      reportElapse("Store Time", sttime, System.nanoTime());
+      reportSortInfo(tfsorter.getSortInfo());
+      tfsorter.clear();
     } catch (FileNotFoundException e) {
       System.err.println(e.getMessage());
       throw e;
@@ -142,5 +144,11 @@ public class Sort {
   static void reportElapse(String msg, long t1, long t2) {
     System.out.println(String.format("%s : %,d ms.", msg,
         TimeUnit.NANOSECONDS.toMillis(t2 - t1)));
+  }
+
+  static void reportSortInfo(long[] sortinfo) {
+    System.out.println(String.format("Scan Count: %,d ", sortinfo[0]));
+    System.out.println(String.format("Swap Count: %,d ", sortinfo[1]));
+    System.out.println(String.format("No Swap Count : %,d ", sortinfo[2]));
   }
 }
