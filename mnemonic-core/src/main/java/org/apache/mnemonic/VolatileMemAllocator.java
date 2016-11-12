@@ -480,6 +480,9 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
   @Override
   public long getPortableAddress(long addr) {
     int i;
+    if (null == m_ttable) {
+      return addr;
+    }
     for (i = 0; i < m_ttable.length; ++i) {
       if (addr >= m_ttable[i][2] && addr < m_ttable[i][1] + m_ttable[i][2]) {
         return addr - m_ttable[i][2];
@@ -499,6 +502,9 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
   @Override
   public long getEffectiveAddress(long addr) {
     int i;
+    if (null == m_ttable) {
+      return addr;
+    }
     for (i = 0; i < m_ttable.length; ++i) {
       if (addr >= m_ttable[i][0] && addr < m_ttable[i][1]) {
         return addr + m_ttable[i][2];

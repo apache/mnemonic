@@ -106,8 +106,12 @@ struct NValueInfo *constructNValInfo(JNIEnv* env, jobject vinfoobj) {
     ret->dtype = (*env)->CallIntMethod(env, dutobj, getval_mtd);
 
     jobjectArray tbarr = (*env)->GetObjectField(env, vinfoobj, transtable_fid);
-    jsize tbarrlen = (*env)->GetArrayLength(env, tbarr);
-    if (NULL != tbarr && tbarrlen > 0){
+    jsize tbarrlen = 0;
+    ret->transtablesz = 0;
+    if (NULL != tbarr) {
+      tbarrlen = (*env)->GetArrayLength(env, tbarr);
+    }
+    if (tbarrlen > 0){
       ret->transtable = (struct transitem *)calloc(
           tbarrlen, sizeof(struct transitem));
       if (NULL != ret->transtable) {
@@ -281,7 +285,7 @@ inline void *to_e(JNIEnv* env, struct NValueInfo *nvinfo, long p) {
     }
     throw(env, "No item found in Translate Table.");
   } else {
-    throw(env, "NValueInfo or Translate Table is NULL.");
+    return p;
   }
   return NULL;
 }
@@ -298,7 +302,7 @@ inline long to_p(JNIEnv* env, struct NValueInfo *nvinfo, void *e) {
     }
     throw(env, "No item found in Translate Table.");
   } else {
-    throw(env, "NValueInfo or Translate Table is NULL.");
+    return e;
   }
   return -1L;
 }
