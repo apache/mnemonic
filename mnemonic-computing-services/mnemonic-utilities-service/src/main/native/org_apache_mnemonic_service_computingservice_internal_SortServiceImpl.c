@@ -135,3 +135,115 @@ jlongArray JNICALL Java_org_apache_mnemonic_service_computingservice_internal_So
   destructNValueInfos(nvinfos, visz);
   return ret;
 }
+
+#define TO_E(nvi, p) addr_from_java(p)
+
+typedef struct {
+  long scan_count;
+  long swap_count;
+  long noswap_count;
+} SortInfo;
+
+long handle1DLongBubbleSort(JNIEnv* env, struct NValueInfo *nvinfo, SortInfo *sortinfo) {
+  if (NULL == nvinfo->frames || 0 >= nvinfo->framessz) {
+    return 0L;
+  }
+  register long *itmaddrs = NULL;
+  register long *nxtfitmaddrs = NULL;
+  register int pendings = 0;
+  register long hdls = 0;
+  hdls = nvinfo->handler;
+  itmaddrs = &nvinfo->handler;
+  register long *iatmp;
+  register long curoff = nvinfo->frames->nextoff;
+  register long curnloff = nvinfo->frames->nlvloff;
+//  register long curnlsz = nvinfo->frames->nlvlsz;
+  register void *addr = NULL;
+  assert(-1L != curoff);
+  iatmp = itmaddrs;
+  register long *hptr1 = NULL, *hptr2 = NULL;
+  register void *pvaladdr = NULL;
+  register long *tmpptr = NULL;
+  register long tmpval = 0L;
+  register long cntscan = 0L, cntswap = 0L, cntnoswap = 0L;
+
+  if (0L == hdls) {
+    return 0L;
+  }
+
+  do {
+    ++cntscan;
+    pendings = 0;
+    pvaladdr = NULL;
+
+    addr = TO_E(nvinfo, hdls) + curnloff;
+    nxtfitmaddrs = (long*)(TO_E(nvinfo, hdls) + curoff);
+    pvaladdr = addr;
+    hptr2 = itmaddrs;
+
+    while (1) {
+      itmaddrs = nxtfitmaddrs;
+      hdls = *itmaddrs;
+      if (0L == hdls) {
+        break;
+      }
+      addr = TO_E(nvinfo, hdls) + curnloff;
+      nxtfitmaddrs = (long*)(TO_E(nvinfo, hdls) + curoff);
+
+      hptr1 = hptr2;
+      hptr2 = itmaddrs;
+      if (*(long*)pvaladdr > *(long*)addr) {
+        tmpptr = nxtfitmaddrs;
+        tmpval = *tmpptr;
+        *tmpptr = *hptr1;
+        *hptr1 = *hptr2;
+        *hptr2 = tmpval;
+        nxtfitmaddrs = hptr2;
+        hptr2 = tmpptr;
+        pendings = 1;
+        ++cntswap;
+      } else {
+        pvaladdr = addr;
+        ++cntnoswap;
+      }
+
+    }
+
+    itmaddrs = iatmp;
+    hdls = *iatmp;
+  } while (0 != pendings);
+
+  if (NULL != sortinfo) {
+    sortinfo->scan_count = cntscan;
+    sortinfo->swap_count = cntswap;
+    sortinfo->noswap_count = cntnoswap;
+  }
+  return nvinfo->handler;
+}
+
+JNIEXPORT
+jlongArray JNICALL Java_org_apache_mnemonic_service_computingservice_internal_SortServiceImpl_nperform1DLongBubbleSort(
+    JNIEnv* env, jobject this, jobjectArray vinfos) {
+  jlongArray ret = NULL;
+  jsize retsz = 1;
+  jsize idx;
+  size_t visz;
+  SortInfo sortinfo;
+  struct NValueInfo **nvinfos = constructNValueInfos(env, vinfos, &visz);
+  retsz = visz + 3;
+  jlong nret[retsz];
+  for(idx = 0; idx < retsz; ++idx) {
+    nret[idx] = 0L;
+  }
+  printNValueInfos(nvinfos, visz);
+  assert(1 == visz);
+
+  nret[0] = handle1DLongBubbleSort(env, *nvinfos, &sortinfo);
+  nret[1] = sortinfo.scan_count;
+  nret[2] = sortinfo.swap_count;
+  nret[3] = sortinfo.noswap_count;
+
+  ret = constructJLongArray(env, nret, retsz);
+  destructNValueInfos(nvinfos, visz);
+  return ret;
+}

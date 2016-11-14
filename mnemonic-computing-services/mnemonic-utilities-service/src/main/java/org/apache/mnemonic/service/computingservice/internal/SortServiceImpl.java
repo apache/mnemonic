@@ -47,6 +47,8 @@ public class SortServiceImpl implements GeneralComputingService {
     if (null != mode && null != valinfos) {
       if ("tensor_bubble".equals(mode)) {
         ret = nperformBubbleSort(valinfos);
+      } else if ("1dlong_bubble".equals(mode)) {
+        ret = nperform1DLongBubbleSort(valinfos);
       }
     }
     return ret;
@@ -58,5 +60,7 @@ public class SortServiceImpl implements GeneralComputingService {
    * @return an array of handler returned by native level
    */
   protected native long[] nperformBubbleSort(ValueInfo[] valinfos);
+
+  protected native long[] nperform1DLongBubbleSort(ValueInfo[] valinfos);
 
 }
