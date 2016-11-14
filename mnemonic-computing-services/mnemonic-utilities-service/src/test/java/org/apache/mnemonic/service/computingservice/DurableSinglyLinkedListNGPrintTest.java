@@ -137,7 +137,7 @@ public class DurableSinglyLinkedListNGPrintTest {
     vinfo.dtype = DurableType.SHORT;
     vinfo.frames = Utils.genNativeParamForm(objstack, fidinfostack);
     ValueInfo[] vinfos = {vinfo};
-    gcsvr.perform(vinfos);
+    gcsvr.perform(null, vinfos);
 
   }
 
@@ -231,7 +231,7 @@ public class DurableSinglyLinkedListNGPrintTest {
     vinfo.dtype = DurableType.DOUBLE;
     vinfo.frames = Utils.genNativeParamForm(objstack, fidinfostack);
     ValueInfo[] vinfos = {vinfo};
-    gcsvr.perform(vinfos);
+    gcsvr.perform(null, vinfos);
 
     // Assert.assert, expected);(plist, plist2);
 

@@ -42,10 +42,12 @@ public class SortServiceImpl implements GeneralComputingService {
    * {@inheritDoc}
    */
   @Override
-  public long[] perform(ValueInfo[] valinfos) {
+  public long[] perform(String mode, ValueInfo[] valinfos) {
     long[] ret = null;
-    if (null != valinfos) {
-      ret = nperformBubbleSort(valinfos);
+    if (null != mode && null != valinfos) {
+      if ("tensor_bubble".equals(mode)) {
+        ret = nperformBubbleSort(valinfos);
+      }
     }
     return ret;
   }

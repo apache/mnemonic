@@ -141,7 +141,7 @@ public class DurableSinglyLinkedListNGSortTest {
     vinfo.dtype = DurableType.SHORT;
     vinfo.frames = Utils.genNativeParamForm(objstack, fidinfostack);
     ValueInfo[] vinfos = {vinfo};
-    long[] ret = gcsvr.perform(vinfos);
+    long[] ret = gcsvr.perform("tensor_bubble", vinfos);
 
     Assert.assertEquals(1, ret.length);
     long handler2 = ret[0];
@@ -262,7 +262,7 @@ public class DurableSinglyLinkedListNGSortTest {
     vinfo.dtype = DurableType.DOUBLE;
     vinfo.frames = Utils.genNativeParamForm(objstack, fidinfostack);
     ValueInfo[] vinfos = {vinfo};
-    gcsvr.perform(vinfos);
+    gcsvr.perform("tensor_bubble", vinfos);
 
     // Assert.assert, expected);(plist, plist2);
     DurableSinglyLinkedList<DurableSinglyLinkedList<Double>> linkedvals3 = DurableSinglyLinkedListFactory.restore(m_act,

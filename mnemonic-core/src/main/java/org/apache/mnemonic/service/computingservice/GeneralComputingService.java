@@ -38,11 +38,14 @@ public interface GeneralComputingService {
   /**
    * perform native functionalities according to prepared computing parameters
    *
+   * @param mode
+   *         a selection mode of run instance
+   *
    * @param valinfos
    *         an array of value info
    *
    * @return the array of handler about updated object graphs if any
    */
-  long[] perform(ValueInfo[] valinfos);
+  long[] perform(String mode, ValueInfo[] valinfos);
 
 }

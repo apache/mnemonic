@@ -42,7 +42,7 @@ public class PrintServiceImpl implements GeneralComputingService {
    * {@inheritDoc}
    */
   @Override
-  public long[] perform(ValueInfo[] valinfos) {
+  public long[] perform(String mode, ValueInfo[] valinfos) {
     long[] ret = null;
     if (null != valinfos) {
       ret = nperformPrint(valinfos);
