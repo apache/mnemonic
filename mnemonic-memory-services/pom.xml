@@ -42,6 +42,7 @@
     <module>mnemonic-nvml-vmem-service</module>
     <module>mnemonic-nvml-pmem-service</module>
     <module>mnemonic-pmalloc-service</module>
+    <module>mnemonic-sys-vmem-service</module>
   </modules>
 
   <dependencies>

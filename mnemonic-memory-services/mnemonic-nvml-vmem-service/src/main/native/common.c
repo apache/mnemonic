@@ -85,4 +85,5 @@ vsize(VMPool *pool, void *p) {
     nativebuf = p - PMBHSZ;
     ret = ((PMBHeader *) nativebuf)->size - PMBHSZ;
   }
+  return ret;
 }
