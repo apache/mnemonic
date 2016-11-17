@@ -24,7 +24,10 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
-import java.util.Random;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
+
 import java.util.concurrent.TimeUnit;
 import java.io.File;
 import java.io.BufferedReader;
@@ -39,15 +42,16 @@ import java.io.FileNotFoundException;
  * 
  */
 public class Sort {
-
   /**
    * Run workloads to bench performance.
    *
    * @param args
    *          array of commandline parameters
    */
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(Sort.class);
+
   public static void main(String[] args) throws Exception {
-    Random randomGenerator = new Random();
 
     Options options = new Options();
 
@@ -83,10 +87,11 @@ public class Sort {
         System.exit(1);
         return;
     }
+    MDC.put("mode", String.format("Mode-%s", runMode));
 
-    System.out.println(String.format("Run Mode is %s", runMode));
-    System.out.println(String.format("Input file is %s", inputFilePath));
-    System.out.println(String.format("Output file is %s", outputFilePath));
+    LOGGER.info("Run Mode : {}", runMode);
+    LOGGER.info("Input file : {}", inputFilePath);
+    LOGGER.info("Output file : {}", outputFilePath);
 
     File inputFile = new File(inputFilePath);
     File outputFile = new File(outputFilePath);
@@ -142,13 +147,13 @@ public class Sort {
   }
 
   static void reportElapse(String msg, long t1, long t2) {
-    System.out.println(String.format("%s : %,d ms.", msg,
-        TimeUnit.NANOSECONDS.toMillis(t2 - t1)));
+    LOGGER.info("{} : {} ms.", msg,
+        TimeUnit.NANOSECONDS.toMillis(t2 - t1));
   }
 
   static void reportSortInfo(long[] sortinfo) {
-    System.out.println(String.format("Scan Count: %,d ", sortinfo[0]));
-    System.out.println(String.format("Swap Count: %,d ", sortinfo[1]));
-    System.out.println(String.format("No Swap Count : %,d ", sortinfo[2]));
+    LOGGER.info("Scan Count : {} ", sortinfo[0]);
+    LOGGER.info("Swap Count : {} ", sortinfo[1]);
+    LOGGER.info("No Swap Count : {} ", sortinfo[2]);
   }
 }
