@@ -202,6 +202,7 @@ Please see the file LICENSE for information on how this library is licensed.
 * **mnemonic-memory-services/mnemonic-pmalloc-service** -- the submodule project for pmalloc memory service
 * **mnemonic-memory-services/mnemonic-nvml-vmem-service** -- the submodule project for vmem memory service
 * **mnemonic-memory-services/mnemonic-nvml-pmem-service** -- the submodule project for pmem memory service
+* **mnemonic-memory-services/mnemonic-sys-vmem-service** -- the submodule project for system vmem memory service
 * **mnemonic-memory-services/service-dist** -- the location of extensive memory services (auto-generated)
 * **mnemonic-computing-services/mnemonic-utilities-service** -- the submodule project for utilities computing service
 * **mnemonic-computing-services/service-dist** -- the location of extensive computing services (auto-generated)
@@ -210,18 +211,18 @@ Please see the file LICENSE for information on how this library is licensed.
 #### Durable Memory Service Comparison Table
 
 
-|    Features                     |    NVML-VMEM    |    PMALLOC    |    NVML-PMEM    |
-|---------------------------------|:---------------:|:-------------:|:---------------:|
-|    Fixed   Durable K-V Store    |        NA       |       O       |        O        |
-|    Support DOM                  |        O        |       O       |        O        |
-|    Support DNCM                 |        O        |       O       |        O        |
-|    Support OS X                 |        NA       |       O       |        NA       |
-|    Memory Map Sync.             |        NA       |       O       |        O        |
-|    PM Flush                     |        NA       |       NA      |        O        |
-|    PM Drain                     |        NA       |       NA      |        O        |
-|    PM Persist                   |        NA       |       NA      |        O        |
-|    PM Atomic   Ops.             |        NA       |       NA      |        O        |
-|    Performance                  |       High      |      High     |       Low       |
+|    Features                     |    NVML-VMEM    |    PMALLOC    |    NVML-PMEM    |     SYS-VMEM    |
+|---------------------------------|:---------------:|:-------------:|:---------------:|:---------------:|
+|    Fixed   Durable K-V Store    |        NA       |       O       |        O        |        NA       |
+|    Support DOM                  |        O        |       O       |        O        |        O        |
+|    Support DNCM                 |        O        |       O       |        O        |        O        |
+|    Support OS X                 |        NA       |       O       |        NA       |        O        |
+|    Memory Map Sync.             |        NA       |       O       |        O        |        NA       |
+|    PM Flush                     |        NA       |       NA      |        O        |        NA       |
+|    PM Drain                     |        NA       |       NA      |        O        |        NA       |
+|    PM Persist                   |        NA       |       NA      |        O        |        NA       |
+|    PM Atomic Ops.               |        NA       |       NA      |        O        |        NA       |
+|    Expected Performance         |       Average   |     Average   |  Slow(on Disk)  |       Fast      |
 
 To build this library, you may need to install some required packages on the build system:
 
