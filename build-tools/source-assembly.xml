@@ -77,6 +77,7 @@
         <include>org.apache.mnemonic:mnemonic-pmalloc-service</include>
         <include>org.apache.mnemonic:mnemonic-nvml-vmem-service</include>
         <include>org.apache.mnemonic:mnemonic-nvml-pmem-service</include>
+        <include>org.apache.mnemonic:mnemonic-sys-vmem-service</include>
       </includes>
       <sources>
         <fileSets>
@@ -136,6 +137,45 @@
           </fileSet>
         </fileSets>
         <outputDirectoryMapping>mnemonic-computing-services/${module.artifactId}</outputDirectoryMapping>
+      </sources>
+    </moduleSet>
+    <moduleSet>
+      <includes>
+        <include>org.apache.mnemonic:mnemonic-benches</include>
+      </includes>
+      <sources>
+        <fileSets>
+          <fileSet>
+            <directory>.</directory>
+            <outputDirectory>.</outputDirectory>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <excludes>
+              <exclude>**/target/**</exclude>
+              <exclude>dependency-reduced-pom.xml</exclude>
+              <exclude>**/*.dat</exclude>
+            </excludes>
+          </fileSet>
+        </fileSets>
+      </sources>
+    </moduleSet>
+    <moduleSet>
+      <includes>
+        <include>org.apache.mnemonic:mnemonic-sort-bench</include>
+      </includes>
+      <sources>
+        <fileSets>
+          <fileSet>
+            <directory>.</directory>
+            <outputDirectory>.</outputDirectory>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <excludes>
+              <exclude>**/target/**</exclude>
+              <exclude>dependency-reduced-pom.xml</exclude>
+              <exclude>**/*.dat</exclude>
+            </excludes>
+          </fileSet>
+        </fileSets>
+        <outputDirectoryMapping>mnemonic-benches/${module.artifactId}</outputDirectoryMapping>
       </sources>
     </moduleSet>
   </moduleSets>
