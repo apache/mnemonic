@@ -86,18 +86,29 @@ mvn clean prepare-package -DskipTests -Dremoteresources.skip=true &&
 mvn prepare-package -DskipTests -Dremoteresources.skip=true &&
 mvn deploy -DskipTests -Dremoteresources.skip=true -P apache-release || { echo "Preparation failed"; exit; }
 
-RELEASEBASENAME=apache-mnemonic-${RELEASE_VERSION}-incubating-src
-RELEASEFULLNAME=${RELEASEBASENAME}.tar.gz
+RELEASEBASENAME=apache-mnemonic-${RELEASE_VERSION}-incubating
+RELEASESRCBASENAME=${RELEASEBASENAME}-src
+RELEASESRCPKGFULLNAME=${RELEASESRCBASENAME}.tar.gz
+
 pushd target || { echo "Artifacts not found"; exit; }
-md5sum ${RELEASEFULLNAME} > ${RELEASEFULLNAME}.md5 || { echo "Generate md5 failed"; exit; }
-shasum -a 512 ${RELEASEFULLNAME} > ${RELEASEFULLNAME}.sha512 || { echo "Generate sha failed"; exit; }
+md5sum ${RELEASESRCPKGFULLNAME} > ${RELEASESRCPKGFULLNAME}.md5 || { echo "Generate md5 failed"; exit; }
+shasum -a 512 ${RELEASESRCPKGFULLNAME} > ${RELEASESRCPKGFULLNAME}.sha512 || { echo "Generate sha failed"; exit; }
 popd
 
+echo "Verifying packaged Source Artifacts"
+rm -rf ${RELEASEBASENAME}/
+tar xzf target/${RELEASESRCPKGFULLNAME} || { echo "Failed to unpack the source artifact"; exit; }
+pushd ${RELEASEBASENAME} || { echo "Unpacked source directory does not exist"; exit; }
+mvn clean install || { echo "Failed to compile the packaged source artifact"; exit; }
+build-tools/runall.sh || { echo "Failed to verify the packaged source artifact"; exit; }
+popd
+rm -rf ${RELEASEBASENAME}/
+
 echo "Prepared Artifacts:"
-echo `ls target/${RELEASEFULLNAME}`
-echo `ls target/${RELEASEFULLNAME}.asc`
-echo `ls target/${RELEASEFULLNAME}.md5`
-echo `ls target/${RELEASEFULLNAME}.sha512`
+echo `ls target/${RELEASESRCPKGFULLNAME}`
+echo `ls target/${RELEASESRCPKGFULLNAME}.asc`
+echo `ls target/${RELEASESRCPKGFULLNAME}.md5`
+echo `ls target/${RELEASESRCPKGFULLNAME}.sha512`
 echo "Please upload those artifacts to your stage repository now."
 continueprompt
 

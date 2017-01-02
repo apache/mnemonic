@@ -18,7 +18,7 @@
 #
 
 echo [INFO] Cleaning up and re-building...
-git clean -xdf > /dev/null
+git ls-files --error-unmatch pom.xml > /dev/null 2>&1 && git clean -xdf > /dev/null
 
 if [ ! -d "testlog" ]
 then
