@@ -17,6 +17,11 @@
 # limitations under the License.
 #
 
+if [ -z "${MNEMONIC_HOME}" ]; then
+  source "$(dirname "$0")/find-mnemonic-home.sh" || { echo "Not found find-mnemonic-home.sh script."; exit 10; }
+fi
+pushd "$MNEMONIC_HOME" || { echo "the environment variable \$MNEMONIC_HOME contains invalid home directory of Mnemonic project."; exit 11; }
+
 echo [INFO] Cleaning up and re-building...
 git ls-files --error-unmatch pom.xml > /dev/null 2>&1 && git clean -xdf > /dev/null
 
@@ -115,4 +120,5 @@ fi
 echo [SUCCESS] Test case DurableSinglyLinkedListNGSortTest for \"mnemonic-computing-services/mnemonic-utilities-service\" is completed!
 
 echo [DONE] All test cases are completed! Log files are available under folder testlog!
-exit 0
+
+popd

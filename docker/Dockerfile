@@ -64,6 +64,8 @@ RUN echo export MAVEN_OPTS="\" $([[ \"x\" != \"x${proxy_host}\" ]] && echo -Dpro
 RUN cd /ws && git clone https://github.com/apache/incubator-mnemonic.git && \
     cd incubator-mnemonic && source /etc/profile.d/mvn.sh && mvn clean package install
 
+ENV MNEMONIC_HOME /ws/incubator-mnemonic
+
 RUN cd /ws/incubator-mnemonic && build-tools/runall.sh
 
 WORKDIR /ws

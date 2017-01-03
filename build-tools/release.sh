@@ -29,14 +29,19 @@ continueprompt() {
 	read -p "Do you wish to continue [y/n] ? " yn
 	case $yn in
 	    [Yy]* ) break;;
-	    [Nn]* ) exit;;
+	    [Nn]* ) exit 2;;
 	    * ) echo "Please answer yes or no.";;
 	    esac
 	done
 }
 
+if [ -z "${MNEMONIC_HOME}" ]; then
+  source "$(dirname "$0")/find-mnemonic-home.sh" || { echo "Not found find-mnemonic-home.sh script."; exit 10; }
+fi
+pushd "$MNEMONIC_HOME" || { echo "the environment variable \$MNEMONIC_HOME contains invalid home directory of Mnemonic project."; exit 11; }
+
 [[ -n "$(git status --porcelain)" ]] &&
-    echo "please commit all changes first." && exit
+    echo "please commit all changes first." && exit 20
 
 [[ $# -ne 3 ]]  && usage
 
@@ -72,7 +77,7 @@ fi
 echo "Preparing to create a branch branch-${RELEASE_VERSION} for release"
 continueprompt
 
-git checkout -b branch-${RELEASE_VERSION} || { echo "Create branch failed"; exit; }
+git checkout -b branch-${RELEASE_VERSION} || { echo "Create branch failed"; exit 30; }
 
 mvn versions:set -DgenerateBackupPoms=false -DnewVersion=${RELEASE_VERSION}-incubating
 git commit . -m "Prepare for releasing ${RELEASE_VERSION}-incubating ${RELEASE_CANDIDATE_ID}"
@@ -84,23 +89,23 @@ git clean -xdf
 
 mvn clean prepare-package -DskipTests -Dremoteresources.skip=true &&
 mvn prepare-package -DskipTests -Dremoteresources.skip=true &&
-mvn deploy -DskipTests -Dremoteresources.skip=true -P apache-release || { echo "Preparation failed"; exit; }
+mvn deploy -DskipTests -Dremoteresources.skip=true -P apache-release || { echo "Preparation failed"; exit 40; }
 
 RELEASEBASENAME=apache-mnemonic-${RELEASE_VERSION}-incubating
 RELEASESRCBASENAME=${RELEASEBASENAME}-src
 RELEASESRCPKGFULLNAME=${RELEASESRCBASENAME}.tar.gz
 
-pushd target || { echo "Artifacts not found"; exit; }
-md5sum ${RELEASESRCPKGFULLNAME} > ${RELEASESRCPKGFULLNAME}.md5 || { echo "Generate md5 failed"; exit; }
-shasum -a 512 ${RELEASESRCPKGFULLNAME} > ${RELEASESRCPKGFULLNAME}.sha512 || { echo "Generate sha failed"; exit; }
+pushd target || { echo "Artifacts not found"; exit 50; }
+md5sum ${RELEASESRCPKGFULLNAME} > ${RELEASESRCPKGFULLNAME}.md5 || { echo "Generate md5 failed"; exit 60; }
+shasum -a 512 ${RELEASESRCPKGFULLNAME} > ${RELEASESRCPKGFULLNAME}.sha512 || { echo "Generate sha failed"; exit 70; }
 popd
 
 echo "Verifying packaged Source Artifacts"
 rm -rf ${RELEASEBASENAME}/
-tar xzf target/${RELEASESRCPKGFULLNAME} || { echo "Failed to unpack the source artifact"; exit; }
-pushd ${RELEASEBASENAME} || { echo "Unpacked source directory does not exist"; exit; }
-mvn clean install || { echo "Failed to compile the packaged source artifact"; exit; }
-build-tools/runall.sh || { echo "Failed to verify the packaged source artifact"; exit; }
+tar xzf target/${RELEASESRCPKGFULLNAME} || { echo "Failed to unpack the source artifact"; exit 80; }
+pushd ${RELEASEBASENAME} || { echo "Unpacked source directory does not exist"; exit 90; }
+mvn clean install || { echo "Failed to compile the packaged source artifact"; exit 100; }
+build-tools/runall.sh || { echo "Failed to verify the packaged source artifact"; exit 110; }
 popd
 rm -rf ${RELEASEBASENAME}/
 
@@ -131,4 +136,6 @@ echo "Push release merge and new version to upstream."
 continueprompt
 
 git push upstream master
+
+popd
 

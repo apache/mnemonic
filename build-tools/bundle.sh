@@ -17,12 +17,17 @@
 # limitations under the License.
 #
 
+if [ -z "${MNEMONIC_HOME}" ]; then
+  source "$(dirname "$0")/find-mnemonic-home.sh" || { echo "Not found find-mnemonic-home.sh script."; exit 10; }
+fi
+pushd "$MNEMONIC_HOME" || { echo "the environment variable \$MNEMONIC_HOME contains invalid home directory of Mnemonic project."; exit 11; }
+
 bundle_path="./target/bundle_tmp"
 bundle_name="./target/bundle.jar"
 
 excluded_modules_arr=(mnemonic-utilities-service* mnemonic-nvml-pmem-service* mnemonic-nvml-vmem-service* mnemonic-pmalloc-service*)
 
-[[ x"${bundle_path}" = x"./target/"* ]] || ( echo "The bundle tmp path must begin with ./target/"; exit )
+[[ x"${bundle_path}" = x"./target/"* ]] || ( echo "The bundle tmp path must begin with ./target/"; exit 20 )
 mkdir -p ${bundle_path} || rm -f ${bundle_path}/*
 bn_arr=($(find . ! -path "${bundle_path}/*" -type f -name "*.pom.asc" -exec basename {} .pom.asc \; | xargs))
 for del in ${excluded_modules_arr[@]}
@@ -46,4 +51,6 @@ rm -f ${bundle_name}
 jar cf ${bundle_name} -C ${bundle_path} .
 echo "The bundle has been generated as follows."
 ls -1 ${bundle_name}
+
+popd
 
