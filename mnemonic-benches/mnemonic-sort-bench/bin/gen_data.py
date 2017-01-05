@@ -20,6 +20,8 @@
 import argparse
 import sys
 import random
+import os
+from benchcommon import *
 
 parser = argparse.ArgumentParser()
 parser.add_argument("count", type=long, help="specify how many random numbers will be generated")

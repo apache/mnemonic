@@ -21,6 +21,8 @@ import argparse
 import sys
 import os.path
 import subprocess
+import os
+from benchcommon import *
 
 parser = argparse.ArgumentParser()
 parser.add_argument("input", type=str, help="specify an input file that contains a set of absolute paths of data files.")
@@ -28,6 +30,8 @@ args = parser.parse_args()
 
 with open(args.input, "r") as sfinput:
   fns = sfinput.readlines()
+
+os.chdir(findHomeDir())
 
 runcmdtmp = "mvn exec:exec -Pbench -pl mnemonic-benches/mnemonic-sort-bench  -Dmode={0} -Dinput={1} -Doutput={1}_{0}.out"
 cmpcmdtmp = "diff {1}_{0}.out {3}_{2}.out"
