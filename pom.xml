@@ -109,6 +109,7 @@
     <slf4j.version>1.7.21</slf4j.version>
     <log4j.version>1.2.17</log4j.version>
     <logback.version>1.1.7</logback.version>
+    <javadoc.opts></javadoc.opts>
   </properties>
 
   <repositories>
@@ -502,6 +503,15 @@
       </plugins>
     </build>
   </profile>
+  <profile>
+     <id>doclint-java8-disable</id>
+     <activation>
+       <jdk>[1.8,)</jdk>
+     </activation>
+     <properties>
+       <javadoc.opts>-Xdoclint:none</javadoc.opts>
+     </properties>
+   </profile>
 </profiles>
 
   <reporting>
@@ -522,10 +532,11 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
-          <additionalparam>-Xdoclint:none</additionalparam>
+          <additionalparam>${javadoc.opts}</additionalparam>
         </configuration>
         <reportSets>
           <reportSet>
+            <id>non-aggregate</id>
             <reports>
               <report>javadoc</report>
               <report>test-javadoc</report>
@@ -536,9 +547,18 @@
             <inherited>false</inherited>
             <reports>
               <report>aggregate</report>
+              <report>test-aggregate</report>
             </reports>
           </reportSet>
         </reportSets>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>findbugs-maven-plugin</artifactId>
+        <version>3.0.4</version>
+        <configuration>
+          <effort>Max</effort>
+        </configuration>
       </plugin>
     </plugins>
   </reporting>
