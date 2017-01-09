@@ -162,7 +162,7 @@ public abstract class DurableSinglyLinkedList<E> implements Durable, Iterable<E>
     @Override
     public E next() {
       if (null == next) {
-        new NoSuchElementException();
+        throw new NoSuchElementException();
       }
       E ret = next.getItem();
       next = next.getNext();
