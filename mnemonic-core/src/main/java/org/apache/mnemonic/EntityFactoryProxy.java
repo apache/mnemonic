@@ -18,11 +18,37 @@
 package org.apache.mnemonic;
 
 /**
- * proxy the restoring of generic non-volatile object fields
+ * delegate the restoration/creation of generic non-volatile object fields
  *
  */
 
 public interface EntityFactoryProxy {
+  /**
+   * create a durable object from persistent allocator using a handler of
+   * non-volatile object
+   *
+   * @param <A>
+   *          indicates that for this instantiation of the allocator.
+   *
+   * @param allocator
+   *          specify a persistent allocator instance
+   *
+   * @param factoryproxys
+   *          specify an array of factory proxies for its restored non-volatile
+   *          object
+   *
+   * @param gfields
+   *          specify an array of generic types of its generic fields
+   *          corresponding to factory proxies
+   *
+   * @param autoreclaim
+   *          specify auto-reclaim for this restored non-volatile object
+   *
+   * @return the created non-volatile object from this factory proxy
+   *
+   */
+  <A extends RestorableAllocator<A>> Durable create(A allocator, EntityFactoryProxy[] factoryproxys,
+      DurableType[] gfields, boolean autoreclaim);
 
   /**
    * restore a durable object from persistent allocator using a handler of

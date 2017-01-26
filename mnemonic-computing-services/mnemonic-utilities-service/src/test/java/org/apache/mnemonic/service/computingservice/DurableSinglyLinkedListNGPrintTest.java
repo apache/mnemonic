@@ -66,6 +66,7 @@ public class DurableSinglyLinkedListNGPrintTest {
     m_act.close();
   }
 
+  @SuppressWarnings("unchecked")
   @Test(enabled = true)
   public void testDurableSinglyLinkedListWithPerson() {
 
@@ -78,6 +79,12 @@ public class DurableSinglyLinkedListNGPrintTest {
           DurableType[] gfields, long phandler, boolean autoreclaim) {
         return PersonFactory.restore(allocator, factoryproxys, gfields, phandler, autoreclaim);
       }
+      @Override
+      public <A extends RestorableAllocator<A>> Durable create(
+          A allocator, EntityFactoryProxy[] factoryproxys,
+          DurableType[] gfields, boolean autoreclaim) {
+        return PersonFactory.create(allocator, factoryproxys, gfields, autoreclaim);
+      }
     } };
 
     DurableSinglyLinkedList<Person<Long>> firstnv = DurableSinglyLinkedListFactory.create(m_act, listefproxies, 
@@ -89,7 +96,7 @@ public class DurableSinglyLinkedListNGPrintTest {
     long val;
     DurableSinglyLinkedList<Person<Long>> newnv;
     for (int i = 0; i < elem_count; ++i) {
-      person = PersonFactory.create(m_act);
+      person = (Person<Long>) listefproxies[0].create(m_act, null, null, false);
       person.setAge((short) m_rand.nextInt(50));
       person.setName(String.format("Name: [%s]", Utils.genRandomString()), true);
       nextnv.setItem(person, false);
@@ -164,6 +171,19 @@ public class DurableSinglyLinkedListNGPrintTest {
           val_gftypes = Arrays.copyOfRange(gfields, 1, gfields.length);
         }
         return DurableSinglyLinkedListFactory.restore(allocator, val_efproxies, val_gftypes, phandler, autoreclaim);
+      }
+      @Override
+      public <A extends RestorableAllocator<A>> Durable create(A allocator, EntityFactoryProxy[] factoryproxys,
+          DurableType[] gfields, boolean autoreclaim) {
+        EntityFactoryProxy[] val_efproxies = null;
+        DurableType[] val_gftypes = null;
+        if (null != factoryproxys && factoryproxys.length >= 2) {
+          val_efproxies = Arrays.copyOfRange(factoryproxys, 1, factoryproxys.length);
+        }
+        if (null != gfields && gfields.length >= 2) {
+          val_gftypes = Arrays.copyOfRange(gfields, 1, gfields.length);
+        }
+        return DurableSinglyLinkedListFactory.create(allocator, val_efproxies, val_gftypes, autoreclaim);
       }
     } };
 

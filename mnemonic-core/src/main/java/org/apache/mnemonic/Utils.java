@@ -472,4 +472,28 @@ public class Utils {
     }
     return ret;
   }
+
+  /**
+   * instantiate an array of entity factory proxy classes.
+   *
+   * @param proxyclses
+   *          an array of entity factory proxy classes
+   *
+   * @return the array of instances
+   */
+  public static EntityFactoryProxy[] instantiateEntityFactoryProxies(Class<?>[] proxyclses) {
+    List<EntityFactoryProxy> ret = new ArrayList<EntityFactoryProxy>();
+    try {
+      for (Class<?> itm : proxyclses) {
+        if (EntityFactoryProxy.class.isAssignableFrom(itm)) {
+            ret.add((EntityFactoryProxy)itm.newInstance());
+        } else {
+          throw new ConfigurationException(String.format("%s is not EntityFactoryProxy", itm.getName()));
+        }
+      }
+    } catch (InstantiationException | IllegalAccessException e) {
+      throw new IllegalArgumentException("Failed to instantiate assigned EntityFactoryProxy classes.", e);
+    }
+    return ret.toArray(new EntityFactoryProxy[0]);
+  }
 }

@@ -108,17 +108,25 @@ public class DurableSinglyLinkedListNGTest {
   @Test(enabled = false)
   public void testNodeValueWithPerson() {
 
-    Person<Long> person = PersonFactory.create(m_act);
-    person.setAge((short) 31);
-
     DurableType gtypes[] = {DurableType.DURABLE};
     EntityFactoryProxy efproxies[] = {new EntityFactoryProxy() {
       @Override
-      public <A extends RestorableAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
+      public <A extends RestorableAllocator<A>> Person<Long> restore(
+          A allocator, EntityFactoryProxy[] factoryproxys,
           DurableType[] gfields, long phandler, boolean autoreclaim) {
         return PersonFactory.restore(allocator, factoryproxys, gfields, phandler, autoreclaim);
       }
+      @Override
+      public <A extends RestorableAllocator<A>> Person<Long> create(
+          A allocator, EntityFactoryProxy[] factoryproxys,
+          DurableType[] gfields, boolean autoreclaim) {
+        return PersonFactory.create(allocator, factoryproxys, gfields, autoreclaim);
+      }
     } };
+
+    @SuppressWarnings("unchecked")
+    Person<Long> person =  (Person<Long>) efproxies[0].create(m_act, null, null, false);
+    person.setAge((short) 31);
 
     DurableSinglyLinkedList<Person<Long>> plln = DurableSinglyLinkedListFactory.create(m_act, efproxies, gtypes, false);
     plln.setItem(person, false);
@@ -130,6 +138,7 @@ public class DurableSinglyLinkedListNGTest {
 
   }
 
+  @SuppressWarnings("unchecked")
   @Test(enabled = false)
   public void testLinkedNodeValueWithPerson() {
 
@@ -139,9 +148,16 @@ public class DurableSinglyLinkedListNGTest {
     DurableType listgftypes[] = {DurableType.DURABLE};
     EntityFactoryProxy listefproxies[] = {new EntityFactoryProxy() {
       @Override
-      public <A extends RestorableAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
+      public <A extends RestorableAllocator<A>> Person<Long> restore(
+          A allocator, EntityFactoryProxy[] factoryproxys,
           DurableType[] gfields, long phandler, boolean autoreclaim) {
         return PersonFactory.restore(allocator, factoryproxys, gfields, phandler, autoreclaim);
+      }
+      @Override
+      public <A extends RestorableAllocator<A>> Person<Long> create(
+          A allocator, EntityFactoryProxy[] factoryproxys,
+          DurableType[] gfields, boolean autoreclaim) {
+        return PersonFactory.create(allocator, factoryproxys, gfields, autoreclaim);
       }
     } };
 
@@ -154,7 +170,7 @@ public class DurableSinglyLinkedListNGTest {
     long val;
     DurableSinglyLinkedList<Person<Long>> newnv;
     for (int i = 0; i < elem_count; ++i) {
-      person = PersonFactory.create(m_act);
+      person = (Person<Long>) listefproxies[0].create(m_act, null, null, false);
       person.setAge((short) m_rand.nextInt(50));
       person.setName(String.format("Name: [%s]", Utils.genRandomString()), true);
       nextnv.setItem(person, false);
@@ -213,6 +229,20 @@ public class DurableSinglyLinkedListNGTest {
           val_gftypes = Arrays.copyOfRange(gfields, 1, gfields.length);
         }
         return DurableSinglyLinkedListFactory.restore(allocator, val_efproxies, val_gftypes, phandler, autoreclaim);
+      }
+      @Override
+      public <A extends RestorableAllocator<A>> Durable create(
+          A allocator, EntityFactoryProxy[] factoryproxys,
+          DurableType[] gfields, boolean autoreclaim) {
+        EntityFactoryProxy[] val_efproxies = null;
+        DurableType[] val_gftypes = null;
+        if (null != factoryproxys && factoryproxys.length >= 2) {
+          val_efproxies = Arrays.copyOfRange(factoryproxys, 1, factoryproxys.length);
+        }
+        if (null != gfields && gfields.length >= 2) {
+          val_gftypes = Arrays.copyOfRange(gfields, 1, gfields.length);
+        }
+        return DurableSinglyLinkedListFactory.create(allocator, val_efproxies, val_gftypes, autoreclaim);
       }
     } };
 
