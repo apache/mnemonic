@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.mnemonic.service.memoryservice.VolatileMemoryAllocatorService;
 import org.apache.mnemonic.service.computingservice.GeneralComputingService;
 import org.apache.mnemonic.service.memoryservice.NonVolatileMemoryAllocatorService;
@@ -495,5 +496,32 @@ public class Utils {
       throw new IllegalArgumentException("Failed to instantiate assigned EntityFactoryProxy classes.", e);
     }
     return ret.toArray(new EntityFactoryProxy[0]);
+  }
+
+  /**
+   * shift durable parameters.
+   *
+   * @param gtypes
+   *          an array of entity generic types
+   *
+   * @param factoryproxies
+   *          an array of entity factory proxies
+   *
+   * @param len
+   *          the length to shift from start
+   *
+   * @return the pair of shifted parameters.
+   */
+  public static Pair<DurableType[], EntityFactoryProxy[]> shiftDurableParams(
+      DurableType[] gtypes, EntityFactoryProxy[] factoryproxies, int len) {
+    DurableType[] ret_gtypes = {};
+    EntityFactoryProxy[] ret_proxies = {};
+    if (null != gtypes && gtypes.length > len) {
+      ret_gtypes = Arrays.copyOfRange(gtypes, len, gtypes.length);
+    }
+    if (null != factoryproxies && factoryproxies.length > len) {
+      ret_proxies = Arrays.copyOfRange(factoryproxies, len, factoryproxies.length);
+    }
+    return Pair.of(ret_gtypes, ret_proxies);
   }
 }

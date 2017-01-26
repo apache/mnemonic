@@ -19,12 +19,12 @@ package org.apache.mnemonic.service.computingservice;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.mnemonic.NonVolatileMemAllocator;
 import org.apache.mnemonic.RestorableAllocator;
 import org.apache.mnemonic.Durable;
@@ -162,28 +162,14 @@ public class DurableSinglyLinkedListNGPrintTest {
       @Override
       public <A extends RestorableAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
           DurableType[] gfields, long phandler, boolean autoreclaim) {
-        EntityFactoryProxy[] val_efproxies = null;
-        DurableType[] val_gftypes = null;
-        if (null != factoryproxys && factoryproxys.length >= 2) {
-          val_efproxies = Arrays.copyOfRange(factoryproxys, 1, factoryproxys.length);
-        }
-        if (null != gfields && gfields.length >= 2) {
-          val_gftypes = Arrays.copyOfRange(gfields, 1, gfields.length);
-        }
-        return DurableSinglyLinkedListFactory.restore(allocator, val_efproxies, val_gftypes, phandler, autoreclaim);
+        Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, 1);
+        return DurableSinglyLinkedListFactory.restore(allocator, dpt.getRight(), dpt.getLeft(), phandler, autoreclaim);
       }
       @Override
       public <A extends RestorableAllocator<A>> Durable create(A allocator, EntityFactoryProxy[] factoryproxys,
           DurableType[] gfields, boolean autoreclaim) {
-        EntityFactoryProxy[] val_efproxies = null;
-        DurableType[] val_gftypes = null;
-        if (null != factoryproxys && factoryproxys.length >= 2) {
-          val_efproxies = Arrays.copyOfRange(factoryproxys, 1, factoryproxys.length);
-        }
-        if (null != gfields && gfields.length >= 2) {
-          val_gftypes = Arrays.copyOfRange(gfields, 1, gfields.length);
-        }
-        return DurableSinglyLinkedListFactory.create(allocator, val_efproxies, val_gftypes, autoreclaim);
+        Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, 1);
+        return DurableSinglyLinkedListFactory.create(allocator, dpt.getRight(), dpt.getLeft(), autoreclaim);
       }
     } };
 
