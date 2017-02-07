@@ -42,12 +42,12 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>>, Writa
 
   @Override
   public void initializeAfterCreate() {
-    System.out.println("Initializing After Created");
+    /* System.out.println("Initializing After Created"); */
   }
 
   @Override
   public void initializeAfterRestore() {
-    System.out.println("Initializing After Restored");
+    /* System.out.println("Initializing After Restored"); */
   }
 
   @Override

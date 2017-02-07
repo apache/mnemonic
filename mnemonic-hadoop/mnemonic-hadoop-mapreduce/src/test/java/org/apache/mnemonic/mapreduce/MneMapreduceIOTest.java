@@ -53,7 +53,7 @@ public class MneMapreduceIOTest {
   private Random m_rand;
   private TaskAttemptID m_taid;
   private TaskAttemptContext m_tacontext;
-  private long m_reccnt = 5000L;
+  private long m_reccnt = 500000L;
   private long m_sumage = 0L;
 
   @BeforeClass
@@ -112,20 +112,30 @@ public class MneMapreduceIOTest {
   @Test(enabled = true, dependsOnMethods = { "testWritePersonData" })
   public void testReadPersonData() throws Exception {
     long sumage = 0L;
-    FileSplit split = new FileSplit(
-        new Path(m_workdir,
-            String.format("part-00001-m-00000%s", MneConfigHelper.FILE_EXTENSION)), 0, 0L, new String[0]);
-    InputFormat<NullWritable, Person<Long>> inputFormat = new MneInputFormat<Person<Long>>();
-    RecordReader<NullWritable, Person<Long>> reader = inputFormat.createRecordReader(split, m_tacontext);
-    Person<Long> person = null;
-    for (int i = 0; i < m_reccnt; ++i) {
-      AssertJUnit.assertTrue(reader.nextKeyValue());
-      person = reader.getCurrentValue();
-      AssertJUnit.assertTrue(person.getAge() < 51);
-      sumage += person.getAge();
+    long reccnt = 0L;
+    File folder = new File(m_workdir.toString());
+    File[] listfiles = folder.listFiles();
+    for (int idx = 0; idx < listfiles.length; ++idx) {
+      if (listfiles[idx].isFile()
+          && listfiles[idx].getName().endsWith(MneConfigHelper.FILE_EXTENSION)) {
+        System.out.println(String.format("Verifying : %s", listfiles[idx].getName()));
+        FileSplit split = new FileSplit(
+            new Path(m_workdir, listfiles[idx].getName()), 0, 0L, new String[0]);
+        InputFormat<NullWritable, Person<Long>> inputFormat = new MneInputFormat<Person<Long>>();
+        RecordReader<NullWritable, Person<Long>> reader = inputFormat.createRecordReader(
+            split, m_tacontext);
+        Person<Long> person = null;
+        while (reader.nextKeyValue()) {
+          person = reader.getCurrentValue();
+          AssertJUnit.assertTrue(person.getAge() < 51);
+          sumage += person.getAge();
+          ++reccnt;
+        }
+        reader.close();
+      }
     }
     AssertJUnit.assertEquals(m_sumage, sumage);
-    reader.close();
+    AssertJUnit.assertEquals(m_reccnt, reccnt);
     System.out.println(String.format("The sum of ages is %d", sumage));
   }
 }
