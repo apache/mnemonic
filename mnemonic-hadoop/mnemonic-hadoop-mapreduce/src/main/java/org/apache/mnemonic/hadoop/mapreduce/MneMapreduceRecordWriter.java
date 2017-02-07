@@ -41,7 +41,8 @@ import org.apache.mnemonic.hadoop.MneConfigHelper;
 import org.apache.mnemonic.collections.DurableSinglyLinkedList;
 import org.apache.mnemonic.collections.DurableSinglyLinkedListFactory;
 
-public class MneMapreduceRecordWriter<V> extends RecordWriter<NullWritable, V> {
+public class MneMapreduceRecordWriter<V> extends RecordWriter<NullWritable, V>
+    implements MneDurableComputable<NonVolatileMemAllocator> {
 
   protected Configuration m_conf;
   protected TaskAttemptContext m_context;
@@ -103,8 +104,18 @@ public class MneMapreduceRecordWriter<V> extends RecordWriter<NullWritable, V> {
     m_newpool = true;
   }
 
+  @Override
   public NonVolatileMemAllocator getAllocator() {
     return m_act;
+  }
+
+  @Override
+  public long getHandler() {
+    long ret = 0L;
+    if (null != m_listnode) {
+      m_listnode.getHandler();
+    }
+    return ret;
   }
 
   @SuppressWarnings("unchecked")

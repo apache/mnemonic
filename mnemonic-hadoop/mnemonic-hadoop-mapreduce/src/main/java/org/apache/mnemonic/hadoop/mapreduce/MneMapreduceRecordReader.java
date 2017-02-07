@@ -38,13 +38,15 @@ import org.apache.mnemonic.hadoop.MneConfigHelper;
  * @param <V> the type of the data item
  */
 public class MneMapreduceRecordReader<V>
-    extends org.apache.hadoop.mapreduce.RecordReader<NullWritable, V> {
+    extends org.apache.hadoop.mapreduce.RecordReader<NullWritable, V>
+    implements MneDurableComputable<NonVolatileMemAllocator> {
 
   protected Configuration m_conf;
   protected TaskAttemptContext m_context;
   protected NonVolatileMemAllocator m_act;
   protected Iterator<V> m_iter;
   protected long m_slotkeyid;
+  protected long m_handler = 0L;
   protected DurableType[] m_gtypes;
   protected EntityFactoryProxy[] m_efproxies;
   protected String m_msvrname;
@@ -73,9 +75,9 @@ public class MneMapreduceRecordReader<V>
 
     m_act = new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService(m_msvrname), 1024000L,
         split.getPath().toString(), true);
-    long handler = m_act.getHandler(m_slotkeyid);
+    m_handler = m_act.getHandler(m_slotkeyid);
     dsllist = DurableSinglyLinkedListFactory.restore(m_act, m_efproxies, 
-        m_gtypes, handler, false);
+        m_gtypes, m_handler, false);
     m_iter = dsllist.iterator();
   }
 
@@ -98,4 +100,15 @@ public class MneMapreduceRecordReader<V>
   public float getProgress() throws IOException {
     return 0.5f; /* TBD */
   }
+
+  @Override
+  public NonVolatileMemAllocator getAllocator() {
+    return m_act;
+  }
+
+  @Override
+  public long getHandler() {
+    return m_handler;
+  }
+
 }
