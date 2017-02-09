@@ -7,15 +7,17 @@ Apache Mnemonic is an advanced hybrid memory storages oriented library, it propo
 ### Features:
 
 * In-place data storage on local non-volatile memory
-* Durable Object Model
+* Durable Object Model (DOM)
+* Durable Native Computing Model (DNCM)
 * Object graphs lazy loading & sharing
 * Auto-reclaim memory resources and Mnemonic objects
 * Hierarchical cache pool for massive data caching
 * Extensible memory services for new device adoption and allocation optimization
 * Durable data structure collection(WIP)
 * Durable computing service
-* Minimize memory footprint on Java heap
+* Minimize memory footprint of on-heap
 * Reduce GC Overheads as the following chart shown (collected from Apache Spark experiments)
+* Drop-in Hadoop MapReduce support
 
 ![Mnemonic_GC_stats](http://nonvolatilecomputing.github.io/Mnemonic/images/mnemonic_GC_stats.png)
 
@@ -206,6 +208,7 @@ Please see the file LICENSE for information on how this library is licensed.
 * **mnemonic-memory-services/service-dist** -- the location of extensive memory services (auto-generated)
 * **mnemonic-computing-services/mnemonic-utilities-service** -- the submodule project for utilities computing service
 * **mnemonic-computing-services/service-dist** -- the location of extensive computing services (auto-generated)
+* **mnemonic-hadoop/mnemonic-hadoop-mapreduce** -- the submodule project for hadoop mapreduce computing
 
 
 #### Durable Memory Service Comparison Table
@@ -282,9 +285,12 @@ To run several test cases:
   
   $ # a testcase for module "mnemonic-computing-services/mnemonic-utilities-service" that requires 'pmalloc' memory service to pass
   $ mvn -Dtest=DurableSinglyLinkedListNGPrintTest test -pl mnemonic-computing-services/mnemonic-utilities-service -DskipTests=false
-
+  
   $ # a testcase for module "mnemonic-computing-services/mnemonic-utilities-service" that requires 'pmalloc' memory service to pass
   $ mvn -Dtest=DurableSinglyLinkedListNGSortTest test -pl mnemonic-computing-services/mnemonic-utilities-service -DskipTests=false
+  
+  $ # a testcase for module "mnemonic-hadoop/mnemonic-hadoop-mapreduce" that requires 'pmalloc' memory service to pass
+  $ mvn -Dtest=MneMapreduceIOTest test -pl mnemonic-hadoop/mnemonic-hadoop-mapreduce -DskipTests=false
 ```
 
 
