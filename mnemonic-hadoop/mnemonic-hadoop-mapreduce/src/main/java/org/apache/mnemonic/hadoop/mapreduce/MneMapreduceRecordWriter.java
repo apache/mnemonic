@@ -71,12 +71,13 @@ public class MneMapreduceRecordWriter<V> extends RecordWriter<NullWritable, V>
 
   protected MneMapreduceRecordWriter(Configuration conf) {
     m_conf = conf;
-    m_msvrname = MneConfigHelper.getOutputMemServiceName(m_conf);
-    m_gtypes = MneConfigHelper.getOutputDurableTypes(m_conf);
-    m_efproxies = Utils.instantiateEntityFactoryProxies(MneConfigHelper.getOutputEntityFactoryProxies(m_conf));
+    m_msvrname = MneConfigHelper.getMemServiceName(m_conf, MneConfigHelper.OUTPUT_CONFIG_PREFIX_DEFAULT);
+    m_gtypes = MneConfigHelper.getDurableTypes(m_conf, MneConfigHelper.OUTPUT_CONFIG_PREFIX_DEFAULT);
+    m_efproxies = Utils.instantiateEntityFactoryProxies(
+        MneConfigHelper.getEntityFactoryProxies(m_conf, MneConfigHelper.OUTPUT_CONFIG_PREFIX_DEFAULT));
     m_recparmpair = Utils.shiftDurableParams(m_gtypes, m_efproxies, 1);
-    m_slotkeyid = MneConfigHelper.getOutputSlotKeyId(m_conf);
-    m_poolsz = MneConfigHelper.getOutputMemPoolSize(conf);
+    m_slotkeyid = MneConfigHelper.getSlotKeyId(m_conf, MneConfigHelper.OUTPUT_CONFIG_PREFIX_DEFAULT);
+    m_poolsz = MneConfigHelper.getMemPoolSize(m_conf, MneConfigHelper.OUTPUT_CONFIG_PREFIX_DEFAULT);
     m_recordmap = new HashMap<V, DurableSinglyLinkedList<V>>();
     if (m_gtypes.length < 1) {
       throw new ConfigurationException("The durable type of record parameters does not exist");

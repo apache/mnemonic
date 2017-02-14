@@ -65,11 +65,11 @@ public class MneMapreduceRecordReader<V>
     FileSplit split = (FileSplit) inputSplit;
     m_context = context;
     m_conf = m_context.getConfiguration();
-    m_msvrname = MneConfigHelper.getInputMemServiceName(m_conf);
-    m_gtypes = MneConfigHelper.getInputDurableTypes(m_conf);
+    m_msvrname = MneConfigHelper.getMemServiceName(m_conf, MneConfigHelper.INPUT_CONFIG_PREFIX_DEFAULT);
+    m_gtypes = MneConfigHelper.getDurableTypes(m_conf, MneConfigHelper.INPUT_CONFIG_PREFIX_DEFAULT);
     m_efproxies = Utils.instantiateEntityFactoryProxies(
-        MneConfigHelper.getInputEntityFactoryProxies(m_conf));
-    m_slotkeyid = MneConfigHelper.getInputSlotKeyId(m_conf);
+        MneConfigHelper.getEntityFactoryProxies(m_conf, MneConfigHelper.INPUT_CONFIG_PREFIX_DEFAULT));
+    m_slotkeyid = MneConfigHelper.getSlotKeyId(m_conf, MneConfigHelper.INPUT_CONFIG_PREFIX_DEFAULT);
     
     DurableSinglyLinkedList<V> dsllist;
 

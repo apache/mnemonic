@@ -47,6 +47,9 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class MneMapreduceIOTest {
+
+  private static final String SERVICE_NAME = "pmalloc";
+  private static final long SLOT_KEY_ID = 5L;
   private Path m_workdir;
   private JobConf m_conf;
   private FileSystem m_fs;
@@ -76,16 +79,20 @@ public class MneMapreduceIOTest {
 
     m_conf.set("mapreduce.output.fileoutputformat.outputdir", m_workdir.toString());
 
-    MneConfigHelper.setInputMemServiceName(m_conf, "pmalloc");
-    MneConfigHelper.setInputSlotKeyId(m_conf, 3L);
-    MneConfigHelper.setInputDurableTypes(m_conf, new DurableType[] {DurableType.DURABLE});
-    MneConfigHelper.setInputEntityFactoryProxies(m_conf, new Class<?>[] {PersonListEFProxy.class});
-    MneConfigHelper.setOutputMemServiceName(m_conf, "pmalloc");
-    MneConfigHelper.setOutputSlotKeyId(m_conf, 3L);
-    MneConfigHelper.setOutputMemPoolSize(m_conf, 1024L * 1024 * 1024 * 4);
-    MneConfigHelper.setOutputDurableTypes(m_conf, new DurableType[] {DurableType.DURABLE});
-    MneConfigHelper.setOutputEntityFactoryProxies(m_conf, new Class<?>[] {PersonListEFProxy.class});
-
+    MneConfigHelper.setMemServiceName(m_conf, MneConfigHelper.INPUT_CONFIG_PREFIX_DEFAULT, SERVICE_NAME);
+    MneConfigHelper.setSlotKeyId(m_conf, MneConfigHelper.INPUT_CONFIG_PREFIX_DEFAULT, SLOT_KEY_ID);
+    MneConfigHelper.setDurableTypes(m_conf,
+        MneConfigHelper.INPUT_CONFIG_PREFIX_DEFAULT, new DurableType[] {DurableType.DURABLE});
+    MneConfigHelper.setEntityFactoryProxies(m_conf,
+        MneConfigHelper.INPUT_CONFIG_PREFIX_DEFAULT, new Class<?>[] {PersonListEFProxy.class});
+    MneConfigHelper.setMemServiceName(m_conf, MneConfigHelper.OUTPUT_CONFIG_PREFIX_DEFAULT, SERVICE_NAME);
+    MneConfigHelper.setSlotKeyId(m_conf, MneConfigHelper.OUTPUT_CONFIG_PREFIX_DEFAULT, SLOT_KEY_ID);
+    MneConfigHelper.setMemPoolSize(m_conf,
+        MneConfigHelper.OUTPUT_CONFIG_PREFIX_DEFAULT, 1024L * 1024 * 1024 * 4);
+    MneConfigHelper.setDurableTypes(m_conf,
+        MneConfigHelper.OUTPUT_CONFIG_PREFIX_DEFAULT, new DurableType[] {DurableType.DURABLE});
+    MneConfigHelper.setEntityFactoryProxies(m_conf,
+        MneConfigHelper.OUTPUT_CONFIG_PREFIX_DEFAULT, new Class<?>[] {PersonListEFProxy.class});
   }
 
   @AfterClass
