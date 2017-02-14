@@ -119,6 +119,15 @@ exit 1
 fi
 echo [SUCCESS] Test case DurableSinglyLinkedListNGSortTest for \"mnemonic-computing-services/mnemonic-utilities-service\" is completed!
 
+echo [INFO] Running MneMapreduceIOTest for \"mnemonic-hadoop/mnemonic-hadoop-mapreduce\"...
+mvn -Dtest=MneMapreduceIOTest test -pl mnemonic-hadoop/mnemonic-hadoop-mapreduce -DskipTests=false > testlog/MneMapreduceIOTest.log
+if [ $? -gt 0 ]
+then
+echo [ERROR] This test case requires \"pmalloc\" memory service to pass, please check if \"pmalloc\" has been configured correctly! If \"pmalloc\" is installed, please refer to testlog/MneMapreduceIOTest.log for detailed information.
+exit 1
+fi
+echo [SUCCESS] Test case MneMapreduceIOTest for \"mnemonic-hadoop/mnemonic-hadoop-mapreduce\" is completed!
+
 echo [DONE] All test cases are completed! Log files are available under folder testlog!
 
 popd
