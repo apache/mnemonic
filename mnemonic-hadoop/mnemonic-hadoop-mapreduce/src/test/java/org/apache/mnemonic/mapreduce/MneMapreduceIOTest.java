@@ -38,8 +38,9 @@ import org.apache.hadoop.mapreduce.task.TaskAttemptContextImpl;
 import org.apache.mnemonic.DurableType;
 import org.apache.mnemonic.Utils;
 import org.apache.mnemonic.hadoop.MneConfigHelper;
+import org.apache.mnemonic.hadoop.MneDurableOutputSession;
+import org.apache.mnemonic.hadoop.MneDurableOutputValue;
 import org.apache.mnemonic.hadoop.mapreduce.MneInputFormat;
-import org.apache.mnemonic.hadoop.mapreduce.MneMapreduceRecordWriter;
 import org.apache.mnemonic.hadoop.mapreduce.MneOutputFormat;
 import org.testng.AssertJUnit;
 import org.testng.annotations.AfterClass;
@@ -79,20 +80,20 @@ public class MneMapreduceIOTest {
 
     m_conf.set("mapreduce.output.fileoutputformat.outputdir", m_workdir.toString());
 
-    MneConfigHelper.setMemServiceName(m_conf, MneConfigHelper.INPUT_CONFIG_PREFIX_DEFAULT, SERVICE_NAME);
-    MneConfigHelper.setSlotKeyId(m_conf, MneConfigHelper.INPUT_CONFIG_PREFIX_DEFAULT, SLOT_KEY_ID);
+    MneConfigHelper.setMemServiceName(m_conf, MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX, SERVICE_NAME);
+    MneConfigHelper.setSlotKeyId(m_conf, MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX, SLOT_KEY_ID);
     MneConfigHelper.setDurableTypes(m_conf,
-        MneConfigHelper.INPUT_CONFIG_PREFIX_DEFAULT, new DurableType[] {DurableType.DURABLE});
+        MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX, new DurableType[] {DurableType.DURABLE});
     MneConfigHelper.setEntityFactoryProxies(m_conf,
-        MneConfigHelper.INPUT_CONFIG_PREFIX_DEFAULT, new Class<?>[] {PersonListEFProxy.class});
-    MneConfigHelper.setMemServiceName(m_conf, MneConfigHelper.OUTPUT_CONFIG_PREFIX_DEFAULT, SERVICE_NAME);
-    MneConfigHelper.setSlotKeyId(m_conf, MneConfigHelper.OUTPUT_CONFIG_PREFIX_DEFAULT, SLOT_KEY_ID);
+        MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX, new Class<?>[] {PersonListEFProxy.class});
+    MneConfigHelper.setMemServiceName(m_conf, MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX, SERVICE_NAME);
+    MneConfigHelper.setSlotKeyId(m_conf, MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX, SLOT_KEY_ID);
     MneConfigHelper.setMemPoolSize(m_conf,
-        MneConfigHelper.OUTPUT_CONFIG_PREFIX_DEFAULT, 1024L * 1024 * 1024 * 4);
+        MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX, 1024L * 1024 * 1024 * 4);
     MneConfigHelper.setDurableTypes(m_conf,
-        MneConfigHelper.OUTPUT_CONFIG_PREFIX_DEFAULT, new DurableType[] {DurableType.DURABLE});
+        MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX, new DurableType[] {DurableType.DURABLE});
     MneConfigHelper.setEntityFactoryProxies(m_conf,
-        MneConfigHelper.OUTPUT_CONFIG_PREFIX_DEFAULT, new Class<?>[] {PersonListEFProxy.class});
+        MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX, new Class<?>[] {PersonListEFProxy.class});
   }
 
   @AfterClass
@@ -103,17 +104,25 @@ public class MneMapreduceIOTest {
   @Test(enabled = true)
   public void testWritePersonData() throws Exception {
     NullWritable nada = NullWritable.get();
-    OutputFormat<NullWritable, Person<Long>> outputFormat = new MneOutputFormat<Person<Long>>();
-    RecordWriter<NullWritable, Person<Long>> writer = outputFormat.getRecordWriter(m_tacontext);
+    MneDurableOutputSession<Person<Long>> sess = new MneDurableOutputSession<Person<Long>>(m_tacontext);
+    sess.readConfig(MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX);
+    sess.initNextPool();
+    MneDurableOutputValue<Person<Long>> mdvalue =
+        new MneDurableOutputValue<Person<Long>>(sess);
+    OutputFormat<NullWritable, MneDurableOutputValue<Person<Long>>> outputFormat =
+        new MneOutputFormat<MneDurableOutputValue<Person<Long>>>();
+    RecordWriter<NullWritable, MneDurableOutputValue<Person<Long>>> writer =
+        outputFormat.getRecordWriter(m_tacontext);
     Person<Long> person = null;
     for (int i = 0; i < m_reccnt; ++i) {
-      person = ((MneMapreduceRecordWriter<Person<Long>>) writer).newDurableObjectRecord();
+      person = sess.newDurableObjectRecord();
       person.setAge((short) m_rand.nextInt(50));
       person.setName(String.format("Name: [%s]", Utils.genRandomString()), true);
       m_sumage += person.getAge();
-      writer.write(nada, person);
+      writer.write(nada, mdvalue.of(person));
     }
     writer.close(m_tacontext);
+    sess.close();
   }
 
   @Test(enabled = true, dependsOnMethods = { "testWritePersonData" })
@@ -124,7 +133,7 @@ public class MneMapreduceIOTest {
     File[] listfiles = folder.listFiles();
     for (int idx = 0; idx < listfiles.length; ++idx) {
       if (listfiles[idx].isFile()
-          && listfiles[idx].getName().endsWith(MneConfigHelper.FILE_EXTENSION)) {
+          && listfiles[idx].getName().endsWith(MneConfigHelper.DEFAULT_FILE_EXTENSION)) {
         System.out.println(String.format("Verifying : %s", listfiles[idx].getName()));
         FileSplit split = new FileSplit(
             new Path(m_workdir, listfiles[idx].getName()), 0, 0L, new String[0]);

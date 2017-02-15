@@ -33,20 +33,27 @@ import org.slf4j.LoggerFactory;
  */
 public class MneConfigHelper {
 
-  public static final String OUTPUT_CONFIG_PREFIX_DEFAULT = "mnemonic.output.";
-  public static final String INPUT_CONFIG_PREFIX_DEFAULT = "mnemonic.input.";
+  public static final String DEFAULT_OUTPUT_CONFIG_PREFIX = "mnemonic.output.";
+  public static final String DEFAULT_INPUT_CONFIG_PREFIX = "mnemonic.input.";
   public static final String DURABLE_TYPES = "durable.types";
   public static final String ENTITY_FACTORY_PROXIES = "entity.factory.proxies.class";
   public static final String SLOT_KEY_ID = "slot.key.id";
   public static final String MEM_SERVICE_NAME = "mem.service.name";
   public static final String MEM_POOL_SIZE = "mem.pool.size";
-  private static final long DEFAULT_OUTPUT_MEM_POOL_SIZE = 1024L * 1024 * 1024 * 4;
-  public static final String FILE_EXTENSION = ".mne";
+  public static final long DEFAULT_OUTPUT_MEM_POOL_SIZE = 1024L * 1024 * 1024 * 4;
+  public static final String DEFAULT_NAME_PART = "part";
+  public static final String DEFAULT_FILE_EXTENSION = ".mne";
+  public static final String BASE_OUTPUT_NAME = "mapreduce.output.basename";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MneConfigHelper.class);
 
   public static String getConfigName(String prefix, String partname) {
+    prefix = null == prefix ? "" : prefix;
     return prefix + partname;
+  }
+
+  public static String getBaseOutputName(Configuration conf, String prefix) {
+    return conf.get(getConfigName(prefix, BASE_OUTPUT_NAME), DEFAULT_NAME_PART);
   }
 
   public static void setDurableTypes(Configuration conf, String prefix, DurableType[] dtypes) {

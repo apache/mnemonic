@@ -32,6 +32,7 @@ import org.apache.mnemonic.Utils;
 import org.apache.mnemonic.collections.DurableSinglyLinkedList;
 import org.apache.mnemonic.collections.DurableSinglyLinkedListFactory;
 import org.apache.mnemonic.hadoop.MneConfigHelper;
+import org.apache.mnemonic.hadoop.MneDurableComputable;
 
 /**
  * This record reader implements the org.apache.hadoop.mapreduce API.
@@ -65,11 +66,11 @@ public class MneMapreduceRecordReader<V>
     FileSplit split = (FileSplit) inputSplit;
     m_context = context;
     m_conf = m_context.getConfiguration();
-    m_msvrname = MneConfigHelper.getMemServiceName(m_conf, MneConfigHelper.INPUT_CONFIG_PREFIX_DEFAULT);
-    m_gtypes = MneConfigHelper.getDurableTypes(m_conf, MneConfigHelper.INPUT_CONFIG_PREFIX_DEFAULT);
+    m_msvrname = MneConfigHelper.getMemServiceName(m_conf, MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX);
+    m_gtypes = MneConfigHelper.getDurableTypes(m_conf, MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX);
     m_efproxies = Utils.instantiateEntityFactoryProxies(
-        MneConfigHelper.getEntityFactoryProxies(m_conf, MneConfigHelper.INPUT_CONFIG_PREFIX_DEFAULT));
-    m_slotkeyid = MneConfigHelper.getSlotKeyId(m_conf, MneConfigHelper.INPUT_CONFIG_PREFIX_DEFAULT);
+        MneConfigHelper.getEntityFactoryProxies(m_conf, MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX));
+    m_slotkeyid = MneConfigHelper.getSlotKeyId(m_conf, MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX);
     
     DurableSinglyLinkedList<V> dsllist;
 

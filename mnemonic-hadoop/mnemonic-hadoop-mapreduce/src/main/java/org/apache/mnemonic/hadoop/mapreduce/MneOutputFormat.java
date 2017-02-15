@@ -21,21 +21,19 @@ package org.apache.mnemonic.hadoop.mapreduce;
 import java.io.IOException;
 
 import org.apache.hadoop.io.NullWritable;
-import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.mnemonic.hadoop.MneConfigHelper;
+import org.apache.mnemonic.hadoop.MneDurableOutputValue;
 
 /**
  * A Mnemonic output format that satisfies the org.apache.hadoop.mapreduce API.
  */
-public class MneOutputFormat<V extends Writable> extends FileOutputFormat<NullWritable, V> {
+public class MneOutputFormat<MV extends MneDurableOutputValue<?>> extends FileOutputFormat<NullWritable, MV> {
 
   @Override
-  public RecordWriter<NullWritable, V> getRecordWriter(TaskAttemptContext taskAttemptContext) throws IOException {
-    return new MneMapreduceRecordWriter<V>(taskAttemptContext, getOutputName(taskAttemptContext),
-        MneConfigHelper.FILE_EXTENSION);
+  public RecordWriter<NullWritable, MV> getRecordWriter(TaskAttemptContext taskAttemptContext) throws IOException {
+    return new MneMapreduceRecordWriter<MV>();
   }
 
 }

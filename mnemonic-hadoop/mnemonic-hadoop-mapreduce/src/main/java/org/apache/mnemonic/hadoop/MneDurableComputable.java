@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.mnemonic.hadoop.mapreduce;
+package org.apache.mnemonic.hadoop;
 
 import org.apache.mnemonic.CommonAllocator;
 

@@ -17,11 +17,6 @@
 
 package org.apache.mnemonic.mapreduce;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
-import org.apache.hadoop.io.Writable;
 import org.apache.mnemonic.Durable;
 import org.apache.mnemonic.EntityFactoryProxy;
 import org.apache.mnemonic.DurableEntity;
@@ -37,7 +32,7 @@ import org.apache.mnemonic.DurableType;
  */
 
 @DurableEntity
-public abstract class Person<E> implements Durable, Comparable<Person<E>>, Writable {
+public abstract class Person<E> implements Durable, Comparable<Person<E>> {
   E element;
 
   @Override
@@ -73,14 +68,6 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>>, Writa
       ret = getName().compareTo(anotherPerson.getName());
     }
     return ret;
-  }
-
-  public void write(DataOutput out) throws IOException {
-
-  }
-
-  public void readFields(DataInput in) throws IOException {
-
   }
 
   @DurableGetter(Id = 1L)
