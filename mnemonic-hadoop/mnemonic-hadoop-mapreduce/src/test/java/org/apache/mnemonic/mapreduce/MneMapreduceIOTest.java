@@ -38,6 +38,7 @@ import org.apache.hadoop.mapreduce.task.TaskAttemptContextImpl;
 import org.apache.mnemonic.DurableType;
 import org.apache.mnemonic.Utils;
 import org.apache.mnemonic.hadoop.MneConfigHelper;
+import org.apache.mnemonic.hadoop.MneDurableInputValue;
 import org.apache.mnemonic.hadoop.MneDurableOutputSession;
 import org.apache.mnemonic.hadoop.MneDurableOutputValue;
 import org.apache.mnemonic.hadoop.mapreduce.MneInputFormat;
@@ -137,14 +138,15 @@ public class MneMapreduceIOTest {
         System.out.println(String.format("Verifying : %s", listfiles[idx].getName()));
         FileSplit split = new FileSplit(
             new Path(m_workdir, listfiles[idx].getName()), 0, 0L, new String[0]);
-        InputFormat<NullWritable, Person<Long>> inputFormat = new MneInputFormat<Person<Long>>();
-        RecordReader<NullWritable, Person<Long>> reader = inputFormat.createRecordReader(
-            split, m_tacontext);
-        Person<Long> person = null;
+        InputFormat<NullWritable, MneDurableInputValue<Person<Long>>> inputFormat =
+            new MneInputFormat<MneDurableInputValue<Person<Long>>, Person<Long>>();
+        RecordReader<NullWritable, MneDurableInputValue<Person<Long>>> reader =
+            inputFormat.createRecordReader(split, m_tacontext);
+        MneDurableInputValue<Person<Long>> personval = null;
         while (reader.nextKeyValue()) {
-          person = reader.getCurrentValue();
-          AssertJUnit.assertTrue(person.getAge() < 51);
-          sumage += person.getAge();
+          personval = reader.getCurrentValue();
+          AssertJUnit.assertTrue(personval.getValue().getAge() < 51);
+          sumage += personval.getValue().getAge();
           ++reccnt;
         }
         reader.close();

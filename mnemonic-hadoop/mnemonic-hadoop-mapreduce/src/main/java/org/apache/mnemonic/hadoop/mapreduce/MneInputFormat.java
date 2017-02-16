@@ -23,6 +23,7 @@ import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.mnemonic.hadoop.MneDurableInputValue;
 import org.apache.hadoop.fs.Path;
 
 import java.io.IOException;
@@ -32,8 +33,8 @@ import org.apache.hadoop.io.NullWritable;
 /**
  * A Mnemonic input format that satisfies the org.apache.hadoop.mapreduce API.
  */
-public class MneInputFormat<V>
-    extends FileInputFormat<NullWritable, V> {
+public class MneInputFormat<MV extends MneDurableInputValue<V>, V>
+    extends FileInputFormat<NullWritable, MV> {
 
   @Override
   protected boolean isSplitable(JobContext context, Path filename) {
@@ -41,11 +42,11 @@ public class MneInputFormat<V>
   }
 
   @Override
-  public RecordReader<NullWritable, V>
+  public RecordReader<NullWritable, MV>
       createRecordReader(InputSplit inputSplit,
                          TaskAttemptContext taskAttemptContext
                          ) throws IOException, InterruptedException {
-    MneMapreduceRecordReader<V> reader = new MneMapreduceRecordReader<V>();
+    MneMapreduceRecordReader<MV, V> reader = new MneMapreduceRecordReader<MV, V>();
     reader.initialize(inputSplit, taskAttemptContext);
     return reader;
   }
