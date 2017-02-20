@@ -290,7 +290,7 @@ To run several test cases:
   $ mvn -Dtest=DurableSinglyLinkedListNGSortTest test -pl mnemonic-computing-services/mnemonic-utilities-service -DskipTests=false
   
   $ # a testcase for module "mnemonic-hadoop/mnemonic-hadoop-mapreduce" that requires 'pmalloc' memory service to pass
-  $ mvn -Dtest=MneMapreduceIOTest test -pl mnemonic-hadoop/mnemonic-hadoop-mapreduce -DskipTests=false
+  $ mvn -Dtest=MneMapreducePersonDataTest test -pl mnemonic-hadoop/mnemonic-hadoop-mapreduce -DskipTests=false
 ```
 
 

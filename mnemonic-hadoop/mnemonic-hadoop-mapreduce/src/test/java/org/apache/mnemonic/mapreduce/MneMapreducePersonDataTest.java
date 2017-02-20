@@ -48,7 +48,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class MneMapreduceIOTest {
+public class MneMapreducePersonDataTest {
 
   private static final String SERVICE_NAME = "pmalloc";
   private static final long SLOT_KEY_ID = 5L;
@@ -80,6 +80,7 @@ public class MneMapreduceIOTest {
     m_tacontext = new TaskAttemptContextImpl(m_conf, m_taid);
 
     m_conf.set("mapreduce.output.fileoutputformat.outputdir", m_workdir.toString());
+    MneConfigHelper.setBaseOutputName(m_conf, null, "person-data");
 
     MneConfigHelper.setMemServiceName(m_conf, MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX, SERVICE_NAME);
     MneConfigHelper.setSlotKeyId(m_conf, MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX, SLOT_KEY_ID);
@@ -134,6 +135,7 @@ public class MneMapreduceIOTest {
     File[] listfiles = folder.listFiles();
     for (int idx = 0; idx < listfiles.length; ++idx) {
       if (listfiles[idx].isFile()
+          && listfiles[idx].getName().startsWith(MneConfigHelper.getBaseOutputName(m_conf, null))
           && listfiles[idx].getName().endsWith(MneConfigHelper.DEFAULT_FILE_EXTENSION)) {
         System.out.println(String.format("Verifying : %s", listfiles[idx].getName()));
         FileSplit split = new FileSplit(
@@ -154,6 +156,6 @@ public class MneMapreduceIOTest {
     }
     AssertJUnit.assertEquals(m_sumage, sumage);
     AssertJUnit.assertEquals(m_reccnt, reccnt);
-    System.out.println(String.format("The sum of ages is %d", sumage));
+    System.out.println(String.format("The checksum of ages is %d", sumage));
   }
 }

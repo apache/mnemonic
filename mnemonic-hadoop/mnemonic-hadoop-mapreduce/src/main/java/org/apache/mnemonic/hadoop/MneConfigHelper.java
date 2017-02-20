@@ -56,6 +56,10 @@ public class MneConfigHelper {
     return conf.get(getConfigName(prefix, BASE_OUTPUT_NAME), DEFAULT_NAME_PART);
   }
 
+  public static void setBaseOutputName(Configuration conf, String prefix, String basename) {
+    conf.set(getConfigName(prefix, BASE_OUTPUT_NAME), basename);
+  }
+
   public static void setDurableTypes(Configuration conf, String prefix, DurableType[] dtypes) {
     String val = StringUtils.join(dtypes, ",");
     conf.set(getConfigName(prefix, DURABLE_TYPES), val);
