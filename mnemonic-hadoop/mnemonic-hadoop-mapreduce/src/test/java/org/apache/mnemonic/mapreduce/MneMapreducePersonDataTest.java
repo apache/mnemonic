@@ -50,6 +50,8 @@ import org.testng.annotations.Test;
 
 public class MneMapreducePersonDataTest {
 
+  private static final String DEFAULT_BASE_WORK_DIR = "target" + File.separator + "test" + File.separator + "tmp";
+  private static final String DEFAULT_WORK_DIR = DEFAULT_BASE_WORK_DIR + File.separator + "person-data";
   private static final String SERVICE_NAME = "pmalloc";
   private static final long SLOT_KEY_ID = 5L;
   private Path m_workdir;
@@ -64,7 +66,7 @@ public class MneMapreducePersonDataTest {
   @BeforeClass
   public void setUp() throws IOException {
     m_workdir = new Path(
-        System.getProperty("test.tmp.dir", "target" + File.separator + "test" + File.separator + "tmp"));
+        System.getProperty("test.tmp.dir", DEFAULT_WORK_DIR));
     m_conf = new JobConf();
     m_rand = Utils.createRandom();
 
