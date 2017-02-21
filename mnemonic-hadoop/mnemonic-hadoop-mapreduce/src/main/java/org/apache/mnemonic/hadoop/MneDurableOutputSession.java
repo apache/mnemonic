@@ -124,7 +124,10 @@ public class MneDurableOutputSession<V>
   @SuppressWarnings("unchecked")
   protected V createDurableObjectRecord() {
     V ret = null;
-    ret = (V) getEntityFactoryProxies()[0].create(m_act, m_recparmpair.getRight(), m_recparmpair.getLeft(), false);
+    if (getDurableTypes()[0] == DurableType.DURABLE) {
+      ret = (V) getEntityFactoryProxies()[0].create(m_act,
+          m_recparmpair.getRight(), m_recparmpair.getLeft(), false);
+    }
     return ret;
   }
 

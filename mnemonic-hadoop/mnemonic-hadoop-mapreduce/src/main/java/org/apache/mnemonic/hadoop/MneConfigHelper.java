@@ -69,8 +69,10 @@ public class MneConfigHelper {
     List<DurableType> ret = new ArrayList<>();
     String val = conf.get(getConfigName(prefix, DURABLE_TYPES));
     String[] vals = StringUtils.split(val, ",");
-    for (String itm : vals) {
-      ret.add(DurableType.valueOf(itm));
+    if (null != vals) {
+      for (String itm : vals) {
+        ret.add(DurableType.valueOf(itm));
+      }
     }
     return ret.toArray(new DurableType[0]);
   }
@@ -88,9 +90,11 @@ public class MneConfigHelper {
     String[] vals = conf.getStrings(getConfigName(prefix, ENTITY_FACTORY_PROXIES));
     String clsname = null;
     try {
-      for (String itm : vals) {
-        clsname = itm;
-        ret.add(Class.forName(itm));
+      if (null != vals) {
+        for (String itm : vals) {
+          clsname = itm;
+          ret.add(Class.forName(itm));
+        }
       }
     } catch (ClassNotFoundException | NoClassDefFoundError e) {
       throw new RuntimeException(String.format("Unable to find class '%s'", clsname), e);
