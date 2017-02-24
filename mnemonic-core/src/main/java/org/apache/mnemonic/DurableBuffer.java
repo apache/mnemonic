@@ -17,6 +17,34 @@
 
 package org.apache.mnemonic;
 
-public abstract class RestorableAllocator<A extends RestorableAllocator<A>> extends RetrievableAllocator<A> {
+import java.nio.ByteBuffer;
+
+public class DurableBuffer<A extends RetrievableAllocator<A>> extends MemBufferHolder<A> implements Durable {
+
+  public DurableBuffer(A ar, ByteBuffer mres) {
+    super(ar, mres);
+  }
+
+  @Override
+  public void initializeAfterCreate() {
+  }
+
+  @Override
+  public void initializeAfterRestore() {
+  }
+
+  @Override
+  public void setupGenericInfo(EntityFactoryProxy[] efproxies, DurableType[] gftypes) {
+  }
+
+  @Override
+  public long getHandler() {
+    return m_allocator.getBufferHandler(this);
+  }
+
+  @Override
+  public long[][] getNativeFieldInfo() {
+    return null;
+  }
 
 }

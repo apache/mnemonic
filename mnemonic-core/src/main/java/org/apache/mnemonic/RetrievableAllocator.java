@@ -17,8 +17,62 @@
 
 package org.apache.mnemonic;
 
-public abstract class RetrievableAllocator<A extends CommonAllocator<A>> extends CommonAllocator<A>
+public abstract class RetrievableAllocator<A extends RetrievableAllocator<A>> extends CommonAllocator<A>
   implements AddressTranslator, HandlerStore, Transaction {
+
+  /**
+   * create a durable chunk that is managed by its holder.
+   *
+   * @param size
+   *          specify the size of memory chunk
+   *
+   * @param autoreclaim
+   *          specify whether or not to reclaim this chunk automatically
+   *
+   * @return a durable chunk contains a memory chunk
+   */
+  @Override
+  public abstract DurableChunk<A> createChunk(long size, boolean autoreclaim);
+
+  /**
+   * create a durable buffer that is managed by its holder.
+   * 
+   * @param size
+   *          specify the size of memory buffer
+   * 
+   * @param autoreclaim
+   *          specify whether or not to reclaim this buffer automatically
+   *
+   * @return a durable buffer contains a memory buffer
+   */
+  @Override
+  public abstract DurableBuffer<A> createBuffer(long size, boolean autoreclaim);
+
+  /**
+   * create a durable chunk that is managed by its holder.
+   *
+   * @param size
+   *          specify the size of memory chunk
+   *
+   * @return a durable chunk contains a memory chunk
+   */
+  @Override
+  public DurableChunk<A> createChunk(long size) {
+    return createChunk(size, true);
+  }
+
+  /**
+   * create a durable buffer that is managed by its holder.
+   * 
+   * @param size
+   *          specify the size of memory buffer
+   * 
+   * @return a durable buffer contains a memory buffer
+   */
+  @Override
+  public DurableBuffer<A> createBuffer(long size) {
+    return createBuffer(size, true);
+  }
 
   /**
    * retrieve a memory buffer from its backed memory allocator.
@@ -26,9 +80,9 @@ public abstract class RetrievableAllocator<A extends CommonAllocator<A>> extends
    * @param phandler
    *          specify the handler of memory buffer to retrieve
    *
-   * @return a holder contains the retrieved memory buffer
+   * @return a durable buffer contains the retrieved memory buffer
    */
-  public MemBufferHolder<A> retrieveBuffer(long phandler) {
+  public DurableBuffer<A> retrieveBuffer(long phandler) {
     return retrieveBuffer(phandler, true);
   }
 
@@ -38,9 +92,9 @@ public abstract class RetrievableAllocator<A extends CommonAllocator<A>> extends
    * @param phandler
    *          specify the handler of memory chunk to retrieve
    *
-   * @return a holder contains the retrieved memory chunk
+   * @return a durable chunk contains the retrieved memory chunk
    */
-  public MemChunkHolder<A> retrieveChunk(long phandler) {
+  public DurableChunk<A> retrieveChunk(long phandler) {
     return retrieveChunk(phandler, true);
   }
 
@@ -54,9 +108,9 @@ public abstract class RetrievableAllocator<A extends CommonAllocator<A>> extends
    *          specify whether this retrieved memory buffer can be reclaimed
    *          automatically or not
    * 
-   * @return a holder contains the retrieved memory buffer
+   * @return a durable buffer contains the retrieved memory buffer
    */
-  public abstract MemBufferHolder<A> retrieveBuffer(long phandler, boolean autoreclaim);
+  public abstract DurableBuffer<A> retrieveBuffer(long phandler, boolean autoreclaim);
 
   /**
    * retrieve a memory chunk from its backed memory allocator.
@@ -68,9 +122,9 @@ public abstract class RetrievableAllocator<A extends CommonAllocator<A>> extends
    *          specify whether this retrieved memory chunk can be reclaimed
    *          automatically or not
    * 
-   * @return a holder contains the retrieved memory chunk
+   * @return a durable chunk contains the retrieved memory chunk
    */
-  public abstract MemChunkHolder<A> retrieveChunk(long phandler, boolean autoreclaim);
+  public abstract DurableChunk<A> retrieveChunk(long phandler, boolean autoreclaim);
 
   /**
    * get the address from a memory buffer holder.

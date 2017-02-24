@@ -219,7 +219,7 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
   }
 
   /**
-   * create a memory chunk that is managed by its holder.
+   * create a durable chunk that is managed by its holder.
    * 
    * @param size
    *          specify the size of memory chunk
@@ -227,18 +227,18 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
    * @param autoreclaim
    *          specify whether or not to reclaim this chunk automatically
    *
-   * @return a holder contains a memory chunk
+   * @return a durable chunk contains a memory chunk
    */
   @Override
-  public MemChunkHolder<VolatileMemAllocator> createChunk(long size, boolean autoreclaim) {
-    MemChunkHolder<VolatileMemAllocator> ret = null;
+  public DurableChunk<VolatileMemAllocator> createChunk(long size, boolean autoreclaim) {
+    DurableChunk<VolatileMemAllocator> ret = null;
     Long addr = m_vmasvc.allocate(m_nid, size, true);
     if (0 == addr && m_activegc) {
       m_chunkcollector.waitReclaimCoolDown(m_gctimeout);
       addr = m_vmasvc.allocate(m_nid, size, true);
     }
     if (0 != addr) {
-      ret = new MemChunkHolder<VolatileMemAllocator>(this, addr, size);
+      ret = new DurableChunk<VolatileMemAllocator>(this, addr, size);
       ret.setCollector(m_chunkcollector);
       if (autoreclaim) {
         m_chunkcollector.register(ret);
@@ -248,7 +248,7 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
   }
 
   /**
-   * create a memory buffer that is managed by its holder.
+   * create a durable buffer that is managed by its holder.
    * 
    * @param size
    *          specify the size of memory buffer
@@ -256,18 +256,18 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
    * @param autoreclaim
    *          specify whether or not to reclaim this buffer automatically
    *
-   * @return a holder contains a memory buffer
+   * @return a durable buffer contains a memory buffer
    */
   @Override
-  public MemBufferHolder<VolatileMemAllocator> createBuffer(long size, boolean autoreclaim) {
-    MemBufferHolder<VolatileMemAllocator> ret = null;
+  public DurableBuffer<VolatileMemAllocator> createBuffer(long size, boolean autoreclaim) {
+    DurableBuffer<VolatileMemAllocator> ret = null;
     ByteBuffer bb = m_vmasvc.createByteBuffer(m_nid, size);
     if (null == bb && m_activegc) {
       m_bufcollector.waitReclaimCoolDown(m_gctimeout);
       bb = m_vmasvc.createByteBuffer(m_nid, size);
     }
     if (null != bb) {
-      ret = new MemBufferHolder<VolatileMemAllocator>(this, bb);
+      ret = new DurableBuffer<VolatileMemAllocator>(this, bb);
       ret.setCollector(m_bufcollector);
       if (autoreclaim) {
         m_bufcollector.register(ret);
@@ -277,7 +277,7 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
   }
 
   /**
-   * retrieve a memory buffer from its backed memory allocator.
+   * retrieve a durable buffer from its backed memory allocator.
    * 
    * @param phandler
    *          specify the handler of memory buffer to retrieve
@@ -286,14 +286,14 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
    *          specify whether this retrieved memory buffer can be reclaimed
    *          automatically or not
    * 
-   * @return a holder contains the retrieved memory buffer
+   * @return a durable buffer contains the retrieved memory buffer
    */
   @Override
-  public MemBufferHolder<VolatileMemAllocator> retrieveBuffer(long phandler, boolean autoreclaim) {
-    MemBufferHolder<VolatileMemAllocator> ret = null;
+  public DurableBuffer<VolatileMemAllocator> retrieveBuffer(long phandler, boolean autoreclaim) {
+    DurableBuffer<VolatileMemAllocator> ret = null;
     ByteBuffer bb = m_vmasvc.retrieveByteBuffer(m_nid, getEffectiveAddress(phandler));
     if (null != bb) {
-      ret = new MemBufferHolder<VolatileMemAllocator>(this, bb);
+      ret = new DurableBuffer<VolatileMemAllocator>(this, bb);
       if (autoreclaim) {
         m_bufcollector.register(ret);
       }
@@ -302,7 +302,7 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
   }
 
   /**
-   * retrieve a memory chunk from its backed memory allocator.
+   * retrieve a durable chunk from its backed memory allocator.
    * 
    * @param phandler
    *          specify the handler of memory chunk to retrieve
@@ -311,15 +311,15 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
    *          specify whether this retrieved memory chunk can be reclaimed
    *          automatically or not
    * 
-   * @return a holder contains the retrieved memory chunk
+   * @return a durable chunk contains the retrieved memory chunk
    */
   @Override
-  public MemChunkHolder<VolatileMemAllocator> retrieveChunk(long phandler, boolean autoreclaim) {
-    MemChunkHolder<VolatileMemAllocator> ret = null;
+  public DurableChunk<VolatileMemAllocator> retrieveChunk(long phandler, boolean autoreclaim) {
+    DurableChunk<VolatileMemAllocator> ret = null;
     long eaddr = getEffectiveAddress(phandler);
     long sz = m_vmasvc.retrieveSize(m_nid, eaddr);
     if (sz > 0L) {
-      ret = new MemChunkHolder<VolatileMemAllocator>(this, eaddr, sz);
+      ret = new DurableChunk<VolatileMemAllocator>(this, eaddr, sz);
       if (autoreclaim) {
         m_chunkcollector.register(ret);
       }

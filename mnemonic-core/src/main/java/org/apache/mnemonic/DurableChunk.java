@@ -17,6 +17,32 @@
 
 package org.apache.mnemonic;
 
-public abstract class RestorableAllocator<A extends RestorableAllocator<A>> extends RetrievableAllocator<A> {
+public class DurableChunk<A extends RetrievableAllocator<A>> extends MemChunkHolder<A> implements Durable {
+
+  public DurableChunk(A ar, Long mres, long size) {
+    super(ar, mres, size);
+  }
+
+  @Override
+  public void initializeAfterCreate() {
+  }
+
+  @Override
+  public void initializeAfterRestore() {
+  }
+
+  @Override
+  public void setupGenericInfo(EntityFactoryProxy[] efproxies, DurableType[] gftypes) {
+  }
+
+  @Override
+  public long getHandler() {
+    return m_allocator.getChunkHandler(this);
+  }
+
+  @Override
+  public long[][] getNativeFieldInfo() {
+    return null;
+  }
 
 }

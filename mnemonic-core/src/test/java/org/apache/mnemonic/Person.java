@@ -71,6 +71,18 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
       throws OutOfHybridMemory, RetrieveDurableEntityError;
 
   @DurableGetter
+  public abstract DurableBuffer<?> getPicture();
+
+  @DurableSetter
+  public abstract void setPicture(DurableBuffer<?> mbh, boolean destroy);
+
+  @DurableGetter
+  public abstract DurableChunk<?> getPreference();
+
+  @DurableSetter
+  public abstract void setPreference(DurableChunk<?> mch, boolean destroy);
+
+  @DurableGetter
   public abstract Person<E> getMother() throws RetrieveDurableEntityError;
 
   @DurableSetter
@@ -80,5 +92,5 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
   public abstract Person<E> getFather() throws RetrieveDurableEntityError;
 
   @DurableSetter
-  public abstract void setFather(Person<E> mother, boolean destroy) throws RetrieveDurableEntityError;
+  public abstract void setFather(Person<E> father, boolean destroy) throws RetrieveDurableEntityError;
 }
