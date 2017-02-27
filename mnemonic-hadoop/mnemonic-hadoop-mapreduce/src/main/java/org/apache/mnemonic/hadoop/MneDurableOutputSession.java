@@ -39,7 +39,7 @@ import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 public class MneDurableOutputSession<V>
-    implements MneDurableComputable<NonVolatileMemAllocator> {
+    implements MneOutputSession<V>, MneDurableComputable<NonVolatileMemAllocator> {
 
   private long poolSize;
   private TaskAttemptContext taskAttemptContext;
@@ -73,7 +73,8 @@ public class MneDurableOutputSession<V>
       }
     }
   }
-  
+
+  @Override
   public void readConfig(String prefix) {
     if (getTaskAttemptContext() == null) {
       throw new ConfigurationException("taskAttemptContext has not yet been set");
@@ -97,6 +98,7 @@ public class MneDurableOutputSession<V>
     return ret;
   }
 
+  @Override
   public void initNextPool() {
     if (m_act != null) {
       m_act.close();
@@ -122,21 +124,53 @@ public class MneDurableOutputSession<V>
   }
 
   @SuppressWarnings("unchecked")
-  protected V createDurableObjectRecord() {
+  protected V createDurableObjectRecord(long size) {
     V ret = null;
-    if (getDurableTypes()[0] == DurableType.DURABLE) {
+    switch (getDurableTypes()[0]) {
+    case DURABLE:
       ret = (V) getEntityFactoryProxies()[0].create(m_act,
           m_recparmpair.getRight(), m_recparmpair.getLeft(), false);
+    case BUFFER:
+      if (size > 0) {
+        ret = (V)m_act.createBuffer(size);
+        if (null == ret) {
+          throw new OutOfHybridMemory("Allocate a buffer failed");
+        }
+      }
+      break;
+    case CHUNK:
+      if (size > 0) {
+        ret = (V)m_act.createChunk(size);
+        if (null == ret) {
+          throw new OutOfHybridMemory("Allocate a chunk failed");
+        }
+      }
+      break;
+    default:
+      break;
     }
     return ret;
   }
 
   public V newDurableObjectRecord() {
+    return newDurableObjectRecord(-1L);
+  }
+
+  /**
+   * create a durable object record
+   *
+   * @param size
+   *        size of buffer or chunk
+   *
+   * @return null if size <= 0 for buffer/chunk type
+   *        throw OutOfHybridMemory if out of memory
+   */
+  public V newDurableObjectRecord(long size) {
     V ret = null;
     DurableSinglyLinkedList<V> nv = null;
     try {
       nv = createDurableNode();
-      ret = createDurableObjectRecord();
+      ret = createDurableObjectRecord(size);
     } catch (OutOfHybridMemory e) {
       if (nv != null) {
         nv.destroy();
@@ -147,7 +181,7 @@ public class MneDurableOutputSession<V>
       initNextPool();
       try { /* retry */
         nv = createDurableNode();
-        ret = createDurableObjectRecord();
+        ret = createDurableObjectRecord(size);
       } catch (OutOfHybridMemory ee) {
         if (nv != null) {
           nv.destroy();
@@ -157,8 +191,12 @@ public class MneDurableOutputSession<V>
         }
       }
     }
-    if (ret != null) {
+    if (null != ret) {
       m_recordmap.put(ret, nv);
+    } else {
+      if (null != nv) {
+        nv.destroy();
+      }
     }
     return ret;
   }
@@ -169,28 +207,33 @@ public class MneDurableOutputSession<V>
     return ret;
   }
 
+  @Override
   public void post(V v) {
     DurableSinglyLinkedList<V> nv = null;
     if (null == v) {
       return;
     }
-    if (DurableType.DURABLE == getDurableTypes()[0]) {
+    switch (getDurableTypes()[0]) {
+    case DURABLE:
+    case BUFFER:
+    case CHUNK:
       if (m_recordmap.containsKey(v)) {
         nv = m_recordmap.remove(v);
       } else {
         throw new RuntimeException("The record hasn't been created by newDurableObjectRecord()");
       }
-    } else {
+      break;
+    default:
       try {
         nv = createDurableNode();
       } catch (OutOfHybridMemory e) {
         initNextPool();
         nv = createDurableNode();
       }
+      break;
     }
-    if (nv != null) {
-      nv.setItem(v, false);
-    }
+    assert null != nv;
+    nv.setItem(v, false);
     if (m_newpool) {
       m_act.setHandler(getSlotKeyId(), nv.getHandler());
       m_newpool = false;
@@ -213,6 +256,7 @@ public class MneDurableOutputSession<V>
     }
   }
 
+  @Override
   public void close() {
     destroyAllPendingRecords();
     m_act.close();

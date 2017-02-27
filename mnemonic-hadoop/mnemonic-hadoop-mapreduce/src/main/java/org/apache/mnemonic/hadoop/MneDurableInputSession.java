@@ -31,7 +31,8 @@ import org.apache.mnemonic.Utils;
 import org.apache.mnemonic.collections.DurableSinglyLinkedList;
 import org.apache.mnemonic.collections.DurableSinglyLinkedListFactory;
 
-public class MneDurableInputSession<V> implements MneDurableComputable<NonVolatileMemAllocator> {
+public class MneDurableInputSession<V>
+    implements MneInputSession<V>, MneDurableComputable<NonVolatileMemAllocator> {
 
   private TaskAttemptContext taskAttemptContext;
   private String serviceName;
@@ -58,6 +59,7 @@ public class MneDurableInputSession<V> implements MneDurableComputable<NonVolati
     }
   }
 
+  @Override
   public void readConfig(String prefix) {
     if (getTaskAttemptContext() == null) {
       throw new ConfigurationException("taskAttemptContext has not yet been set");
@@ -71,6 +73,7 @@ public class MneDurableInputSession<V> implements MneDurableComputable<NonVolati
     validateConfig();
   }
 
+  @Override
   public void initialize(Path path) {
     DurableSinglyLinkedList<V> dsllist;
     m_act = new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService(getServiceName()), 1024000L,
@@ -81,10 +84,12 @@ public class MneDurableInputSession<V> implements MneDurableComputable<NonVolati
     m_iter = dsllist.iterator();
   }
 
+  @Override
   public Iterator<V> iterator() {
     return m_iter;
   }
 
+  @Override
   public void close() {
     m_act.close();
   }
