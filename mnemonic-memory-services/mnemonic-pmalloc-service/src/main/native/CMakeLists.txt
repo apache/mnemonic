@@ -18,6 +18,8 @@
 cmake_minimum_required(VERSION 2.8.11)
 project(pmallocallocator)
 
+include_directories(/usr/local/include)
+
 configure_file (
   "${PROJECT_SOURCE_DIR}/config.h.in"
     "${PROJECT_BINARY_DIR}/config.h"
