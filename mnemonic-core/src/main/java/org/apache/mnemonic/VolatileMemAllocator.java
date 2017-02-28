@@ -156,11 +156,11 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
    * @param size
    *          specify a new size of memory chunk
    * 
-   * @return the resized memory chunk handler
+   * @return the resized durable memory chunk handler
    */
   @Override
-  public MemChunkHolder<VolatileMemAllocator> resizeChunk(MemChunkHolder<VolatileMemAllocator> mholder, long size) {
-    MemChunkHolder<VolatileMemAllocator> ret = null;
+  public DurableChunk<VolatileMemAllocator> resizeChunk(MemChunkHolder<VolatileMemAllocator> mholder, long size) {
+    DurableChunk<VolatileMemAllocator> ret = null;
     boolean ac = null != mholder.getRefId();
     if (size > 0) {
       Long addr = m_vmasvc.reallocate(m_nid, mholder.get(), size, true);
@@ -171,7 +171,7 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
       if (0 != addr) {
         mholder.clear();
         mholder.destroy();
-        ret = new MemChunkHolder<VolatileMemAllocator>(this, addr, size);
+        ret = new DurableChunk<VolatileMemAllocator>(this, addr, size);
         if (ac) {
           m_chunkcollector.register(ret);
         }
@@ -189,12 +189,12 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
    * @param size
    *          specify a new size of memory chunk
    * 
-   * @return the resized memory buffer handler
+   * @return the resized durable memory buffer handler
    *
    */
   @Override
-  public MemBufferHolder<VolatileMemAllocator> resizeBuffer(MemBufferHolder<VolatileMemAllocator> mholder, long size) {
-    MemBufferHolder<VolatileMemAllocator> ret = null;
+  public DurableBuffer<VolatileMemAllocator> resizeBuffer(MemBufferHolder<VolatileMemAllocator> mholder, long size) {
+    DurableBuffer<VolatileMemAllocator> ret = null;
     boolean ac = null != mholder.getRefId();
     if (size > 0) {
       int bufpos = mholder.get().position();
@@ -209,7 +209,7 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
         mholder.destroy();
         buf.position(bufpos <= size ? bufpos : 0);
         buf.limit(buflimit <= size ? buflimit : (int) size);
-        ret = new MemBufferHolder<VolatileMemAllocator>(this, buf);
+        ret = new DurableBuffer<VolatileMemAllocator>(this, buf);
         if (ac) {
           m_bufcollector.register(ret);
         }

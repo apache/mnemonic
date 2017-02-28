@@ -160,12 +160,12 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
    * @param size
    *          specify a new size of memory chunk
    * 
-   * @return the resized memory chunk handler
+   * @return the resized durable memory chunk handler
    */
   @Override
-  public MemChunkHolder<NonVolatileMemAllocator> resizeChunk(MemChunkHolder<NonVolatileMemAllocator> mholder,
+  public DurableChunk<NonVolatileMemAllocator> resizeChunk(MemChunkHolder<NonVolatileMemAllocator> mholder,
       long size) {
-    MemChunkHolder<NonVolatileMemAllocator> ret = null;
+    DurableChunk<NonVolatileMemAllocator> ret = null;
     boolean ac = null != mholder.getRefId();
     if (size > 0) {
       Long addr = m_nvmasvc.reallocate(m_nid, mholder.get(), size, true);
@@ -176,7 +176,7 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
       if (0 != addr) {
         mholder.clear();
         mholder.destroy();
-        ret = new MemChunkHolder<NonVolatileMemAllocator>(this, addr, size);
+        ret = new DurableChunk<NonVolatileMemAllocator>(this, addr, size);
         if (ac) {
           m_chunkcollector.register(ret);
         }
@@ -194,13 +194,13 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
    * @param size
    *          specify a new size of memory chunk
    * 
-   * @return the resized memory buffer handler
+   * @return the resized durable memory buffer handler
    *
    */
   @Override
-  public MemBufferHolder<NonVolatileMemAllocator> resizeBuffer(MemBufferHolder<NonVolatileMemAllocator> mholder,
+  public DurableBuffer<NonVolatileMemAllocator> resizeBuffer(MemBufferHolder<NonVolatileMemAllocator> mholder,
       long size) {
-    MemBufferHolder<NonVolatileMemAllocator> ret = null;
+    DurableBuffer<NonVolatileMemAllocator> ret = null;
     boolean ac = null != mholder.getRefId();
     if (size > 0) {
       int bufpos = mholder.get().position();
@@ -215,7 +215,7 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
         mholder.destroy();
         buf.position(bufpos <= size ? bufpos : 0);
         buf.limit(buflimit <= size ? buflimit : (int) size);
-        ret = new MemBufferHolder<NonVolatileMemAllocator>(this, buf);
+        ret = new DurableBuffer<NonVolatileMemAllocator>(this, buf);
         if (ac) {
           m_bufcollector.register(ret);
         }

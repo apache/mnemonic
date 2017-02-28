@@ -127,6 +127,35 @@ public abstract class RetrievableAllocator<A extends RetrievableAllocator<A>> ex
   public abstract DurableChunk<A> retrieveChunk(long phandler, boolean autoreclaim);
 
   /**
+   * re-size a specified chunk on its backed memory pool.
+   * 
+   * @param mholder
+   *          the holder of memory chunk.
+   *
+   * @param size
+   *         specify a new size of memory chunk
+   *
+   * @return the resized durable memory chunk handler
+   */
+  @Override
+  public abstract DurableChunk<A> resizeChunk(MemChunkHolder<A> mholder, long size);
+
+  /**
+   * resize a specified buffer on its backed memory pool.
+   *
+   * @param mholder
+   *          the holder of memory buffer. it can be null.
+   * 
+   * @param size
+   *          specify a new size of memory chunk
+   * 
+   * @return the resized durable memory buffer handler
+   *
+   */
+  @Override
+  public abstract DurableBuffer<A> resizeBuffer(MemBufferHolder<A> mholder, long size);
+
+  /**
    * get the address from a memory buffer holder.
    * 
    * @param mbuf
