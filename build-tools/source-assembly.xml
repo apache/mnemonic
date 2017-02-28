@@ -178,6 +178,45 @@
         <outputDirectoryMapping>mnemonic-benches/${module.artifactId}</outputDirectoryMapping>
       </sources>
     </moduleSet>
+    <moduleSet>
+      <includes>
+        <include>org.apache.mnemonic:mnemonic-hadoop</include>
+      </includes>
+      <sources>
+        <fileSets>
+          <fileSet>
+            <directory>.</directory>
+            <outputDirectory>.</outputDirectory>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <excludes>
+              <exclude>**/target/**</exclude>
+              <exclude>dependency-reduced-pom.xml</exclude>
+              <exclude>**/*.dat</exclude>
+            </excludes>
+          </fileSet>
+        </fileSets>
+      </sources>
+    </moduleSet>
+    <moduleSet>
+      <includes>
+        <include>org.apache.mnemonic:mnemonic-hadoop-mapreduce</include>
+      </includes>
+      <sources>
+        <fileSets>
+          <fileSet>
+            <directory>.</directory>
+            <outputDirectory>.</outputDirectory>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <excludes>
+              <exclude>**/target/**</exclude>
+              <exclude>dependency-reduced-pom.xml</exclude>
+              <exclude>**/*.dat</exclude>
+            </excludes>
+          </fileSet>
+        </fileSets>
+        <outputDirectoryMapping>mnemonic-hadoop/${module.artifactId}</outputDirectoryMapping>
+      </sources>
+    </moduleSet>
   </moduleSets>
   <fileSets>
     <fileSet>
