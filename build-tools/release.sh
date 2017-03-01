@@ -105,7 +105,7 @@ rm -rf ${RELEASEBASENAME}/
 tar xzf target/${RELEASESRCPKGFULLNAME} || { echo "Failed to unpack the source artifact"; exit 80; }
 pushd ${RELEASEBASENAME} || { echo "Unpacked source directory does not exist"; exit 90; }
 mvn clean install || { echo "Failed to compile the packaged source artifact"; exit 100; }
-build-tools/runall.sh || { echo "Failed to verify the packaged source artifact"; exit 110; }
+python build-tools/runTestCases.py || { echo "Failed to verify the packaged source artifact"; exit 110; }
 popd
 rm -rf ${RELEASEBASENAME}/
 
