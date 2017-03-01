@@ -162,7 +162,7 @@ public class MneDurableOutputSession<V>
    * @param size
    *        size of buffer or chunk
    *
-   * @return null if size <= 0 for buffer/chunk type
+   * @return null if size not greater than 0 for buffer/chunk type
    *        throw OutOfHybridMemory if out of memory
    */
   public V newDurableObjectRecord(long size) {
