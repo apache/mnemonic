@@ -20,6 +20,12 @@
 import re
 import subprocess
 import sys
+import os
+
+testLogDir = "testlog/"
+
+if not os.path.exists(testLogDir):
+    os.makedirs(testLogDir)
 
 testCmdFile = 'build-tools/test.conf'
 tcCmdReg = re.compile('^mvn\s.*$')
@@ -29,7 +35,7 @@ with open(testCmdFile) as fp:
     for line in fp:
         match = tcCmdReg.findall(line)
         if match:
-            logFilePath = "testlog/" + tcNameReg.findall(line)[0] + ".log"
+            logFilePath = testLogDir + tcNameReg.findall(line)[0] + ".log"
             print("[INFO] Running " + tcNameReg.findall(line)[0] + " test case for \"" + tcModuleReg.findall(line)[0] + "\"...")
             try:
                 #maven build
