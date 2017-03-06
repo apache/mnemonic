@@ -42,7 +42,7 @@ public class MneDurableInputSession<V>
 
   protected long m_handler;
   protected NonVolatileMemAllocator m_act;
-  protected Iterator<V> m_iter;
+
 
   public MneDurableInputSession(TaskAttemptContext taskAttemptContext) {
     setTaskAttemptContext(taskAttemptContext);
@@ -75,18 +75,19 @@ public class MneDurableInputSession<V>
 
   @Override
   public void initialize(Path path) {
-    DurableSinglyLinkedList<V> dsllist;
     m_act = new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService(getServiceName()), 1024000L,
         path.toString(), true);
     m_handler = m_act.getHandler(getSlotKeyId());
-    dsllist = DurableSinglyLinkedListFactory.restore(m_act, getEntityFactoryProxies(), getDurableTypes(), m_handler,
-        false);
-    m_iter = dsllist.iterator();
   }
 
   @Override
   public Iterator<V> iterator() {
-    return m_iter;
+    Iterator<V> iter;
+    DurableSinglyLinkedList<V> dsllist;
+    dsllist = DurableSinglyLinkedListFactory.restore(m_act, getEntityFactoryProxies(), getDurableTypes(), m_handler,
+        false);
+    iter = dsllist.iterator();
+    return iter;
   }
 
   @Override
