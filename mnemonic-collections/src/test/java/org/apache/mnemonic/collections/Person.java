@@ -17,6 +17,8 @@
 
 package org.apache.mnemonic.collections;
 
+import java.util.Objects;
+
 import org.apache.mnemonic.Durable;
 import org.apache.mnemonic.EntityFactoryProxy;
 import org.apache.mnemonic.DurableEntity;
@@ -38,12 +40,12 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
 
   @Override
   public void initializeAfterCreate() {
-    System.out.println("Initializing After Created");
+    //System.out.println("Initializing After Created");
   }
 
   @Override
   public void initializeAfterRestore() {
-    System.out.println("Initializing After Restored");
+    //System.out.println("Initializing After Restored");
   }
 
   @Override
@@ -68,6 +70,14 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
     return ret;
   }
 
+  public int hashCode() {
+    return Objects.hash(getAge(), getName());
+  }
+
+  @Override
+  public boolean equals(Object anotherPerson) {
+    return (0 == this.compareTo((Person<E>)anotherPerson)) ? true : false; 
+  }
   @DurableGetter(Id = 1L)
   public abstract Short getAge();
 

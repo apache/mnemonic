@@ -606,18 +606,18 @@ public class AnnotatedDurableEntityClass {
           code.addStatement("$1N = null", dynfieldinfo.name);
           code.addStatement("$1N.putAddress($2N.get() + $3L, 0L)", unsafename, holdername, dynfieldinfo.fieldoff);
           code.endControlFlow();
-          code.beginControlFlow("if ($1L.getAllocator() != $2N)", arg0, allocname);
+          code.beginControlFlow("if ((null != $1L) && ($1L.getAllocator() != $2N))", arg0, allocname);
           code.addStatement("throw new IllegalAllocatorError(\"This chunk is allocated by another allocator!\")");
           code.endControlFlow();
-          code.beginControlFlow("if (null != $1L)", arg0);
           code.addStatement("$1N = $2L", dynfieldinfo.name, arg0);
+          code.addStatement("$1N.putLong($2N.get() + $3L, null == $4N ? 0L : $4N.getHandler())",
+              unsafename, holdername, dynfieldinfo.fieldoff, dynfieldinfo.name);
+          code.beginControlFlow("if (null != $1L)", dynfieldinfo.name);
           code.beginControlFlow("if ($1N)", autoreclaimname);
           code.addStatement("$1N.registerAutoReclaim();", dynfieldinfo.name);
           code.nextControlFlow("else");
           code.addStatement("$1N.cancelAutoReclaim();", dynfieldinfo.name);
           code.endControlFlow();
-          code.addStatement("$1N.putLong($2N.get() + $3L, null == $4N ? 0L : $4N.getHandler())",
-              unsafename, holdername, dynfieldinfo.fieldoff, dynfieldinfo.name);
           code.endControlFlow();
         } else if (valtname.toString().startsWith(DurableBuffer.class.getCanonicalName())) {
           code.beginControlFlow("if ($1L && null != $2L())", arg1, gsetterName(name, true));
@@ -625,18 +625,18 @@ public class AnnotatedDurableEntityClass {
           code.addStatement("$1N = null", dynfieldinfo.name);
           code.addStatement("$1N.putAddress($2N.get() + $3L, 0L)", unsafename, holdername, dynfieldinfo.fieldoff);
           code.endControlFlow();
-          code.beginControlFlow("if ($1L.getAllocator() != $2N)", arg0, allocname);
+          code.beginControlFlow("if ((null != $1L) && ($1L.getAllocator() != $2N))", arg0, allocname);
           code.addStatement("throw new IllegalAllocatorError(\"This buffer is allocated by another allocator!\")");
           code.endControlFlow();
-          code.beginControlFlow("if (null != $1L)", arg0);
           code.addStatement("$1N = $2L", dynfieldinfo.name, arg0);
+          code.addStatement("$1N.putLong($2N.get() + $3L, null == $4N ? 0L : $4N.getHandler())",
+              unsafename, holdername, dynfieldinfo.fieldoff, dynfieldinfo.name);
+          code.beginControlFlow("if (null != $1L)", dynfieldinfo.name);
           code.beginControlFlow("if ($1N)", autoreclaimname);
           code.addStatement("$1N.registerAutoReclaim();", dynfieldinfo.name);
           code.nextControlFlow("else");
           code.addStatement("$1N.cancelAutoReclaim();", dynfieldinfo.name);
           code.endControlFlow();
-          code.addStatement("$1N.putLong($2N.get() + $3L, null == $4N ? 0L : $4N.getHandler())",
-              unsafename, holdername, dynfieldinfo.fieldoff, dynfieldinfo.name);
           code.endControlFlow();
         } else if (valtname.toString().equals(String.class.getCanonicalName())) {
           code.beginControlFlow("if ($1L && null != $2L())", arg1, gsetterName(name, true));
@@ -684,15 +684,15 @@ public class AnnotatedDurableEntityClass {
           code.addStatement("$1N = null", dynfieldinfo.name);
           code.addStatement("$1N.putAddress($2N.get() + $3L, 0L)", unsafename, holdername, dynfieldinfo.fieldoff);
           code.endControlFlow();
-          code.beginControlFlow("if (null != $1L)", arg0);
           code.addStatement("$1N = $2L", dynfieldinfo.name, arg0);
+          code.addStatement("$1N.putLong($2N.get() + $3L, null == $4N ? 0L : $4N.getHandler())", unsafename,
+              holdername, dynfieldinfo.fieldoff, dynfieldinfo.name);
+          code.beginControlFlow("if (null != $1L)", dynfieldinfo.name);
           code.beginControlFlow("if ($1N)", autoreclaimname);
           code.addStatement("$1N.registerAutoReclaim();", dynfieldinfo.name);
           code.nextControlFlow("else");
           code.addStatement("$1N.cancelAutoReclaim();", dynfieldinfo.name);
           code.endControlFlow();
-          code.addStatement("$1N.putLong($2N.get() + $3L, null == $4N ? 0L : $4N.getHandler())", unsafename,
-              holdername, dynfieldinfo.fieldoff, dynfieldinfo.name);
           code.endControlFlow();
         }
       }
