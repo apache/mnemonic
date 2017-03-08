@@ -26,9 +26,12 @@ import org.apache.mnemonic.RestorableAllocator;
 import org.apache.mnemonic.RestoreDurableEntityError;
 import org.apache.mnemonic.RetrieveDurableEntityError;
 import org.apache.mnemonic.Utils;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.ArrayUtils;
 import sun.misc.Unsafe;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 @SuppressWarnings("restriction")
 public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
@@ -442,6 +445,86 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
       throw new OutOfHybridMemory("Create Durable Entity Error!");
     }
     initializeAfterCreate();
+  }
+
+  @Override
+  public Iterator<MapEntry<K, V>> iterator() {
+    return new HashMapItr(this);
+  }
+
+  private class HashMapItr implements Iterator<MapEntry<K, V>> {
+    long currentBucketAddr = 0;
+    long prevBucketAddr = 0;
+    long maxBucketAddr = 0;
+    DurableHashMapImpl<A, K, V> map;
+    DurableSinglyLinkedList<MapEntry<K, V>> currentNode = null;
+    DurableSinglyLinkedList<MapEntry<K, V>> prevNode = null;
+    DurableSinglyLinkedList<MapEntry<K, V>> prevPrevNode = null;
+
+    HashMapItr(DurableHashMapImpl<A, K, V> map) {
+      this.map = map;
+      currentBucketAddr = map.holder.get();
+      maxBucketAddr = currentBucketAddr + MAX_OBJECT_SIZE * map.totalCapacity;
+      nextValidBucket();
+    }
+
+    @Override
+    public boolean hasNext() {
+      return (null != currentNode);
+    }
+
+    public void nextValidBucket() {
+      while ((null == currentNode) && (currentBucketAddr < maxBucketAddr)) {
+        long handler = unsafe.getAddress(currentBucketAddr);
+        if (0L != handler) {
+          currentNode = DurableSinglyLinkedListFactory.restore(allocator,
+              listefproxies, listgftypes, handler, false);
+          break;
+        }
+        currentBucketAddr += MAX_OBJECT_SIZE;
+      }
+    }
+
+    @Override
+    public MapEntry<K, V> next() {
+      if (null != currentNode) {
+        MapEntry<K, V> entry = currentNode.getItem();
+        if (prevBucketAddr != currentBucketAddr) {
+          prevPrevNode = null;
+          prevBucketAddr = currentBucketAddr;
+        } else {
+          prevPrevNode = prevNode;
+        }
+        prevNode = currentNode;
+        currentNode = currentNode.getNext();
+        if (null == currentNode) {
+          currentBucketAddr += MAX_OBJECT_SIZE;
+          nextValidBucket();
+        }
+        return entry;
+      } else {
+        throw new NoSuchElementException();
+      }
+    }
+
+    @Override
+    public void remove() {
+      if (null == prevPrevNode) {
+        if (null == prevNode.getNext()) {
+          unsafe.putAddress(prevBucketAddr, 0L);
+          prevNode.destroy();
+        } else {
+          unsafe.putAddress(prevBucketAddr, prevNode.getNext().getHandler());
+          prevNode.setNext(null, false);
+          prevNode.destroy(); // #TODO: better way to delete one node
+        }
+      } else {
+        prevPrevNode.setNext(prevNode.getNext(), false);
+        prevNode.setNext(null, false);
+        prevNode.destroy(); // #TODO: better way to delete one node
+      }
+      map.mapSize--;
+    }
   }
 }
  

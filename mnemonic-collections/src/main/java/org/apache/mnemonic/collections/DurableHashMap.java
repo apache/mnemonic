@@ -21,7 +21,9 @@ import org.apache.mnemonic.Durable;
 import org.apache.mnemonic.EntityFactoryProxy;
 import org.apache.mnemonic.DurableType;
 
-public abstract class DurableHashMap<K, V> implements Durable {
+import java.util.Iterator;
+
+public abstract class DurableHashMap<K, V> implements Durable, Iterable<MapEntry<K, V>> {
   protected transient EntityFactoryProxy[] m_node_efproxies;
   protected transient DurableType[] m_node_gftypes;
   protected long threshold;
@@ -96,6 +98,13 @@ public abstract class DurableHashMap<K, V> implements Durable {
    */
   public abstract V remove(K key);
 
+  /**
+   * Retrieve a iterator
+   *
+   * @return iterator to the hash map
+   */
+
+  public abstract Iterator<MapEntry<K, V>> iterator();
   /**
    * Apply hash function to given hash code
    * 

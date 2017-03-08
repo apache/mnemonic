@@ -17,6 +17,7 @@
 
 package org.apache.mnemonic.collections;
 
+import java.util.Iterator;
 import java.nio.ByteBuffer;
 
 import org.apache.mnemonic.Utils;
@@ -31,6 +32,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.testng.AssertJUnit;
+
 /**
  *
  *
@@ -109,6 +111,16 @@ public class DurableHashMapNGTest {
     val = map.remove("world");
     AssertJUnit.assertEquals(2, val.intValue());
 
+    Iterator<MapEntry<String, Integer>> iter = map.iterator();
+    MapEntry<String, Integer> entry = null;
+    int count = 0;
+    while (iter.hasNext()) {
+      entry = iter.next();
+      count++;
+    }
+    AssertJUnit.assertEquals(count, 1);
+    AssertJUnit.assertEquals(entry.getKey(), "hello");
+    AssertJUnit.assertEquals(entry.getValue().intValue(), 3);
 
     DurableHashMap<String, Integer> restoredMap = DurableHashMapFactory.restore(m_act, null, gtypes, handler, 
         false);
@@ -336,11 +348,21 @@ public class DurableHashMapNGTest {
     DurableType gtypes[] = {DurableType.STRING, DurableType.INTEGER};
     DurableHashMap<String, Integer> map = DurableHashMapFactory.create(m_act, null, gtypes, mInitialCapacity, false);
     Long handler = map.getHandler();
+    Iterator<MapEntry<String, Integer>> iter = null;
+    MapEntry<String, Integer> entry = null;
+    int count = 0;
     Integer val = 0;
     for (int i = 0; i < 200; i++) {
       val = map.put("str" + i, i);
       AssertJUnit.assertNull(val);
     }
+
+    iter = map.iterator();
+    while (iter.hasNext()) {
+      entry = iter.next();
+      count++;
+    }
+    AssertJUnit.assertEquals(count, 200);
     AssertJUnit.assertEquals(map.getSize(), 200);
     for (int i = 0; i < 200; i++) {
       AssertJUnit.assertEquals(map.get("str" + i).intValue(), i);
@@ -350,7 +372,16 @@ public class DurableHashMapNGTest {
     AssertJUnit.assertEquals(restoredMap.getSize(), 200);
     for (int i = 0; i < 200; i++) {
       AssertJUnit.assertEquals(restoredMap.get("str" + i).intValue(), i);
-    } 
+    }
+
+    iter = restoredMap.iterator();
+    count = 0;
+    while (iter.hasNext()) {
+      entry = iter.next();
+      count++;
+    }
+    AssertJUnit.assertEquals(count, 200);
+
     for (int i = 0; i < 100; i++) {
       AssertJUnit.assertEquals(restoredMap.remove("str" + i).intValue(), i);
     }
@@ -362,5 +393,82 @@ public class DurableHashMapNGTest {
       AssertJUnit.assertEquals(restoredMap.get("str" + i).intValue(), i);
       }
     }
+
+    iter = restoredMap.iterator();
+    count = 0;
+    while (iter.hasNext()) {
+      entry = iter.next();
+      count++;
+    }
+    AssertJUnit.assertEquals(count, 100);
+
+    iter = restoredMap.iterator();
+    count = 0;
+    while (iter.hasNext()) {
+      entry = iter.next();
+      count++;
+      if (count > 50) {
+        iter.remove();
+      }
+    }
+    AssertJUnit.assertEquals(restoredMap.getSize(), 50);
+
+    iter = restoredMap.iterator();
+    count = 0;
+    while (iter.hasNext()) {
+      entry = iter.next();
+      count++;
+    }
+    AssertJUnit.assertEquals(count, 50);
+
+
+  }
+
+  @Test(enabled = true)
+  public void testMapIterator() {
+    DurableType gtypes[] = {DurableType.STRING, DurableType.INTEGER};
+    DurableHashMap<String, Integer> map = DurableHashMapFactory.create(m_act, null, gtypes, mInitialCapacity, false);
+
+    Long handler = map.getHandler();
+    map.put("hello", 1);
+    map.put("world", 2);
+    AssertJUnit.assertEquals(map.getSize(), 2);
+
+    Iterator<MapEntry<String, Integer>> iter = map.iterator();
+    MapEntry<String, Integer> entry = null;
+    int count = 0;
+    while (iter.hasNext()) {
+      entry = iter.next();
+      count++;
+      if (entry.getKey().equals("world")) {
+        iter.remove();
+      }
+    }
+    AssertJUnit.assertEquals(count, 2);
+    AssertJUnit.assertEquals(map.getSize(), 1);
+    iter = map.iterator();
+    count = 0;
+    while (iter.hasNext()) {
+      entry = iter.next();
+      iter.remove();
+      count++;
+    }
+    AssertJUnit.assertEquals(count, 1);
+    AssertJUnit.assertEquals(map.getSize(), 0);
+    AssertJUnit.assertEquals(entry.getKey(), "hello");
+    AssertJUnit.assertEquals(entry.getValue().intValue(), 1);
+
+    iter = map.iterator();
+    count = 0;
+    while (iter.hasNext()) {
+      entry = iter.next();
+      count++;
+    }
+    AssertJUnit.assertEquals(count, 0);
+    map.put("hello", 1);
+    map.put("world", 2);
+    AssertJUnit.assertEquals(map.get("hello").intValue(), 1);
+    AssertJUnit.assertEquals(map.get("world").intValue(), 2);
+    AssertJUnit.assertEquals(map.getSize(), 2);
   }
 }
