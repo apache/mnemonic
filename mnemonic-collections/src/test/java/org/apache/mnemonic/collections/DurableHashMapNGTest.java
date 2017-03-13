@@ -53,6 +53,7 @@ public class DurableHashMapNGTest {
       public boolean reclaim(ByteBuffer mres, Long sz) {
         System.out.println(String.format("Reclaim Memory Buffer: %X  Size: %s", System.identityHashCode(mres),
             null == sz ? "NULL" : sz.toString()));
+        System.out.println(" String buffer " + mres.asCharBuffer().toString());
         return false;
       }
     });
@@ -136,6 +137,8 @@ public class DurableHashMapNGTest {
     AssertJUnit.assertNull(val);
     val = restoredMap.get("test");
     AssertJUnit.assertEquals(4, val.intValue());
+
+    restoredMap.destroy();
   }
 
   @Test(enabled = true)
@@ -189,6 +192,8 @@ public class DurableHashMapNGTest {
 
     str = map.get(third);
     AssertJUnit.assertEquals(str, "world");
+    third.destroy();
+    map.destroy();
   }
 
   @Test(enabled = true)
@@ -211,13 +216,31 @@ public class DurableHashMapNGTest {
     } };
     
     Person<Long> person =  (Person<Long>) efproxies[1].create(m_act, null, null, false);
+    person.setName("Alice", false);
     person.setAge((short) 31);
     DurableHashMap<String, Person<Long>> map = DurableHashMapFactory.create(m_act, 
                             efproxies, gtypes, mInitialCapacity, false);
     map.put("hello", person);
-    
+    Person<Long> anotherPerson =  (Person<Long>) efproxies[1].create(m_act, null, null, false);
+    anotherPerson.setAge((short) 30);
+    anotherPerson.setName("Bob", false);
+    map.put("world", anotherPerson);
+
     Person<Long> per = map.get("hello");
-    AssertJUnit.assertEquals(31, (int)per.getAge()); 
+    AssertJUnit.assertEquals(31, (int)per.getAge());
+
+    per = map.get("world");
+    AssertJUnit.assertEquals(30, (int)per.getAge());
+
+    Person<Long> third =  (Person<Long>) efproxies[1].create(m_act, null, null, false);
+    third.setAge((short) 29);
+    third.setName("Frank", false);
+    per = map.put("world", third);
+    per.destroy();
+
+    per = map.get("world");
+    AssertJUnit.assertEquals(29, (int)per.getAge());
+    map.destroy();
   }
 
   @Test(enabled = true)
@@ -251,7 +274,7 @@ public class DurableHashMapNGTest {
         return PersonFactory.create(allocator, factoryproxys, gfields, autoreclaim);
       }
     } };
-   
+
     Person<Long> person =  (Person<Long>) efproxies[0].create(m_act, null, null, false);
     person.setAge((short) 31);
     person.setName("Bob", true);
@@ -263,11 +286,13 @@ public class DurableHashMapNGTest {
     DurableHashMap<Person<Long>, Person<Long>> map = DurableHashMapFactory.create(m_act, 
                             efproxies, gtypes, mInitialCapacity, false);
     map.put(person, anotherPerson);
-    
+
     Person<Long> per = map.get(person);
     AssertJUnit.assertEquals(30, (int)per.getAge()); 
     per = map.get(anotherPerson);
     AssertJUnit.assertNull(per);
+
+    map.destroy();
   }
 
   @Test(enabled = true)
@@ -323,7 +348,7 @@ public class DurableHashMapNGTest {
     person.setName("Bob", true);
 
 
-    Person<Long> anotherPerson =  (Person<Long>) efproxies[1].create(m_act, null, null, false);
+    Person<Long> anotherPerson =  PersonFactory.create(m_act, null, null, false);
     anotherPerson.setAge((short) 30);
     anotherPerson.setName("Alice", true);
     
@@ -338,9 +363,12 @@ public class DurableHashMapNGTest {
     bigMap.put("hello", map);
     per = bigMap.get("hello").get("world");
     AssertJUnit.assertEquals(31, (int)per.getAge());
+
     bigMap.get("hello").put("testing", anotherPerson);
     per = bigMap.get("hello").get("testing");
     AssertJUnit.assertEquals("Alice", per.getName());
+
+    bigMap.destroy();
   }
     
   @Test(enabled = true)
@@ -421,7 +449,7 @@ public class DurableHashMapNGTest {
     }
     AssertJUnit.assertEquals(count, 50);
 
-
+    restoredMap.destroy();
   }
 
   @Test(enabled = true)
@@ -470,5 +498,16 @@ public class DurableHashMapNGTest {
     AssertJUnit.assertEquals(map.get("hello").intValue(), 1);
     AssertJUnit.assertEquals(map.get("world").intValue(), 2);
     AssertJUnit.assertEquals(map.getSize(), 2);
+
+    iter = map.iterator();
+    count = 0;
+    while (iter.hasNext()) {
+      entry = iter.next();
+      count++;
+    }
+    AssertJUnit.assertEquals(count, 2);
+
+    map.destroy();
   }
+
 }

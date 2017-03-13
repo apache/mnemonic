@@ -300,6 +300,7 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
     ByteBuffer bb = m_nvmasvc.retrieveByteBuffer(m_nid, getEffectiveAddress(phandler));
     if (null != bb) {
       ret = new DurableBuffer<NonVolatileMemAllocator>(this, bb);
+      ret.setCollector(m_bufcollector);
       if (autoreclaim) {
         m_bufcollector.register(ret);
       }
@@ -326,6 +327,7 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
     long sz = m_nvmasvc.retrieveSize(m_nid, eaddr);
     if (sz > 0L) {
       ret = new DurableChunk<NonVolatileMemAllocator>(this, eaddr, sz);
+      ret.setCollector(m_chunkcollector);
       if (autoreclaim) {
         m_chunkcollector.register(ret);
       }

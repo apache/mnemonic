@@ -19,6 +19,7 @@ package org.apache.mnemonic.collections;
 
 import org.apache.mnemonic.EntityFactoryProxy;
 import org.apache.mnemonic.DurableType;
+import org.apache.mnemonic.Durable;
 import org.apache.mnemonic.MemChunkHolder;
 import org.apache.mnemonic.MemoryDurableEntity;
 import org.apache.mnemonic.OutOfHybridMemory;
@@ -81,7 +82,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
    * @return previous value with key else return null
    */
   @Override
-  public V put(K key, V value) {
+  public V put(K key, V value) throws OutOfHybridMemory {
     int hash = hash(key.hashCode());
     long bucketIndex = getBucketIndex(hash);
     long bucketAddr = holder.get() + MAX_OBJECT_SIZE * bucketIndex;
@@ -106,13 +107,24 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
    *
    * @return previous value with key else return null
    */
-  public V addEntry(K key, V value, long bucketAddr) {
+  protected V addEntry(K key, V value, long bucketAddr) throws OutOfHybridMemory {
     V retValue = null;
     long handler = unsafe.getAddress(bucketAddr);
     if (0L == handler) {
-      DurableSinglyLinkedList<MapEntry<K, V>> head = DurableSinglyLinkedListFactory.create(allocator, 
-          listefproxies, listgftypes, false);
-      MapEntry<K, V> entry = MapEntryFactory.create(allocator, factoryProxy, genericField, false);
+      DurableSinglyLinkedList<MapEntry<K, V>> head = null;
+      MapEntry<K, V> entry = null;
+      try {
+        head = DurableSinglyLinkedListFactory.create(allocator, listefproxies, listgftypes, false);
+        entry = MapEntryFactory.create(allocator, factoryProxy, genericField, false);
+      } catch (OutOfHybridMemory fe) {
+        if (null != head) {
+          head.destroy();
+        }
+        if (null != entry) {
+          entry.destroy();
+        }
+        throw fe;
+      }
       entry.setKey(key, false);
       entry.setValue(value, false);
       head.setItem(entry, false);
@@ -128,7 +140,11 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
         K entryKey = mapEntry.getKey();
         if (entryKey == key || entryKey.equals(key)) {
           retValue = mapEntry.getValue();
-          mapEntry.setValue(value, false);
+          if (retValue instanceof Durable) {
+            mapEntry.setValue(value, false);
+          } else {
+            mapEntry.setValue(value, true);
+          }
           found = true;
           break;
         }
@@ -136,9 +152,20 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
         head = head.getNext();
       }
       if (true != found) {
-        DurableSinglyLinkedList<MapEntry<K, V>> newNode = DurableSinglyLinkedListFactory.create(allocator, 
-            listefproxies, listgftypes, false);
-        MapEntry<K, V> entry = MapEntryFactory.create(allocator, factoryProxy, genericField, false);
+        DurableSinglyLinkedList<MapEntry<K, V>> newNode = null;
+        MapEntry<K, V> entry = null;
+        try {
+          newNode = DurableSinglyLinkedListFactory.create(allocator, listefproxies, listgftypes, false);
+          entry = MapEntryFactory.create(allocator, factoryProxy, genericField, false);
+        } catch (OutOfHybridMemory fe) {
+          if (null != newNode) {
+            newNode.destroy();
+          }
+          if (null != entry) {
+            entry.destroy();
+          }
+          throw fe;
+        }
         entry.setKey(key, false);
         entry.setValue(value, false);
         newNode.setItem(entry, false);
@@ -176,7 +203,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
    *
    * @return previous value with key else return null
    */
-  public V getEntry(K key, long bucketAddr) {
+  protected V getEntry(K key, long bucketAddr) {
     V retValue = null;
     long handler = unsafe.getAddress(bucketAddr);
     if (0L != handler) {
@@ -222,7 +249,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
    *
    * @return previous value with key else return null
    */
-  public V removeEntry(K key, long bucketAddr) {
+  protected V removeEntry(K key, long bucketAddr) {
     V retValue = null;
     long handler = unsafe.getAddress(bucketAddr);
     if (0L != handler) {
@@ -248,13 +275,11 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
             head.destroy();
           } else {
             unsafe.putAddress(bucketAddr, head.getNext().getHandler());        
-            head.setNext(null, false);
-            head.destroy(); // #TODO: better way to delete one node
+            head.destroy();
           }
         } else {
           prev.setNext(head.getNext(), false);
-          head.setNext(null, false);
-          head.destroy(); // #TODO: better way to delete one node
+          head.destroy();
         }
         mapSize--;
       }       
@@ -272,9 +297,14 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
     MemChunkHolder<A> prevHolder = holder; 
     long bucketAddr = prevHolder.get();
     long maxbucketAddr = bucketAddr + MAX_OBJECT_SIZE * totalCapacity;
+    holder = allocator.createChunk(MAX_OBJECT_SIZE * newCapacity, autoReclaim);
+    if (null == holder) {
+      autoResize = false;
+      holder = prevHolder;
+      return;
+    }
     totalCapacity = newCapacity;
     threshold = (long) (totalCapacity * DEFAULT_MAP_LOAD_FACTOR);
-    holder = allocator.createChunk(MAX_OBJECT_SIZE * totalCapacity, autoReclaim);
     unsafe.putLong(chunkAddr.get(), allocator.getChunkHandler(holder));
     while (bucketAddr < maxbucketAddr) {
       long handler = unsafe.getAddress(bucketAddr);
@@ -299,7 +329,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
    * @param elem
    *          the item in the old map
    */
-  public void transfer(DurableSinglyLinkedList<MapEntry<K, V>> elem) {
+  protected void transfer(DurableSinglyLinkedList<MapEntry<K, V>> elem) {
     int hash = hash(elem.getItem().getKey().hashCode());
     long bucketIndex = getBucketIndex(hash);
     long bucketAddr = holder.get() + MAX_OBJECT_SIZE * bucketIndex;
@@ -318,7 +348,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
    * Recomputes the size of the map during restore without persistence
    * 
    */
-  public long recomputeMapSize() {
+  protected long recomputeMapSize() {
     long size = 0;
     long bucketAddr = holder.get();
     long maxbucketAddr = bucketAddr + MAX_OBJECT_SIZE * totalCapacity;
@@ -351,13 +381,19 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
   public void destroy() throws RetrieveDurableEntityError {
     long bucketAddr = holder.get();
     long maxbucketAddr = bucketAddr + MAX_OBJECT_SIZE * totalCapacity;
+    DurableSinglyLinkedList<MapEntry<K, V>> head, prev;
     while (bucketAddr < maxbucketAddr) {
       long handler = unsafe.getAddress(bucketAddr);
       if (0L != handler) {
-        DurableSinglyLinkedList<MapEntry<K, V>> head = DurableSinglyLinkedListFactory.restore(allocator,
+        head = DurableSinglyLinkedListFactory.restore(allocator,
             listefproxies, listgftypes, handler, false);
-        head.destroy();
+        prev = head;
+        while (null != head) {
+          head = head.getNext();
+          prev.destroy(); //TODO: Destroy head in a cascading way
+          prev = head;
         }
+      }
       bucketAddr += MAX_OBJECT_SIZE;
     }
     holder.destroy();
@@ -383,12 +419,12 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
 
   @Override
   public void restoreDurableEntity(A allocator, EntityFactoryProxy[] factoryProxy, 
-             DurableType[] gField, long phandler, boolean autoreclaim) throws RestoreDurableEntityError {
-    initializeDurableEntity(allocator, factoryProxy, gField, autoreclaim);
+             DurableType[] gField, long phandler, boolean autoReclaim) throws RestoreDurableEntityError {
+    initializeDurableEntity(allocator, factoryProxy, gField, autoReclaim);
     if (0L == phandler) {
       throw new RestoreDurableEntityError("Input handler is null on restoreDurableEntity.");
     }
-    chunkAddr = allocator.retrieveChunk(phandler, autoreclaim);
+    chunkAddr = allocator.retrieveChunk(phandler, autoReclaim);
     long chunkHandler = unsafe.getLong(chunkAddr.get());
     holder = allocator.retrieveChunk(chunkHandler, autoReclaim);
     if (null == holder || null == chunkAddr) {
@@ -436,10 +472,10 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
 
   @Override
   public void createDurableEntity(A allocator, EntityFactoryProxy[] factoryProxy, 
-              DurableType[] gField, boolean autoreclaim) throws OutOfHybridMemory {
-    initializeDurableEntity(allocator, factoryProxy, gField, autoreclaim);
-    this.holder = allocator.createChunk(MAX_OBJECT_SIZE * totalCapacity, autoreclaim);
-    this.chunkAddr = allocator.createChunk(MAX_OBJECT_SIZE, autoreclaim);
+              DurableType[] gField, boolean autoReclaim) throws OutOfHybridMemory {
+    initializeDurableEntity(allocator, factoryProxy, gField, autoReclaim);
+    this.holder = allocator.createChunk(MAX_OBJECT_SIZE * totalCapacity, autoReclaim);
+    this.chunkAddr = allocator.createChunk(MAX_OBJECT_SIZE, autoReclaim);
     unsafe.putLong(chunkAddr.get(), allocator.getChunkHandler(holder));
     if (null == this.holder || null == this.chunkAddr) {
       throw new OutOfHybridMemory("Create Durable Entity Error!");
@@ -515,13 +551,13 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
           prevNode.destroy();
         } else {
           unsafe.putAddress(prevBucketAddr, prevNode.getNext().getHandler());
-          prevNode.setNext(null, false);
-          prevNode.destroy(); // #TODO: better way to delete one node
+          prevNode.destroy();
+          prevNode = null;
         }
       } else {
         prevPrevNode.setNext(prevNode.getNext(), false);
-        prevNode.setNext(null, false);
-        prevNode.destroy(); // #TODO: better way to delete one node
+        prevNode.destroy();
+        prevNode = prevPrevNode;
       }
       map.mapSize--;
     }
