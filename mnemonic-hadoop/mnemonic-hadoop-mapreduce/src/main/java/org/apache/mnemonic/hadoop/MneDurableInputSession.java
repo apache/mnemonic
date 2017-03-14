@@ -35,6 +35,7 @@ public class MneDurableInputSession<V>
     implements MneInputSession<V>, MneDurableComputable<NonVolatileMemAllocator> {
 
   private TaskAttemptContext taskAttemptContext;
+  private Configuration configuration;
   private String serviceName;
   private DurableType[] durableTypes;
   private EntityFactoryProxy[] entityFactoryProxies;
@@ -46,6 +47,11 @@ public class MneDurableInputSession<V>
 
   public MneDurableInputSession(TaskAttemptContext taskAttemptContext) {
     setTaskAttemptContext(taskAttemptContext);
+    setConfiguration(taskAttemptContext.getConfiguration());
+  }
+
+  public MneDurableInputSession(Configuration configuration) {
+    setConfiguration(configuration);
   }
 
   public void validateConfig() {
@@ -61,10 +67,10 @@ public class MneDurableInputSession<V>
 
   @Override
   public void readConfig(String prefix) {
-    if (getTaskAttemptContext() == null) {
-      throw new ConfigurationException("taskAttemptContext has not yet been set");
+    if (getConfiguration() == null) {
+      throw new ConfigurationException("configuration has not yet been set");
     }
-    Configuration conf = getTaskAttemptContext().getConfiguration();
+    Configuration conf = getConfiguration();
     setServiceName(MneConfigHelper.getMemServiceName(conf, MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX));
     setDurableTypes(MneConfigHelper.getDurableTypes(conf, MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX));
     setEntityFactoryProxies(Utils.instantiateEntityFactoryProxies(
@@ -143,5 +149,13 @@ public class MneDurableInputSession<V>
   @Override
   public long getHandler() {
     return m_handler;
+  }
+
+  public Configuration getConfiguration() {
+    return configuration;
+  }
+
+  public void setConfiguration(Configuration configuration) {
+    this.configuration = configuration;
   }
 }

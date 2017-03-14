@@ -28,6 +28,7 @@ import org.apache.mnemonic.Utils;
 import org.apache.mnemonic.collections.DurableSinglyLinkedList;
 import org.apache.mnemonic.collections.DurableSinglyLinkedListFactory;
 
+import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -35,7 +36,9 @@ import java.util.Map;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.apache.hadoop.mapreduce.TaskID;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 public class MneDurableOutputSession<V>
@@ -43,6 +46,7 @@ public class MneDurableOutputSession<V>
 
   private long poolSize;
   private TaskAttemptContext taskAttemptContext;
+  private Configuration configuration;
   private String serviceName;
   private DurableType[] durableTypes;
   private EntityFactoryProxy[] entityFactoryProxies;
@@ -61,6 +65,11 @@ public class MneDurableOutputSession<V>
   public MneDurableOutputSession(TaskAttemptContext taskAttemptContext) {
     setTaskAttemptContext(taskAttemptContext);
     m_recordmap = new HashMap<V, DurableSinglyLinkedList<V>>();
+    setConfiguration(taskAttemptContext.getConfiguration());
+  }
+  
+  public MneDurableOutputSession(Configuration configuration) {
+    setConfiguration(configuration);
   }
 
   public void validateConfig() {
@@ -79,7 +88,7 @@ public class MneDurableOutputSession<V>
     if (getTaskAttemptContext() == null) {
       throw new ConfigurationException("taskAttemptContext has not yet been set");
     }
-    Configuration conf = getTaskAttemptContext().getConfiguration();
+    Configuration conf = getConfiguration();
     setServiceName(MneConfigHelper.getMemServiceName(conf, MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX));
     setDurableTypes(MneConfigHelper.getDurableTypes(conf, MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX));
     setEntityFactoryProxies(Utils.instantiateEntityFactoryProxies(
@@ -93,9 +102,39 @@ public class MneDurableOutputSession<V>
 
   protected Path genNextPoolPath() {
     Path ret = new Path(FileOutputFormat.getOutputPath(getTaskAttemptContext()),
-        FileOutputFormat.getUniqueFile(getTaskAttemptContext(),
-            String.format("%s-%05d", getBaseOutputName(), ++m_poolidx), MneConfigHelper.DEFAULT_FILE_EXTENSION));
+        getUniqueName(String.format("%s-%05d", getBaseOutputName(), ++m_poolidx), 
+            MneConfigHelper.DEFAULT_FILE_EXTENSION));
     return ret;
+  }
+  
+  protected String getUniqueName(String name, String extension) {
+    int partition;
+    
+    NumberFormat numberFormat = NumberFormat.getInstance();
+    numberFormat.setMinimumIntegerDigits(5);
+    numberFormat.setGroupingUsed(false);
+    
+    if (null != getTaskAttemptContext()) {
+      TaskID taskId = getTaskAttemptContext().getTaskAttemptID().getTaskID();
+      partition = taskId.getId();
+    } else {
+      partition = getConfiguration().getInt(JobContext.TASK_PARTITION, -1);
+    } 
+    if (partition == -1) {
+      throw new IllegalArgumentException("This method can only be called from an application");
+    }
+    
+    String taskType = getConfiguration().getBoolean(JobContext.TASK_ISMAP, JobContext.DEFAULT_TASK_ISMAP) ? "m" : "r";
+    
+    StringBuilder result = new StringBuilder();
+    result.append(name);
+    result.append('-');
+    result.append(taskType);
+    result.append('-');
+    result.append(numberFormat.format(partition));
+    result.append(extension);
+    return result.toString();
+    
   }
 
   @Override
@@ -324,6 +363,14 @@ public class MneDurableOutputSession<V>
 
   public void setBaseOutputName(String baseOutputName) {
     this.baseOutputName = baseOutputName;
+  }
+
+  public Configuration getConfiguration() {
+    return configuration;
+  }
+
+  public void setConfiguration(Configuration configuration) {
+    this.configuration = configuration;
   }
 
 }
