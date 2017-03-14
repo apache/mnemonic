@@ -19,19 +19,29 @@ package org.apache.mnemonic.collections;
 
 import java.util.Iterator;
 import java.nio.ByteBuffer;
+import java.util.Random;
+import java.util.zip.Checksum;
+import java.util.zip.CRC32;
 
 import org.apache.mnemonic.Utils;
 import org.apache.mnemonic.RestorableAllocator;
 import org.apache.mnemonic.NonVolatileMemAllocator;
+import org.apache.mnemonic.OutOfHybridMemory;
 import org.apache.mnemonic.EntityFactoryProxy;
 import org.apache.mnemonic.DurableType;
+import org.apache.mnemonic.DurableBuffer;
+import org.apache.mnemonic.DurableChunk;
 import org.apache.mnemonic.Reclaim;
 import org.apache.mnemonic.Durable;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.RandomUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.testng.AssertJUnit;
+import org.testng.Assert;
+
+import sun.misc.Unsafe;
 
 /**
  *
@@ -41,10 +51,49 @@ import org.testng.AssertJUnit;
 public class DurableHashMapNGTest {
   private long cKEYCAPACITY;
   private NonVolatileMemAllocator m_act;
+  private Random rand;
+  private Unsafe unsafe;
   private long mInitialCapacity = 1;
 
+  protected DurableBuffer<NonVolatileMemAllocator>
+      genuptBuffer(NonVolatileMemAllocator act, Checksum cs, int size) {
+    DurableBuffer<NonVolatileMemAllocator> ret = null;
+    ret = act.createBuffer(size, false);
+    if (null == ret) {
+      throw new OutOfHybridMemory("Create Durable Buffer Failed.");
+    }
+    ret.get().clear();
+    byte[] rdbytes = RandomUtils.nextBytes(size);
+    Assert.assertNotNull(rdbytes);
+    ret.get().put(rdbytes);
+    cs.update(rdbytes, 0, rdbytes.length);
+    return ret;
+  }
+
+  protected DurableChunk<NonVolatileMemAllocator>
+      genuptChunk(NonVolatileMemAllocator act, Checksum cs, long size) {
+    DurableChunk<NonVolatileMemAllocator> ret = null;
+    ret = act.createChunk(size, false);
+    if (null == ret) {
+      throw new OutOfHybridMemory("Create Durable Chunk Failed.");
+    }
+    byte b;
+    for (int i = 0; i < ret.getSize(); ++i) {
+      b = (byte) rand.nextInt(255);
+      unsafe.putByte(ret.get() + i, b);
+      cs.update(b);
+    }
+    return ret;
+  }
+
+  protected int genRandSize() {
+    return rand.nextInt(1024 * 1024) + 1024 * 1024;
+  }
+
   @BeforeClass
-  public void setUp() {
+  public void setUp() throws Exception {
+    rand = Utils.createRandom();
+    unsafe = Utils.getUnsafe();
     m_act = new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService("pmalloc"), 1024 * 1024 * 1024,
         "./pobj_hashmaps.dat", true);
     cKEYCAPACITY = m_act.handlerCapacity();
@@ -510,4 +559,88 @@ public class DurableHashMapNGTest {
     map.destroy();
   }
 
+  @Test(enabled = true)
+  public void testMapValueBuffer() {
+    DurableType gtypes[] = {DurableType.STRING, DurableType.BUFFER};
+    DurableHashMap<String, DurableBuffer> map = DurableHashMapFactory.create(m_act, null, gtypes, 1, false);
+    long bufVal;
+
+    Checksum bufferCheckSum = new CRC32();
+    bufferCheckSum.reset();
+
+    Long handler = map.getHandler();
+    for (int i = 0; i < 10; i++) {
+      map.put("buffer" + i, genuptBuffer(m_act, bufferCheckSum, genRandSize()));
+    }
+
+    bufVal = bufferCheckSum.getValue();
+
+    bufferCheckSum.reset();
+    for (int i = 0; i < 10; i++) {
+      DurableBuffer<NonVolatileMemAllocator> db = map.get("buffer" + i);
+      Assert.assertNotNull(db);
+      byte buf[] = new byte[db.get().capacity()];
+      db.get().get(buf);
+      bufferCheckSum.update(buf, 0, buf.length);
+    }
+    Assert.assertEquals(bufferCheckSum.getValue(), bufVal);
+
+    bufferCheckSum.reset();
+    DurableHashMap<String, DurableBuffer> restoredMap = DurableHashMapFactory.restore(m_act,
+                            null, gtypes, handler, false);
+    for (int i = 0; i < 10; i++) {
+      DurableBuffer<NonVolatileMemAllocator> db = restoredMap.get("buffer" + i);
+      Assert.assertNotNull(db);
+      byte buf[] = new byte[db.get().capacity()];
+      db.get().get(buf);
+      bufferCheckSum.update(buf, 0, buf.length);
+    }
+    Assert.assertEquals(bufferCheckSum.getValue(), bufVal);
+
+    restoredMap.destroy();
+  }
+
+  @Test(enabled = true)
+  public void testMapValueChunk() {
+    DurableType gtypes[] = {DurableType.STRING, DurableType.CHUNK};
+    DurableHashMap<String, DurableChunk> map = DurableHashMapFactory.create(m_act, null, gtypes, 1, false);
+    long chunkVal;
+
+    Checksum chunkCheckSum = new CRC32();
+    chunkCheckSum.reset();
+
+    Long handler = map.getHandler();
+    for (int i = 0; i < 10; i++) {
+      map.put("chunk" + i, genuptChunk(m_act, chunkCheckSum, genRandSize()));
+    }
+
+    chunkVal = chunkCheckSum.getValue();
+    chunkCheckSum.reset();
+
+    for (int i = 0; i < 10; i++) {
+      DurableChunk<NonVolatileMemAllocator> dc = map.get("chunk" + i);
+      for (int j = 0; j < dc.getSize(); ++j) {
+        byte b = unsafe.getByte(dc.get() + j);
+        chunkCheckSum.update(b);
+      }
+    }
+    chunkVal = chunkCheckSum.getValue();
+    Assert.assertEquals(chunkCheckSum.getValue(), chunkVal);
+
+    chunkCheckSum.reset();
+    DurableHashMap<String, DurableChunk> restoredMap = DurableHashMapFactory.restore(m_act,
+                            null, gtypes, handler, false);
+
+    for (int i = 0; i < 10; i++) {
+      DurableChunk<NonVolatileMemAllocator> dc = restoredMap.get("chunk" + i);
+      for (int j = 0; j < dc.getSize(); ++j) {
+        byte b = unsafe.getByte(dc.get() + j);
+        chunkCheckSum.update(b);
+      }
+    }
+    chunkVal = chunkCheckSum.getValue();
+    Assert.assertEquals(chunkCheckSum.getValue(), chunkVal);
+
+    restoredMap.destroy();
+  }
 }
