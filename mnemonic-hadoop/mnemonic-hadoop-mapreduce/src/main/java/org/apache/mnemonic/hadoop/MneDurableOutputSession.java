@@ -39,7 +39,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.TaskID;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 public class MneDurableOutputSession<V>
     implements MneOutputSession<V>, MneDurableComputable<NonVolatileMemAllocator> {
@@ -63,13 +62,13 @@ public class MneDurableOutputSession<V>
   protected Iterator<V> m_iter;
 
   public MneDurableOutputSession(TaskAttemptContext taskAttemptContext) {
+    this(taskAttemptContext.getConfiguration());
     setTaskAttemptContext(taskAttemptContext);
-    m_recordmap = new HashMap<V, DurableSinglyLinkedList<V>>();
-    setConfiguration(taskAttemptContext.getConfiguration());
   }
   
   public MneDurableOutputSession(Configuration configuration) {
     setConfiguration(configuration);
+    m_recordmap = new HashMap<V, DurableSinglyLinkedList<V>>();
   }
 
   public void validateConfig() {
@@ -85,10 +84,10 @@ public class MneDurableOutputSession<V>
 
   @Override
   public void readConfig(String prefix) {
-    if (getTaskAttemptContext() == null) {
-      throw new ConfigurationException("taskAttemptContext has not yet been set");
-    }
     Configuration conf = getConfiguration();
+    if (conf == null) {
+      throw new ConfigurationException("Configuration has not yet been set");
+    }
     setServiceName(MneConfigHelper.getMemServiceName(conf, MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX));
     setDurableTypes(MneConfigHelper.getDurableTypes(conf, MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX));
     setEntityFactoryProxies(Utils.instantiateEntityFactoryProxies(
@@ -101,12 +100,17 @@ public class MneDurableOutputSession<V>
   }
 
   protected Path genNextPoolPath() {
-    Path ret = new Path(FileOutputFormat.getOutputPath(getTaskAttemptContext()),
+    Path ret = new Path(getOutputDir(),
         getUniqueName(String.format("%s-%05d", getBaseOutputName(), ++m_poolidx), 
             MneConfigHelper.DEFAULT_FILE_EXTENSION));
     return ret;
   }
-  
+
+  protected Path getOutputDir() {
+    String name = MneConfigHelper.getDir(getConfiguration(), MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX);
+    return name == null ? null : new Path(name);
+  }
+
   protected String getUniqueName(String name, String extension) {
     int partition;
     

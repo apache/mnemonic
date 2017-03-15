@@ -44,6 +44,7 @@ public class MneConfigHelper {
   public static final String DEFAULT_NAME_PART = "part";
   public static final String DEFAULT_FILE_EXTENSION = ".mne";
   public static final String BASE_OUTPUT_NAME = "mapreduce.output.basename";
+  public static final String DIR = "dir";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MneConfigHelper.class);
 
@@ -128,6 +129,14 @@ public class MneConfigHelper {
 
   public static long getMemPoolSize(Configuration conf, String prefix) {
     return conf.getLong(getConfigName(prefix, MEM_POOL_SIZE), DEFAULT_OUTPUT_MEM_POOL_SIZE);
+  }
+  
+  public static String getDir(Configuration conf, String prefix) {
+    return conf.get(getConfigName(prefix, DIR));
+  }
+
+  public static void setDir(Configuration conf, String prefix, String dirname) {
+    conf.set(getConfigName(prefix, DIR), dirname);
   }
 
 }

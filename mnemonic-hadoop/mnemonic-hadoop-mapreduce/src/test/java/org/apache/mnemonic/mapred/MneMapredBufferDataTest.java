@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.mnemonic.mapreduce;
+package org.apache.mnemonic.mapred;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,63 +27,57 @@ import java.util.Random;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapreduce.InputFormat;
-import org.apache.hadoop.mapreduce.OutputFormat;
-import org.apache.hadoop.mapreduce.RecordReader;
-import org.apache.hadoop.mapreduce.RecordWriter;
-import org.apache.hadoop.mapreduce.TaskAttemptContext;
-import org.apache.hadoop.mapreduce.TaskAttemptID;
-import org.apache.hadoop.mapreduce.TaskType;
-import org.apache.hadoop.mapreduce.lib.input.FileSplit;
-import org.apache.hadoop.mapreduce.task.TaskAttemptContextImpl;
-import org.apache.mnemonic.DurableChunk;
+import org.apache.hadoop.mapred.InputFormat;
+import org.apache.hadoop.mapred.InputSplit;
+import org.apache.hadoop.mapred.OutputFormat;
+import org.apache.hadoop.mapred.RecordReader;
+import org.apache.hadoop.mapred.RecordWriter;
+import org.apache.hadoop.mapreduce.JobContext;
+import org.apache.hadoop.mapred.FileSplit;
+import org.apache.mnemonic.DurableBuffer;
 import org.apache.mnemonic.DurableType;
 import org.apache.mnemonic.Utils;
 import org.apache.mnemonic.hadoop.MneConfigHelper;
 import org.apache.mnemonic.hadoop.MneDurableInputValue;
 import org.apache.mnemonic.hadoop.MneDurableOutputSession;
 import org.apache.mnemonic.hadoop.MneDurableOutputValue;
-import org.apache.mnemonic.hadoop.mapreduce.MneInputFormat;
-import org.apache.mnemonic.hadoop.mapreduce.MneOutputFormat;
+import org.apache.mnemonic.hadoop.mapred.MneInputFormat;
+import org.apache.mnemonic.hadoop.mapred.MneOutputFormat;
 import org.testng.Assert;
 import org.testng.AssertJUnit;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import sun.misc.Unsafe;
-
-@SuppressWarnings("restriction")
-public class MneMapreduceChunkDataTest {
+public class MneMapredBufferDataTest {
 
   private static final String DEFAULT_BASE_WORK_DIR = "target" + File.separator + "test" + File.separator + "tmp";
-  private static final String DEFAULT_WORK_DIR = DEFAULT_BASE_WORK_DIR + File.separator + "chunk-data";
+  private static final String DEFAULT_WORK_DIR = DEFAULT_BASE_WORK_DIR + File.separator + "mapred-buffer-data";
   private static final String SERVICE_NAME = "pmalloc";
   private static final long SLOT_KEY_ID = 5L;
+  private static final int TASK_PARTITION = 0;
+  
   private Path m_workdir;
   private JobConf m_conf;
   private FileSystem m_fs;
   private Random m_rand;
-  private TaskAttemptID m_taid;
-  private TaskAttemptContext m_tacontext;
   private long m_reccnt = 5000L;
   private volatile long m_checksum;
   private volatile long m_totalsize = 0L;
   private List<String> m_partfns;
-  private Unsafe unsafe;
 
   @BeforeClass
-  public void setUp() throws Exception {
+  public void setUp() throws IOException {
     m_workdir = new Path(
         System.getProperty("test.tmp.dir", DEFAULT_WORK_DIR));
     m_conf = new JobConf();
     m_rand = Utils.createRandom();
     m_partfns = new ArrayList<String>();
-    unsafe = Utils.getUnsafe();
 
     try {
       m_fs = FileSystem.getLocal(m_conf).getRaw();
@@ -93,16 +87,15 @@ public class MneMapreduceChunkDataTest {
       throw new IllegalStateException("bad fs init", e);
     }
 
-    m_taid = new TaskAttemptID("jt", 0, TaskType.MAP, 0, 0);
-    m_tacontext = new TaskAttemptContextImpl(m_conf, m_taid);
-
+    m_conf.setInt(JobContext.TASK_PARTITION, TASK_PARTITION);
+    
     MneConfigHelper.setDir(m_conf, MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX, m_workdir.toString());
-    MneConfigHelper.setBaseOutputName(m_conf, null, "chunk-data");
+    MneConfigHelper.setBaseOutputName(m_conf, null, "mapred-buffer-data");
 
     MneConfigHelper.setMemServiceName(m_conf, MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX, SERVICE_NAME);
     MneConfigHelper.setSlotKeyId(m_conf, MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX, SLOT_KEY_ID);
     MneConfigHelper.setDurableTypes(m_conf,
-        MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX, new DurableType[] {DurableType.CHUNK});
+        MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX, new DurableType[] {DurableType.BUFFER});
     MneConfigHelper.setEntityFactoryProxies(m_conf,
         MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX, new Class<?>[] {});
     MneConfigHelper.setMemServiceName(m_conf, MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX, SERVICE_NAME);
@@ -110,7 +103,7 @@ public class MneMapreduceChunkDataTest {
     MneConfigHelper.setMemPoolSize(m_conf,
         MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX, 1024L * 1024 * 1024 * 4);
     MneConfigHelper.setDurableTypes(m_conf,
-        MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX, new DurableType[] {DurableType.CHUNK});
+        MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX, new DurableType[] {DurableType.BUFFER});
     MneConfigHelper.setEntityFactoryProxies(m_conf,
         MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX, new Class<?>[] {});
   }
@@ -120,52 +113,52 @@ public class MneMapreduceChunkDataTest {
 
   }
 
-  protected DurableChunk<?> genupdDurableChunk(
-      MneDurableOutputSession<DurableChunk<?>> s, Checksum cs) {
-    DurableChunk<?> ret = null;
+  protected DurableBuffer<?> genupdDurableBuffer(
+      MneDurableOutputSession<DurableBuffer<?>> s, Checksum cs) {
+    DurableBuffer<?> ret = null;
     int sz = m_rand.nextInt(1024 * 1024) + 1024 * 1024;
     ret = s.newDurableObjectRecord(sz);
-    byte b;
     if (null != ret) {
-      for (int i = 0; i < ret.getSize(); ++i) {
-        b = (byte) m_rand.nextInt(255);
-        unsafe.putByte(ret.get() + i, b);
-        cs.update(b);
-      }
+      ret.get().clear();
+      byte[] rdbytes = RandomUtils.nextBytes(sz);
+      Assert.assertNotNull(rdbytes);
+      ret.get().put(rdbytes);
+      cs.update(rdbytes, 0, rdbytes.length);
       m_totalsize += sz;
     }
     return ret;
   }
 
   @Test(enabled = true)
-  public void testWriteChunkData() throws Exception {
+  public void testWriteBufferData() throws Exception {
     NullWritable nada = NullWritable.get();
-    MneDurableOutputSession<DurableChunk<?>> sess = new MneDurableOutputSession<DurableChunk<?>>(m_tacontext);
+    MneDurableOutputSession<DurableBuffer<?>> sess = new MneDurableOutputSession<DurableBuffer<?>>(m_conf);
     sess.readConfig(MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX);
     sess.initNextPool();
-    MneDurableOutputValue<DurableChunk<?>> mdvalue =
-        new MneDurableOutputValue<DurableChunk<?>>(sess);
-    OutputFormat<NullWritable, MneDurableOutputValue<DurableChunk<?>>> outputFormat =
-        new MneOutputFormat<MneDurableOutputValue<DurableChunk<?>>>();
-    RecordWriter<NullWritable, MneDurableOutputValue<DurableChunk<?>>> writer =
-        outputFormat.getRecordWriter(m_tacontext);
-    DurableChunk<?> dchunk = null;
+    MneDurableOutputValue<DurableBuffer<?>> mdvalue =
+        new MneDurableOutputValue<DurableBuffer<?>>(sess);
+    OutputFormat<NullWritable, MneDurableOutputValue<DurableBuffer<?>>> outputFormat =
+        new MneOutputFormat<MneDurableOutputValue<DurableBuffer<?>>>();
+    RecordWriter<NullWritable, MneDurableOutputValue<DurableBuffer<?>>> writer =
+        outputFormat.getRecordWriter(m_fs, m_conf, null, null);
+    DurableBuffer<?> dbuf = null;
     Checksum cs = new CRC32();
     cs.reset();
     for (int i = 0; i < m_reccnt; ++i) {
-      dchunk = genupdDurableChunk(sess, cs);
-      Assert.assertNotNull(dchunk);
-      writer.write(nada, mdvalue.of(dchunk));
+      dbuf = genupdDurableBuffer(sess, cs);
+      Assert.assertNotNull(dbuf);
+      writer.write(nada, mdvalue.of(dbuf));
     }
     m_checksum = cs.getValue();
-    writer.close(m_tacontext);
+    writer.close(null);
     sess.close();
   }
 
-  @Test(enabled = true, dependsOnMethods = { "testWriteChunkData" })
-  public void testReadChunkData() throws Exception {
+  @Test(enabled = true, dependsOnMethods = { "testWriteBufferData" })
+  public void testReadBufferData() throws Exception {
     long reccnt = 0L;
     long tsize = 0L;
+    byte[] buf;
     Checksum cs = new CRC32();
     cs.reset();
     File folder = new File(m_workdir.toString());
@@ -182,26 +175,32 @@ public class MneMapreduceChunkDataTest {
       System.out.println(String.format("Verifying : %s", m_partfns.get(idx)));
       FileSplit split = new FileSplit(
           new Path(m_workdir, m_partfns.get(idx)), 0, 0L, new String[0]);
-      InputFormat<NullWritable, MneDurableInputValue<DurableChunk<?>>> inputFormat =
-          new MneInputFormat<MneDurableInputValue<DurableChunk<?>>, DurableChunk<?>>();
-      RecordReader<NullWritable, MneDurableInputValue<DurableChunk<?>>> reader =
-          inputFormat.createRecordReader(split, m_tacontext);
-      MneDurableInputValue<DurableChunk<?>> dchkval = null;
-      while (reader.nextKeyValue()) {
-        dchkval = reader.getCurrentValue();
-        byte b;
-        for (int j = 0; j < dchkval.getValue().getSize(); ++j) {
-          b = unsafe.getByte(dchkval.getValue().get() + j);
-          cs.update(b);
+      InputFormat<NullWritable, MneDurableInputValue<DurableBuffer<?>>> inputFormat =
+          new MneInputFormat<MneDurableInputValue<DurableBuffer<?>>, DurableBuffer<?>>();
+      RecordReader<NullWritable, MneDurableInputValue<DurableBuffer<?>>> reader =
+          inputFormat.getRecordReader((InputSplit) split, m_conf, null);
+      NullWritable dbufkey = reader.createKey();
+      MneDurableInputValue<DurableBuffer<?>> dbufval = null;
+      while (true) {
+        dbufval = reader.createValue();
+        if (reader.next(dbufkey, dbufval)) {
+          assert dbufval.getValue().getSize() == dbufval.getValue().get().capacity();
+          dbufval.getValue().get().clear();
+          buf = new byte[dbufval.getValue().get().capacity()];
+          dbufval.getValue().get().get(buf);
+          cs.update(buf, 0, buf.length);
+          tsize += dbufval.getValue().getSize();
+          ++reccnt;
+        } else {
+          break;
         }
-        tsize += dchkval.getValue().getSize();
-        ++reccnt;
       }
       reader.close();
     }
     AssertJUnit.assertEquals(m_reccnt, reccnt);
     AssertJUnit.assertEquals(m_totalsize, tsize);
     AssertJUnit.assertEquals(m_checksum, cs.getValue());
-    System.out.println(String.format("The checksum of chunk is %d", m_checksum));
+    System.out.println(String.format("The checksum of buffer is %d", m_checksum));
   }
 }
+

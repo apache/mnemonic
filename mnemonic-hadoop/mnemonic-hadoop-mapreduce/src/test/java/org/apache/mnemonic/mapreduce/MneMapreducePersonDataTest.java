@@ -81,7 +81,7 @@ public class MneMapreducePersonDataTest {
     m_taid = new TaskAttemptID("jt", 0, TaskType.MAP, 0, 0);
     m_tacontext = new TaskAttemptContextImpl(m_conf, m_taid);
 
-    m_conf.set("mapreduce.output.fileoutputformat.outputdir", m_workdir.toString());
+    MneConfigHelper.setDir(m_conf, MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX, m_workdir.toString());
     MneConfigHelper.setBaseOutputName(m_conf, null, "person-data");
 
     MneConfigHelper.setMemServiceName(m_conf, MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX, SERVICE_NAME);

@@ -46,8 +46,8 @@ public class MneDurableInputSession<V>
 
 
   public MneDurableInputSession(TaskAttemptContext taskAttemptContext) {
+    this(taskAttemptContext.getConfiguration());
     setTaskAttemptContext(taskAttemptContext);
-    setConfiguration(taskAttemptContext.getConfiguration());
   }
 
   public MneDurableInputSession(Configuration configuration) {
@@ -67,10 +67,10 @@ public class MneDurableInputSession<V>
 
   @Override
   public void readConfig(String prefix) {
-    if (getConfiguration() == null) {
-      throw new ConfigurationException("configuration has not yet been set");
-    }
     Configuration conf = getConfiguration();
+    if (conf == null) {
+      throw new ConfigurationException("Configuration has not yet been set");
+    }
     setServiceName(MneConfigHelper.getMemServiceName(conf, MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX));
     setDurableTypes(MneConfigHelper.getDurableTypes(conf, MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX));
     setEntityFactoryProxies(Utils.instantiateEntityFactoryProxies(
