@@ -16,13 +16,13 @@
  * limitations under the License.
  */
 
-package org.apache.mnemonic.hadoop;
+package org.apache.mnemonic.sessions;
 
-import org.apache.mnemonic.CommonAllocator;
+import java.io.Closeable;
+import java.util.Iterator;
 
-public interface MneDurableComputable<A extends CommonAllocator<A>> {
+public interface InputSession<V> extends Closeable {
 
-  A getAllocator();
-  
-  long getHandler();
+  Iterator<V> iterator();
+
 }

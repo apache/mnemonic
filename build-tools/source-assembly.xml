@@ -35,6 +35,7 @@
       <includes>
         <include>org.apache.mnemonic:mnemonic-core</include>
         <include>org.apache.mnemonic:mnemonic-collections</include>
+        <include>org.apache.mnemonic:mnemonic-sessions</include>
         <include>org.apache.mnemonic:mnemonic-examples</include>
       </includes>
       <sources>

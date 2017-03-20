@@ -16,14 +16,20 @@
  * limitations under the License.
  */
 
-package org.apache.mnemonic.hadoop;
+package org.apache.mnemonic.sessions;
 
 import java.io.Closeable;
 
-public interface MneOutputSession<V> extends Closeable {
+public interface OutputSession<V> extends Closeable {
 
-  void readConfig(String prefix);
-  void initNextPool();
+  V newDurableObjectRecord();
+
+  V newDurableObjectRecord(long size);
+
   void post(V v);
+
+  void destroyPendingRecord(V k);
+
+  void destroyAllPendingRecords();
 
 }

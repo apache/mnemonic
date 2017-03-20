@@ -56,6 +56,12 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
+      <groupId>org.apache.mnemonic</groupId>
+      <artifactId>mnemonic-sessions</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
       <groupId>org.flowcomputing.commons</groupId>
       <artifactId>commons-primitives</artifactId>
     </dependency>

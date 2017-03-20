@@ -16,17 +16,13 @@
  * limitations under the License.
  */
 
-package org.apache.mnemonic.hadoop;
+package org.apache.mnemonic.sessions;
 
-import java.io.Closeable;
-import java.util.Iterator;
+import org.apache.mnemonic.RestorableAllocator;
 
-import org.apache.hadoop.fs.Path;
+public interface DurableComputable<A extends RestorableAllocator<A>> {
 
-public interface MneInputSession<V> extends Closeable {
+  A getAllocator();
 
-  void readConfig(String prefix);
-  void initialize(Path path);
-  Iterator<V> iterator();
-
+  long getHandler();
 }

@@ -19,21 +19,15 @@
 package org.apache.mnemonic.hadoop;
 
 import org.apache.mnemonic.ConfigurationException;
-import org.apache.mnemonic.Durable;
 import org.apache.mnemonic.DurableType;
-import org.apache.mnemonic.EntityFactoryProxy;
 import org.apache.mnemonic.NonVolatileMemAllocator;
-import org.apache.mnemonic.OutOfHybridMemory;
 import org.apache.mnemonic.Utils;
 import org.apache.mnemonic.collections.DurableSinglyLinkedList;
-import org.apache.mnemonic.collections.DurableSinglyLinkedListFactory;
+import org.apache.mnemonic.sessions.DurableOutputSession;
 
 import java.text.NumberFormat;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.JobContext;
@@ -41,25 +35,12 @@ import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.TaskID;
 
 public class MneDurableOutputSession<V>
-    implements MneOutputSession<V>, MneDurableComputable<NonVolatileMemAllocator> {
+    extends DurableOutputSession<V, NonVolatileMemAllocator> {
 
-  private long poolSize;
-  private TaskAttemptContext taskAttemptContext;
-  private Configuration configuration;
-  private String serviceName;
-  private DurableType[] durableTypes;
-  private EntityFactoryProxy[] entityFactoryProxies;
-  private long slotKeyId;
   private String baseOutputName;
   private Path outputPath;
-
-  protected Map<V, DurableSinglyLinkedList<V>> m_recordmap;
-  protected boolean m_newpool;
-  protected long m_poolidx = 0L;
-  protected Pair<DurableType[], EntityFactoryProxy[]> m_recparmpair;
-  protected DurableSinglyLinkedList<V> m_listnode;
-  protected NonVolatileMemAllocator m_act;
-  protected Iterator<V> m_iter;
+  private TaskAttemptContext taskAttemptContext;
+  private Configuration configuration;
 
   public MneDurableOutputSession(TaskAttemptContext taskAttemptContext) {
     this(taskAttemptContext.getConfiguration());
@@ -82,7 +63,6 @@ public class MneDurableOutputSession<V>
     }
   }
 
-  @Override
   public void readConfig(String prefix) {
     Configuration conf = getConfiguration();
     if (conf == null) {
@@ -152,205 +132,12 @@ public class MneDurableOutputSession<V>
     m_newpool = true;
   }
 
-  @Override
-  public NonVolatileMemAllocator getAllocator() {
-    return m_act;
-  }
-
-  @Override
-  public long getHandler() {
-    long ret = 0L;
-    if (null != m_listnode) {
-      m_listnode.getHandler();
-    }
-    return ret;
-  }
-
-  @SuppressWarnings("unchecked")
-  protected V createDurableObjectRecord(long size) {
-    V ret = null;
-    switch (getDurableTypes()[0]) {
-    case DURABLE:
-      ret = (V) getEntityFactoryProxies()[0].create(m_act,
-          m_recparmpair.getRight(), m_recparmpair.getLeft(), false);
-    case BUFFER:
-      if (size > 0) {
-        ret = (V)m_act.createBuffer(size);
-        if (null == ret) {
-          throw new OutOfHybridMemory("Allocate a buffer failed");
-        }
-      }
-      break;
-    case CHUNK:
-      if (size > 0) {
-        ret = (V)m_act.createChunk(size);
-        if (null == ret) {
-          throw new OutOfHybridMemory("Allocate a chunk failed");
-        }
-      }
-      break;
-    default:
-      break;
-    }
-    return ret;
-  }
-
-  public V newDurableObjectRecord() {
-    return newDurableObjectRecord(-1L);
-  }
-
-  /**
-   * create a durable object record
-   *
-   * @param size
-   *        size of buffer or chunk
-   *
-   * @return null if size not greater than 0 for buffer/chunk type
-   *        throw OutOfHybridMemory if out of memory
-   */
-  public V newDurableObjectRecord(long size) {
-    V ret = null;
-    DurableSinglyLinkedList<V> nv = null;
-    try {
-      nv = createDurableNode();
-      ret = createDurableObjectRecord(size);
-    } catch (OutOfHybridMemory e) {
-      if (nv != null) {
-        nv.destroy();
-      }
-      if (ret != null) {
-        ((Durable) ret).destroy();
-      }
-      initNextPool();
-      try { /* retry */
-        nv = createDurableNode();
-        ret = createDurableObjectRecord(size);
-      } catch (OutOfHybridMemory ee) {
-        if (nv != null) {
-          nv.destroy();
-        }
-        if (ret != null) {
-          ((Durable) ret).destroy();
-        }
-      }
-    }
-    if (null != ret) {
-      m_recordmap.put(ret, nv);
-    } else {
-      if (null != nv) {
-        nv.destroy();
-      }
-    }
-    return ret;
-  }
-
-  protected DurableSinglyLinkedList<V> createDurableNode() {
-    DurableSinglyLinkedList<V> ret = null;
-    ret = DurableSinglyLinkedListFactory.create(m_act, getEntityFactoryProxies(), getDurableTypes(), false);
-    return ret;
-  }
-
-  @Override
-  public void post(V v) {
-    DurableSinglyLinkedList<V> nv = null;
-    if (null == v) {
-      return;
-    }
-    switch (getDurableTypes()[0]) {
-    case DURABLE:
-    case BUFFER:
-    case CHUNK:
-      if (m_recordmap.containsKey(v)) {
-        nv = m_recordmap.remove(v);
-      } else {
-        throw new RuntimeException("The record hasn't been created by newDurableObjectRecord()");
-      }
-      break;
-    default:
-      try {
-        nv = createDurableNode();
-      } catch (OutOfHybridMemory e) {
-        initNextPool();
-        nv = createDurableNode();
-      }
-      break;
-    }
-    assert null != nv;
-    nv.setItem(v, false);
-    if (m_newpool) {
-      m_act.setHandler(getSlotKeyId(), nv.getHandler());
-      m_newpool = false;
-    } else {
-      m_listnode.setNext(nv, false);
-    }
-    m_listnode = nv;
-  }
-
-  public void destroyPendingRecord(V k) {
-    if (m_recordmap.containsKey(k)) {
-      m_recordmap.get(k).destroy();
-      ((Durable) k).destroy();
-    }
-  }
-
-  public void destroyAllPendingRecords() {
-    for (V k : m_recordmap.keySet()) {
-      destroyPendingRecord(k);
-    }
-  }
-
-  @Override
-  public void close() {
-    destroyAllPendingRecords();
-    m_act.close();
-  }
-
-  public long getSlotKeyId() {
-    return slotKeyId;
-  }
-
-  public void setSlotKeyId(long slotKeyId) {
-    this.slotKeyId = slotKeyId;
-  }
-
-  public EntityFactoryProxy[] getEntityFactoryProxies() {
-    return entityFactoryProxies;
-  }
-
-  public void setEntityFactoryProxies(EntityFactoryProxy[] entityFactoryProxies) {
-    this.entityFactoryProxies = entityFactoryProxies;
-  }
-
-  public DurableType[] getDurableTypes() {
-    return durableTypes;
-  }
-
-  public void setDurableTypes(DurableType[] durableTypes) {
-    this.durableTypes = durableTypes;
-  }
-
-  public String getServiceName() {
-    return serviceName;
-  }
-
-  public void setServiceName(String serviceName) {
-    this.serviceName = serviceName;
-  }
-
-  public long getPoolSize() {
-    return poolSize;
-  }
-
   public Path getOutputPath() {
     return outputPath;
   }
 
   public void setOutputPath(Path outputPath) {
     this.outputPath = outputPath;
-  }
-
-  public void setPoolSize(long poolSize) {
-    this.poolSize = poolSize;
   }
 
   public TaskAttemptContext getTaskAttemptContext() {

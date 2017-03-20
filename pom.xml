@@ -93,6 +93,7 @@
     <module>mnemonic-memory-services</module>
     <module>mnemonic-computing-services</module>
     <module>mnemonic-benches</module>
+    <module>mnemonic-sessions</module>
     <module>mnemonic-hadoop</module>
   </modules>
 
