@@ -46,8 +46,6 @@ public abstract class DurableOutputSession<V, A extends RestorableAllocator<A>>
   protected DurableSinglyLinkedList<V> m_listnode;
   protected A m_act;
 
-  protected abstract void initNextPool();
-
   @Override
   public A getAllocator() {
     return m_act;
@@ -119,16 +117,17 @@ public abstract class DurableOutputSession<V, A extends RestorableAllocator<A>>
       if (ret != null) {
         ((Durable) ret).destroy();
       }
-      initNextPool();
-      try { /* retry */
-        nv = createDurableNode();
-        ret = createDurableObjectRecord(size);
-      } catch (OutOfHybridMemory ee) {
-        if (nv != null) {
-          nv.destroy();
-        }
-        if (ret != null) {
-          ((Durable) ret).destroy();
+      if (initNextPool()) {
+        try { /* retry */
+          nv = createDurableNode();
+          ret = createDurableObjectRecord(size);
+        } catch (OutOfHybridMemory ee) {
+          if (nv != null) {
+            nv.destroy();
+          }
+          if (ret != null) {
+            ((Durable) ret).destroy();
+          }
         }
       }
     }
@@ -168,8 +167,9 @@ public abstract class DurableOutputSession<V, A extends RestorableAllocator<A>>
       try {
         nv = createDurableNode();
       } catch (OutOfHybridMemory e) {
-        initNextPool();
-        nv = createDurableNode();
+        if (initNextPool()) {
+          nv = createDurableNode();
+        }
       }
       break;
     }
@@ -201,8 +201,10 @@ public abstract class DurableOutputSession<V, A extends RestorableAllocator<A>>
 
   @Override
   public void close() {
-    destroyAllPendingRecords();
-    m_act.close();
+    if (null != m_act) {
+      destroyAllPendingRecords();
+      m_act.close();
+    }
   }
 
   public long getSlotKeyId() {

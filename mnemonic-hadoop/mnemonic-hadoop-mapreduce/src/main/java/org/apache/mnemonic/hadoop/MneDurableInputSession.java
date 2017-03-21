@@ -18,6 +18,13 @@
 
 package org.apache.mnemonic.hadoop;
 
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
@@ -25,6 +32,8 @@ import org.apache.mnemonic.ConfigurationException;
 import org.apache.mnemonic.DurableType;
 import org.apache.mnemonic.NonVolatileMemAllocator;
 import org.apache.mnemonic.Utils;
+import org.apache.mnemonic.collections.DurableSinglyLinkedList;
+import org.apache.mnemonic.collections.DurableSinglyLinkedListFactory;
 import org.apache.mnemonic.sessions.DurableInputSession;
 
 public class MneDurableInputSession<V>
@@ -32,14 +41,21 @@ public class MneDurableInputSession<V>
 
   private TaskAttemptContext taskAttemptContext;
   private Configuration configuration;
+  private Iterator<String> m_fp_iter;
 
-  public MneDurableInputSession(TaskAttemptContext taskAttemptContext) {
-    this(taskAttemptContext.getConfiguration());
+  public MneDurableInputSession(TaskAttemptContext taskAttemptContext, Path path) {
+    this(taskAttemptContext.getConfiguration(), path);
     setTaskAttemptContext(taskAttemptContext);
   }
 
-  public MneDurableInputSession(Configuration configuration) {
+  public MneDurableInputSession(Configuration configuration, Path path) {
     setConfiguration(configuration);
+    if (!Files.isRegularFile(Paths.get(path.toString()), LinkOption.NOFOLLOW_LINKS)) {
+      throw new UnsupportedOperationException();
+    }
+    List<String> fpathlist = new ArrayList<String>();
+    fpathlist.add(path.toString());
+    m_fp_iter = fpathlist.iterator();
   }
 
   public void validateConfig() {
@@ -66,10 +82,29 @@ public class MneDurableInputSession<V>
     validateConfig();
   }
 
-  public void initialize(Path path) {
-    m_act = new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService(getServiceName()), 1024000L,
-        path.toString(), true);
-    m_handler = m_act.getHandler(getSlotKeyId());
+  @Override
+  public boolean initNextPool() {
+    boolean ret = false;
+    if (m_act != null) {
+      m_act.close();
+      m_act = null;
+    }
+    if (null != m_fp_iter && m_fp_iter.hasNext()) {
+      m_act = new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService(getServiceName()), 1024000L,
+          m_fp_iter.next(), true);
+      if (null != m_act) {
+        m_handler = m_act.getHandler(getSlotKeyId());
+        if (0L != m_handler) {
+          DurableSinglyLinkedList<V> dsllist = DurableSinglyLinkedListFactory.restore(
+              m_act, getEntityFactoryProxies(), getDurableTypes(), m_handler, false);
+          if (null != dsllist) {
+            m_iter = dsllist.iterator();
+            ret = null != m_iter;
+          }
+        }
+      }
+    }
+    return ret;
   }
 
   public TaskAttemptContext getTaskAttemptContext() {

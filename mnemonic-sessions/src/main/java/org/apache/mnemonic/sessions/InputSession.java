@@ -21,7 +21,14 @@ package org.apache.mnemonic.sessions;
 import java.io.Closeable;
 import java.util.Iterator;
 
-public interface InputSession<V> extends Closeable {
+public interface InputSession<V> extends Closeable, Iterable<V> {
+
+  /**
+   * Initialize the next pool, must be called before use
+   *
+   * @return true if success
+   */
+  boolean initNextPool();
 
   Iterator<V> iterator();
 

@@ -156,8 +156,8 @@ public class MneMapreducePersonDataTest {
         reader.close();
       }
     }
-    AssertJUnit.assertEquals(m_sumage, sumage);
     AssertJUnit.assertEquals(m_reccnt, reccnt);
+    AssertJUnit.assertEquals(m_sumage, sumage);
     System.out.println(String.format("The checksum of ages is %d", sumage));
   }
 }

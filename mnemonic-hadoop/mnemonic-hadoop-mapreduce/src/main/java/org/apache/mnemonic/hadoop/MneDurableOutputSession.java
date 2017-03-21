@@ -122,14 +122,20 @@ public class MneDurableOutputSession<V>
   }
 
   @Override
-  public void initNextPool() {
+  public boolean initNextPool() {
+    boolean ret = false;
     if (m_act != null) {
       m_act.close();
+      m_act = null;
     }
     setOutputPath(genNextPoolPath());
     m_act = new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService(getServiceName()), getPoolSize(),
         getOutputPath().toString(), true);
-    m_newpool = true;
+    if (null != m_act) {
+      m_newpool = true;
+      ret = true;
+    }
+    return ret;
   }
 
   public Path getOutputPath() {

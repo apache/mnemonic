@@ -19,12 +19,11 @@
 package org.apache.mnemonic.sessions;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import org.apache.mnemonic.DurableType;
 import org.apache.mnemonic.EntityFactoryProxy;
 import org.apache.mnemonic.RestorableAllocator;
-import org.apache.mnemonic.collections.DurableSinglyLinkedList;
-import org.apache.mnemonic.collections.DurableSinglyLinkedListFactory;
 
 public abstract class DurableInputSession<V, A extends RestorableAllocator<A>>
     implements InputSession<V>, DurableComputable<A> {
@@ -36,20 +35,72 @@ public abstract class DurableInputSession<V, A extends RestorableAllocator<A>>
 
   protected long m_handler;
   protected A m_act;
+  protected Iterator<V> m_iter;
 
+  /**
+   * One session can only manage one iterator instance at a time for the simplicity
+   *
+   * @return the singleton iterator
+   *
+   */
   @Override
   public Iterator<V> iterator() {
-    Iterator<V> iter;
-    DurableSinglyLinkedList<V> dsllist;
-    dsllist = DurableSinglyLinkedListFactory.restore(m_act, getEntityFactoryProxies(), getDurableTypes(), m_handler,
-        false);
-    iter = dsllist.iterator();
-    return iter;
+    return new Intr();
+  }
+
+  /**
+   * this class defines a iterator for multiple pools read
+   *
+   */
+  private class Intr implements Iterator<V> {
+
+    /**
+     * determine the existing of next
+     *
+     * @return true if there is a next node
+     *
+     */
+    @Override
+    public boolean hasNext() {
+      if (null == m_iter) {
+        return false;
+      }
+      boolean ret = m_iter.hasNext();
+      if (!ret) {
+        if (initNextPool()) {
+          ret = m_iter.hasNext();
+        }
+      }
+      return ret;
+    }
+
+    /**
+     * get next node
+     *
+     * @return the next node
+     */
+    @Override
+    public V next() {
+      if (null == m_iter) {
+        throw new NoSuchElementException();
+      }
+      return m_iter.next();
+    }
+
+    /**
+     * override remove()
+     */
+    @Override
+    public void remove() {
+      throw new UnsupportedOperationException();
+    }
   }
 
   @Override
   public void close() {
-    m_act.close();
+    if (null != m_act) {
+      m_act.close();
+    }
   }
 
   public String getServiceName() {
