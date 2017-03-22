@@ -28,6 +28,7 @@ import org.apache.mnemonic.RestoreDurableEntityError;
 import org.apache.mnemonic.RetrieveDurableEntityError;
 import org.apache.mnemonic.Utils;
 
+import java.util.NoSuchElementException;
 import sun.misc.Unsafe;
 import java.util.Iterator;
 
@@ -215,6 +216,36 @@ public class DurableArrayImpl<A extends RestorableAllocator<A>, E>
 
   @Override
   public Iterator<E> iterator() {
-    return null;
+    return new ArrayItr(this);
+  }
+
+  private class ArrayItr implements Iterator<E> {
+
+    protected DurableArray<E> array = null;
+    int currentIndex = 0;
+
+    ArrayItr(DurableArray<E> itr) {
+      array = itr;
+    }
+
+    @Override
+    public boolean hasNext() {
+      return currentIndex < array.arraySize;
+    }
+
+    @Override
+    public E next() {
+      if (currentIndex >= array.arraySize) {
+        throw new NoSuchElementException();
+      }
+      E item = get(currentIndex);
+      currentIndex++;
+      return item;
+    }
+
+    @Override
+    public void remove() {
+      throw new UnsupportedOperationException();
+    }
   }
 }

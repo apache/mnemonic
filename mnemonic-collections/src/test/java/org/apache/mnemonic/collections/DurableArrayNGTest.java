@@ -21,6 +21,7 @@ import java.nio.ByteBuffer;
 import java.util.Random;
 import java.util.zip.Checksum;
 import java.util.zip.CRC32;
+import java.util.Iterator;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -138,6 +139,14 @@ public class DurableArrayNGTest {
     for (int i = 0; i < capacity; i++) {
       Assert.assertEquals(array.get(i).intValue(), 100 + i);
     }
+
+    Iterator<Integer> itr = array.iterator();
+    int val = 0;
+    while (itr.hasNext()) {
+     Assert.assertEquals(itr.next().intValue(), 100 + val);
+     val++;
+    }
+    Assert.assertEquals(val, capacity);
     array.destroy();
   }
 
@@ -156,6 +165,15 @@ public class DurableArrayNGTest {
     for (int i = 0; i < capacity; i++) {
       Assert.assertEquals(array.get(i), "string" + i);
     }
+
+    Iterator<String> itr = array.iterator();
+    int val = 0;
+    while (itr.hasNext()) {
+     Assert.assertEquals(itr.next(), "string" + val);
+     val++;
+    }
+    Assert.assertEquals(val, capacity);
+
     array.destroy();
   }
 
@@ -185,6 +203,7 @@ public class DurableArrayNGTest {
       byte buf[] = new byte[db.get().capacity()];
       db.get().get(buf);
       bufferCheckSum.update(buf, 0, buf.length);
+      db.get().clear();
     }
     Assert.assertEquals(bufferCheckSum.getValue(), bufVal);
     bufferCheckSum.reset();
@@ -196,7 +215,23 @@ public class DurableArrayNGTest {
       byte buf[] = new byte[db.get().capacity()];
       db.get().get(buf);
       bufferCheckSum.update(buf, 0, buf.length);
+      db.get().clear();
     }
+    Assert.assertEquals(bufferCheckSum.getValue(), bufVal);
+
+    bufferCheckSum.reset();
+    Iterator<DurableBuffer> itr = restoredArray.iterator();
+    int val = 0;
+    while (itr.hasNext()) {
+      DurableBuffer<NonVolatileMemAllocator> db = itr.next();
+      Assert.assertNotNull(db);
+      byte buf[] = new byte[db.get().capacity()];
+      db.get().get(buf);
+      bufferCheckSum.update(buf, 0, buf.length);
+      db.get().clear();
+      val++;
+    }
+    Assert.assertEquals(val, capacity);
     Assert.assertEquals(bufferCheckSum.getValue(), bufVal);
 
     restoredArray.destroy();
@@ -243,6 +278,22 @@ public class DurableArrayNGTest {
       }
     }
     Assert.assertEquals(chunkCheckSum.getValue(), chunkVal);
+
+    chunkCheckSum.reset();
+    Iterator<DurableChunk> itr = restoredArray.iterator();
+    int val = 0;
+    while (itr.hasNext()) {
+      DurableChunk<NonVolatileMemAllocator> dc = itr.next();
+      Assert.assertNotNull(dc);
+      for (int j = 0; j < dc.getSize(); ++j) {
+        byte b = unsafe.getByte(dc.get() + j);
+        chunkCheckSum.update(b);
+      }
+      val++;
+    }
+    Assert.assertEquals(val, capacity);
+    Assert.assertEquals(chunkCheckSum.getValue(), chunkVal);
+
     restoredArray.destroy();
   }
 
