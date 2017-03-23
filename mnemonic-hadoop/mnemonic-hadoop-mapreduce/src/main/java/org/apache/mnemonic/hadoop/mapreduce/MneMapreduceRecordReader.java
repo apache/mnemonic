@@ -19,6 +19,7 @@ package org.apache.mnemonic.hadoop.mapreduce;
 
 import java.io.IOException;
 
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
@@ -51,7 +52,7 @@ public class MneMapreduceRecordReader<MV extends MneDurableInputValue<V>, V>
   public void initialize(InputSplit inputSplit, TaskAttemptContext context) {
     FileSplit split = (FileSplit) inputSplit;
     m_session = new MneDurableInputSession<V>(context, null,
-        split.getPath(), MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX);
+        new Path[]{split.getPath()}, MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX);
     m_iter = m_session.iterator();
   }
 

@@ -20,6 +20,7 @@ package org.apache.mnemonic.hadoop.mapred;
 
 import java.io.IOException;
 
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapred.FileSplit;
 import org.apache.hadoop.mapred.JobConf;
@@ -46,7 +47,7 @@ public class MneMapredRecordReader<MV extends MneDurableInputValue<V>, V>
     public MneMapredRecordReader(FileSplit fileSplit, JobConf conf) throws IOException {
         m_fileSplit = fileSplit;
         m_session = new MneDurableInputSession<V>(null, conf,
-            m_fileSplit.getPath(), MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX);
+            new Path[]{m_fileSplit.getPath()}, MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX);
         m_iter = m_session.iterator();
     }
     

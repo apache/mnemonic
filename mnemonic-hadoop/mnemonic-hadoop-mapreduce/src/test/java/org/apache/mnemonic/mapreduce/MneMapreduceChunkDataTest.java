@@ -44,11 +44,13 @@ import org.apache.mnemonic.DurableChunk;
 import org.apache.mnemonic.DurableType;
 import org.apache.mnemonic.Utils;
 import org.apache.mnemonic.hadoop.MneConfigHelper;
+import org.apache.mnemonic.hadoop.MneDurableInputSession;
 import org.apache.mnemonic.hadoop.MneDurableInputValue;
 import org.apache.mnemonic.hadoop.MneDurableOutputSession;
 import org.apache.mnemonic.hadoop.MneDurableOutputValue;
 import org.apache.mnemonic.hadoop.mapreduce.MneInputFormat;
 import org.apache.mnemonic.hadoop.mapreduce.MneOutputFormat;
+import org.apache.mnemonic.sessions.SessionIterator;
 import org.testng.Assert;
 import org.testng.AssertJUnit;
 import org.testng.annotations.AfterClass;
@@ -73,7 +75,6 @@ public class MneMapreduceChunkDataTest {
   private long m_reccnt = 5000L;
   private volatile long m_checksum;
   private volatile long m_totalsize = 0L;
-  private List<String> m_partfns;
   private Unsafe unsafe;
 
   @BeforeClass
@@ -82,7 +83,6 @@ public class MneMapreduceChunkDataTest {
         System.getProperty("test.tmp.dir", DEFAULT_WORK_DIR));
     m_conf = new JobConf();
     m_rand = Utils.createRandom();
-    m_partfns = new ArrayList<String>();
     unsafe = Utils.getUnsafe();
 
     try {
@@ -164,6 +164,7 @@ public class MneMapreduceChunkDataTest {
 
   @Test(enabled = true, dependsOnMethods = { "testWriteChunkData" })
   public void testReadChunkData() throws Exception {
+    List<String> partfns = new ArrayList<String>();
     long reccnt = 0L;
     long tsize = 0L;
     Checksum cs = new CRC32();
@@ -174,14 +175,14 @@ public class MneMapreduceChunkDataTest {
       if (listfiles[idx].isFile()
           && listfiles[idx].getName().startsWith(MneConfigHelper.getBaseOutputName(m_conf, null))
           && listfiles[idx].getName().endsWith(MneConfigHelper.DEFAULT_FILE_EXTENSION)) {
-        m_partfns.add(listfiles[idx].getName());
+        partfns.add(listfiles[idx].getName());
       }
     }
-    Collections.sort(m_partfns); // keep the order for checksum
-    for (int idx = 0; idx < m_partfns.size(); ++idx) {
-      System.out.println(String.format("Verifying : %s", m_partfns.get(idx)));
+    Collections.sort(partfns); // keep the order for checksum
+    for (int idx = 0; idx < partfns.size(); ++idx) {
+      System.out.println(String.format("Verifying : %s", partfns.get(idx)));
       FileSplit split = new FileSplit(
-          new Path(m_workdir, m_partfns.get(idx)), 0, 0L, new String[0]);
+          new Path(m_workdir, partfns.get(idx)), 0, 0L, new String[0]);
       InputFormat<NullWritable, MneDurableInputValue<DurableChunk<?>>> inputFormat =
           new MneInputFormat<MneDurableInputValue<DurableChunk<?>>, DurableChunk<?>>();
       RecordReader<NullWritable, MneDurableInputValue<DurableChunk<?>>> reader =
@@ -203,5 +204,48 @@ public class MneMapreduceChunkDataTest {
     AssertJUnit.assertEquals(m_totalsize, tsize);
     AssertJUnit.assertEquals(m_checksum, cs.getValue());
     System.out.println(String.format("The checksum of chunk is %d", m_checksum));
+  }
+
+  @Test(enabled = true, dependsOnMethods = { "testWriteChunkData" })
+  public void testBatchReadChunkDataUsingInputSession() throws Exception {
+    List<String> partfns = new ArrayList<String>();
+    long reccnt = 0L;
+    long tsize = 0L;
+    Checksum cs = new CRC32();
+    cs.reset();
+    File folder = new File(m_workdir.toString());
+    File[] listfiles = folder.listFiles();
+    for (int idx = 0; idx < listfiles.length; ++idx) {
+      if (listfiles[idx].isFile()
+          && listfiles[idx].getName().startsWith(MneConfigHelper.getBaseOutputName(m_conf, null))
+          && listfiles[idx].getName().endsWith(MneConfigHelper.DEFAULT_FILE_EXTENSION)) {
+        partfns.add(listfiles[idx].getName());
+      }
+    }
+    Collections.sort(partfns); // keep the order for checksum
+    List<Path> paths = new ArrayList<Path>();
+    for (String fns : partfns) {
+      paths.add(new Path(m_workdir, fns));
+      System.out.println(String.format("[Batch Mode] Added : %s", fns));
+    }
+    MneDurableInputSession<DurableChunk<?>> m_session =
+        new MneDurableInputSession<DurableChunk<?>>(m_tacontext, null,
+        paths.toArray(new Path[0]), MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX);
+    SessionIterator<DurableChunk<?>, ?> m_iter = m_session.iterator();
+    DurableChunk<?> val = null;
+    while (m_iter.hasNext()) {
+      val = m_iter.next();
+      byte b;
+      for (int j = 0; j < val.getSize(); ++j) {
+        b = unsafe.getByte(val.get() + j);
+        cs.update(b);
+      }
+      tsize += val.getSize();
+      ++reccnt;
+    }
+    AssertJUnit.assertEquals(m_reccnt, reccnt);
+    AssertJUnit.assertEquals(m_totalsize, tsize);
+    AssertJUnit.assertEquals(m_checksum, cs.getValue());
+    System.out.println(String.format("The checksum of chunk is %d [Batch Mode]", m_checksum));
   }
 }
