@@ -20,8 +20,17 @@ package org.apache.mnemonic.sessions;
 
 import java.util.Iterator;
 
-public interface InputSession<V> extends Iterable<V> {
+import org.apache.mnemonic.CloseableIterator;
+import org.apache.mnemonic.RestorableAllocator;
 
-  Iterator<V> iterator();
+public interface SessionIterator<V, A extends RestorableAllocator<A>>
+    extends CloseableIterator<V>, DurableComputable<A> {
 
+  void setAllocator(A alloc);
+
+  void setHandler(long hdl);
+
+  void setIterator(Iterator<V> iter);
+
+  Iterator<V> getIterator();
 }

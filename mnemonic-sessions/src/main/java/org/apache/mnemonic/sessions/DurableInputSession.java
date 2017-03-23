@@ -26,16 +26,19 @@ import org.apache.mnemonic.EntityFactoryProxy;
 import org.apache.mnemonic.RestorableAllocator;
 
 public abstract class DurableInputSession<V, A extends RestorableAllocator<A>>
-    implements InputSession<V>, DurableComputable<A> {
+    implements InputSession<V> {
 
   private String serviceName;
   private DurableType[] durableTypes;
   private EntityFactoryProxy[] entityFactoryProxies;
   private long slotKeyId;
 
-  protected long m_handler;
-  protected A m_act;
-  protected Iterator<V> m_iter;
+  /**
+   * Initialize the next pool, must be called before use
+   *
+   * @return true if success
+   */
+  protected abstract boolean initNextPool(SessionIterator<V, A> sessiter);
 
   /**
    * One session can only manage one iterator instance at a time for the simplicity
@@ -44,15 +47,21 @@ public abstract class DurableInputSession<V, A extends RestorableAllocator<A>>
    *
    */
   @Override
-  public Iterator<V> iterator() {
-    return new Intr();
+  public SessionIterator<V, A> iterator() {
+    SessionIterator<V, A> ret = new Intr();
+    initNextPool(ret);
+    return ret;
   }
 
   /**
    * this class defines a iterator for multiple pools read
    *
    */
-  private class Intr implements Iterator<V> {
+  private class Intr implements SessionIterator<V, A> {
+
+    protected long m_handler;
+    protected A m_act;
+    protected Iterator<V> m_iter;
 
     /**
      * determine the existing of next
@@ -67,7 +76,7 @@ public abstract class DurableInputSession<V, A extends RestorableAllocator<A>>
       }
       boolean ret = m_iter.hasNext();
       if (!ret) {
-        if (initNextPool()) {
+        if (initNextPool(this)) {
           ret = m_iter.hasNext();
         }
       }
@@ -94,13 +103,44 @@ public abstract class DurableInputSession<V, A extends RestorableAllocator<A>>
     public void remove() {
       throw new UnsupportedOperationException();
     }
-  }
 
-  @Override
-  public void close() {
-    if (null != m_act) {
-      m_act.close();
+    @Override
+    public A getAllocator() {
+      return m_act;
     }
+
+    @Override
+    public long getHandler() {
+      return m_handler;
+    }
+
+    @Override
+    public void setAllocator(A alloc) {
+      m_act = alloc;
+    }
+
+    @Override
+    public void setHandler(long hdl) {
+      m_handler = hdl;
+    }
+
+    @Override
+    public void setIterator(Iterator<V> iter) {
+      m_iter = iter;
+    }
+
+    @Override
+    public void close() {
+      if (null != m_act) {
+        m_act.close();
+      }
+    }
+
+    @Override
+    public Iterator<V> getIterator() {
+      return m_iter;
+    }
+
   }
 
   public String getServiceName() {
@@ -133,16 +173,6 @@ public abstract class DurableInputSession<V, A extends RestorableAllocator<A>>
 
   public void setSlotKeyId(long slotKeyId) {
     this.slotKeyId = slotKeyId;
-  }
-
-  @Override
-  public A getAllocator() {
-    return m_act;
-  }
-
-  @Override
-  public long getHandler() {
-    return m_handler;
   }
 
 }

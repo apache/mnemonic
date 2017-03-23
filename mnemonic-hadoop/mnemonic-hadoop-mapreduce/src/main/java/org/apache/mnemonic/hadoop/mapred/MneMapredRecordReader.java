@@ -19,11 +19,11 @@
 package org.apache.mnemonic.hadoop.mapred;
 
 import java.io.IOException;
-import java.util.Iterator;
 
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapred.FileSplit;
 import org.apache.hadoop.mapred.JobConf;
+import org.apache.mnemonic.CloseableIterator;
 import org.apache.mnemonic.hadoop.MneConfigHelper;
 import org.apache.mnemonic.hadoop.MneDurableInputSession;
 import org.apache.mnemonic.hadoop.MneDurableInputValue;
@@ -38,7 +38,7 @@ import org.apache.mnemonic.hadoop.MneDurableInputValue;
 public class MneMapredRecordReader<MV extends MneDurableInputValue<V>, V>
     implements org.apache.hadoop.mapred.RecordReader<NullWritable, MV> {
     
-    protected Iterator<V> m_iter;
+    protected CloseableIterator<V> m_iter;
     protected MneDurableInputSession<V> m_session;
     protected FileSplit m_fileSplit;
 
@@ -47,7 +47,6 @@ public class MneMapredRecordReader<MV extends MneDurableInputValue<V>, V>
         m_fileSplit = fileSplit;
         m_session = new MneDurableInputSession<V>(conf, m_fileSplit.getPath());
         m_session.readConfig(MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX);
-        m_session.initNextPool();
         m_iter = m_session.iterator();
     }
     
@@ -79,7 +78,9 @@ public class MneMapredRecordReader<MV extends MneDurableInputValue<V>, V>
 
     @Override
     public void close() throws IOException {
-        m_session.close();        
+      if (null != m_iter) {
+        m_iter.close();
+      }
     }
 
     @Override

@@ -35,6 +35,7 @@ import org.apache.mnemonic.Utils;
 import org.apache.mnemonic.collections.DurableSinglyLinkedList;
 import org.apache.mnemonic.collections.DurableSinglyLinkedListFactory;
 import org.apache.mnemonic.sessions.DurableInputSession;
+import org.apache.mnemonic.sessions.SessionIterator;
 
 public class MneDurableInputSession<V>
     extends DurableInputSession<V, NonVolatileMemAllocator> {
@@ -83,23 +84,23 @@ public class MneDurableInputSession<V>
   }
 
   @Override
-  public boolean initNextPool() {
+  protected boolean initNextPool(SessionIterator<V, NonVolatileMemAllocator> sessiter) {
     boolean ret = false;
-    if (m_act != null) {
-      m_act.close();
-      m_act = null;
+    if (sessiter.getAllocator() != null) {
+      sessiter.getAllocator().close();
+      sessiter.setAllocator(null);
     }
     if (null != m_fp_iter && m_fp_iter.hasNext()) {
-      m_act = new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService(getServiceName()), 1024000L,
-          m_fp_iter.next(), true);
-      if (null != m_act) {
-        m_handler = m_act.getHandler(getSlotKeyId());
-        if (0L != m_handler) {
+      sessiter.setAllocator(new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService(
+          getServiceName()), 1024000L, m_fp_iter.next(), true));
+      if (null != sessiter.getAllocator()) {
+        sessiter.setHandler(sessiter.getAllocator().getHandler(getSlotKeyId()));
+        if (0L != sessiter.getHandler()) {
           DurableSinglyLinkedList<V> dsllist = DurableSinglyLinkedListFactory.restore(
-              m_act, getEntityFactoryProxies(), getDurableTypes(), m_handler, false);
+              sessiter.getAllocator(), getEntityFactoryProxies(), getDurableTypes(), sessiter.getHandler(), false);
           if (null != dsllist) {
-            m_iter = dsllist.iterator();
-            ret = null != m_iter;
+            sessiter.setIterator(dsllist.iterator());
+            ret = null != sessiter.getIterator();
           }
         }
       }

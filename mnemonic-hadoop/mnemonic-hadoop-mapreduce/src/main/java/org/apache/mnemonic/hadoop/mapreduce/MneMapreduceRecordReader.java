@@ -18,12 +18,12 @@
 package org.apache.mnemonic.hadoop.mapreduce;
 
 import java.io.IOException;
-import java.util.Iterator;
 
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
+import org.apache.mnemonic.CloseableIterator;
 import org.apache.mnemonic.hadoop.MneConfigHelper;
 import org.apache.mnemonic.hadoop.MneDurableInputSession;
 import org.apache.mnemonic.hadoop.MneDurableInputValue;
@@ -37,12 +37,14 @@ import org.apache.mnemonic.hadoop.MneDurableInputValue;
 public class MneMapreduceRecordReader<MV extends MneDurableInputValue<V>, V>
     extends org.apache.hadoop.mapreduce.RecordReader<NullWritable, MV> {
 
-  protected Iterator<V> m_iter;
+  protected CloseableIterator<V> m_iter;
   protected MneDurableInputSession<V> m_session;
 
   @Override
   public void close() throws IOException {
-    m_session.close();
+    if (null != m_iter) {
+      m_iter.close();
+    }
   }
 
   @Override
@@ -50,7 +52,6 @@ public class MneMapreduceRecordReader<MV extends MneDurableInputValue<V>, V>
     FileSplit split = (FileSplit) inputSplit;
     m_session = new MneDurableInputSession<V>(context, split.getPath());
     m_session.readConfig(MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX);
-    m_session.initNextPool();
     m_iter = m_session.iterator();
   }
 
