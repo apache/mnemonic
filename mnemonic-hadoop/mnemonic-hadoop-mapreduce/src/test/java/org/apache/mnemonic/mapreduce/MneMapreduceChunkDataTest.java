@@ -140,9 +140,9 @@ public class MneMapreduceChunkDataTest {
   @Test(enabled = true)
   public void testWriteChunkData() throws Exception {
     NullWritable nada = NullWritable.get();
-    MneDurableOutputSession<DurableChunk<?>> sess = new MneDurableOutputSession<DurableChunk<?>>(m_tacontext);
-    sess.readConfig(MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX);
-    sess.initNextPool();
+    MneDurableOutputSession<DurableChunk<?>> sess =
+        new MneDurableOutputSession<DurableChunk<?>>(m_tacontext, null,
+            MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX);
     MneDurableOutputValue<DurableChunk<?>> mdvalue =
         new MneDurableOutputValue<DurableChunk<?>>(sess);
     OutputFormat<NullWritable, MneDurableOutputValue<DurableChunk<?>>> outputFormat =

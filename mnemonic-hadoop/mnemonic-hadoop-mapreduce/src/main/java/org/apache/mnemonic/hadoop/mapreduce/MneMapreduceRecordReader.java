@@ -50,8 +50,8 @@ public class MneMapreduceRecordReader<MV extends MneDurableInputValue<V>, V>
   @Override
   public void initialize(InputSplit inputSplit, TaskAttemptContext context) {
     FileSplit split = (FileSplit) inputSplit;
-    m_session = new MneDurableInputSession<V>(context, split.getPath());
-    m_session.readConfig(MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX);
+    m_session = new MneDurableInputSession<V>(context, null,
+        split.getPath(), MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX);
     m_iter = m_session.iterator();
   }
 

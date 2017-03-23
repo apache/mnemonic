@@ -42,14 +42,24 @@ public class MneDurableOutputSession<V>
   private TaskAttemptContext taskAttemptContext;
   private Configuration configuration;
 
-  public MneDurableOutputSession(TaskAttemptContext taskAttemptContext) {
-    this(taskAttemptContext.getConfiguration());
-    setTaskAttemptContext(taskAttemptContext);
+  public MneDurableOutputSession(TaskAttemptContext taskAttemptContext,
+      Configuration configuration, String prefix) {
+    if (null == taskAttemptContext && null == configuration) {
+      throw new ConfigurationException("Session is not configured properly");
+    }
+    if (null != taskAttemptContext) {
+      setTaskAttemptContext(taskAttemptContext);
+      setConfiguration(taskAttemptContext.getConfiguration());
+    } else {
+      setConfiguration(configuration);
+    }
+    initialize(prefix);
   }
-  
-  public MneDurableOutputSession(Configuration configuration) {
-    setConfiguration(configuration);
+
+  public void initialize(String prefix) {
     m_recordmap = new HashMap<V, DurableSinglyLinkedList<V>>();
+    readConfig(prefix);
+    initNextPool();
   }
 
   public void validateConfig() {
@@ -122,7 +132,7 @@ public class MneDurableOutputSession<V>
   }
 
   @Override
-  public boolean initNextPool() {
+  protected boolean initNextPool() {
     boolean ret = false;
     if (m_act != null) {
       m_act.close();

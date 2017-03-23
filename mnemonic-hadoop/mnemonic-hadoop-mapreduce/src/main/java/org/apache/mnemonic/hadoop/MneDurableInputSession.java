@@ -44,19 +44,28 @@ public class MneDurableInputSession<V>
   private Configuration configuration;
   private Iterator<String> m_fp_iter;
 
-  public MneDurableInputSession(TaskAttemptContext taskAttemptContext, Path path) {
-    this(taskAttemptContext.getConfiguration(), path);
-    setTaskAttemptContext(taskAttemptContext);
+  public MneDurableInputSession(TaskAttemptContext taskAttemptContext,
+      Configuration configuration, Path path, String prefix) {
+    if (null == taskAttemptContext && null == configuration) {
+      throw new ConfigurationException("Session is not configured properly");
+    }
+    if (null != taskAttemptContext) {
+      setTaskAttemptContext(taskAttemptContext);
+      setConfiguration(taskAttemptContext.getConfiguration());
+    } else {
+      setConfiguration(configuration);
+    }
+    initialize(path, prefix);
   }
 
-  public MneDurableInputSession(Configuration configuration, Path path) {
-    setConfiguration(configuration);
+  public void initialize(Path path, String prefix) {
     if (!Files.isRegularFile(Paths.get(path.toString()), LinkOption.NOFOLLOW_LINKS)) {
       throw new UnsupportedOperationException();
     }
     List<String> fpathlist = new ArrayList<String>();
     fpathlist.add(path.toString());
     m_fp_iter = fpathlist.iterator();
+    readConfig(prefix);
   }
 
   public void validateConfig() {

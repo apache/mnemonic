@@ -135,9 +135,9 @@ public class MneMapreduceBufferDataTest {
   @Test(enabled = true)
   public void testWriteBufferData() throws Exception {
     NullWritable nada = NullWritable.get();
-    MneDurableOutputSession<DurableBuffer<?>> sess = new MneDurableOutputSession<DurableBuffer<?>>(m_tacontext);
-    sess.readConfig(MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX);
-    sess.initNextPool();
+    MneDurableOutputSession<DurableBuffer<?>> sess =
+        new MneDurableOutputSession<DurableBuffer<?>>(m_tacontext, null,
+            MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX);
     MneDurableOutputValue<DurableBuffer<?>> mdvalue =
         new MneDurableOutputValue<DurableBuffer<?>>(sess);
     OutputFormat<NullWritable, MneDurableOutputValue<DurableBuffer<?>>> outputFormat =

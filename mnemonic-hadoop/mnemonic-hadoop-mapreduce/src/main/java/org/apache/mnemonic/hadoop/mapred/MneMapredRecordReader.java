@@ -45,8 +45,8 @@ public class MneMapredRecordReader<MV extends MneDurableInputValue<V>, V>
   
     public MneMapredRecordReader(FileSplit fileSplit, JobConf conf) throws IOException {
         m_fileSplit = fileSplit;
-        m_session = new MneDurableInputSession<V>(conf, m_fileSplit.getPath());
-        m_session.readConfig(MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX);
+        m_session = new MneDurableInputSession<V>(null, conf,
+            m_fileSplit.getPath(), MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX);
         m_iter = m_session.iterator();
     }
     

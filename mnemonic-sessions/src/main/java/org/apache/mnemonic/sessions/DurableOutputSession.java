@@ -46,6 +46,13 @@ public abstract class DurableOutputSession<V, A extends RestorableAllocator<A>>
   protected DurableSinglyLinkedList<V> m_listnode;
   protected A m_act;
 
+  /**
+   * Initialize the next pool, must be called before use
+   *
+   * @return true if success
+   */
+  protected abstract boolean initNextPool();
+
   @Override
   public A getAllocator() {
     return m_act;

@@ -108,9 +108,9 @@ public class MneMapreduceLongDataTest {
   @Test(enabled = true)
   public void testWriteLongData() throws Exception {
     NullWritable nada = NullWritable.get();
-    MneDurableOutputSession<Long> sess = new MneDurableOutputSession<Long>(m_tacontext);
-    sess.readConfig(MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX);
-    sess.initNextPool();
+    MneDurableOutputSession<Long> sess =
+        new MneDurableOutputSession<Long>(m_tacontext, null,
+            MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX);
     MneDurableOutputValue<Long> mdvalue =
         new MneDurableOutputValue<Long>(sess);
     OutputFormat<NullWritable, MneDurableOutputValue<Long>> outputFormat =

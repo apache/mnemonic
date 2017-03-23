@@ -108,9 +108,9 @@ public class MneMapreducePersonDataTest {
   @Test(enabled = true)
   public void testWritePersonData() throws Exception {
     NullWritable nada = NullWritable.get();
-    MneDurableOutputSession<Person<Long>> sess = new MneDurableOutputSession<Person<Long>>(m_tacontext);
-    sess.readConfig(MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX);
-    sess.initNextPool();
+    MneDurableOutputSession<Person<Long>> sess =
+        new MneDurableOutputSession<Person<Long>>(m_tacontext, null,
+            MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX);
     MneDurableOutputValue<Person<Long>> mdvalue =
         new MneDurableOutputValue<Person<Long>>(sess);
     OutputFormat<NullWritable, MneDurableOutputValue<Person<Long>>> outputFormat =

@@ -22,13 +22,6 @@ import java.io.Closeable;
 
 public interface OutputSession<V> extends Closeable {
 
-  /**
-   * Initialize the next pool, must be called before use
-   *
-   * @return true if success
-   */
-  boolean initNextPool();
-
   V newDurableObjectRecord();
 
   V newDurableObjectRecord(long size);
