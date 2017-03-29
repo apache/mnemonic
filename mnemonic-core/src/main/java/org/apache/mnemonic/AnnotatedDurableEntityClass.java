@@ -742,7 +742,6 @@ public class AnnotatedDurableEntityClass {
         code.addStatement("return $1N", autoreclaimname);
         break;
       case "destroy":
-        code.addStatement("$1N.destroy()", holdername);
         for (String fname : m_dynfieldsinfo.keySet()) {
           dynfieldinfo = m_dynfieldsinfo.get(fname);
           if (!isUnboxPrimitive(dynfieldinfo.type)) {
@@ -752,6 +751,7 @@ public class AnnotatedDurableEntityClass {
             code.endControlFlow();
           }
         }
+        code.addStatement("$1N.destroy()", holdername);
         break;
       case "getNativeFieldInfo":
         code.addStatement("return $1N", m_fieldsinfo.get("nfieldinfo").name);
