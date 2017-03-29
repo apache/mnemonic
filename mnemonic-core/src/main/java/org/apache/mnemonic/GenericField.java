@@ -362,17 +362,19 @@ public class GenericField<A extends RestorableAllocator<A>, E> implements Durabl
    */
   @Override
   public void destroy() throws RetrieveDurableEntityError {
-    if (null != m_field) {
-      m_field.destroy();
-    }
-    if (null != m_strfield) {
-      m_strfield.destroy();
-    }
-    if (null != m_chunkfield) {
-      m_chunkfield.destroy();
-    }
-    if (null != m_bufferfield) {
-      m_bufferfield.destroy();
+    if (null != get()) {
+      if (null != m_field) {
+        m_field.destroy();
+      }
+      if (null != m_strfield) {
+        m_strfield.destroy();
+      }
+      if (null != m_chunkfield) {
+        m_chunkfield.destroy();
+      }
+      if (null != m_bufferfield) {
+        m_bufferfield.destroy();
+      }
     }
   }
 
