@@ -28,7 +28,15 @@
     <!-- Checks that property files contain the same keys.         -->
     <!-- See http://checkstyle.sf.net/config_misc.html#Translation -->
     <module name="Translation"/>
-
+ 
+    <!-- All source files should end with a unix-style end of line. -->
+    <module name="NewlineAtEndOfFile">
+        <!--
+             Use unix style newlines. When set, the checker ensures the last byte in the file is \n.
+        -->
+        <property name="lineSeparator" value="lf"/>
+  
+    </module>
     <module name="FileLength"/>
 
     <!-- All source files should end with a unix-style end of line. -->
