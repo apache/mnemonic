@@ -115,35 +115,39 @@ public class AnnotatedDurableEntityClass {
   private Map<String, MethodInfo> m_durablemtdinfo = new HashMap<String, MethodInfo>();
   private Map<String, MethodInfo> m_entitymtdinfo = new HashMap<String, MethodInfo>();
 
-  private long computeTypeSize(TypeMirror type) {
-    long ret;
-    switch (type.getKind()) {
-    case BYTE:
-      ret = 1L;
-      break;
-    case BOOLEAN:
-      ret = 1L;
-      break;
-    case CHAR:
-      ret = 2L;
-      break;
-    case DOUBLE:
+  private long computeTypeSize(TypeName tname) throws AnnotationProcessingException {
+    long ret = 0L;
+    if (isUnboxPrimitive(tname)) {
+      TypeName tn = unboxTypeName(tname);
+      if (tn.equals(TypeName.BOOLEAN)) {
+        ret = 1L;
+      }
+      if (tn.equals(TypeName.BYTE)) {
+        ret = 1L;
+      }
+      if (tn.equals(TypeName.CHAR)) {
+        ret = 2L;
+      }
+      if (tn.equals(TypeName.DOUBLE)) {
+        ret = 8L;
+      }
+      if (tn.equals(TypeName.FLOAT)) {
+        ret = 4L;
+      }
+      if (tn.equals(TypeName.INT)) {
+        ret = 4L;
+      }
+      if (tn.equals(TypeName.LONG)) {
+        ret = 8L;
+      }
+      if (tn.equals(TypeName.SHORT)) {
+        ret = 2L;
+      }
+    } else {
       ret = 8L;
-      break;
-    case FLOAT:
-      ret = 4L;
-      break;
-    case SHORT:
-      ret = 2L;
-      break;
-    case INT:
-      ret = 4L;
-      break;
-    case LONG:
-      ret = 8L;
-      break;
-    default:
-      ret = 8L;
+    }
+    if (0L == ret) {
+      throw new AnnotationProcessingException(null, "%s is not supported for type names", tname.toString());
     }
     return ret;
   }
@@ -280,7 +284,7 @@ public class AnnotatedDurableEntityClass {
           }
           fieldinfo.name = String.format("m_%s_%s", methodname.substring(3).toLowerCase(), Utils.genRandomString());
           fieldinfo.specbuilder = FieldSpec.builder(fieldinfo.type, fieldinfo.name, Modifier.PRIVATE);
-          fieldinfo.fieldsize = computeTypeSize(methodinfo.elem.getReturnType());
+          fieldinfo.fieldsize = computeTypeSize(TypeName.get(methodinfo.elem.getReturnType()));
           fieldinfo.fieldoff = fieldoff;
           fieldoff += fieldinfo.fieldsize;
           fieldinfo.efproxiesname = pgetter.EntityFactoryProxies();
