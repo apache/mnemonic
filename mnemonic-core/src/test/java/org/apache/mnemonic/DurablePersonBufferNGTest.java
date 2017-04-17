@@ -25,75 +25,23 @@ package org.apache.mnemonic;
 import java.nio.ByteBuffer;
 import java.util.Random;
 import java.util.UUID;
-import java.util.zip.CRC32;
-import java.util.zip.Checksum;
 
-import org.apache.commons.lang3.RandomUtils;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import sun.misc.Unsafe;
-
-@SuppressWarnings("restriction")
-public class DurablePersonNGTest {
+public class DurablePersonBufferNGTest {
   private long cKEYCAPACITY;
-  private long pic_checksum;
-  private long fp_checksum;
-  private Random rand;
-  private Unsafe unsafe;
 
-  protected DurableBuffer<NonVolatileMemAllocator>
-      genuptBuffer(NonVolatileMemAllocator act, Checksum cs, int size) {
-    DurableBuffer<NonVolatileMemAllocator> ret = null;
-    ret = act.createBuffer(size, false);
-    if (null == ret) {
-      throw new OutOfHybridMemory("Create Durable Buffer Failed.");
-    }
-    ret.get().clear();
-    byte[] rdbytes = RandomUtils.nextBytes(size);
-    Assert.assertNotNull(rdbytes);
-    ret.get().put(rdbytes);
-    cs.update(rdbytes, 0, rdbytes.length);
-    return ret;
-  }
-
-  protected DurableChunk<NonVolatileMemAllocator>
-      genuptChunk(NonVolatileMemAllocator act, Checksum cs, long size) {
-    DurableChunk<NonVolatileMemAllocator> ret = null;
-    ret = act.createChunk(size, false);
-    if (null == ret) {
-      throw new OutOfHybridMemory("Create Durable Chunk Failed.");
-    }
-    byte b;
-    for (int i = 0; i < ret.getSize(); ++i) {
-      b = (byte) rand.nextInt(255);
-      unsafe.putByte(ret.get() + i, b);
-      cs.update(b);
-    }
-    return ret;
-  }
-
-  protected int genRandSize() {
-    return rand.nextInt(1024 * 1024) + 1024 * 1024;
-  }
-
-  @BeforeClass
-  public void setup() throws Exception {
-    rand = Utils.createRandom();
-    unsafe = Utils.getUnsafe();
-  }
-  
   @Test(expectedExceptions = { OutOfHybridMemory.class })
   public void testGenPeople() throws OutOfHybridMemory, RetrieveDurableEntityError {
     Random rand = Utils.createRandom();
     NonVolatileMemAllocator act = new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService("pmalloc"),
-        1024L * 1024 * 1024, "./pobj_person.dat", true);
+        1024 * 1024 * 8, "./pobj_person.dat", true);
     cKEYCAPACITY = act.handlerCapacity();
     act.setBufferReclaimer(new Reclaim<ByteBuffer>() {
       @Override
       public boolean reclaim(ByteBuffer mres, Long sz) {
-        System.out.println(String.format("Reclaim Memory Buffer: %X  Size: %s", System.identityHashCode(mres),
+        System.out.println(String.format("WLReclaim Memory Buffer: %X  Size: %s", System.identityHashCode(mres),
             null == sz ? "NULL" : sz.toString()));
         return false;
       }
@@ -101,7 +49,7 @@ public class DurablePersonNGTest {
     act.setChunkReclaimer(new Reclaim<Long>() {
       @Override
       public boolean reclaim(Long mres, Long sz) {
-        System.out.println(String.format("Reclaim Memory Chunk: %X  Size: %s", System.identityHashCode(mres),
+        System.out.println(String.format("WLReclaim Memory Chunk: %X  Size: %s", System.identityHashCode(mres),
             null == sz ? "NULL" : sz.toString()));
         return false;
       }
@@ -111,36 +59,28 @@ public class DurablePersonNGTest {
       act.setHandler(i, 0L);
     }
 
-    Person<Integer> mother;
-    Person<Integer> person;
+    PersonBuffer<Integer> mother;
+    PersonBuffer<Integer> person;
 
-    Checksum pic_cs = new CRC32();
-    pic_cs.reset();
-    Checksum fp_cs = new CRC32();
-    fp_cs.reset();
+    int size = 1024;
+    ByteBuffer bbuf = ByteBuffer.allocate(10);
+
+    MemBufferHolder<?> mbh;
+    mbh = act.createBuffer(size);
+//    MemBufferHolder mbh = new MemBufferHolder(act, bbuf);
+   
+    Assert.assertNotNull(mbh);
+    for (int i = 0; i < size; i++) {
+      mbh.get().put((byte) rand.nextInt(16));
+    }
+    // if (bb.hasArray()) randomGenerator.nextBytes(bb.array());
+    Assert.assertNotNull(mbh);
+    Assert.assertEquals(size, mbh.get().capacity());
+    System.out.println(String.format("[Seq.....] size %d - %d, (%s)", size, mbh.get().capacity(),
+size == mbh.get().capacity() ? "Correct" : "Failed!!!"));
 
     long keyidx = 0;
     long val;
-<<<<<<< HEAD
-=======
-    for (long i = 0; i < cKEYCAPACITY; ++i) {
-      act.setHandler(i, 0L);
-      val = act.getHandler(i);
-      if (0L != val) {
-        PersonFactory.restore(act, val, true);
-      }
-    }
-
-    MemBufferHolder<?> mbh;
-    int size = rand.nextInt(1024 * 1024) + 1024 * 1024;
-    mbh = act.createBuffer(size);
-    Assert.assertNotNull(mbh);
-    for (int i = 0; i < size; i++) {
-      mbh.get().put((byte) rand.nextInt(255));
-    }
-
-    Assert.assertEquals(size, mbh.get().capacity());
->>>>>>> f977d59... Mnemonic-97-debug
 
     try {
       while (true) {
@@ -152,34 +92,30 @@ public class DurablePersonNGTest {
 
         val = act.getHandler(keyidx);
         if (0L != val) {
-          PersonFactory.restore(act, val, true);
+          PersonBufferFactory.restore(act, val, true);
         }
 
-        person = PersonFactory.create(act);
+        person = PersonBufferFactory.create(act);
         person.setAge((short) rand.nextInt(50));
         person.setName(String.format("Name: [%s]", UUID.randomUUID().toString()), true);
         person.setName(String.format("Name: [%s]", UUID.randomUUID().toString()), true);
         person.setName(String.format("Name: [%s]", UUID.randomUUID().toString()), true);
         person.setName(String.format("Name: [%s]", UUID.randomUUID().toString()), true);
+        person.setName(String.format("Name: [%d]", bbuf.capacity()), true);
 
-        person.setPicture(genuptBuffer(act, pic_cs, genRandSize()), true);
-        person.setPreference(genuptChunk(act, fp_cs, genRandSize()), true);
+        Assert.assertNotNull(mbh);
+        Assert.assertNotNull(person);
+        person.setNamebuffer(mbh, false);
 
         act.setHandler(keyidx, person.getHandler());
-        pic_checksum = pic_cs.getValue();
-        fp_checksum = fp_cs.getValue();
 
         for (int deep = 0; deep < rand.nextInt(100); ++deep) {
 
-          mother = PersonFactory.create(act);
+          mother = PersonBufferFactory.create(act);
           mother.setAge((short) (50 + rand.nextInt(50)));
           mother.setName(String.format("Name: [%s]", UUID.randomUUID().toString()), true);
-          mother.setPicture(genuptBuffer(act, pic_cs, genRandSize()), true);
-          mother.setPreference(genuptChunk(act, fp_cs, genRandSize()), true);
 
           person.setMother(mother, true);
-          pic_checksum = pic_cs.getValue();
-          fp_checksum = fp_cs.getValue();
 
           person = mother;
 
@@ -198,7 +134,7 @@ public class DurablePersonNGTest {
     act.setBufferReclaimer(new Reclaim<ByteBuffer>() {
       @Override
       public boolean reclaim(ByteBuffer mres, Long sz) {
-        System.out.println(String.format("Reclaim Memory Buffer: %X  Size: %s", System.identityHashCode(mres),
+        System.out.println(String.format("WMReclaim Memory Buffer: %X  Size: %s", System.identityHashCode(mres),
             null == sz ? "NULL" : sz.toString()));
         return false;
       }
@@ -206,44 +142,26 @@ public class DurablePersonNGTest {
     act.setChunkReclaimer(new Reclaim<Long>() {
       @Override
       public boolean reclaim(Long mres, Long sz) {
-        System.out.println(String.format("Reclaim Memory Chunk: %X  Size: %s", System.identityHashCode(mres),
+        System.out.println(String.format("WMReclaim Memory Chunk: %X  Size: %s", System.identityHashCode(mres),
             null == sz ? "NULL" : sz.toString()));
         return false;
       }
     });
 
-    Checksum pic_cs = new CRC32();
-    pic_cs.reset();
-    Checksum fp_cs = new CRC32();
-    fp_cs.reset();
-    long size;
-    byte[] buf;
-
     long val;
     for (long i = 0; i < cKEYCAPACITY; ++i) {
-      System.out.printf("----------Key %d--------------\n", i);
+      System.out.printf("----------Key WM %d--------------\n", i);
       val = act.getHandler(i);
       if (0L == val) {
         break;
       }
-      Person<Integer> person = PersonFactory.restore(act, val, true);
+      PersonBuffer<Integer> person = PersonBufferFactory.restore(act, val, true);
       while (null != person) {
         person.testOutput();
-        person.getPicture().get().clear();
-        buf = new byte[person.getPicture().get().capacity()];
-        person.getPicture().get().get(buf);
-        pic_cs.update(buf, 0, buf.length);
-        byte b;
-        for (int j = 0; j < person.getPreference().getSize(); ++j) {
-          b = unsafe.getByte(person.getPreference().get() + j);
-          fp_cs.update(b);
-        }
         person = person.getMother();
       }
     }
 
     act.close();
-    Assert.assertEquals(pic_cs.getValue(), pic_checksum);
-    Assert.assertEquals(fp_cs.getValue(), fp_checksum);
   }
 }
