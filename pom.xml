@@ -95,9 +95,11 @@
     <module>mnemonic-benches</module>
     <module>mnemonic-sessions</module>
     <module>mnemonic-hadoop</module>
+    <module>mnemonic-spark</module>
   </modules>
 
   <properties>
+    <java.version>1.7</java.version>
     <maven.min-version>3.2.1</maven.min-version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -322,8 +324,8 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.3</version>
 	  <configuration>
-            <source>1.7</source>
-            <target>1.7</target>
+            <source>${java.version}</source>
+            <target>${java.version}</target>
             <compilerArgs>
               <arg>-XDignore.symbol.file</arg>
               <arg>-XDenableSunApiLintControl</arg>

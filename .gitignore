@@ -44,4 +44,6 @@ testlog/
 *.patch
 *.swp
 *.pyc
+.cache-tests
+.cache-main
 
