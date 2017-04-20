@@ -587,7 +587,7 @@ public class AnnotatedDurableEntityClass {
       }
       if (isUnboxPrimitive(ftname)) {
         if (unboxTypeName(ftname).equals(TypeName.BOOLEAN)) {
-          codefmt = "$1N.$4L($2N.get() + $3L, $5L?1:0)";
+          codefmt = "$1N.$4L($2N.get() + $3L, (byte) ($5L? 1 : 0))";
         } else {
           codefmt = "$1N.$4L($2N.get() + $3L, $5L)";
         }
