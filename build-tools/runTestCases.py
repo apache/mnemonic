@@ -29,7 +29,7 @@ if not os.path.exists(testLogDir):
 
 testCmdFile = 'build-tools/test.conf'
 tcCmdReg = re.compile('^mvn\s.*$')
-tcNameReg = re.compile('-Dtest=(.+?)\s')
+tcNameReg = re.compile('-D(?:test|suites)=(.+?)\s')
 tcModuleReg = re.compile('-pl\s(.+?)\s')
 with open(testCmdFile) as fp:
     for line in fp:
