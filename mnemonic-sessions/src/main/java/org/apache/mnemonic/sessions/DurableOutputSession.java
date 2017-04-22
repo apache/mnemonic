@@ -58,6 +58,10 @@ public abstract class DurableOutputSession<V, A extends RestorableAllocator<A>>
     return m_act;
   }
 
+  public void setAllocator(A alloc) {
+    m_act = alloc;
+  }
+
   @Override
   public long getHandler() {
     long ret = 0L;

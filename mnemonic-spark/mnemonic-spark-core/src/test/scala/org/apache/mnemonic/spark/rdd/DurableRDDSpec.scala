@@ -17,13 +17,13 @@
 
 package org.apache.mnemonic.spark.rdd;
 
-import org.scalatest.FlatSpec
-import org.scalatest.Matchers
-import org.scalatest.BeforeAndAfter
+import org.apache.mnemonic.spark.TestSpec
 
-class DurableRDDSuite extends FlatSpec with Matchers with BeforeAndAfter {
+class DurableRDDSpec extends TestSpec {
 
-  "An empty Set" should "have size 0" in {
+  behavior of "A DurableRDD"
+
+  it should "have size 0" in {
     assert(Set.empty.size == 0)
   }
 

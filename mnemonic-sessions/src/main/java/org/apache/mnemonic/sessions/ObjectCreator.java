@@ -18,14 +18,11 @@
 
 package org.apache.mnemonic.sessions;
 
-import java.io.Closeable;
+public interface ObjectCreator<V> {
 
-public interface OutputSession<V> extends ObjectCreator<V>, Closeable {
+  V newDurableObjectRecord();
 
-  void post(V v);
-
-  void destroyPendingRecord(V k);
-
-  void destroyAllPendingRecords();
+  V newDurableObjectRecord(long size);
 
 }
+
