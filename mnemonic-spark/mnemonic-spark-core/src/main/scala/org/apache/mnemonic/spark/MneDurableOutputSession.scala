@@ -33,34 +33,18 @@ import org.apache.mnemonic.sessions.DurableOutputSession
 class MneDurableOutputSession[V: ClassTag]
     extends DurableOutputSession[V, NonVolatileMemAllocator] {
 
-  private var _baseDir: Path = null
-  private var _flist: ArrayBuffer[File] = new ArrayBuffer[File]
-  private var _outputFile: File = null
-  private var _outPrefix: String = null
+  var baseDir: Path = null
+  var fileList: ArrayBuffer[File] = new ArrayBuffer[File]
+  var outputFile: File = null
+  var outputPrefix: String = null
   private var _outidx: Long = 0L
 
-  def baseDir = _baseDir
-
-  def baseDir_=(value: Path): Unit = _baseDir = value
-
-  def fileList = _flist.toArray
-
-  def outputPrefix = _outPrefix
-
-  def outputPrefix_=(value: String): Unit = _outPrefix = value
-
   protected def genNextPoolFile(): File = {
-    val file = new File(baseDir.toFile(), f"${_outPrefix}_${_outidx}%05d.mne")
+    val file = new File(baseDir.toFile(), f"${outputPrefix}_${_outidx}%05d.mne")
     _outidx = _outidx + 1
-    _flist += file
+    fileList += file
     file
   }
-
-  def setOutputFile(file: File): Unit = {
-    _outputFile = file
-  }
-
-  def getOutputFile: File = _outputFile
 
   override def initNextPool(): Boolean = {
     var ret: Boolean = false
@@ -68,9 +52,9 @@ class MneDurableOutputSession[V: ClassTag]
       getAllocator.close();
       setAllocator(null);
     }
-    setOutputFile(genNextPoolFile);
+    outputFile = genNextPoolFile;
     m_act = new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService(getServiceName),
-      getPoolSize, getOutputFile.toString, true);
+      getPoolSize, outputFile.toString, true);
     if (null != getAllocator) {
       m_newpool = true;
       ret = true;

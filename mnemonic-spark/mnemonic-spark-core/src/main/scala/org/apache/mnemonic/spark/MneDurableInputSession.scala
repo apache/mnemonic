@@ -33,11 +33,7 @@ import org.apache.mnemonic.sessions.SessionIterator
 class MneDurableInputSession[V: ClassTag]
     extends DurableInputSession[V, NonVolatileMemAllocator] {
 
-  private var _flist: Array[File] = null
-
-  def fileList = _flist
-
-  def fileList_=(value: Array[File]): Unit = _flist = value
+  var fileList: Array[File] = null
 
   override def initNextPool(sessiter: SessionIterator[V, NonVolatileMemAllocator]): Boolean = {
     var ret: Boolean = false

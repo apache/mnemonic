@@ -63,7 +63,7 @@ class DurableRDD[D: ClassTag, T: ClassTag](
           case None =>
         }
       }
-      _parmap += (split -> outsess.fileList)
+      _parmap += (split -> outsess.fileList.toArray)
     } finally {
       outsess.close()
     }
