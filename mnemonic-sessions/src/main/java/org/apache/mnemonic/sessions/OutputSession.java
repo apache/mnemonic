@@ -20,7 +20,10 @@ package org.apache.mnemonic.sessions;
 
 import java.io.Closeable;
 
-public interface OutputSession<V> extends ObjectCreator<V>, Closeable {
+import org.apache.mnemonic.RestorableAllocator;
+
+public interface OutputSession<V, A extends RestorableAllocator<A>>
+    extends ObjectCreator<V, A>, Closeable {
 
   void post(V v);
 

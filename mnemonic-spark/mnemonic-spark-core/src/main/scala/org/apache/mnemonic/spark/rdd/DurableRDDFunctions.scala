@@ -35,7 +35,7 @@ class DurableRDDFunctions[T: ClassTag](rdd: RDD[T]) extends Serializable {
     slotKeyId: Long,
     partitionPoolSize: Long,
     baseDir: Path,
-    f: (T, ObjectCreator[D]) => Option[D],
+    f: (T, ObjectCreator[D, _]) => Option[D],
     preservesPartitioning: Boolean = false) =
     new DurableRDD[D, T](rdd,
       serviceName, durableTypes, entityFactoryProxies, slotKeyId,

@@ -40,7 +40,7 @@ class DurableRDD[D: ClassTag, T: ClassTag](
   serviceName: String, durableTypes: Array[DurableType],
   entityFactoryProxies: Array[EntityFactoryProxy], slotKeyId: Long,
   partitionPoolSize: Long, baseDir: Path,
-  f: (T, ObjectCreator[D]) => Option[D],
+  f: (T, ObjectCreator[D, _]) => Option[D],
   preservesPartitioning: Boolean = false)
     extends RDD[D](prev) {
 

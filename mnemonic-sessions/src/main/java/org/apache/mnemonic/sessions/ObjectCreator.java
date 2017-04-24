@@ -18,11 +18,14 @@
 
 package org.apache.mnemonic.sessions;
 
-public interface ObjectCreator<V> {
+import org.apache.mnemonic.RestorableAllocator;
+
+public interface ObjectCreator<V, A extends RestorableAllocator<A>> {
 
   V newDurableObjectRecord();
 
   V newDurableObjectRecord(long size);
 
+  A getAllocator();
 }
 
