@@ -22,8 +22,9 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.TaskContext
 import scala.reflect.ClassTag
 import scala.language.implicitConversions
+import org.apache.mnemonic.NonVolatileMemAllocator
 import org.apache.mnemonic.DurableType
-import org.apache.mnemonic.EntityFactoryProxy;
+import org.apache.mnemonic.EntityFactoryProxy
 import org.apache.mnemonic.sessions.ObjectCreator
 
 class DurableRDDFunctions[T: ClassTag](rdd: RDD[T]) extends Serializable {
@@ -35,7 +36,7 @@ class DurableRDDFunctions[T: ClassTag](rdd: RDD[T]) extends Serializable {
     slotKeyId: Long,
     partitionPoolSize: Long,
     baseDir: Path,
-    f: (T, ObjectCreator[D, _]) => Option[D],
+    f: (T, ObjectCreator[D, NonVolatileMemAllocator]) => Option[D],
     preservesPartitioning: Boolean = false) =
     new DurableRDD[D, T](rdd,
       serviceName, durableTypes, entityFactoryProxies, slotKeyId,

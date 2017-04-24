@@ -25,12 +25,12 @@ import org.apache.spark.{ Partition, TaskContext }
 import scala.reflect.{ classTag, ClassTag }
 import scala.collection.mutable.HashMap
 import scala.collection.JavaConverters._
-import org.apache.mnemonic.ConfigurationException;
-import org.apache.mnemonic.DurableType;
-import org.apache.mnemonic.EntityFactoryProxy;
-import org.apache.mnemonic.NonVolatileMemAllocator;
-import org.apache.mnemonic.sessions.DurableInputSession;
-import org.apache.mnemonic.sessions.SessionIterator;
+import org.apache.mnemonic.ConfigurationException
+import org.apache.mnemonic.DurableType
+import org.apache.mnemonic.EntityFactoryProxy
+import org.apache.mnemonic.NonVolatileMemAllocator
+import org.apache.mnemonic.sessions.DurableInputSession
+import org.apache.mnemonic.sessions.SessionIterator
 import org.apache.mnemonic.sessions.ObjectCreator
 import org.apache.mnemonic.spark.MneDurableInputSession
 import org.apache.mnemonic.spark.MneDurableOutputSession
@@ -40,7 +40,7 @@ class DurableRDD[D: ClassTag, T: ClassTag](
   serviceName: String, durableTypes: Array[DurableType],
   entityFactoryProxies: Array[EntityFactoryProxy], slotKeyId: Long,
   partitionPoolSize: Long, baseDir: Path,
-  f: (T, ObjectCreator[D, _]) => Option[D],
+  f: (T, ObjectCreator[D, NonVolatileMemAllocator]) => Option[D],
   preservesPartitioning: Boolean = false)
     extends RDD[D](prev) {
 
