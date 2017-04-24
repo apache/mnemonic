@@ -18,7 +18,6 @@
 package org.apache.mnemonic.spark.rdd;
 
 import java.io.File
-import java.nio.file.Path
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{ Partition, TaskContext }
@@ -39,7 +38,7 @@ class DurableRDD[D: ClassTag, T: ClassTag](
   var prev: RDD[T],
   serviceName: String, durableTypes: Array[DurableType],
   entityFactoryProxies: Array[EntityFactoryProxy], slotKeyId: Long,
-  partitionPoolSize: Long, baseDir: Path,
+  partitionPoolSize: Long, baseDir: String,
   f: (T, ObjectCreator[D, NonVolatileMemAllocator]) => Option[D],
   preservesPartitioning: Boolean = false)
     extends RDD[D](prev) {

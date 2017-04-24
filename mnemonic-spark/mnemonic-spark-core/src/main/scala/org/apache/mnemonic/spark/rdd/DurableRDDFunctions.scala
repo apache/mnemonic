@@ -17,7 +17,6 @@
 
 package org.apache.mnemonic.spark.rdd
 
-import java.nio.file.Path
 import org.apache.spark.rdd.RDD
 import org.apache.spark.TaskContext
 import scala.reflect.ClassTag
@@ -35,7 +34,7 @@ class DurableRDDFunctions[T: ClassTag](rdd: RDD[T]) extends Serializable {
     entityFactoryProxies: Array[EntityFactoryProxy],
     slotKeyId: Long,
     partitionPoolSize: Long,
-    baseDir: Path,
+    baseDir: String,
     f: (T, ObjectCreator[D, NonVolatileMemAllocator]) => Option[D],
     preservesPartitioning: Boolean = false) =
     new DurableRDD[D, T](rdd,

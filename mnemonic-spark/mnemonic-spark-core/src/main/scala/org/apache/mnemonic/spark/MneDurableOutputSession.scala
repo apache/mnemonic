@@ -17,7 +17,6 @@
 
 package org.apache.mnemonic.spark
 import java.io.File
-import java.nio.file.Path
 import scala.reflect.{ classTag, ClassTag }
 import scala.collection.mutable.ArrayBuffer
 
@@ -33,14 +32,14 @@ import org.apache.mnemonic.sessions.DurableOutputSession
 class MneDurableOutputSession[V: ClassTag]
     extends DurableOutputSession[V, NonVolatileMemAllocator] {
 
-  var baseDir: Path = null
+  var baseDir: String = null
   var fileList: ArrayBuffer[File] = new ArrayBuffer[File]
   var outputFile: File = null
   var outputPrefix: String = null
   private var _outidx: Long = 0L
 
   protected def genNextPoolFile(): File = {
-    val file = new File(baseDir.toFile(), f"${outputPrefix}_${_outidx}%05d.mne")
+    val file = new File(baseDir, f"${outputPrefix}_${_outidx}%05d.mne")
     _outidx = _outidx + 1
     fileList += file
     file
@@ -71,7 +70,7 @@ object MneDurableOutputSession {
     entityFactoryProxies: Array[EntityFactoryProxy],
     slotKeyId: Long,
     partitionPoolSize: Long,
-    baseDir: Path,
+    baseDir: String,
     outputPrefix: String): MneDurableOutputSession[V] = {
     var ret = new MneDurableOutputSession[V]
     ret.setServiceName(serviceName)
