@@ -16,6 +16,7 @@
  */
 
 package org.apache.mnemonic.spark
+
 import java.io.File
 import scala.reflect.{ classTag, ClassTag }
 import scala.collection.mutable.ArrayBuffer
@@ -29,34 +30,67 @@ import org.apache.mnemonic.collections.DurableSinglyLinkedList
 import org.apache.mnemonic.collections.DurableSinglyLinkedListFactory
 import org.apache.mnemonic.sessions.DurableOutputSession
 
-class MneDurableOutputSession[V: ClassTag]
+class MneDurableOutputSession[V: ClassTag](
+    serviceName: String,
+    durableTypes: Array[DurableType],
+    entityFactoryProxies: Array[EntityFactoryProxy],
+    slotKeyId: Long,
+    partitionPoolSize: Long,
+    baseDirectory: String,
+    outputMemPrefix: String)
     extends DurableOutputSession[V, NonVolatileMemAllocator] {
 
   var baseDir: String = null
-  var fileList: ArrayBuffer[File] = new ArrayBuffer[File]
+  var memPools: ArrayBuffer[File] = new ArrayBuffer[File]
   var outputFile: File = null
   var outputPrefix: String = null
   private var _outidx: Long = 0L
 
+  initialize(serviceName, durableTypes, entityFactoryProxies,
+      slotKeyId, partitionPoolSize, baseDirectory, outputMemPrefix)
+
+  def initialize(
+    serviceName: String,
+    durableTypes: Array[DurableType],
+    entityFactoryProxies: Array[EntityFactoryProxy],
+    slotKeyId: Long,
+    partitionPoolSize: Long,
+    baseDirectory: String,
+    outputMemPrefix: String) {
+    setServiceName(serviceName)
+    setDurableTypes(durableTypes)
+    setEntityFactoryProxies(entityFactoryProxies)
+    setSlotKeyId(slotKeyId)
+    setPoolSize(partitionPoolSize)
+    baseDir = baseDirectory
+    outputPrefix = outputMemPrefix
+    if (!initNextPool) {
+      throw new RuntimeException("Firstly init next pool failed")
+    }
+  }
+
   protected def genNextPoolFile(): File = {
     val file = new File(baseDir, f"${outputPrefix}_${_outidx}%05d.mne")
-    _outidx = _outidx + 1
-    fileList += file
+    _outidx += 1
+    memPools += file
     file
   }
 
   override def initNextPool(): Boolean = {
     var ret: Boolean = false
     if (null != getAllocator) {
-      getAllocator.close();
-      setAllocator(null);
+      getAllocator.close()
+      setAllocator(null)
     }
-    outputFile = genNextPoolFile;
+    outputFile = genNextPoolFile
+    if (outputFile.exists) {
+      outputFile.delete
+    }
     m_act = new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService(getServiceName),
       getPoolSize, outputFile.toString, true);
     if (null != getAllocator) {
       m_newpool = true;
-      ret = true;
+      ret = true
     }
     ret
   }
@@ -70,16 +104,11 @@ object MneDurableOutputSession {
     entityFactoryProxies: Array[EntityFactoryProxy],
     slotKeyId: Long,
     partitionPoolSize: Long,
-    baseDir: String,
-    outputPrefix: String): MneDurableOutputSession[V] = {
-    var ret = new MneDurableOutputSession[V]
-    ret.setServiceName(serviceName)
-    ret.setDurableTypes(durableTypes)
-    ret.setEntityFactoryProxies(entityFactoryProxies)
-    ret.setSlotKeyId(slotKeyId)
-    ret.setPoolSize(partitionPoolSize)
-    ret.baseDir = baseDir
-    ret.outputPrefix = outputPrefix
+    baseDirectory: String,
+    outputMemPrefix: String): MneDurableOutputSession[V] = {
+    val ret = new MneDurableOutputSession[V] (
+        serviceName, durableTypes, entityFactoryProxies,
+        slotKeyId, partitionPoolSize, baseDirectory, outputMemPrefix)
     ret
   }
 }

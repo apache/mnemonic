@@ -113,17 +113,18 @@ public class Utils {
    *
    * @return the non-volatile memory allocator service instance
    */
-  public static NonVolatileMemoryAllocatorService getNonVolatileMemoryAllocatorService(String id) {
+  public static synchronized NonVolatileMemoryAllocatorService getNonVolatileMemoryAllocatorService(String id) {
     NonVolatileMemoryAllocatorService ret = null;
     if (null == m_nvmasvcloader) {
       m_nvmasvcloader = ServiceLoader.load(NonVolatileMemoryAllocatorService.class);
     }
     Iterator<NonVolatileMemoryAllocatorService> svcit = m_nvmasvcloader.iterator();
     NonVolatileMemoryAllocatorService svc = null;
-    while (null == ret && svcit.hasNext()) {
+    while (svcit.hasNext()) {
       svc = svcit.next();
       if (svc.getServiceId().equals(id)) {
         ret = svc;
+        break;
       }
     }
     assert null != ret : "NonVolatileMemoryAllocatorService \'" + id + "\' not found!";
@@ -138,17 +139,18 @@ public class Utils {
    *
    * @return the durable general computing service instance
    */
-  public static GeneralComputingService getGeneralComputingService(String id) {
+  public static synchronized GeneralComputingService getGeneralComputingService(String id) {
     GeneralComputingService ret = null;
     if (null == m_gcompsvcloader) {
       m_gcompsvcloader = ServiceLoader.load(GeneralComputingService.class);
     }
     Iterator<GeneralComputingService> svcit = m_gcompsvcloader.iterator();
     GeneralComputingService svc = null;
-    while (null == ret && svcit.hasNext()) {
+    while (svcit.hasNext()) {
       svc = svcit.next();
       if (svc.getServiceId().equals(id)) {
         ret = svc;
+        break;
       }
     }
     assert null != ret : "GeneralComputingService \'" + id + "\' not found!";

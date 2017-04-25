@@ -56,9 +56,11 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
    *          a place holder, always specify it as true
    */
   public VolatileMemAllocator(VolatileMemoryAllocatorService vmasvc, long capacity, String uri, boolean isnew) {
-    assert null != vmasvc : "VolatileMemoryAllocatorService object is null";
+    if (null == vmasvc) {
+      throw new IllegalArgumentException("VolatileMemoryAllocatorService object is null");
+    }
     if (capacity <= 0) {
-      throw new IllegalArgumentException("BigDataMemAllocator cannot be initialized with capacity <= 0.");
+      throw new IllegalArgumentException("VolatileMemAllocator cannot be initialized with capacity <= 0.");
     }
 
     m_vmasvc = vmasvc;

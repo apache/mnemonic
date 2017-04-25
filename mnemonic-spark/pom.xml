@@ -161,7 +161,17 @@
             <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
             <junitxml>.</junitxml>
             <filereports>SparkIntegrationTestSuite.txt</filereports>
+            <forkMode>always</forkMode>
             <skipTests>${skipTests}</skipTests>
+            <argLine>-Djava.ext.dirs=${memory.service.dist.dir}:${computing.service.dist.dir}</argLine>
+            <systemProperties>
+              <spark.service-dist-dirs>
+                ${memory.service.dist.dir}:${computing.service.dist.dir}
+              </spark.service-dist-dirs>
+              <spark.executorEnv.SPARK_JAVA_OPTS>
+                -D${memory.service.dist.dir}:${computing.service.dist.dir}
+              </spark.executorEnv.SPARK_JAVA_OPTS>
+            </systemProperties>
           </configuration>
           <executions>
             <execution>

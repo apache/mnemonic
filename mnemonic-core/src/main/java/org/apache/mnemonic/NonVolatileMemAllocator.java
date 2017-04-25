@@ -56,9 +56,11 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
    *          a place holder, always specify it as true
    */
   public NonVolatileMemAllocator(NonVolatileMemoryAllocatorService nvmasvc, long capacity, String uri, boolean isnew) {
-    assert null != nvmasvc : "NonVolatileMemoryAllocatorService object is null";
+    if (null == nvmasvc) {
+      throw new IllegalArgumentException("NonVolatileMemoryAllocatorService object is null");
+    }
     if (capacity <= 0) {
-      throw new IllegalArgumentException("BigDataPMemAllocator cannot be initialized with capacity <= 0.");
+      throw new IllegalArgumentException("NonVolatileMemAllocator cannot be initialized with capacity <= 0.");
     }
 
     m_nvmasvc = nvmasvc;

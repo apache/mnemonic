@@ -22,11 +22,9 @@ import org.apache.mnemonic.ConfigurationException;
 import org.apache.mnemonic.DurableType;
 import org.apache.mnemonic.NonVolatileMemAllocator;
 import org.apache.mnemonic.Utils;
-import org.apache.mnemonic.collections.DurableSinglyLinkedList;
 import org.apache.mnemonic.sessions.DurableOutputSession;
 
 import java.text.NumberFormat;
-import java.util.HashMap;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -57,7 +55,6 @@ public class MneDurableOutputSession<V>
   }
 
   public void initialize(String prefix) {
-    m_recordmap = new HashMap<V, DurableSinglyLinkedList<V>>();
     readConfig(prefix);
     initNextPool();
   }

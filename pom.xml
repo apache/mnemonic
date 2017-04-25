@@ -290,6 +290,7 @@
           <configuration>
             <excludes>
               <exclude>.git/**/*</exclude>
+	      <exclude>**/.project</exclude>
               <exclude>**/*.</exclude>
 	      <exclude>**/target/**/*</exclude>
               <exclude>**/README*</exclude>

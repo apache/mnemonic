@@ -26,6 +26,7 @@ import org.apache.mnemonic.RestorableAllocator;
 import org.apache.mnemonic.collections.DurableSinglyLinkedList;
 import org.apache.mnemonic.collections.DurableSinglyLinkedListFactory;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -39,7 +40,8 @@ public abstract class DurableOutputSession<V, A extends RestorableAllocator<A>>
   private EntityFactoryProxy[] entityFactoryProxies;
   private long slotKeyId;
 
-  protected Map<V, DurableSinglyLinkedList<V>> m_recordmap;
+  protected Map<V, DurableSinglyLinkedList<V>> m_recordmap =
+      new HashMap<V, DurableSinglyLinkedList<V>>();
   protected boolean m_newpool;
   protected long m_poolidx = 0L;
   protected Pair<DurableType[], EntityFactoryProxy[]> m_recparmpair;

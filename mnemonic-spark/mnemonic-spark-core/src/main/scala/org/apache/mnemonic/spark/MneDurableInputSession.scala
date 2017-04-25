@@ -30,10 +30,36 @@ import org.apache.mnemonic.collections.DurableSinglyLinkedListFactory
 import org.apache.mnemonic.sessions.DurableInputSession
 import org.apache.mnemonic.sessions.SessionIterator
 
-class MneDurableInputSession[V: ClassTag]
+class MneDurableInputSession[V: ClassTag] (
+    serviceName: String,
+    durableTypes: Array[DurableType],
+    entityFactoryProxies: Array[EntityFactoryProxy],
+    slotKeyId: Long,
+    memPoolList: Array[File] )
     extends DurableInputSession[V, NonVolatileMemAllocator] {
 
-  var fileList: Array[File] = null
+  var memPools: Array[File] = null
+
+  private var flistIter:Iterator[File] = null
+
+  initialize(serviceName, durableTypes, entityFactoryProxies,
+      slotKeyId, memPoolList)
+
+  def initialize (
+    serviceName: String,
+    durableTypes: Array[DurableType],
+    entityFactoryProxies: Array[EntityFactoryProxy],
+    slotKeyId: Long,
+    memPoolList: Array[File]) {
+    setServiceName(serviceName)
+    setDurableTypes(durableTypes)
+    setEntityFactoryProxies(entityFactoryProxies)
+    setSlotKeyId(slotKeyId);
+    memPools = memPoolList
+    if (null != memPools) {
+      flistIter = memPools.iterator
+    }
+  }
 
   override def initNextPool(sessiter: SessionIterator[V, NonVolatileMemAllocator]): Boolean = {
     var ret: Boolean = false
@@ -41,9 +67,9 @@ class MneDurableInputSession[V: ClassTag]
       sessiter.getAllocator.close
       sessiter.setAllocator(null)
     }
-    for (file <- fileList) {
+    if (null != flistIter && flistIter.hasNext) {
       sessiter.setAllocator(new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService(
-        getServiceName), 1024000L, file.toString, true));
+        getServiceName), 1024000L, flistIter.next.toString, true));
       if (null != sessiter.getAllocator) {
         sessiter.setHandler(sessiter.getAllocator.getHandler(getSlotKeyId))
         if (0L != sessiter.getHandler) {
@@ -67,13 +93,10 @@ object MneDurableInputSession {
     durableTypes: Array[DurableType],
     entityFactoryProxies: Array[EntityFactoryProxy],
     slotKeyId: Long,
-    files: Array[File]): MneDurableInputSession[V] = {
-    var ret = new MneDurableInputSession[V]
-    ret.setServiceName(serviceName)
-    ret.setDurableTypes(durableTypes)
-    ret.setEntityFactoryProxies(entityFactoryProxies)
-    ret.setSlotKeyId(slotKeyId);
-    ret.fileList = files
+    memPoolList: Array[File]): MneDurableInputSession[V] = {
+    val ret = new MneDurableInputSession[V] (
+        serviceName, durableTypes, entityFactoryProxies,
+        slotKeyId, memPoolList)
     ret
   }
 }

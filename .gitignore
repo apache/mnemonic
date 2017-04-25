@@ -46,4 +46,5 @@ testlog/
 *.pyc
 .cache-tests
 .cache-main
+*.mne
 

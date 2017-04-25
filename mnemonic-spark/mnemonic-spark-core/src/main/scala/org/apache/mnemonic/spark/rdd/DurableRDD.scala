@@ -21,6 +21,7 @@ import java.io.File
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{ Partition, TaskContext }
+import org.apache.spark.internal.Logging
 import scala.reflect.{ classTag, ClassTag }
 import scala.collection.mutable.HashMap
 import scala.collection.JavaConverters._
@@ -33,12 +34,13 @@ import org.apache.mnemonic.sessions.SessionIterator
 import org.apache.mnemonic.sessions.ObjectCreator
 import org.apache.mnemonic.spark.MneDurableInputSession
 import org.apache.mnemonic.spark.MneDurableOutputSession
+import org.apache.mnemonic.spark.DurableException
 
 class DurableRDD[D: ClassTag, T: ClassTag](
   var prev: RDD[T],
   serviceName: String, durableTypes: Array[DurableType],
   entityFactoryProxies: Array[EntityFactoryProxy], slotKeyId: Long,
-  partitionPoolSize: Long, baseDir: String,
+  partitionPoolSize: Long, baseDirectory: String,
   f: (T, ObjectCreator[D, NonVolatileMemAllocator]) => Option[D],
   preservesPartitioning: Boolean = false)
     extends RDD[D](prev) {
@@ -53,8 +55,8 @@ class DurableRDD[D: ClassTag, T: ClassTag](
       iterator: Iterator[T]) {
     val outsess = MneDurableOutputSession[D](serviceName,
         durableTypes, entityFactoryProxies, slotKeyId,
-        partitionPoolSize, baseDir,
-        f"mem_${this.hashCode()}%10d_${split.hashCode()}%10d")
+        partitionPoolSize, baseDirectory,
+        f"mem_${this.hashCode()}%010d_${split.hashCode()}%010d")
     try {
       for (item <- iterator) {
         f(item, outsess) match {
@@ -62,7 +64,7 @@ class DurableRDD[D: ClassTag, T: ClassTag](
           case None =>
         }
       }
-      _parmap += (split -> outsess.fileList.toArray)
+      _parmap += (split -> outsess.memPools.toArray)
     } finally {
       outsess.close()
     }
@@ -71,13 +73,14 @@ class DurableRDD[D: ClassTag, T: ClassTag](
   override def compute(split: Partition, context: TaskContext): Iterator[D] = {
     if (!(_parmap contains split)) {
       prepareDurablePartition(split, context, firstParent[T].iterator(split, context))
+      logInfo(s"Done persisting RDD ${prev.id} to ${baseDirectory}")
     }
-    val flist = _parmap.get(split) match {
-      case Some(flst) => flst
-      case None => throw new RuntimeException("Not construct durable partition properly")
+    val memplist = _parmap.get(split) match {
+      case Some(mplst) => mplst
+      case None => throw new DurableException("Not construct durable partition properly")
     }
     val insess = MneDurableInputSession[D](serviceName,
-        durableTypes, entityFactoryProxies, slotKeyId, flist)
+        durableTypes, entityFactoryProxies, slotKeyId, memplist)
     insess.iterator.asScala
   }
 
@@ -86,4 +89,16 @@ class DurableRDD[D: ClassTag, T: ClassTag](
     prev = null
   }
 
+  def close {
+    if (null != _parmap) {
+      _parmap foreach { case (par, mplst) =>
+        mplst foreach {(file) =>
+          if (file.exists) {
+            file.delete
+          }
+        }
+      }
+      _parmap.clear()
+    }
+  }
 }

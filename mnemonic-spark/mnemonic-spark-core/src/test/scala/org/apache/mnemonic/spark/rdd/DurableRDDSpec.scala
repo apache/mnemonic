@@ -18,13 +18,48 @@
 package org.apache.mnemonic.spark.rdd;
 
 import org.apache.mnemonic.spark.TestSpec
+import org.apache.spark.SparkConf
+import org.apache.spark.SparkContext
+import org.apache.spark.rdd.RDD
+import org.apache.mnemonic.spark.rdd.DurableRDDFunctions._
+import org.apache.mnemonic.DurableType
+import org.apache.mnemonic.NonVolatileMemAllocator
+import org.apache.mnemonic.EntityFactoryProxy
+import org.apache.mnemonic.sessions.ObjectCreator
 
 class DurableRDDSpec extends TestSpec {
 
+  val defaultServiceName = "pmalloc"
+  val defaultSlotKeyId = 2L
+  val defaultPartitionSize = 1024 * 1024 * 1024L
+  val defaultBaseDirectory = "."
+  val defaultNumOfRecordsPerPartition = 5000L
+
   behavior of "A DurableRDD"
 
-  it should "have size 0" in {
-    assert(Set.empty.size == 0)
+  it should "have the same sum value" in {
+    val conf = new SparkConf()
+        .setMaster("local[*]")
+        .setAppName("Test")
+    val sc = new SparkContext(conf)
+    // sc.getConf.getAll.foreach(println)
+    val ds = Seq(5, 6, 3, 8, 4)
+    val data: RDD[Int] = sc.parallelize(ds)
+    val durdd = data.makeDurable[Long](
+        defaultServiceName,
+        Array(DurableType.LONG), Array(),
+        defaultSlotKeyId, defaultPartitionSize,
+        defaultBaseDirectory,
+        (v: Int, oc: ObjectCreator[Long, NonVolatileMemAllocator])=>
+          { Some(v.asInstanceOf[Long]) })
+    // data.collect().foreach(println)
+    // durdd.collect().foreach(println)
+    val (rcnt, rsum) = (data.count, data.sum)
+    val (dcnt, dsum) = (durdd.count, durdd.sum)
+    durdd.close
+    assertResult((rcnt, rsum)) {
+      (dcnt, dsum)
+    }
   }
 
   it should "produce NoSuchElementException when head is invoked" in {

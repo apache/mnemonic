@@ -34,13 +34,12 @@ class DurableRDDFunctions[T: ClassTag](rdd: RDD[T]) extends Serializable {
     entityFactoryProxies: Array[EntityFactoryProxy],
     slotKeyId: Long,
     partitionPoolSize: Long,
-    baseDir: String,
+    baseDirectory: String,
     f: (T, ObjectCreator[D, NonVolatileMemAllocator]) => Option[D],
     preservesPartitioning: Boolean = false) =
     new DurableRDD[D, T](rdd,
       serviceName, durableTypes, entityFactoryProxies, slotKeyId,
-      partitionPoolSize, baseDir, f, preservesPartitioning)
-
+      partitionPoolSize, baseDirectory, f, preservesPartitioning)
 }
 
 object DurableRDDFunctions {
