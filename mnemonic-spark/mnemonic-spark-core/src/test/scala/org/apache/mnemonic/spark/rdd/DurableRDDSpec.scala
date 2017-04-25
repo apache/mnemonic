@@ -17,6 +17,7 @@
 
 package org.apache.mnemonic.spark.rdd;
 
+import scala.util._
 import org.apache.mnemonic.spark.TestSpec
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
@@ -33,7 +34,8 @@ class DurableRDDSpec extends TestSpec {
   val defaultSlotKeyId = 2L
   val defaultPartitionSize = 1024 * 1024 * 1024L
   val defaultBaseDirectory = "."
-  val defaultNumOfRecordsPerPartition = 5000L
+  val defaultNumOfPartitions = 8
+  val defaultNumOfRecordsPerPartition = 5000
 
   behavior of "A DurableRDD"
 
@@ -43,8 +45,9 @@ class DurableRDDSpec extends TestSpec {
         .setAppName("Test")
     val sc = new SparkContext(conf)
     // sc.getConf.getAll.foreach(println)
-    val ds = Seq(5, 6, 3, 8, 4)
-    val data: RDD[Int] = sc.parallelize(ds)
+    val seed: RDD[Int] = sc.parallelize(
+        Seq.fill(defaultNumOfPartitions)(defaultNumOfRecordsPerPartition), defaultNumOfPartitions)
+    val data = seed flatMap (recnum => Seq.fill(recnum)(Random.nextInt)) cache //must be cached to fix rand numbers
     val durdd = data.makeDurable[Long](
         defaultServiceName,
         Array(DurableType.LONG), Array(),

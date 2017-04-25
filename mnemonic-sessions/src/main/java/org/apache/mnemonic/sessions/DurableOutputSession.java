@@ -50,7 +50,7 @@ public abstract class DurableOutputSession<V, A extends RestorableAllocator<A>>
 
   /**
    * Initialize the next pool, must be called before use
-   *
+   * and after configuration
    * @return true if success
    */
   protected abstract boolean initNextPool();
