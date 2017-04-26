@@ -30,15 +30,13 @@ import org.apache.mnemonic.collections.DurableSinglyLinkedListFactory
 import org.apache.mnemonic.sessions.DurableInputSession
 import org.apache.mnemonic.sessions.SessionIterator
 
-class MneDurableInputSession[V: ClassTag] (
+private[spark] class MneDurableInputSession[V: ClassTag] (
     serviceName: String,
     durableTypes: Array[DurableType],
     entityFactoryProxies: Array[EntityFactoryProxy],
     slotKeyId: Long,
     memPoolList: Array[File] )
     extends DurableInputSession[V, NonVolatileMemAllocator] {
-
-  var memPools: Array[File] = null
 
   private var flistIter:Iterator[File] = null
 
@@ -55,9 +53,8 @@ class MneDurableInputSession[V: ClassTag] (
     setDurableTypes(durableTypes)
     setEntityFactoryProxies(entityFactoryProxies)
     setSlotKeyId(slotKeyId);
-    memPools = memPoolList
-    if (null != memPools) {
-      flistIter = memPools.iterator
+    if (null != memPoolList) {
+      flistIter = memPoolList.iterator
     }
   }
 

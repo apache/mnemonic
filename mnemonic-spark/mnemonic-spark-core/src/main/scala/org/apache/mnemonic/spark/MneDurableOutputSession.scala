@@ -30,24 +30,21 @@ import org.apache.mnemonic.collections.DurableSinglyLinkedList
 import org.apache.mnemonic.collections.DurableSinglyLinkedListFactory
 import org.apache.mnemonic.sessions.DurableOutputSession
 
-class MneDurableOutputSession[V: ClassTag](
+private[spark] class MneDurableOutputSession[V: ClassTag] (
     serviceName: String,
     durableTypes: Array[DurableType],
     entityFactoryProxies: Array[EntityFactoryProxy],
     slotKeyId: Long,
     partitionPoolSize: Long,
-    baseDirectory: String,
-    outputMemPrefix: String)
+    durableDirectory: String,
+    outputMemFileNameGen: (Long)=>String)
     extends DurableOutputSession[V, NonVolatileMemAllocator] {
 
-  var baseDir: String = null
-  var memPools: ArrayBuffer[File] = new ArrayBuffer[File]
-  var outputFile: File = null
-  var outputPrefix: String = null
+  val memPools: ArrayBuffer[File] = new ArrayBuffer[File]
   private var _outidx: Long = 0L
 
   initialize(serviceName, durableTypes, entityFactoryProxies,
-      slotKeyId, partitionPoolSize, baseDirectory, outputMemPrefix)
+      slotKeyId, partitionPoolSize, durableDirectory, outputMemFileNameGen)
 
   def initialize(
     serviceName: String,
@@ -55,22 +52,20 @@ class MneDurableOutputSession[V: ClassTag](
     entityFactoryProxies: Array[EntityFactoryProxy],
     slotKeyId: Long,
     partitionPoolSize: Long,
-    baseDirectory: String,
-    outputMemPrefix: String) {
+    durableDirectory: String,
+    outputMemFileNameGen: (Long)=>String) {
     setServiceName(serviceName)
     setDurableTypes(durableTypes)
     setEntityFactoryProxies(entityFactoryProxies)
     setSlotKeyId(slotKeyId)
     setPoolSize(partitionPoolSize)
-    baseDir = baseDirectory
-    outputPrefix = outputMemPrefix
     if (!initNextPool) {
-      throw new RuntimeException("Firstly init next pool failed")
+      throw new DurableException("Firstly init next pool failed")
     }
   }
 
   protected def genNextPoolFile(): File = {
-    val file = new File(baseDir, f"${outputPrefix}_${_outidx}%05d.mne")
+    val file = new File(durableDirectory, outputMemFileNameGen(_outidx))
     _outidx += 1
     memPools += file
     file
@@ -82,9 +77,9 @@ class MneDurableOutputSession[V: ClassTag](
       getAllocator.close()
       setAllocator(null)
     }
-    outputFile = genNextPoolFile
+    val outputFile = genNextPoolFile
     if (outputFile.exists) {
-      outputFile.delete
+      throw new DurableException(s"Durable memory file already exists ${outputFile}")
     }
     m_act = new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService(getServiceName),
       getPoolSize, outputFile.toString, true);
@@ -104,11 +99,11 @@ object MneDurableOutputSession {
     entityFactoryProxies: Array[EntityFactoryProxy],
     slotKeyId: Long,
     partitionPoolSize: Long,
-    baseDirectory: String,
-    outputMemPrefix: String): MneDurableOutputSession[V] = {
+    durableDirectory: String,
+    outputMemFileNameGen: (Long)=>String): MneDurableOutputSession[V] = {
     val ret = new MneDurableOutputSession[V] (
         serviceName, durableTypes, entityFactoryProxies,
-        slotKeyId, partitionPoolSize, baseDirectory, outputMemPrefix)
+        slotKeyId, partitionPoolSize, durableDirectory, outputMemFileNameGen)
     ret
   }
 }

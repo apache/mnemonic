@@ -45,6 +45,7 @@ class DurableRDDSpec extends TestSpec {
         .setAppName("Test")
     val sc = new SparkContext(conf)
     // sc.getConf.getAll.foreach(println)
+    // DurableRDD.setDurableBaseDir(sc, defaultBaseDirectory)
     val seed: RDD[Int] = sc.parallelize(
         Seq.fill(defaultNumOfPartitions)(defaultNumOfRecordsPerPartition), defaultNumOfPartitions)
     val data = seed flatMap (recnum => Seq.fill(recnum)(Random.nextInt)) cache //must be cached to fix rand numbers
@@ -52,14 +53,16 @@ class DurableRDDSpec extends TestSpec {
         defaultServiceName,
         Array(DurableType.LONG), Array(),
         defaultSlotKeyId, defaultPartitionSize,
-        defaultBaseDirectory,
         (v: Int, oc: ObjectCreator[Long, NonVolatileMemAllocator])=>
           { Some(v.asInstanceOf[Long]) })
     // data.collect().foreach(println)
     // durdd.collect().foreach(println)
     val (rcnt, rsum) = (data.count, data.sum)
     val (dcnt, dsum) = (durdd.count, durdd.sum)
-    durdd.close
+    durdd.reset
+    /*sys.addShutdownHook({
+      DurableRDD.cleanupForApp(sc)
+    })*/
     assertResult((rcnt, rsum)) {
       (dcnt, dsum)
     }

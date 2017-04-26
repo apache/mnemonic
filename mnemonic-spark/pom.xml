@@ -165,6 +165,9 @@
             <skipTests>${skipTests}</skipTests>
             <argLine>-Djava.ext.dirs=${memory.service.dist.dir}:${computing.service.dist.dir}</argLine>
             <systemProperties>
+              <spark.durable-basedir>
+                .
+              </spark.durable-basedir>
               <spark.service-dist-dirs>
                 ${memory.service.dist.dir}:${computing.service.dist.dir}
               </spark.service-dist-dirs>
