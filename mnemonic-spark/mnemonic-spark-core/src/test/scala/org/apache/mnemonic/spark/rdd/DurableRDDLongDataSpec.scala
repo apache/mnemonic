@@ -15,20 +15,23 @@
  * limitations under the License.
  */
 
-package org.apache.mnemonic.spark.rdd;
+package org.apache.mnemonic.spark.rdd
 
 import scala.util._
+import scala.language.existentials
 import org.apache.mnemonic.spark.TestSpec
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.apache.mnemonic.spark.rdd.DurableRDDFunctions._
 import org.apache.mnemonic.DurableType
+import org.apache.mnemonic.DurableChunk
+import org.apache.mnemonic.Utils
 import org.apache.mnemonic.NonVolatileMemAllocator
 import org.apache.mnemonic.EntityFactoryProxy
 import org.apache.mnemonic.sessions.ObjectCreator
 
-class DurableRDDSpec extends TestSpec {
+class DurableRDDLongDataSpec extends TestSpec {
 
   val defaultServiceName = "pmalloc"
   val defaultSlotKeyId = 2L
@@ -37,9 +40,9 @@ class DurableRDDSpec extends TestSpec {
   val defaultNumOfPartitions = 8
   val defaultNumOfRecordsPerPartition = 5000
 
-  behavior of "A DurableRDD"
+  behavior of "A DurableRDD with Long Type Data"
 
-  it should "have the same sum value" in {
+  it should "have unmodified values if only converting the data type from Int to Long" in {
     val conf = new SparkConf()
         .setMaster("local[*]")
         .setAppName("Test")
@@ -68,9 +71,5 @@ class DurableRDDSpec extends TestSpec {
     }
   }
 
-  it should "produce NoSuchElementException when head is invoked" in {
-    assertThrows[NoSuchElementException] {
-      Set.empty.head
-    }
-  }
 }
+

@@ -160,6 +160,7 @@
           <configuration>
             <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
             <junitxml>.</junitxml>
+            <parallel>false</parallel>
             <filereports>SparkIntegrationTestSuite.txt</filereports>
             <forkMode>always</forkMode>
             <skipTests>${skipTests}</skipTests>
