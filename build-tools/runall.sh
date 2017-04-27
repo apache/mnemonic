@@ -17,13 +17,25 @@
 # limitations under the License.
 #
 
+continueprompt() {
+    while true; do
+	read -p "$1 Do you wish to continue [y/n] ? " yn
+	case $yn in
+	    [Yy]* ) break;;
+	    [Nn]* ) exit 2;;
+	    * ) echo "Please answer yes or no.";;
+	    esac
+	done
+    return 0
+}
+
 if [ -z "${MNEMONIC_HOME}" ]; then
   source "$(dirname "$0")/find-mnemonic-home.sh" || { echo "Not found find-mnemonic-home.sh script."; exit 10; }
 fi
 pushd "$MNEMONIC_HOME" || { echo "the environment variable \$MNEMONIC_HOME contains invalid home directory of Mnemonic project."; exit 11; }
 
 echo [INFO] Cleaning up and re-building...
-git ls-files --error-unmatch pom.xml > /dev/null 2>&1 && git clean -xdf > /dev/null
+git ls-files --error-unmatch pom.xml > /dev/null 2>&1 && continueprompt "Please make sure all source codes have already been checked in or backed up otherwise un-checked files would be purged" && git clean -xdf > /dev/null
 
 if [ ! -d "testlog" ]
 then
