@@ -27,7 +27,6 @@ import org.apache.mnemonic.spark.rdd.DurableRDDFunctions._
 import org.apache.mnemonic.DurableType
 import org.apache.mnemonic.DurableChunk
 import org.apache.mnemonic.Utils
-import org.apache.mnemonic.NonVolatileMemAllocator
 import org.apache.mnemonic.EntityFactoryProxy
 import org.apache.mnemonic.sessions.ObjectCreator
 
@@ -56,7 +55,7 @@ class DurableRDDLongDataSpec extends TestSpec {
         defaultServiceName,
         Array(DurableType.LONG), Array(),
         defaultSlotKeyId, defaultPartitionSize,
-        (v: Int, oc: ObjectCreator[Long, NonVolatileMemAllocator])=>
+        (v: Int, oc: ObjectCreator[Long, _])=>
           { Some(v.asInstanceOf[Long]) })
     // data.collect().foreach(println)
     // durdd.collect().foreach(println)

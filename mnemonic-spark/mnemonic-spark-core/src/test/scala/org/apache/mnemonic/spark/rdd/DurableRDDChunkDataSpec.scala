@@ -30,7 +30,6 @@ import org.apache.mnemonic.spark.rdd.DurableRDDFunctions._
 import org.apache.mnemonic.DurableType
 import org.apache.mnemonic.DurableChunk
 import org.apache.mnemonic.Utils
-import org.apache.mnemonic.NonVolatileMemAllocator
 import org.apache.mnemonic.EntityFactoryProxy
 import org.apache.mnemonic.sessions.ObjectCreator
 
@@ -58,7 +57,7 @@ class DurableRDDChunkDataSpec extends TestSpec {
         defaultServiceName,
         Array(DurableType.CHUNK), Array(),
         defaultSlotKeyId, defaultPartitionSize,
-        (v: Int, oc: ObjectCreator[DurableChunk[_], NonVolatileMemAllocator])=>
+        (v: Int, oc: ObjectCreator[DurableChunk[_], _])=>
           {
             val cs = new CRC32
             cs.reset
@@ -66,7 +65,7 @@ class DurableRDDChunkDataSpec extends TestSpec {
             val chunk = oc.newDurableObjectRecord(v)
             var b: Byte = 0
             if (null != chunk) {
-              for (i <- dataOffset until chunk.getSize.asInstanceOf[Int]) {
+              for (i <- dataOffset until chunk.getSize.toInt) {
                 b = Random.nextInt(255).asInstanceOf[Byte]
                 unsafe.putByte(chunk.get + i, b)
                 cs.update(b)
@@ -75,24 +74,25 @@ class DurableRDDChunkDataSpec extends TestSpec {
             }
             Option(chunk)
           })
-    val durtsz = durdd map (_.getSize.asInstanceOf[Int]) sum
+    val durtsz = durdd map (_.getSize.toInt) sum
     val derrcount = durdd map (
         chunk => {
           val unsafe = Utils.getUnsafe
+          var chksum: Long = -1L
           val cs = new CRC32
           cs.reset
           if (null != chunk) {
             var b: Byte = 0
-            for (j <- dataOffset until chunk.getSize.asInstanceOf[Int]) {
+            for (j <- dataOffset until chunk.getSize.toInt) {
               b = unsafe.getByte(chunk.get + j)
               cs.update(b)
             }
+            chksum = unsafe.getLong(chunk.get)
           }
-          val res = unsafe.getLong(chunk.get)
-          if (res != cs.getValue) 1 else 0
+          if (chksum != cs.getValue) 1 else 0
         }) sum
-    val (rerrcnt: Long, rsz: Long) = (0L, data.sum.asInstanceOf[Long])
-    val (derrcnt: Long, dsz: Long) = (derrcount.asInstanceOf[Long], durtsz.asInstanceOf[Long])
+    val (rerrcnt: Long, rsz: Long) = (0L, data.sum.toLong)
+    val (derrcnt: Long, dsz: Long) = (derrcount.toLong, durtsz.toLong)
     durdd.reset
     assertResult((rerrcnt, rsz)) {
       (derrcnt, dsz)
