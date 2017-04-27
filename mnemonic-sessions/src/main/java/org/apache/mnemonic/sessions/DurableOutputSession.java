@@ -126,9 +126,11 @@ public abstract class DurableOutputSession<V, A extends RestorableAllocator<A>>
     } catch (OutOfHybridMemory e) {
       if (nv != null) {
         nv.destroy();
+        nv = null;
       }
       if (ret != null) {
         ((Durable) ret).destroy();
+        ret = null;
       }
       if (initNextPool()) {
         try { /* retry */
@@ -137,18 +139,25 @@ public abstract class DurableOutputSession<V, A extends RestorableAllocator<A>>
         } catch (OutOfHybridMemory ee) {
           if (nv != null) {
             nv.destroy();
+            nv = null;
           }
           if (ret != null) {
             ((Durable) ret).destroy();
+            ret = null;
           }
         }
       }
     }
-    if (null != ret) {
+    if (null != ret && null != nv) {
       m_recordmap.put(ret, nv);
     } else {
       if (null != nv) {
         nv.destroy();
+        nv = null;
+      }
+      if (ret != null) {
+        ((Durable) ret).destroy();
+        ret = null;
       }
     }
     return ret;
@@ -173,7 +182,8 @@ public abstract class DurableOutputSession<V, A extends RestorableAllocator<A>>
       if (m_recordmap.containsKey(v)) {
         nv = m_recordmap.remove(v);
       } else {
-        throw new RuntimeException("The record hasn't been created by newDurableObjectRecord()");
+        throw new RuntimeException("The record hasn't been created by newDurableObjectRecord(...) "
+              + "Please make sure the overrides of hashCode() and/or equals() are appropriate.");
       }
       break;
     default:

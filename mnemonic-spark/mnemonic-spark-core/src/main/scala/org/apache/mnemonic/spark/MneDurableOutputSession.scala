@@ -59,6 +59,7 @@ private[spark] class MneDurableOutputSession[V: ClassTag] (
     setEntityFactoryProxies(entityFactoryProxies)
     setSlotKeyId(slotKeyId)
     setPoolSize(partitionPoolSize)
+    m_recparmpair = Utils.shiftDurableParams(getDurableTypes, getEntityFactoryProxies, 1);
     if (!initNextPool) {
       throw new DurableException("Firstly init next pool failed")
     }
