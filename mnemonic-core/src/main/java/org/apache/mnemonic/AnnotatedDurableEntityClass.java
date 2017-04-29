@@ -693,9 +693,13 @@ public class AnnotatedDurableEntityClass {
               holdername, dynfieldinfo.fieldoff, dynfieldinfo.name);
           code.beginControlFlow("if (null != $1L)", dynfieldinfo.name);
           code.beginControlFlow("if ($1N)", autoreclaimname);
+          code.beginControlFlow("if (!$1N.autoReclaim())", dynfieldinfo.name);
           code.addStatement("$1N.registerAutoReclaim();", dynfieldinfo.name);
+          code.endControlFlow();
           code.nextControlFlow("else");
+          code.beginControlFlow("if ($1N.autoReclaim())", dynfieldinfo.name);
           code.addStatement("$1N.cancelAutoReclaim();", dynfieldinfo.name);
+          code.endControlFlow();
           code.endControlFlow();
           code.endControlFlow();
         }
