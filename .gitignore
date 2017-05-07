@@ -47,4 +47,5 @@ testlog/
 .cache-tests
 .cache-main
 *.mne
-
+*.iml
+.idea/

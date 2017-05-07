@@ -15,42 +15,28 @@
  * limitations under the License.
  */
 
-package org.apache.mnemonic.spark.rdd
+package org.apache.mnemonic.spark
 
 import org.apache.spark.rdd.RDD
+import org.apache.spark._
 import scala.reflect.ClassTag
 import scala.language.implicitConversions
-import org.apache.mnemonic.NonVolatileMemAllocator
 import org.apache.mnemonic.DurableType
 import org.apache.mnemonic.EntityFactoryProxy
-import org.apache.mnemonic.sessions.ObjectCreator
+import org.apache.mnemonic.spark.rdd.DurableRDD
 
-class DurableRDDFunctions[T: ClassTag](rdd: RDD[T]) extends Serializable {
+class DurableSparkFunctions(sc: SparkContext) extends Serializable {
 
-  def makeDurable[D: ClassTag] (
-      serviceName: String,
-      durableTypes: Array[DurableType],
-      entityFactoryProxies: Array[EntityFactoryProxy],
-      slotKeyId: Long,
-      partitionPoolSize: Long,
-      f: (T, ObjectCreator[D, NonVolatileMemAllocator]) => Option[D],
-      preservesPartitioning: Boolean = false) = {
-    DurableRDD[D, T](rdd,
-      serviceName, durableTypes, entityFactoryProxies, slotKeyId,
-      partitionPoolSize, f, preservesPartitioning)
-  }
-
-  def saveAsMnemonic[D: ClassTag] (dir: String,
+  def mnemonic[D: ClassTag] (pathname: String,
                      serviceName: String,
                      durableTypes: Array[DurableType],
                      entityFactoryProxies: Array[EntityFactoryProxy],
-                     slotKeyId: Long,
-                     partitionPoolSize: Long,
-                     f: (T, ObjectCreator[D, NonVolatileMemAllocator]) => Option[D]) {
-    //TODO: implement export operationl
+                     slotKeyId: Long) = {
+    DurableRDD[D](sc, pathname: String,
+      serviceName, durableTypes, entityFactoryProxies, slotKeyId)
   }
 }
 
-object DurableRDDFunctions {
-  implicit def addDurableFunctions[T: ClassTag](rdd: RDD[T]) = new DurableRDDFunctions[T](rdd)
+object DurableSparkFunctions {
+  implicit def addDurableFunctions(sc: SparkContext) = new DurableSparkFunctions(sc)
 }

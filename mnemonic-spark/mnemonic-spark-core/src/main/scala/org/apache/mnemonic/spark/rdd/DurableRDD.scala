@@ -15,40 +15,37 @@
  * limitations under the License.
  */
 
-package org.apache.mnemonic.spark.rdd;
+package org.apache.mnemonic.spark.rdd
 
 import java.io.File
-import scala.util._
 
 import org.apache.spark.rdd.RDD
-import org.apache.spark.{ Partition, TaskContext, SparkContext }
-import org.apache.spark.internal.Logging
+import org.apache.spark._
 import org.apache.commons.io.FileUtils
-import scala.reflect.{ classTag, ClassTag }
-import scala.collection.mutable.HashMap
+import scala.reflect.{ ClassTag }
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
-import org.apache.mnemonic.ConfigurationException
 import org.apache.mnemonic.DurableType
 import org.apache.mnemonic.EntityFactoryProxy
 import org.apache.mnemonic.NonVolatileMemAllocator
-import org.apache.mnemonic.sessions.DurableInputSession
-import org.apache.mnemonic.sessions.SessionIterator
 import org.apache.mnemonic.sessions.ObjectCreator
 import org.apache.mnemonic.spark.MneDurableInputSession
 import org.apache.mnemonic.spark.MneDurableOutputSession
 import org.apache.mnemonic.spark.DurableException
 
 private[spark] class DurableRDD[D: ClassTag, T: ClassTag] (
-  private var rdd: RDD[T],
+  @transient private var _sc: SparkContext,
+  @transient private var deps: Seq[Dependency[_]],
   serviceName: String, durableTypes: Array[DurableType],
   entityFactoryProxies: Array[EntityFactoryProxy], slotKeyId: Long,
   partitionPoolSize: Long, durableDirectory: String,
   f: (T, ObjectCreator[D, NonVolatileMemAllocator]) => Option[D],
   preservesPartitioning: Boolean = false)
-    extends RDD[D](rdd) {
+    extends RDD[D](_sc, deps) {
 
-  val durdddir = DurableRDD.getRddDirName(durableDirectory, id)
+  private val isInputOnly =  null == deps
+
+  private val durdddir = DurableRDD.getRddDirName(durableDirectory, id)
   DurableRDD.resetRddDir(durdddir)
 
   override val partitioner = if (preservesPartitioning) firstParent[T].partitioner else None
@@ -80,7 +77,7 @@ private[spark] class DurableRDD[D: ClassTag, T: ClassTag] (
     val memplist = mempListOpt match {
       case None => {
         val mplst = prepareDurablePartition(split, context, firstParent[T].iterator(split, context))
-        logInfo(s"Done transformed RDD #${rdd.id} to durableRDD #${id} on ${durdddir.toString}")
+        logInfo(s"Done transformed RDD #${firstParent[T].id} to durableRDD #${id} on ${durdddir.toString}")
         mplst
       }
       case Some(mplst) => mplst
@@ -92,11 +89,14 @@ private[spark] class DurableRDD[D: ClassTag, T: ClassTag] (
 
   override def clearDependencies {
     super.clearDependencies()
-    rdd = null
   }
 
   def reset {
     DurableRDD.resetRddDir(durdddir)
+  }
+
+  def destroy {
+    DurableRDD.deleteRddDir(durdddir)
   }
 }
 
@@ -141,12 +141,21 @@ object DurableRDD {
   }
 
   def resetRddDir(rddDirName: String) {
+    deleteRddDir(rddDirName)
+    createRddDir(rddDirName)
+  }
+
+  def createRddDir(rddDirName: String) {
+    val durdddir = new File(rddDirName)
+    if (!durdddir.mkdir) {
+      throw new DurableException(s"Durable RDD directory ${durdddir.toString} cannot be created")
+    }
+  }
+
+  def deleteRddDir(rddDirName: String) {
     val durdddir = new File(rddDirName)
     if (durdddir.exists) {
       FileUtils.deleteDirectory(durdddir)
-    }
-    if (!durdddir.mkdir) {
-      throw new DurableException(s"Durable RDD directory ${durdddir.toString} cannot be created")
     }
   }
 
@@ -182,11 +191,21 @@ object DurableRDD {
       partitionPoolSize: Long,
       f: (T, ObjectCreator[D, NonVolatileMemAllocator]) => Option[D],
       preservesPartitioning: Boolean = false) = {
-    val sc: SparkContext = rdd.context
-    val ret = new DurableRDD[D, T](rdd,
+//    val sc: SparkContext = rdd.context
+    val ret = new DurableRDD[D, T](rdd.context , List(new OneToOneDependency(rdd)),
       serviceName, durableTypes, entityFactoryProxies, slotKeyId,
-      partitionPoolSize, getDurableDir(sc).get, f, preservesPartitioning)
+      partitionPoolSize, getDurableDir(rdd.context).get, f, preservesPartitioning)
     //sc.cleaner.foreach(_.registerRDDForCleanup(ret))
+    ret
+  }
+
+  def apply[D: ClassTag] (
+      sc: SparkContext, pathname: String,
+      serviceName: String, durableTypes: Array[DurableType],
+      entityFactoryProxies: Array[EntityFactoryProxy], slotKeyId: Long) = {
+    val ret = new DurableRDD[D, Unit](sc, null,
+      serviceName, durableTypes, entityFactoryProxies, slotKeyId,
+      1024*1024*1024L, pathname, null)
     ret
   }
 
