@@ -22,16 +22,17 @@ import java.io.File
 import org.apache.spark.rdd.RDD
 import org.apache.spark._
 import org.apache.commons.io.FileUtils
-import scala.reflect.{ ClassTag }
+
+import scala.reflect.ClassTag
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
-import org.apache.mnemonic.DurableType
-import org.apache.mnemonic.EntityFactoryProxy
-import org.apache.mnemonic.NonVolatileMemAllocator
+import org.apache.mnemonic.{ConfigurationException, DurableType, EntityFactoryProxy, NonVolatileMemAllocator}
 import org.apache.mnemonic.sessions.ObjectCreator
 import org.apache.mnemonic.spark.MneDurableInputSession
 import org.apache.mnemonic.spark.MneDurableOutputSession
 import org.apache.mnemonic.spark.DurableException
+
+import scala.collection.mutable
 
 private[spark] class DurableRDD[D: ClassTag, T: ClassTag] (
   @transient private var _sc: SparkContext,
@@ -45,40 +46,47 @@ private[spark] class DurableRDD[D: ClassTag, T: ClassTag] (
 
   private val isInputOnly =  null == deps
 
-  private val durdddir = DurableRDD.getRddDirName(durableDirectory, id)
-  DurableRDD.resetRddDir(durdddir)
-
-  override val partitioner = if (preservesPartitioning) firstParent[T].partitioner else None
-
-  override protected def getPartitions: Array[Partition] = firstParent[T].partitions
-
-  def prepareDurablePartition(split: Partition, context: TaskContext,
-      iterator: Iterator[T]): Array[File] = {
-    val outsess = MneDurableOutputSession[D](serviceName,
-        durableTypes, entityFactoryProxies, slotKeyId,
-        partitionPoolSize, durdddir.toString,
-        DurableRDD.genDurableFileName(split.hashCode)_)
-    try {
-      for (item <- iterator) {
-        f(item, outsess) match {
-          case Some(res) => outsess.post(res)
-          case None =>
-        }
-      }
-    } finally {
-      outsess.close()
+  private var durdddir:String = _
+  if (isInputOnly) {
+    val dir = new File(durableDirectory)
+    if (!dir.exists) {
+      throw new ConfigurationException("Input directory does not exist")
     }
-    outsess.memPools.toArray
+    durdddir = durableDirectory
+  } else {
+    durdddir = DurableRDD.getRddDirName(durableDirectory, id)
+    DurableRDD.resetRddDir(durdddir)
+  }
+
+  override val partitioner = if (!isInputOnly && preservesPartitioning) firstParent[T].partitioner else None
+
+  override protected def getPartitions: Array[Partition] = {
+    if (isInputOnly) {
+      val ret = DurableRDD.collectMemPoolPartitionList(durdddir).getOrElse(Array[Partition]())
+      if (ret.isEmpty) {
+        logInfo(s"Not found any partitions in the directory ${durdddir}")
+      }
+      ret
+    } else {
+      firstParent[T].partitions
+    }
   }
 
   override def compute(split: Partition, context: TaskContext): Iterator[D] = {
     val mempListOpt: Option[Array[File]] =
-      DurableRDD.collectMemPoolFileList(durdddir.toString, DurableRDD.genDurableFileName(split.hashCode)_)
+      DurableRDD.collectMemPoolFileList(durdddir, DurableRDD.genDurableFileName(context.partitionId)_)
     val memplist = mempListOpt match {
       case None => {
-        val mplst = prepareDurablePartition(split, context, firstParent[T].iterator(split, context))
-        logInfo(s"Done transformed RDD #${firstParent[T].id} to durableRDD #${id} on ${durdddir.toString}")
-        mplst
+        if (isInputOnly) {
+          logInfo(s"Not found any mem pool files related to the partition #${context.partitionId}")
+          Array[File]()
+        } else {
+          val mplst = DurableRDD.prepareDurablePartition[D, T](durdddir,
+            serviceName, durableTypes, entityFactoryProxies, slotKeyId,
+            partitionPoolSize, f)(context, firstParent[T].iterator(split, context))
+          logInfo(s"Done transformed RDD #${firstParent[T].id} to durableRDD #${id} on ${durdddir}")
+          mplst
+        }
       }
       case Some(mplst) => mplst
     }
@@ -104,6 +112,7 @@ object DurableRDD {
 
   val durableSubDirNameTemplate = "durable-rdd-%010d"
   val durableFileNameTemplate = "mem_%010d_%010d.mne"
+  val durableFileNamePartitionRegex = raw"mem_(\d{10})_0000000000.mne".r
 
   private var durableDir: Option[String] = None
 
@@ -146,21 +155,38 @@ object DurableRDD {
   }
 
   def createRddDir(rddDirName: String) {
-    val durdddir = new File(rddDirName)
-    if (!durdddir.mkdir) {
-      throw new DurableException(s"Durable RDD directory ${durdddir.toString} cannot be created")
+    val dir = new File(rddDirName)
+    if (!dir.mkdir) {
+      throw new DurableException(s"Durable RDD directory ${dir.toString} cannot be created")
     }
   }
 
   def deleteRddDir(rddDirName: String) {
-    val durdddir = new File(rddDirName)
-    if (durdddir.exists) {
-      FileUtils.deleteDirectory(durdddir)
+    val dir = new File(rddDirName)
+    if (dir.exists) {
+      FileUtils.deleteDirectory(dir)
     }
   }
 
-  def genDurableFileName(splitId: Int)(mempidx: Long): String = {
+  def genDurableFileName(splitId: Long)(mempidx: Long): String = {
     durableFileNameTemplate.format(splitId, mempidx)
+  }
+
+  def collectMemPoolPartitionList(path: String): Option[Array[Partition]] = {
+    val paridset = new mutable.TreeSet[Int]
+    val dir = new File(path)
+    if (dir.isDirectory) {
+      val flst = dir.listFiles.filter(_.isDirectory)
+      for (file <- flst) {
+        file.toString match {
+          case durableFileNamePartitionRegex(paridx) => {
+            paridset += paridx.toInt
+          }
+          case _ =>
+        }
+      }
+    }
+    Option(paridset.toArray.map(x => new Partition { val index = x }))
   }
 
   def collectMemPoolFileList(durddir: String, memFileNameGen: (Long)=>String): Option[Array[File]] = {
@@ -184,6 +210,29 @@ object DurableRDD {
     }
   }
 
+  def prepareDurablePartition[D: ClassTag, T: ClassTag] (path: String,
+                              serviceName: String, durableTypes: Array[DurableType],
+                              entityFactoryProxies: Array[EntityFactoryProxy], slotKeyId: Long,
+                              partitionPoolSize: Long,
+                              func: (T, ObjectCreator[D, NonVolatileMemAllocator]) => Option[D]
+                             ) (context: TaskContext, iterator: Iterator[T]): Array[File] = {
+    val outsess = MneDurableOutputSession[D](serviceName,
+      durableTypes, entityFactoryProxies, slotKeyId,
+      partitionPoolSize, path,
+      genDurableFileName(context.partitionId)_)
+    try {
+      for (item <- iterator) {
+        func(item, outsess) match {
+          case Some(res) => outsess.post(res)
+          case None =>
+        }
+      }
+    } finally {
+      outsess.close()
+    }
+    outsess.memPools.toArray
+  }
+
   def apply[D: ClassTag, T: ClassTag] (
       rdd: RDD[T],
       serviceName: String, durableTypes: Array[DurableType],
@@ -191,21 +240,22 @@ object DurableRDD {
       partitionPoolSize: Long,
       f: (T, ObjectCreator[D, NonVolatileMemAllocator]) => Option[D],
       preservesPartitioning: Boolean = false) = {
-//    val sc: SparkContext = rdd.context
+    val sc: SparkContext = rdd.context
+    val cleanF = f // sc.clean(f)
     val ret = new DurableRDD[D, T](rdd.context , List(new OneToOneDependency(rdd)),
       serviceName, durableTypes, entityFactoryProxies, slotKeyId,
-      partitionPoolSize, getDurableDir(rdd.context).get, f, preservesPartitioning)
+      partitionPoolSize, getDurableDir(sc).get, cleanF, preservesPartitioning)
     //sc.cleaner.foreach(_.registerRDDForCleanup(ret))
     ret
   }
 
   def apply[D: ClassTag] (
-      sc: SparkContext, pathname: String,
+      sc: SparkContext, path: String,
       serviceName: String, durableTypes: Array[DurableType],
       entityFactoryProxies: Array[EntityFactoryProxy], slotKeyId: Long) = {
     val ret = new DurableRDD[D, Unit](sc, null,
       serviceName, durableTypes, entityFactoryProxies, slotKeyId,
-      1024*1024*1024L, pathname, null)
+      1024*1024*1024L, path, null)
     ret
   }
 

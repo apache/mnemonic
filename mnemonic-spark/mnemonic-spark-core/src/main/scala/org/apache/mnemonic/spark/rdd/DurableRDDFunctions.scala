@@ -17,6 +17,7 @@
 
 package org.apache.mnemonic.spark.rdd
 
+import java.io.File
 import org.apache.spark.rdd.RDD
 import scala.reflect.ClassTag
 import scala.language.implicitConversions
@@ -40,14 +41,22 @@ class DurableRDDFunctions[T: ClassTag](rdd: RDD[T]) extends Serializable {
       partitionPoolSize, f, preservesPartitioning)
   }
 
-  def saveAsMnemonic[D: ClassTag] (dir: String,
+  def saveAsMnemonic[D: ClassTag] (path: String,
                      serviceName: String,
                      durableTypes: Array[DurableType],
                      entityFactoryProxies: Array[EntityFactoryProxy],
                      slotKeyId: Long,
                      partitionPoolSize: Long,
                      f: (T, ObjectCreator[D, NonVolatileMemAllocator]) => Option[D]) {
-    //TODO: implement export operationl
+    val dir = new File(path)
+    if (!dir.exists) {
+      dir.mkdir
+    }
+    val cleanF = f // rdd.context.clean(f)
+    val func = DurableRDD.prepareDurablePartition[D, T] (path,
+      serviceName, durableTypes, entityFactoryProxies, slotKeyId,
+      partitionPoolSize, cleanF)_
+    rdd.context.runJob(rdd, func)
   }
 }
 

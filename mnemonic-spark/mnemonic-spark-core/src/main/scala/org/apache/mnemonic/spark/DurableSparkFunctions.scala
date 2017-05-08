@@ -17,7 +17,6 @@
 
 package org.apache.mnemonic.spark
 
-import org.apache.spark.rdd.RDD
 import org.apache.spark._
 import scala.reflect.ClassTag
 import scala.language.implicitConversions
@@ -27,12 +26,12 @@ import org.apache.mnemonic.spark.rdd.DurableRDD
 
 class DurableSparkFunctions(sc: SparkContext) extends Serializable {
 
-  def mnemonic[D: ClassTag] (pathname: String,
+  def mnemonic[D: ClassTag] (path: String,
                      serviceName: String,
                      durableTypes: Array[DurableType],
                      entityFactoryProxies: Array[EntityFactoryProxy],
                      slotKeyId: Long) = {
-    DurableRDD[D](sc, pathname: String,
+    DurableRDD[D](sc, path: String,
       serviceName, durableTypes, entityFactoryProxies, slotKeyId)
   }
 }
