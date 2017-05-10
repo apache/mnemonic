@@ -32,7 +32,7 @@ import java.util.Map;
 import org.apache.commons.lang3.tuple.Pair;
 
 public abstract class DurableOutputSession<V, A extends RestorableAllocator<A>>
-    implements OutputSession<V, A>, DurableComputable<A> {
+    implements OutputSession<V, A> {
 
   private long poolSize;
   private String serviceName;

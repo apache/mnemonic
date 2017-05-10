@@ -23,7 +23,7 @@ import java.io.Closeable;
 import org.apache.mnemonic.RestorableAllocator;
 
 public interface OutputSession<V, A extends RestorableAllocator<A>>
-    extends ObjectCreator<V, A>, Closeable {
+    extends ObjectCreator<V, A>, DurableComputable<A>, Closeable {
 
   void post(V v);
 
