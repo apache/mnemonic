@@ -208,7 +208,8 @@ Please see the file LICENSE for information on how this library is licensed.
 * **mnemonic-memory-services/service-dist** -- the location of extensive memory services (auto-generated)
 * **mnemonic-computing-services/mnemonic-utilities-service** -- the submodule project for utilities computing service
 * **mnemonic-computing-services/service-dist** -- the location of extensive computing services (auto-generated)
-* **mnemonic-hadoop/mnemonic-hadoop-mapreduce** -- the submodule project for hadoop mapreduce computing
+* **mnemonic-hadoop/mnemonic-hadoop-mapreduce** -- the submodule project for Apache Hadoop mapreduce computing
+* **mnemonic-spark/mnemonic-spark-core** -- the submodule project for Apache Spark durable computing
 
 
 #### Durable Memory Service Comparison Table
