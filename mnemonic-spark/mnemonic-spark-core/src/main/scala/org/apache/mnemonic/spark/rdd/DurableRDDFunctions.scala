@@ -25,6 +25,7 @@ import org.apache.mnemonic.NonVolatileMemAllocator
 import org.apache.mnemonic.DurableType
 import org.apache.mnemonic.EntityFactoryProxy
 import org.apache.mnemonic.sessions.ObjectCreator
+import org.apache.commons.io.FileUtils
 
 class DurableRDDFunctions[T: ClassTag](rdd: RDD[T]) extends Serializable {
 
@@ -41,7 +42,7 @@ class DurableRDDFunctions[T: ClassTag](rdd: RDD[T]) extends Serializable {
       partitionPoolSize, f, preservesPartitioning)
   }
 
-  def saveAsMnemonic[D: ClassTag] (path: String,
+  def saveAsMnemonic[D: ClassTag] (path: String, cleanPath: Boolean,
                      serviceName: String,
                      durableTypes: Array[DurableType],
                      entityFactoryProxies: Array[EntityFactoryProxy],
@@ -49,6 +50,9 @@ class DurableRDDFunctions[T: ClassTag](rdd: RDD[T]) extends Serializable {
                      partitionPoolSize: Long,
                      f: (T, ObjectCreator[D, NonVolatileMemAllocator]) => Option[D]) {
     val dir = new File(path)
+    if (cleanPath && dir.exists) {
+      FileUtils.deleteDirectory(dir)
+    }
     if (!dir.exists) {
       dir.mkdir
     }
@@ -61,5 +65,5 @@ class DurableRDDFunctions[T: ClassTag](rdd: RDD[T]) extends Serializable {
 }
 
 object DurableRDDFunctions {
-  implicit def addDurableFunctions[T: ClassTag](rdd: RDD[T]) = new DurableRDDFunctions[T](rdd)
+  implicit def addDurableRDDFunctions[T: ClassTag](rdd: RDD[T]) = new DurableRDDFunctions[T](rdd)
 }

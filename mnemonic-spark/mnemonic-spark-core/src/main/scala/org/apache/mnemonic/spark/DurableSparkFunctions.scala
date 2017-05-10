@@ -37,5 +37,5 @@ class DurableSparkFunctions(sc: SparkContext) extends Serializable {
 }
 
 object DurableSparkFunctions {
-  implicit def addDurableFunctions(sc: SparkContext) = new DurableSparkFunctions(sc)
+  implicit def addDurableSparkFunctions(sc: SparkContext) = new DurableSparkFunctions(sc)
 }
