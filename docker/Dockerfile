@@ -66,7 +66,7 @@ RUN cd /ws && git clone https://github.com/apache/incubator-mnemonic.git && \
 
 ENV MNEMONIC_HOME /ws/incubator-mnemonic
 
-RUN cd /ws/incubator-mnemonic && build-tools/runall.sh -y
+#RUN cd /ws/incubator-mnemonic && build-tools/runall.sh -y
 
 WORKDIR /ws
 CMD ["bash"]
