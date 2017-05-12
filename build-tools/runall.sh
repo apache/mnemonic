@@ -16,6 +16,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+ARGCONFIRMED=false
+
+while getopts ":y" opt; do
+  case $opt in
+    y)
+      ARGCONFIRMED=true
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      ;;
+  esac
+done
 
 continueprompt() {
     while true; do
@@ -35,7 +47,13 @@ fi
 pushd "$MNEMONIC_HOME" || { echo "the environment variable \$MNEMONIC_HOME contains invalid home directory of Mnemonic project."; exit 11; }
 
 echo [INFO] Cleaning up and re-building...
-git ls-files --error-unmatch pom.xml > /dev/null 2>&1 && continueprompt "Please make sure all source codes have already been checked in or backed up otherwise un-checked files would be purged" && git clean -xdf > /dev/null
+git ls-files --error-unmatch pom.xml > /dev/null 2>&1; rc=$?
+if [[ $rc == 0 ]]; then
+  if [[ "$ARGCONFIRMED" == "false" ]]; then
+    continueprompt "Please make sure all source codes have already been checked in or backed up otherwise un-checked files would be purged"
+  fi
+  git clean -xdf > /dev/null
+fi
 
 if [ ! -d "testlog" ]
 then
