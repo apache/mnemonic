@@ -18,16 +18,15 @@
 FROM centos:latest
 MAINTAINER Gang Wang (garyw@apache.org)
 
-#set up your proxy below, refer to readme in the Docker folder
-ENV proxy_host ""
-ENV proxy_port ""
-#ENV http_proxy "http://${proxy_host}:${proxy_port}"
-#ENV https_proxy ${http_proxy}
-#ENV HTTP_PROXY ${http_proxy}
-#ENV HTTPS_PROXY ${http_proxy}
-#ENV proxy ${http_proxy}
+#set up your proxy below, please refer to readme in the Docker folder
+ARG proxy_host=""
+ARG proxy_port=""
+ENV http_proxy ${proxy_host:+"http://${proxy_host}:${proxy_port}"}
+ENV https_proxy ${http_proxy}
+ENV HTTP_PROXY ${http_proxy}
+ENV HTTPS_PROXY ${http_proxy}
 
-RUN echo $proxy
+RUN echo The proxy set : ${http_proxy}
 
 RUN curl -sSL https://s3.amazonaws.com/download.fpcomplete.com/centos/7/fpco.repo | tee /etc/yum.repos.d/fpco.repo
 
