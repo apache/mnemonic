@@ -42,6 +42,11 @@ public class PMemServiceImpl implements NonVolatileMemoryAllocatorService {
   }
 
   @Override
+  public long adjustCapacity(long id, long reserve) {
+    throw new UnsupportedOperationException("Unsupported to reduce capacity of this memory service");
+  }
+
+  @Override
   public void close(long id) {
     nclose(id);
   }

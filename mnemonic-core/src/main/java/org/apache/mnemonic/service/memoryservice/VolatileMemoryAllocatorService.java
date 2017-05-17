@@ -135,6 +135,19 @@ public interface VolatileMemoryAllocatorService {
   long init(long capacity, String uri, boolean isnew);
 
   /**
+   * Adjust the capacity of a memory pool
+   *
+   * @param id
+   *         specify the id of underlying native allocator
+   *
+   * @param reserve
+   *         reserve certain amount of memory space in tail for use
+   *
+   * @return the new capacity
+   */
+  long adjustCapacity(long id, long reserve);
+
+  /**
    * close the memory pool through native interface.
    *
    * @param id
