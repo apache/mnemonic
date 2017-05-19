@@ -30,10 +30,28 @@ public interface Allocator<A extends CommonAllocator<A>> extends Allocatable<A> 
   void close();
 
   /**
-   * sync. dirty data to underlying memory-like device
+   * sync. dirty data to memory
    *
    */
-  void sync();
+  void sync(long addr, long length, boolean autodetect);
+
+  /**
+   * sync. a buffer to memory.
+   *
+   * @param mbuf
+   *         specify a buffer to be sync.
+   */
+  void sync(MemBufferHolder<A> mbuf);
+
+  /**
+   * sync. a chunk to memory.
+   *
+   * @param mchunk
+   *         specify a chunk to be sync.
+   */
+  void sync(MemChunkHolder<A> mchunk);
+
+  void syncAll();
 
   /**
    * enable active garbage collection. the GC will be forced to collect garbages

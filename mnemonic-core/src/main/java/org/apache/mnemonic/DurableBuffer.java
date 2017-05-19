@@ -20,9 +20,13 @@ package org.apache.mnemonic;
 import java.nio.ByteBuffer;
 
 public class DurableBuffer<A extends RetrievableAllocator<A>> extends MemBufferHolder<A> implements Durable {
+  protected Persistence<A> m_persistOps = null;
 
   public DurableBuffer(A ar, ByteBuffer mres) {
     super(ar, mres);
+    if (ar instanceof Persistence) {
+      m_persistOps = (Persistence<A>) ar;
+    }
   }
 
   @Override
@@ -40,6 +44,34 @@ public class DurableBuffer<A extends RetrievableAllocator<A>> extends MemBufferH
   @Override
   public long getHandler() {
     return m_allocator.getBufferHandler(this);
+  }
+
+  /**
+   * sync. this object
+   */
+  @Override
+  public void sync() {
+    m_allocator.sync(this);
+  }
+
+  /**
+   * Make any cached changes to this object persistent.
+   */
+  @Override
+  public void persist() {
+    if (null != m_persistOps) {
+      m_persistOps.persist(this);
+    }
+  }
+
+  /**
+   * flush processors cache for this object
+   */
+  @Override
+  public void flush() {
+    if (null != m_persistOps) {
+      m_persistOps.flush(this);
+    }
   }
 
   @Override

@@ -141,12 +141,12 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
   }
 
   /**
-   * force to synchronize uncommitted data to backed memory pool (this is a
-   * placeholder).
+   * force to synchronize uncommitted data to memory.
    *
    */
   @Override
-  public void sync() {
+  public void sync(long addr, long length, boolean autodetect) {
+    m_vmasvc.sync(m_nid, addr, length, autodetect);
   }
 
   /**
@@ -367,21 +367,23 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
   }
 
   /**
-   * sync. a buffer to underlying memory device.
-   * 
+   * sync. a buffer to memory.
+   *
    * @param mbuf
    *         specify a buffer to be sync.
    */
+  @Override
   public void sync(MemBufferHolder<VolatileMemAllocator> mbuf) {
     m_vmasvc.sync(m_nid, getBufferAddress(mbuf), 0L, true);
   }
 
   /**
-   * sync. a chunk to underlying memory device.
-   * 
+   * sync. a chunk to memory.
+   *
    * @param mchunk
    *         specify a chunk to be sync.
    */
+  @Override
   public void sync(MemChunkHolder<VolatileMemAllocator> mchunk) {
     m_vmasvc.sync(m_nid, getChunkAddress(mchunk), 0L, true);
   }
@@ -389,6 +391,7 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
   /**
    * sync. the memory pool to underlying memory device.
    */
+  @Override
   public void syncAll() {
     m_vmasvc.sync(m_nid, 0L, 0L, true);
   }

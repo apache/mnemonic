@@ -149,12 +149,40 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
   }
 
   /**
-   * force to synchronize uncommitted data to backed memory pool (this is a
-   * placeholder).
+   * sync. dirty data to memory
    *
+   * @param addr
+   * @param length
+   * @param autodetect
    */
   @Override
-  public void sync() {
+  public void sync(long addr, long length, boolean autodetect) {
+    throw new UnsupportedOperationException("SysMemAllocator doesn't support sync");
+  }
+
+  /**
+   * sync. a buffer to memory.
+   *
+   * @param mbuf specify a buffer to be sync.
+   */
+  @Override
+  public void sync(MemBufferHolder<SysMemAllocator> mbuf) {
+    throw new UnsupportedOperationException("SysMemAllocator doesn't support sync");
+  }
+
+  /**
+   * sync. a chunk to memory.
+   *
+   * @param mchunk specify a chunk to be sync.
+   */
+  @Override
+  public void sync(MemChunkHolder<SysMemAllocator> mchunk) {
+    throw new UnsupportedOperationException("SysMemAllocator doesn't support sync");
+  }
+
+  @Override
+  public void syncAll() {
+    throw new UnsupportedOperationException("SysMemAllocator doesn't support sync");
   }
 
   /**

@@ -105,7 +105,7 @@ public class AnnotatedDurableEntityClass {
   private TypeName m_factoryproxystypename = TypeName.get(EntityFactoryProxy[].class);
   private TypeName m_gfieldstypename = TypeName.get(DurableType[].class);
   private TypeVariableName m_alloctypevarname = TypeVariableName.get(cALLOCTYPENAME,
-      ParameterizedTypeName.get(ClassName.get(RestorableAllocator.class), TypeVariableName.get(cALLOCTYPENAME)));
+      ParameterizedTypeName.get(ClassName.get(RestorableAllocator.class), m_alloctypename));
 
   private Map<String, MethodInfo> m_gettersinfo = new HashMap<String, MethodInfo>();
   private Map<String, MethodInfo> m_settersinfo = new HashMap<String, MethodInfo>();
@@ -186,6 +186,9 @@ public class AnnotatedDurableEntityClass {
     m_durablemtdinfo.put("getHandler", new MethodInfo());
     m_durablemtdinfo.put("autoReclaim", new MethodInfo());
     m_durablemtdinfo.put("destroy", new MethodInfo());
+    m_durablemtdinfo.put("sync", new MethodInfo());
+    m_durablemtdinfo.put("persist", new MethodInfo());
+    m_durablemtdinfo.put("flush", new MethodInfo());
     m_durablemtdinfo.put("getNativeFieldInfo", new MethodInfo());
 
     m_entitymtdinfo.put("initializeDurableEntity", new MethodInfo());
@@ -223,7 +226,7 @@ public class AnnotatedDurableEntityClass {
 
     fieldinfo = new FieldInfo();
     fieldinfo.name = String.format("m_holder_%s", Utils.genRandomString());
-    fieldinfo.type = ParameterizedTypeName.get(ClassName.get(MemChunkHolder.class), m_alloctypename);
+    fieldinfo.type = ParameterizedTypeName.get(ClassName.get(DurableChunk.class), m_alloctypename);
     fieldinfo.specbuilder = FieldSpec.builder(fieldinfo.type, fieldinfo.name, Modifier.PRIVATE);
     m_fieldsinfo.put("holder", fieldinfo);
 
@@ -748,6 +751,15 @@ public class AnnotatedDurableEntityClass {
         break;
       case "autoReclaim":
         code.addStatement("return $1N", autoreclaimname);
+        break;
+      case "sync":
+        code.addStatement("$1N.sync()", holdername);
+        break;
+      case "persist":
+        code.addStatement("$1N.persist()", holdername);
+        break;
+      case "flush":
+        code.addStatement("$1N.flush()", holdername);
         break;
       case "destroy":
         for (String fname : m_dynfieldsinfo.keySet()) {

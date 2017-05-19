@@ -29,7 +29,7 @@ import org.flowcomputing.commons.resgc.ResReclaim;
  *
  */
 public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemAllocator>
-    implements AddressTranslator {
+    implements AddressTranslator, Persistence<NonVolatileMemAllocator> {
 
   private boolean m_activegc = true;
   private long m_gctimeout = 100;
@@ -145,12 +145,12 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
   }
 
   /**
-   * force to synchronize uncommitted data to backed memory pool (this is a
-   * placeholder).
+   * force to synchronize uncommitted data to memory.
    *
    */
   @Override
-  public void sync() {
+  public void sync(long addr, long length, boolean autodetect) {
+    m_nvmasvc.sync(m_nid, addr, length, autodetect);
   }
 
   /**
@@ -376,20 +376,22 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
 
   /**
    * sync. a buffer to underlying memory device.
-   * 
+   *
    * @param mbuf
    *         specify a buffer to be sync.
    */
+  @Override
   public void sync(MemBufferHolder<NonVolatileMemAllocator> mbuf) {
     m_nvmasvc.sync(m_nid, getBufferAddress(mbuf), 0L, true);
   }
 
   /**
    * sync. a chunk to underlying memory device.
-   * 
+   *
    * @param mchunk
    *         specify a chunk to be sync.
    */
+  @Override
   public void sync(MemChunkHolder<NonVolatileMemAllocator> mchunk) {
     m_nvmasvc.sync(m_nid, getChunkAddress(mchunk), 0L, true);
   }
@@ -397,26 +399,53 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
   /**
    * sync. the memory pool to underlying memory device.
    */
+  @Override
   public void syncAll() {
     m_nvmasvc.sync(m_nid, 0L, 0L, true);
   }
 
   /**
+   * Make any cached changes to a memory resource persistent.
+   *
+   * @param addr       the address of a memory resource
+   * @param length     the length of the memory resource
+   * @param autodetect if NULL == address and autodetect : persist whole pool
+   */
+  @Override
+  public void persist(long addr, long length, boolean autodetect) {
+    m_nvmasvc.persist(m_nid, addr, length, autodetect);
+  }
+
+  /**
+   * flush processors cache for a memory resource
+   *
+   * @param addr       the address of a memory resource
+   * @param length     the length of the memory resource
+   * @param autodetect if NULL == address and autodetect : flush whole pool
+   */
+  @Override
+  public void flush(long addr, long length, boolean autodetect) {
+    m_nvmasvc.flush(m_nid, addr, length, autodetect);
+  }
+
+  /**
    * persist a buffer to persistent memory.
-   * 
+   *
    * @param mbuf
    *         specify a buffer to be persisted
    */
+  @Override
   public void persist(MemBufferHolder<NonVolatileMemAllocator> mbuf) {
     m_nvmasvc.persist(m_nid, getBufferAddress(mbuf), 0L, true);
   }
 
   /**
    * persist a chunk to persistent memory.
-   * 
+   *
    * @param mchunk
    *         specify a chunk to be persisted
    */
+  @Override
   public void persist(MemChunkHolder<NonVolatileMemAllocator> mchunk) {
     m_nvmasvc.persist(m_nid, getChunkAddress(mchunk), 0L, true);
   }
@@ -424,6 +453,7 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
   /**
    * persist the memory pool to persistent memory.
    */
+  @Override
   public void persistAll() {
     m_nvmasvc.persist(m_nid, 0L, 0L, true);
   }
@@ -434,6 +464,7 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
    * @param mbuf
    *         specify a buffer to be flushed
    */
+  @Override
   public void flush(MemBufferHolder<NonVolatileMemAllocator> mbuf) {
     m_nvmasvc.flush(m_nid, getBufferAddress(mbuf), 0L, true);
   }
@@ -444,6 +475,7 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
    * @param mchunk
    *         specify a chunk to be flushed
    */
+  @Override
   public void flush(MemChunkHolder<NonVolatileMemAllocator> mchunk) {
     m_nvmasvc.flush(m_nid, getChunkAddress(mchunk), 0L, true);
   }
@@ -451,6 +483,7 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
   /**
    * flush the memory pool to persistent memory.
    */
+  @Override
   public void flushAll() {
     m_nvmasvc.flush(m_nid, 0L, 0L, true);
   }
@@ -458,6 +491,7 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
   /**
    * drain memory caches to persistent memory.
    */
+  @Override
   public void drain() {
     m_nvmasvc.drain(m_nid);
   }

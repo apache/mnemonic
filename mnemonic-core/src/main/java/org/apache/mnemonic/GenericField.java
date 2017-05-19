@@ -31,10 +31,11 @@ public class GenericField<A extends RestorableAllocator<A>, E> implements Durabl
   private long m_fpos;
   private DurableType m_dgftype = null;
   private Durable m_field = null;
-  private MemBufferHolder<A> m_strfield = null;
+  private DurableBuffer<A> m_strfield = null;
   private DurableChunk<A> m_chunkfield = null;
   private DurableBuffer<A> m_bufferfield = null;
   private A m_allocator;
+  private Persistence<A> m_persistOps = null;
   private boolean m_autoreclaim;
   private EntityFactoryProxy m_defproxy = null;
   private EntityFactoryProxy[] m_efproxies;
@@ -79,6 +80,9 @@ public class GenericField<A extends RestorableAllocator<A>, E> implements Durabl
     m_gftypes = gftypes;
     m_defproxy = defproxy;
     m_dgftype = dgftype;
+    if (m_allocator instanceof Persistence) {
+      m_persistOps = (Persistence<A>) m_allocator;
+    }
   }
 
   /**
@@ -355,6 +359,171 @@ public class GenericField<A extends RestorableAllocator<A>, E> implements Durabl
   @Override
   public boolean autoReclaim() {
     return m_autoreclaim;
+  }
+
+  /**
+   * sync. this generic field
+   */
+  @Override
+  public void sync() {
+    if (null != m_allocator) {
+      switch (m_dgftype) {
+        case BYTE:
+          m_allocator.sync(m_fpos, Byte.BYTES, false);
+          break;
+        case BOOLEAN:
+          m_allocator.sync(m_fpos, Byte.BYTES, false);
+          break;
+        case CHARACTER:
+          m_allocator.sync(m_fpos, Character.BYTES, false);
+          break;
+        case SHORT:
+          m_allocator.sync(m_fpos, Short.BYTES, false);
+          break;
+        case INTEGER:
+          m_allocator.sync(m_fpos, Integer.BYTES, false);
+          break;
+        case LONG:
+          m_allocator.sync(m_fpos, Long.BYTES, false);
+          break;
+        case FLOAT:
+          m_allocator.sync(m_fpos, Float.BYTES, false);
+          break;
+        case DOUBLE:
+          m_allocator.sync(m_fpos, Double.BYTES, false);
+          break;
+        case STRING:
+          if (null != m_strfield) {
+            m_strfield.sync();
+          }
+          break;
+        case DURABLE:
+          if (null != m_field) {
+            m_field.sync();
+          }
+          break;
+        case CHUNK:
+          if (null != m_chunkfield) {
+            m_chunkfield.sync();
+          }
+          break;
+        case BUFFER:
+          if (null != m_bufferfield) {
+            m_bufferfield.sync();
+          }
+          break;
+      }
+    }
+  }
+
+  /**
+   * Make any cached changes to this generic field persistent.
+   */
+  @Override
+  public void persist() {
+    if (null != m_persistOps) {
+      switch (m_dgftype) {
+        case BYTE:
+          m_persistOps.persist(m_fpos, Byte.BYTES, false);
+          break;
+        case BOOLEAN:
+          m_persistOps.persist(m_fpos, Byte.BYTES, false);
+          break;
+        case CHARACTER:
+          m_persistOps.persist(m_fpos, Character.BYTES, false);
+          break;
+        case SHORT:
+          m_persistOps.persist(m_fpos, Short.BYTES, false);
+          break;
+        case INTEGER:
+          m_persistOps.persist(m_fpos, Integer.BYTES, false);
+          break;
+        case LONG:
+          m_persistOps.persist(m_fpos, Long.BYTES, false);
+          break;
+        case FLOAT:
+          m_persistOps.persist(m_fpos, Float.BYTES, false);
+          break;
+        case DOUBLE:
+          m_persistOps.persist(m_fpos, Double.BYTES, false);
+          break;
+        case STRING:
+          if (null != m_strfield) {
+            m_strfield.persist();
+          }
+          break;
+        case DURABLE:
+          if (null != m_field) {
+            m_field.persist();
+          }
+          break;
+        case CHUNK:
+          if (null != m_chunkfield) {
+            m_chunkfield.persist();
+          }
+          break;
+        case BUFFER:
+          if (null != m_bufferfield) {
+            m_bufferfield.persist();
+          }
+          break;
+      }
+    }
+  }
+
+  /**
+   * flush processors cache for this generic field
+   */
+  @Override
+  public void flush() {
+    if (null != m_persistOps) {
+      switch (m_dgftype) {
+        case BYTE:
+          m_persistOps.flush(m_fpos, Byte.BYTES, false);
+          break;
+        case BOOLEAN:
+          m_persistOps.flush(m_fpos, Byte.BYTES, false);
+          break;
+        case CHARACTER:
+          m_persistOps.flush(m_fpos, Character.BYTES, false);
+          break;
+        case SHORT:
+          m_persistOps.flush(m_fpos, Short.BYTES, false);
+          break;
+        case INTEGER:
+          m_persistOps.flush(m_fpos, Integer.BYTES, false);
+          break;
+        case LONG:
+          m_persistOps.flush(m_fpos, Long.BYTES, false);
+          break;
+        case FLOAT:
+          m_persistOps.flush(m_fpos, Float.BYTES, false);
+          break;
+        case DOUBLE:
+          m_persistOps.flush(m_fpos, Double.BYTES, false);
+          break;
+        case STRING:
+          if (null != m_strfield) {
+            m_strfield.flush();
+          }
+          break;
+        case DURABLE:
+          if (null != m_field) {
+            m_field.flush();
+          }
+          break;
+        case CHUNK:
+          if (null != m_chunkfield) {
+            m_chunkfield.flush();
+          }
+          break;
+        case BUFFER:
+          if (null != m_bufferfield) {
+            m_bufferfield.flush();
+          }
+          break;
+      }
+    }
   }
 
   /**

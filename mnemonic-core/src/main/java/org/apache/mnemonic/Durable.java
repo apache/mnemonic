@@ -81,6 +81,21 @@ public interface Durable {
   boolean autoReclaim();
 
   /**
+   * sync. this object
+   */
+  void sync();
+
+  /**
+   * Make any cached changes to this object persistent.
+   */
+  void persist();
+
+  /**
+   * flush processors cache for this object
+   */
+  void flush();
+
+  /**
    * manually destroy this object and release its memory resource
    *
    */

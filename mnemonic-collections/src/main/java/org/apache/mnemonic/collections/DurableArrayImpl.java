@@ -134,6 +134,30 @@ public class DurableArrayImpl<A extends RestorableAllocator<A>, E>
     return autoReclaim;
   }
 
+  /**
+   * sync. this object
+   */
+  @Override
+  public void sync() {
+
+  }
+
+  /**
+   * Make any cached changes to this object persistent.
+   */
+  @Override
+  public void persist() {
+
+  }
+
+  /**
+   * flush processors cache for this object
+   */
+  @Override
+  public void flush() {
+
+  }
+
   @Override
   public long[][] getNativeFieldInfo() {
     return fieldInfo;
