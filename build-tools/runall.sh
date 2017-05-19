@@ -50,9 +50,13 @@ echo [INFO] Cleaning up and re-building...
 git ls-files --error-unmatch pom.xml > /dev/null 2>&1; rc=$?
 if [[ $rc == 0 ]]; then
   if [[ "$ARGCONFIRMED" == "false" ]]; then
-    continueprompt "Please make sure all source codes have already been checked in or backed up otherwise un-checked files would be purged"
+    if [[ -n $(git status -s) ]]; then
+      echo "There are uncommitted or un-tracked files, please make sure it is clean or adding option -y to run."
+      exit 22
+    fi
   fi
-  git clean -xdf > /dev/null
+  echo "Starting to clean unrelated files..."
+  git clean -xdf -e .idea/ -e "**/*.iml" -e .classpath -e .settings/ -e .project > /dev/null
 fi
 
 if [ ! -d "testlog" ]
