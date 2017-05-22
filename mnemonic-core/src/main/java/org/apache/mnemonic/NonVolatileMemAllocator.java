@@ -497,47 +497,6 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
   }
 
   /**
-   * determine whether the allocator supports transaction feature or not
-   *
-   * @return true if supported
-   */
-  @Override
-  public boolean supportTransaction() {
-    return false;
-  }
-
-  /**
-   * start a application level transaction on this allocator. (it is a place
-   * holder)
-   *
-   */
-  @Override
-  public void beginTransaction() {
-    throw new UnsupportedOperationException("Transaction Unsupported.");
-  }
-
-  /**
-   * end a application level transaction on this allocator. (it is a place
-   * holder)
-   *
-   */
-  @Override
-  public void endTransaction() {
-    throw new UnsupportedOperationException("Transaction Unsupported.");
-  }
-
-  /**
-   * determine whether the allocator does atomic operations on memory pool
-   *
-   * @return true if it does
-   *
-   */
-  @Override
-  public boolean isAtomicOperation() {
-    return false;
-  }
-
-  /**
    * set a handler on key.
    * 
    * @param key
@@ -633,4 +592,40 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
     m_ttable = tbl;
   }
 
+  /**
+   * start a transaction
+   *
+   * @param readOnly 
+   *          specify if the transaction is readonly
+   */
+  @Override
+  public void begin(boolean readOnly) {
+    m_nvmasvc.beginTransaction(readOnly);
+  }
+
+  /**
+   * commit current transaction.
+   */
+  @Override
+  public void commit() {
+    m_nvmasvc.commitTransaction();
+  }
+
+  /**
+   * abort current transaction
+   */
+  @Override
+  public void abort() {
+    m_nvmasvc.abortTransaction();
+  }
+
+  /**
+   * determine if in a transaction
+   *
+   * @return the true if it is in a transaction
+   */
+  @Override
+  public boolean isInTransaction() {
+    return m_nvmasvc.isInTransaction();
+  }
 }

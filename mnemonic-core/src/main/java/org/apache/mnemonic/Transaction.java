@@ -14,36 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.mnemonic;
 
 public interface Transaction {
 
   /**
-   * determine whether the allocator supports transaction feature or not
-   *
-   * @return true if supported
+   * start a transaction
+   * @param readOnly
+   *          specify if the transaction is readonly
    */
-  boolean supportTransaction();
+  void begin(boolean readOnly);
 
   /**
-   * determine whether the allocator does atomic operations on memory pool
-   *
-   * @return true if it does
+   * commit current transaction.
    *
    */
-  boolean isAtomicOperation();
+  void commit();
 
   /**
-   * start a application level transaction on this allocator.
-   *
+   * abort current transaction
    */
-  void beginTransaction();
+  void abort();
 
   /**
-   * end a application level transaction on this allocator.
-   *
+   * determine if in a transaction
+   * @return the true if it is in a transaction
    */
-  void endTransaction();
+  boolean isInTransaction();
 
 }

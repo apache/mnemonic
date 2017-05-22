@@ -273,4 +273,28 @@ public interface VolatileMemoryAllocatorService {
    *          the specified ByteBuffer object to be destroyed
    */
   void destroyByteBuffer(long id, ByteBuffer bytebuf);
+
+  /**
+   * begin a transaction
+   * @param readOnly
+   *          specify if the transaction is readonly
+   */
+  void beginTransaction(boolean readOnly);
+
+  /**
+   * commit current transaction
+   */
+  void commitTransaction();
+
+  /**
+   * abort current transaction
+   */
+  void abortTransaction();
+
+  /**
+   * determine if in a transaction
+   * @return the true if it is in a transaction
+   */
+  boolean isInTransaction();
+
 }

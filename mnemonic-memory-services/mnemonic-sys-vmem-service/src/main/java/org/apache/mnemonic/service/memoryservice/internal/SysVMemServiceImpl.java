@@ -134,6 +134,26 @@ public class SysVMemServiceImpl implements VolatileMemoryAllocatorService {
     //return ngetBaseAddress(id);
   }
 
+  @Override
+  public void beginTransaction(boolean readOnly) {
+    throw new UnsupportedOperationException("Not support transaction");
+  }
+
+  @Override
+  public void commitTransaction() {
+    throw new UnsupportedOperationException("Not support transaction");
+  }
+
+  @Override
+  public void abortTransaction() {
+    throw new UnsupportedOperationException("Not support transaction");
+  }
+
+  @Override
+  public boolean isInTransaction() {
+    throw new UnsupportedOperationException("Not support transaction");
+  }
+
   protected native long ninit(long capacity, String uri, boolean isnew);
 
   protected native void nclose(long id);
