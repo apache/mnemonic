@@ -65,5 +65,12 @@ Run image:
   $ docker run --name CONTAINER_NAME -it NAME[:TAG]
 ```
 
+### Sharing host project folder to Dock container for IDEs e.g. Eclipse, Intellij IDEA
+
+```bash
+  $ docker run -v <hostdir>/incubator-mnemonic:/ws/incubator-mnemonic -it NAME[:TAG]
+```
+Note: this command will override the container's project folder, you can use another name to avoid it.
+
  * More details please refer to [Docker run reference](https://docs.docker.com/engine/reference/run/)
 
