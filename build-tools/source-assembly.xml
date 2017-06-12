@@ -271,6 +271,7 @@
         <include>KEYS</include>
         <include>pom.xml</include>
         <include>build-tools/**</include>
+        <include>docker/**</include>
       </includes>
       <useDefaultExcludes>true</useDefaultExcludes>
     </fileSet>
