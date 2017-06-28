@@ -77,4 +77,17 @@ public class DurableChunk<A extends RetrievableAllocator<A>> extends MemChunkHol
     return null;
   }
 
+  /**
+   * Get a buffer backed by a region of DurableChunk
+   * @param offset
+   *          the start position of region
+   * @param size
+   *          the size of region
+   * @return
+   *          the ChunkBuffer to present the region of chunk
+   */
+  public ChunkBuffer getChunkBuffer(long offset, int size) {
+    return new ChunkBuffer(this, offset, size);
+  }
+
 }
