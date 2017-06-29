@@ -27,11 +27,13 @@ import java.nio.ByteOrder;
  */
 public class ChunkBuffer<A extends RetrievableAllocator<A>> {
 
+  protected DurableChunk<A> m_dchunk = null;
   protected ByteBuffer m_buffer = null;
 
   public ChunkBuffer(DurableChunk<A> dchunk, long offset, int size) {
     Field address, capacity;
-    if (size > 0 && offset >= 0
+    m_dchunk = dchunk;
+    if (null != dchunk && size > 0 && offset >= 0
             && offset + size <= dchunk.getSize()) {
       ByteBuffer bb = ByteBuffer.allocateDirect(0).order(ByteOrder.nativeOrder());
       try {
@@ -54,6 +56,10 @@ public class ChunkBuffer<A extends RetrievableAllocator<A>> {
 
   public ByteBuffer get() {
     return m_buffer;
+  }
+
+  public DurableChunk<A> getChunk() {
+    return m_dchunk;
   }
 }
 
