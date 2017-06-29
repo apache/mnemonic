@@ -31,7 +31,7 @@ public class ChunkBuffer<A extends RetrievableAllocator<A>> {
   protected ByteBuffer m_buffer = null;
 
   public ChunkBuffer(DurableChunk<A> dchunk, long offset, int size) {
-    Field address, capacity;
+    Field address, capacity, limit;
     m_dchunk = dchunk;
     if (null != dchunk && size > 0 && offset >= 0
             && offset + size <= dchunk.getSize()) {
@@ -41,8 +41,11 @@ public class ChunkBuffer<A extends RetrievableAllocator<A>> {
         address.setAccessible(true);
         capacity = Buffer.class.getDeclaredField("capacity");
         capacity.setAccessible(true);
+        limit = Buffer.class.getDeclaredField("limit");
+        limit.setAccessible(true);
         address.setLong(bb, dchunk.get() + offset);
         capacity.setInt(bb, size);
+        limit.setInt(bb, size);
         m_buffer = bb;
       } catch (NoSuchFieldException e) {
         throw new ConfigurationException("Buffer fields not found.");
