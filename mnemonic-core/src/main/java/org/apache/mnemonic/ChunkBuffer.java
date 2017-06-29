@@ -43,6 +43,7 @@ public class ChunkBuffer<A extends RetrievableAllocator<A>> {
         capacity.setAccessible(true);
         address.setLong(bb, dchunk.get() + offset);
         capacity.setInt(bb, size);
+        bb.limit(size);
         m_buffer = bb;
       } catch (NoSuchFieldException e) {
         throw new ConfigurationException("Buffer fields not found.");
