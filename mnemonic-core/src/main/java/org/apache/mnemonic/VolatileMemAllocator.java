@@ -52,10 +52,8 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
    * @param uri
    *          the location of memory pool will be created
    * 
-   * @param isnew
-   *          a place holder, always specify it as true
    */
-  public VolatileMemAllocator(VolatileMemoryAllocatorService vmasvc, long capacity, String uri, boolean isnew) {
+  public VolatileMemAllocator(VolatileMemoryAllocatorService vmasvc, long capacity, String uri) {
     if (null == vmasvc) {
       throw new IllegalArgumentException("VolatileMemoryAllocatorService object is null");
     }
@@ -64,7 +62,7 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
     }
 
     m_vmasvc = vmasvc;
-    m_nid = m_vmasvc.init(capacity, uri, isnew);
+    m_nid = m_vmasvc.init(capacity, uri, true);
 
     /**
      * create a resource collector to release specified bytebuffer that backed

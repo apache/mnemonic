@@ -65,7 +65,7 @@ public class Main {
         // true).disableActiveGC(),
         // MemClustering.PerformanceLevel.NORMAL),
         new MemClustering.NodeConfig(
-            new VolatileMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"), 1024 * 1024 * 20, ".", true),
+            new VolatileMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"), 1024 * 1024 * 20, "."),
             // Utils.getVolatileMemoryAllocatorService("pmalloc"),
             // 1024 * 1024 * 20, "./example.dat", true),
             MemClustering.PerformanceLevel.SLOW), };

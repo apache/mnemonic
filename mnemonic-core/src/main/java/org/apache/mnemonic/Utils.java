@@ -17,6 +17,7 @@
 
 package org.apache.mnemonic;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
@@ -525,5 +526,14 @@ public class Utils {
       ret_proxies = Arrays.copyOfRange(factoryproxies, len, factoryproxies.length);
     }
     return Pair.of(ret_gtypes, ret_proxies);
+  }
+
+  public static void deleteFileOnly(String pathname) {
+    File f = new File(pathname);
+    if (f.isFile()) {
+      if (!f.delete()) {
+        throw new ConfigurationException(String.format("Failure to delete the file %s.", pathname));
+      }
+    }
   }
 }

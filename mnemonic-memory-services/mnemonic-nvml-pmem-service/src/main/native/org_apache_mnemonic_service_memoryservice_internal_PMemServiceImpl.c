@@ -331,6 +331,12 @@ jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMemServic
     throw(env, "Big memory path not specified!");
   }
   needcreate = access(mpathname, F_OK);
+  if (isnew && !needcreate) {
+    if(0 != unlink(mpathname)) {
+      throw(env, "Failure to delete file to create new one.");
+    }
+    needcreate = 1;
+  }
   if (needcreate && capacity < PMEMOBJ_MIN_POOL) {
     capacity = PMEMOBJ_MIN_POOL;
   }

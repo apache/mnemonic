@@ -74,7 +74,7 @@ public class ChunkBufferNGTest {
     Checksum cs = new CRC32();
     cs.reset();
     NonVolatileMemAllocator act = new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService("pmalloc"),
-            1L, "./pmchunkbuffertest.dat", true);
+            1L, "./pmchunkbuffertest.dat", false);
     act.setChunkReclaimer(new Reclaim<Long>() {
       @Override
       public boolean reclaim(Long mres, Long sz) {

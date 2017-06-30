@@ -53,7 +53,7 @@ public class ByteBufferSerializerNGTest {
   @Test
   public void testToFromMemBufferHolder() throws IOException, ClassNotFoundException {
     VolatileMemAllocator act = new VolatileMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"),
-        1024 * 1024 * 1024, ".", true);
+        1024 * 1024 * 1024, ".");
 
     Random randomGenerator = new Random();
     for (int idx = 0; idx < 100; idx++) {

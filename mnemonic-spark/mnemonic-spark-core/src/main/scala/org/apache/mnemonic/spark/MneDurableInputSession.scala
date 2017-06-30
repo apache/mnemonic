@@ -66,7 +66,7 @@ private[spark] class MneDurableInputSession[V: ClassTag] (
     }
     if (null != flistIter && flistIter.hasNext) {
       sessiter.setAllocator(new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService(
-        getServiceName), 1024000L, flistIter.next.toString, true));
+        getServiceName), 1024000L, flistIter.next.toString, false));
       if (null != sessiter.getAllocator) {
         sessiter.setHandler(sessiter.getAllocator.getHandler(getSlotKeyId))
         if (0L != sessiter.getHandler) {

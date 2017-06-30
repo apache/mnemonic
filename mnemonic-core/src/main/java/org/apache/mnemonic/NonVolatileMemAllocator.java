@@ -53,13 +53,14 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
    *          the location of memory pool will be created
    * 
    * @param isnew
-   *          a place holder, always specify it as true
+   *          force to create new memory pool if true
+   *          otherwise, load specified memory pool if exists, create new one if not exits
    */
   public NonVolatileMemAllocator(NonVolatileMemoryAllocatorService nvmasvc, long capacity, String uri, boolean isnew) {
     if (null == nvmasvc) {
       throw new IllegalArgumentException("NonVolatileMemoryAllocatorService object is null");
     }
-    if (capacity <= 0) {
+    if (isnew && capacity <= 0) {
       throw new IllegalArgumentException("NonVolatileMemAllocator cannot be initialized with capacity <= 0.");
     }
 

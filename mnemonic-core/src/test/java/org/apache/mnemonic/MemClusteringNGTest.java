@@ -41,14 +41,14 @@ public class MemClusteringNGTest {
         new MemClustering.NodeConfig<SysMemAllocator>(new SysMemAllocator(1024 * 1024 * 20, true).disableActiveGC(),
             MemClustering.PerformanceLevel.FASTEST),
         new MemClustering.NodeConfig<VolatileMemAllocator>(
-            new VolatileMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"), 1024 * 1024 * 20, ".", true)
+            new VolatileMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"), 1024 * 1024 * 20, ".")
                 .disableActiveGC(),
             MemClustering.PerformanceLevel.FAST),
         // new MemClustering.NodeConfig(new
         // BigMemAllocator(1024*1024*20, ".", true).disableActiveGC(),
         // MemClustering.PerformanceLevel.NORMAL),
         new MemClustering.NodeConfig<VolatileMemAllocator>(
-            new VolatileMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"), 1024 * 1024 * 20, ".", true)
+            new VolatileMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"), 1024 * 1024 * 20, ".")
                 .disableActiveGC(),
             MemClustering.PerformanceLevel.SLOW), };
     MemClustering mclst = new MemClustering(ncs);
@@ -72,7 +72,7 @@ public class MemClusteringNGTest {
     Random randomGenerator = new Random();
     MemClustering.NodeConfig<?> ncs[] = new MemClustering.NodeConfig<?>[] {
         new MemClustering.NodeConfig<VolatileMemAllocator>(
-            new VolatileMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"), 1024 * 1024 * 20, ".", true),
+            new VolatileMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"), 1024 * 1024 * 20, "."),
             MemClustering.PerformanceLevel.NORMAL),
         // new MemClustering.NodeConfig(new BigMemAllocator(1024*1024*20, ".",
         // true), MemClustering.PerformanceLevel.SLOW),
@@ -98,14 +98,14 @@ public class MemClusteringNGTest {
     Random randomGenerator = new Random();
     MemClustering.NodeConfig<?> ncs[] = new MemClustering.NodeConfig<?>[] {
         new MemClustering.NodeConfig<VolatileMemAllocator>(
-            new VolatileMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"), 1024 * 1024 * 20, ".", true)
+            new VolatileMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"), 1024 * 1024 * 20, ".")
                 .disableActiveGC(),
             MemClustering.PerformanceLevel.FAST),
         // new MemClustering.NodeConfig(new
         // BigMemAllocator(1024*1024*20, ".", true).disableActiveGC(),
         // MemClustering.PerformanceLevel.NORMAL),
         new MemClustering.NodeConfig<VolatileMemAllocator>(
-            new VolatileMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"), 1024 * 1024 * 20, ".", true),
+            new VolatileMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"), 1024 * 1024 * 20, "."),
             MemClustering.PerformanceLevel.SLOW), };
     MemClustering mclst = new MemClustering(ncs);
     MemBufferHolder<?> mbh;
@@ -136,14 +136,14 @@ public class MemClusteringNGTest {
         new MemClustering.NodeConfig<SysMemAllocator>(new SysMemAllocator(1024 * 1024 * 20, true).disableActiveGC(),
             MemClustering.PerformanceLevel.FASTEST),
         new MemClustering.NodeConfig<VolatileMemAllocator>(
-            new VolatileMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"), 1024 * 1024 * 20, ".", true)
+            new VolatileMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"), 1024 * 1024 * 20, ".")
                 .disableActiveGC(),
             MemClustering.PerformanceLevel.FAST),
         // new MemClustering.NodeConfig(new
         // BigMemAllocator(1024*1024*20, ".", true).disableActiveGC(),
         // MemClustering.PerformanceLevel.NORMAL),
         new MemClustering.NodeConfig<VolatileMemAllocator>(
-            new VolatileMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"), 1024 * 1024 * 20, ".", true),
+            new VolatileMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"), 1024 * 1024 * 20, "."),
             MemClustering.PerformanceLevel.SLOW), };
     MemClustering mclst = new MemClustering(ncs) {
     };

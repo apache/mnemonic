@@ -103,7 +103,7 @@ public class MneDurableInputSession<V>
     }
     if (null != m_fp_iter && m_fp_iter.hasNext()) {
       sessiter.setAllocator(new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService(
-          getServiceName()), 1024000L, m_fp_iter.next(), true));
+          getServiceName()), 1024000L, m_fp_iter.next(), false));
       if (null != sessiter.getAllocator()) {
         sessiter.setHandler(sessiter.getAllocator().getHandler(getSlotKeyId()));
         if (0L != sessiter.getHandler()) {

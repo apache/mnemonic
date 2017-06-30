@@ -51,7 +51,7 @@ public class DNCSTextFileSort implements TextFileSort {
       clear();
     }
     m_act = new VolatileMemAllocator(Utils.getVolatileMemoryAllocatorService("sysvmem"), 1024 * 1024 * 1024 * 5,
-        uri, true);
+        uri);
     String text = null;
     DurableSinglyLinkedList<Long> curnode = null, prvnode = null, node = null;
     Long val;

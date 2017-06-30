@@ -309,6 +309,12 @@ jlong JNICALL Java_org_apache_mnemonic_service_memoryservice_internal_PMallocSer
     pthread_rwlock_unlock(&g_pmalp_rwlock);
     throw(env, "Big memory path not specified!");
   }
+  int needcreate = access(mpathname, F_OK);
+  if (isnew && !needcreate) {
+    if(0 != unlink(mpathname)) {
+      throw(env, "Failure to delete file to create new one.");
+    }
+  }
   if ((md = pmopen(mpathname, NULL,
                    PMALLOC_MIN_POOL_SIZE > capacity ? PMALLOC_MIN_POOL_SIZE : capacity)) == NULL) {
     pthread_rwlock_unlock(&g_pmalp_rwlock);

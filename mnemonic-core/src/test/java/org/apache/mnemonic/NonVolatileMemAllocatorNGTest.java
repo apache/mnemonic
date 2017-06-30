@@ -107,7 +107,7 @@ public class NonVolatileMemAllocatorNGTest {
   @Test(dependsOnMethods = { "testGenPMemByteBufferWithKey" })
   public void testCheckPMemByteBufferWithKey() {
     NonVolatileMemAllocator act = new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService("pmalloc"),
-        1024 * 1024 * 1024, "./pmtest_key.dat", true);
+        1024 * 1024 * 1024, "./pmtest_key.dat", false);
     act.setBufferReclaimer(new Reclaim<ByteBuffer>() {
       @Override
       public boolean reclaim(ByteBuffer mres, Long sz) {

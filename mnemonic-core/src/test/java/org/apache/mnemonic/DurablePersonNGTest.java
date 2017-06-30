@@ -174,7 +174,7 @@ public class DurablePersonNGTest {
   @Test(dependsOnMethods = { "testGenPeople" })
   public void testCheckPeople() throws RetrieveDurableEntityError {
     NonVolatileMemAllocator act = new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService("pmalloc"),
-        1024 * 1024 * 8, "./pobj_person.dat", true);
+        1024 * 1024 * 8, "./pobj_person.dat", false);
     act.setBufferReclaimer(new Reclaim<ByteBuffer>() {
       @Override
       public boolean reclaim(ByteBuffer mres, Long sz) {

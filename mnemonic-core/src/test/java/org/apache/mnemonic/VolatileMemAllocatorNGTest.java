@@ -33,7 +33,7 @@ public class VolatileMemAllocatorNGTest {
   public void testMemByteBuffer() {
     Random randomGenerator = new Random();
     Allocator<VolatileMemAllocator> act = new VolatileMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"),
-        1024 * 1024 * 1024, ".", true);
+        1024 * 1024 * 1024, ".");
     MemBufferHolder<?> mbh;
     for (int idx = 1; idx <= 5; ++idx) {
       int size = randomGenerator.nextInt(1024 * 1024) + 1024 * 1024;
@@ -55,7 +55,7 @@ public class VolatileMemAllocatorNGTest {
   public void testMemChunk() {
     Random randomGenerator = new Random();
     Allocator<VolatileMemAllocator> act = new VolatileMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"),
-        1024 * 1024 * 1024, ".", true);
+        1024 * 1024 * 1024, ".");
     MemChunkHolder<?> mch;
     for (int idx = 1; idx <= 5; ++idx) {
       int size = randomGenerator.nextInt(1024 * 1024) + 1024 * 1024;
