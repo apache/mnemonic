@@ -35,6 +35,7 @@ import org.apache.mnemonic.DurableType;
 import org.apache.mnemonic.Durable;
 import org.apache.mnemonic.EntityFactoryProxy;
 import org.apache.mnemonic.Reclaim;
+import org.apache.mnemonic.ParameterHolder;
 import org.apache.commons.lang3.RandomUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -308,12 +309,23 @@ public class DurableArrayNGTest {
         return PersonFactory.restore(allocator, factoryproxys, gfields, phandler, autoreclaim);
       }
       @Override
+      public <A extends RestorableAllocator<A>> Person<Long> restore(ParameterHolder<A> ph) {
+        return PersonFactory.restore(ph.getAllocator(),
+            ph.getEntityFactoryProxies(), ph.getGenericTypes(), ph.getHandler(), ph.getAutoReclaim());
+      }
+      @Override
       public <A extends RestorableAllocator<A>> Person<Long> create(
           A allocator, EntityFactoryProxy[] factoryproxys,
           DurableType[] gfields, boolean autoreclaim) {
         return PersonFactory.create(allocator, factoryproxys, gfields, autoreclaim);
       }
-    } };
+      @Override
+      public <A extends RestorableAllocator<A>> Person<Long> create(ParameterHolder<A> ph) {
+        return PersonFactory.create(ph.getAllocator(),
+            ph.getEntityFactoryProxies(), ph.getGenericTypes(), ph.getAutoReclaim());
+      } 
+    }
+    };
 
     Person<Long> person =  (Person<Long>) efproxies[0].create(m_act, null, null, false);
     person.setName("Alice", false);
@@ -355,11 +367,25 @@ public class DurableArrayNGTest {
         return DurableSinglyLinkedListFactory.restore(allocator, dpt.getRight(), dpt.getLeft(), phandler, autoreclaim);
       }
       @Override
+      public <A extends RestorableAllocator<A>> Durable restore(ParameterHolder<A> ph) {
+        Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(ph.getGenericTypes(),
+            ph.getEntityFactoryProxies(), 1);
+        return DurableSinglyLinkedListFactory.restore(ph.getAllocator(),
+            dpt.getRight(), dpt.getLeft(), ph.getHandler(), ph.getAutoReclaim());
+      }
+      @Override
       public <A extends RestorableAllocator<A>> Durable create(
           A allocator, EntityFactoryProxy[] factoryproxys,
           DurableType[] gfields, boolean autoreclaim) {
         Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, 1);
         return DurableSinglyLinkedListFactory.create(allocator, dpt.getRight(), dpt.getLeft(), autoreclaim);
+      }
+      @Override     
+      public <A extends RestorableAllocator<A>> Durable create(ParameterHolder<A> ph) {
+        Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(ph.getGenericTypes(),
+            ph.getEntityFactoryProxies(), 1);
+        return DurableSinglyLinkedListFactory.create(ph.getAllocator(),
+            dpt.getRight(), dpt.getLeft(), ph.getAutoReclaim());
       }
     }
     };
@@ -388,10 +414,20 @@ public class DurableArrayNGTest {
         return PersonFactory.restore(allocator, factoryproxys, gfields, phandler, autoreclaim);
       }
       @Override
+      public <A extends RestorableAllocator<A>> Person<Long> restore(ParameterHolder<A> ph) {
+        return PersonFactory.restore(ph.getAllocator(),
+            ph.getEntityFactoryProxies(), ph.getGenericTypes(), ph.getHandler(), ph.getAutoReclaim());
+      }
+      @Override
       public <A extends RestorableAllocator<A>> Person<Long> create(
           A allocator, EntityFactoryProxy[] factoryproxys,
           DurableType[] gfields, boolean autoreclaim) {
         return PersonFactory.create(allocator, factoryproxys, gfields, autoreclaim);
+      }
+      @Override
+      public <A extends RestorableAllocator<A>> Person<Long> create(ParameterHolder<A> ph) {
+        return PersonFactory.create(ph.getAllocator(),
+            ph.getEntityFactoryProxies(), ph.getGenericTypes(), ph.getAutoReclaim());
       }
     }
     };
@@ -420,12 +456,26 @@ public class DurableArrayNGTest {
         return DurableHashMapFactory.restore(allocator, dpt.getRight(), dpt.getLeft(), phandler, autoreclaim);
           }
       @Override
+      public <A extends RestorableAllocator<A>> DurableHashMap<String, Person<Long>> restore(ParameterHolder<A> ph) {
+          Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(ph.getGenericTypes(),
+              ph.getEntityFactoryProxies(), 1);
+        return DurableHashMapFactory.restore(ph.getAllocator(),
+              dpt.getRight(), dpt.getLeft(), ph.getHandler(), ph.getAutoReclaim());
+      }
+      @Override
       public <A extends RestorableAllocator<A>> DurableHashMap<String, Person<Long>> create(
           A allocator, EntityFactoryProxy[] factoryproxys,
           DurableType[] gfields, boolean autoreclaim) {
           Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, 1);
         return DurableHashMapFactory.create(allocator, dpt.getRight(), dpt.getLeft(), 10, autoreclaim);
           }
+      @Override
+      public <A extends RestorableAllocator<A>> DurableHashMap<String, Person<Long>> create(ParameterHolder<A> ph) {
+          Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(ph.getGenericTypes(),
+              ph.getEntityFactoryProxies(), 1);
+        return DurableHashMapFactory.create(ph.getAllocator(),
+                dpt.getRight(), dpt.getLeft(), 10, ph.getAutoReclaim());
+      }
     }
     };
     arrayproxies = ArrayUtils.addAll(arrayproxies, efproxies);

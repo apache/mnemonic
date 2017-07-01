@@ -27,6 +27,7 @@ import org.apache.mnemonic.RestorableAllocator;
 import org.apache.mnemonic.RestoreDurableEntityError;
 import org.apache.mnemonic.RetrieveDurableEntityError;
 import org.apache.mnemonic.Utils;
+import org.apache.mnemonic.ParameterHolder;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.ArrayUtils;
@@ -478,11 +479,24 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
         return MapEntryFactory.restore(allocator, dpt.getRight(), dpt.getLeft(), phandler, autoreclaim);
           }
       @Override
+      public <A extends RestorableAllocator<A>> MapEntry<K, V> restore(ParameterHolder<A> ph) {
+          Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(ph.getGenericTypes(),
+              ph.getEntityFactoryProxies(), 1);
+        return MapEntryFactory.restore(ph.getAllocator(),
+              dpt.getRight(), dpt.getLeft(), ph.getHandler(), ph.getAutoReclaim());
+          }
+      @Override
       public <A extends RestorableAllocator<A>> MapEntry<K, V> create(
           A allocator, EntityFactoryProxy[] factoryproxys,
           DurableType[] gfields, boolean autoreclaim) {
           Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, 1);
         return MapEntryFactory.create(allocator, dpt.getRight(), dpt.getLeft(), autoreclaim);
+          }
+      @Override
+      public <A extends RestorableAllocator<A>> MapEntry<K, V> create(ParameterHolder<A> ph) {
+          Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(ph.getGenericTypes(),
+              ph.getEntityFactoryProxies(), 1);
+        return MapEntryFactory.create(ph.getAllocator(), dpt.getRight(), dpt.getLeft(), ph.getAutoReclaim());
           }
     }
     };

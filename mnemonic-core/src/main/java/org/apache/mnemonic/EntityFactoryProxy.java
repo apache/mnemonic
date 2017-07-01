@@ -50,6 +50,8 @@ public interface EntityFactoryProxy {
   <A extends RestorableAllocator<A>> Durable create(A allocator, EntityFactoryProxy[] factoryproxys,
       DurableType[] gfields, boolean autoreclaim);
 
+  <A extends RestorableAllocator<A>> Durable create(ParameterHolder<A> ph);
+
   /**
    * restore a durable object from persistent allocator using a handler of
    * non-volatile object
@@ -79,4 +81,6 @@ public interface EntityFactoryProxy {
    */
   <A extends RestorableAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
       DurableType[] gfields, long phandler, boolean autoreclaim);
+
+  <A extends RestorableAllocator<A>> Durable restore(ParameterHolder<A> ph);
 }

@@ -21,6 +21,7 @@ package org.apache.mnemonic.mapreduce;
 
 import org.apache.mnemonic.DurableType;
 import org.apache.mnemonic.EntityFactoryProxy;
+import org.apache.mnemonic.ParameterHolder;
 import org.apache.mnemonic.RestorableAllocator;
 
 public class PersonListEFProxy implements EntityFactoryProxy {
@@ -31,10 +32,20 @@ public class PersonListEFProxy implements EntityFactoryProxy {
     return PersonFactory.restore(allocator, factoryproxys, gfields, phandler, autoreclaim);
   }
   @Override
+  public <A extends RestorableAllocator<A>> Person<Long> restore(ParameterHolder<A> ph) {
+    return PersonFactory.restore(ph.getAllocator(),
+            ph.getEntityFactoryProxies(), ph.getGenericTypes(), ph.getHandler(), ph.getAutoReclaim());
+  }
+  @Override
   public <A extends RestorableAllocator<A>> Person<Long> create(
       A allocator, EntityFactoryProxy[] factoryproxys,
       DurableType[] gfields, boolean autoreclaim) {
     return PersonFactory.create(allocator, factoryproxys, gfields, autoreclaim);
+  }
+  @Override
+  public <A extends RestorableAllocator<A>> Person<Long> create(ParameterHolder<A> ph) {
+    return PersonFactory.create(ph.getAllocator(),
+            ph.getEntityFactoryProxies(), ph.getGenericTypes(), ph.getAutoReclaim());
   }
 
 }

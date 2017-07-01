@@ -33,6 +33,7 @@ import org.apache.mnemonic.Utils;
 import org.apache.mnemonic.DurableType;
 import org.apache.mnemonic.collections.DurableSinglyLinkedList;
 import org.apache.mnemonic.collections.DurableSinglyLinkedListFactory;
+import org.apache.mnemonic.ParameterHolder;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -80,10 +81,20 @@ public class DurableSinglyLinkedListNGPrintTest {
         return PersonFactory.restore(allocator, factoryproxys, gfields, phandler, autoreclaim);
       }
       @Override
+      public <A extends RestorableAllocator<A>> Durable restore(ParameterHolder<A> ph) {
+        return PersonFactory.restore(ph.getAllocator(),
+                ph.getEntityFactoryProxies(), ph.getGenericTypes(), ph.getHandler(), ph.getAutoReclaim());
+      }
+      @Override
       public <A extends RestorableAllocator<A>> Durable create(
           A allocator, EntityFactoryProxy[] factoryproxys,
           DurableType[] gfields, boolean autoreclaim) {
         return PersonFactory.create(allocator, factoryproxys, gfields, autoreclaim);
+      }
+      @Override
+      public <A extends RestorableAllocator<A>> Durable create(ParameterHolder<A> ph) {
+        return PersonFactory.create(ph.getAllocator(),
+                ph.getEntityFactoryProxies(), ph.getGenericTypes(), ph.getAutoReclaim());
       }
     } };
 
@@ -166,10 +177,24 @@ public class DurableSinglyLinkedListNGPrintTest {
         return DurableSinglyLinkedListFactory.restore(allocator, dpt.getRight(), dpt.getLeft(), phandler, autoreclaim);
       }
       @Override
+      public <A extends RestorableAllocator<A>> Durable restore(ParameterHolder<A> ph) {
+        Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(ph.getGenericTypes(),
+                ph.getEntityFactoryProxies(), 1);
+        return DurableSinglyLinkedListFactory.restore(ph.getAllocator(),
+                dpt.getRight(), dpt.getLeft(), ph.getHandler(), ph.getAutoReclaim());
+      }
+      @Override
       public <A extends RestorableAllocator<A>> Durable create(A allocator, EntityFactoryProxy[] factoryproxys,
           DurableType[] gfields, boolean autoreclaim) {
         Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, 1);
         return DurableSinglyLinkedListFactory.create(allocator, dpt.getRight(), dpt.getLeft(), autoreclaim);
+      }
+      @Override
+      public <A extends RestorableAllocator<A>> Durable create(ParameterHolder<A> ph) {
+        Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(ph.getGenericTypes(),
+                ph.getEntityFactoryProxies(), 1);
+        return DurableSinglyLinkedListFactory.create(ph.getAllocator(),
+                dpt.getRight(), dpt.getLeft(), ph.getAutoReclaim());
       }
     } };
 

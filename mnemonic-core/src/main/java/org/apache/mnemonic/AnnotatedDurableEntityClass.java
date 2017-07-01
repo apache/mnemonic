@@ -106,6 +106,7 @@ public class AnnotatedDurableEntityClass {
   private TypeName m_gfieldstypename = TypeName.get(DurableType[].class);
   private TypeVariableName m_alloctypevarname = TypeVariableName.get(cALLOCTYPENAME,
       ParameterizedTypeName.get(ClassName.get(RestorableAllocator.class), m_alloctypename));
+  private TypeName m_parameterholder = ParameterizedTypeName.get(ClassName.get(ParameterHolder.class), m_alloctypename);
 
   private Map<String, MethodInfo> m_gettersinfo = new HashMap<String, MethodInfo>();
   private Map<String, MethodInfo> m_settersinfo = new HashMap<String, MethodInfo>();
@@ -876,6 +877,18 @@ public class AnnotatedDurableEntityClass {
     TypeName entitytn = ParameterizedTypeName.get(ClassName.get(m_packagename, m_entityname),
         entityspec.typeVariables.toArray(new TypeVariableName[0]));
 
+    ParameterSpec parameterhold = ParameterSpec.builder(m_parameterholder, "parameterholder").build();
+    code = CodeBlock.builder().addStatement("$1T entity = new $1T()", entitytn)
+        .addStatement("entity.setupGenericInfo($1N.getEntityFactoryProxies(), $1N.getGenericTypes())",
+                parameterhold.name)
+        .addStatement("entity.createDurableEntity($1L.getAllocator(), $1L.getEntityFactoryProxies(), "
+                    + "$1L.getGenericTypes(), $1L.getAutoReclaim())", parameterhold.name)
+        .addStatement("return entity").build();
+    methodspec = MethodSpec.methodBuilder("create").addTypeVariables(entityspec.typeVariables)
+        .addException(OutOfHybridMemory.class).addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+        .returns(TypeName.get(m_elem.asType())).addParameter(parameterhold).addCode(code).build();
+    typespecbuilder.addMethod(methodspec);
+
     ParameterSpec allocparam = ParameterSpec.builder(m_alloctypename, "allocator").build();
     code = CodeBlock.builder().addStatement("return create($1L, false)", allocparam.name).build();
     methodspec = MethodSpec.methodBuilder("create").addTypeVariables(entityspec.typeVariables)
@@ -912,6 +925,17 @@ public class AnnotatedDurableEntityClass {
         .addException(RestoreDurableEntityError.class).addModifiers(Modifier.PUBLIC, Modifier.STATIC)
         .returns(TypeName.get(m_elem.asType())).addParameter(allocparam).addParameter(phandlerparam).addCode(code)
         .build();
+    typespecbuilder.addMethod(methodspec);
+
+    code = CodeBlock.builder().addStatement("$1T entity = new $1T()", entitytn)
+        .addStatement("entity.setupGenericInfo($1N.getEntityFactoryProxies(), $1N.getGenericTypes())",
+                parameterhold.name)
+        .addStatement("entity.restoreDurableEntity($1L.getAllocator(), $1L.getEntityFactoryProxies(),"
+                    + "$1L.getGenericTypes(), $1L.getHandler(), $1L.getAutoReclaim())", parameterhold.name)
+        .addStatement("return entity").build();
+    methodspec = MethodSpec.methodBuilder("restore").addTypeVariables(entityspec.typeVariables)
+            .addException(RestoreDurableEntityError.class).addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            .returns(TypeName.get(m_elem.asType())).addParameter(parameterhold).addCode(code).build();
     typespecbuilder.addMethod(methodspec);
 
     code = CodeBlock.builder().addStatement("return restore($1L, null, null, $2L, $3L)", allocparam.name,
