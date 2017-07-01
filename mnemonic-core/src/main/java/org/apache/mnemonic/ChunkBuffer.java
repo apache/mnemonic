@@ -29,6 +29,8 @@ public class ChunkBuffer<A extends RetrievableAllocator<A>> {
 
   protected DurableChunk<A> m_dchunk = null;
   protected ByteBuffer m_buffer = null;
+  protected long m_offset;
+  protected int m_size;
 
   public ChunkBuffer(DurableChunk<A> dchunk, long offset, int size) {
     Field address, capacity;
@@ -45,6 +47,8 @@ public class ChunkBuffer<A extends RetrievableAllocator<A>> {
         capacity.setInt(bb, size);
         bb.limit(size);
         m_buffer = bb;
+        m_offset = offset;
+        m_size = size;
       } catch (NoSuchFieldException e) {
         throw new ConfigurationException("Buffer fields not found.");
       } catch (IllegalAccessException e) {
@@ -62,5 +66,28 @@ public class ChunkBuffer<A extends RetrievableAllocator<A>> {
   public DurableChunk<A> getChunk() {
     return m_dchunk;
   }
+
+  public void persist() {
+    if (m_dchunk.getAllocator() instanceof NonVolatileMemAllocator) {
+      NonVolatileMemAllocator alloc = (NonVolatileMemAllocator) m_dchunk.getAllocator();
+      alloc.persist(m_dchunk.get() + m_offset, m_size, false);
+    } else {
+      throw new UnsupportedOperationException("The ChunkBuffer does not backed by a non-volatile allocator");
+      }
+    }
+
+  public void sync() {
+    m_dchunk.getAllocator().sync(m_dchunk.get() + m_offset, m_size, false);
+  }
+
+  public void flush() {
+    if (m_dchunk.getAllocator() instanceof NonVolatileMemAllocator) {
+      NonVolatileMemAllocator alloc = (NonVolatileMemAllocator) m_dchunk.getAllocator();
+      alloc.flush(m_dchunk.get() + m_offset, m_size, false);
+    } else {
+      throw new UnsupportedOperationException("The ChunkBuffer does not backed by a non-volatile allocator");
+    }
+  }
+
 }
 
