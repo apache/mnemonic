@@ -31,6 +31,7 @@ public class ChunkBufferNGTest {
 
   private long m_keyid = 22L;
   private volatile long m_checksum;
+  private volatile long m_count;
   private int m_bufsize = 90 * 1024 * 1024;
 
   @Test
@@ -55,7 +56,7 @@ public class ChunkBufferNGTest {
     long bufcnt = mch.getSize() / m_bufsize;
     ChunkBuffer ckbuf;
     byte[] rdbytes;
-    for (int idx = 0; idx < bufcnt; ++idx) {
+    for (long idx = 0; idx < bufcnt; ++idx) {
 //      System.err.println(String.format("---- bufcnt: %d, bufsize: %d, idx: %d", bufcnt, m_bufsize, idx));
       ckbuf = mch.getChunkBuffer(idx * m_bufsize, m_bufsize);
       Assert.assertNotNull(ckbuf);
@@ -66,6 +67,7 @@ public class ChunkBufferNGTest {
       cs.update(rdbytes, 0, rdbytes.length);
     }
     m_checksum = cs.getValue();
+    m_count = bufcnt;
     act.close();
   }
 
@@ -90,7 +92,7 @@ public class ChunkBufferNGTest {
 
     ChunkBuffer ckbuf;
     byte[] buf;
-    for (int idx = 0; idx < bufcnt; ++idx) {
+    for (long idx = 0; idx < bufcnt; ++idx) {
       ckbuf = mch.getChunkBuffer(idx * m_bufsize, m_bufsize);
       Assert.assertNotNull(ckbuf);
       buf = new byte[m_bufsize];
@@ -101,7 +103,8 @@ public class ChunkBufferNGTest {
     act.close();
 
     Assert.assertEquals(m_checksum, cs.getValue());
-    System.out.println(String.format("The checksum of chunk buffers are %d", m_checksum));
+    Assert.assertEquals(m_count, bufcnt);
+    System.out.println(String.format("The checksum of chunk buffers are %d, Total count is %d", m_checksum, m_count));
   }
 
 }
