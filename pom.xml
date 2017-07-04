@@ -110,7 +110,7 @@
     <memory.service.dist.dir>${root.dir}/mnemonic-memory-services/service-dist</memory.service.dist.dir>
     <computing.service.dist.dir>${root.dir}/mnemonic-computing-services/service-dist</computing.service.dist.dir>
     <github.global.server>github</github.global.server>
-    <buildtools.dir>${basedir}/build-tools</buildtools.dir>
+    <buildtools.dir>${basedir}/bin</buildtools.dir>
     <gpg.keyname>apache.org</gpg.keyname>
     <slf4j.version>1.7.21</slf4j.version>
     <log4j.version>1.2.17</log4j.version>
@@ -270,7 +270,7 @@
           <artifactId>maven-checkstyle-plugin</artifactId>
           <version>2.17</version>
           <configuration>
-            <configLocation>build-tools/mnemonic-checkstyle.xml</configLocation>
+            <configLocation>bin/mnemonic-checkstyle.xml</configLocation>
             <includeTestSourceDirectory>true</includeTestSourceDirectory>
             <encoding>UTF-8</encoding>
             <failOnViolation>true</failOnViolation>
@@ -433,22 +433,22 @@
     <id>activate-buildtools-in-module</id>
     <activation>
       <file>
-        <exists>${basedir}/../build-tools/mnemonic-checkstyle.xml</exists>
+        <exists>${basedir}/../bin/mnemonic-checkstyle.xml</exists>
       </file>
     </activation>
     <properties>
-      <buildtools.dir>${basedir}/../build-tools</buildtools.dir>
+      <buildtools.dir>${basedir}/../bin</buildtools.dir>
     </properties>
   </profile>
   <profile>
     <id>activate-buildtools-in-submodule</id>
     <activation>
       <file>
-        <exists>${basedir}/../../build-tools/mnemonic-checkstyle.xml</exists>
+        <exists>${basedir}/../../bin/mnemonic-checkstyle.xml</exists>
       </file>
     </activation>
     <properties>
-      <buildtools.dir>${basedir}/../../build-tools</buildtools.dir>
+      <buildtools.dir>${basedir}/../../bin</buildtools.dir>
     </properties>
   </profile>
 
@@ -470,7 +470,7 @@
           <version>2.4</version>
           <configuration>
             <finalName>apache-mnemonic-${project.version}</finalName>
-            <descriptor>build-tools/source-assembly.xml</descriptor>
+            <descriptor>bin/source-assembly.xml</descriptor>
           </configuration>
         </plugin>
         <plugin>

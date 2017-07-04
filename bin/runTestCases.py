@@ -27,7 +27,7 @@ testLogDir = "testlog/"
 if not os.path.exists(testLogDir):
     os.makedirs(testLogDir)
 
-testCmdFile = 'build-tools/test.conf'
+testCmdFile = 'bin/test.conf'
 tcCmdReg = re.compile('^mvn\s.*$')
 tcNameReg = re.compile('-D(?:test|suites)=(.+?)\s')
 tcModuleReg = re.compile('-pl\s(.+?)\s')

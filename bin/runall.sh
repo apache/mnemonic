@@ -81,6 +81,6 @@ exit 1
 fi
 echo [SUCCESS] Mnemonic example is completed!
 
-python build-tools/runTestCases.py
+python bin/runTestCases.py
 
 popd
