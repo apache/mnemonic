@@ -105,6 +105,19 @@ public abstract class DurableTree<E> implements Durable, Iterable<E> {
   public abstract void insert(E item);
 
   /**
+   *  removes a specific element from the tree
+   *
+   *  @param item
+   *           the item to be removed
+   *
+   *  @param destroy
+   *           destroy the item to be removed
+   *
+   *  @return true if element is removed
+   */
+  public abstract boolean remove(E item, boolean destroy);
+
+  /**
    * print tree
    *
    */

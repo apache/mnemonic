@@ -114,6 +114,20 @@ public class DurableTreeNGTest {
     AssertJUnit.assertEquals(tree.predecessor(7).intValue(), 6);
     AssertJUnit.assertNull(tree.successor(7));
 
+    AssertJUnit.assertTrue(tree.contains(3));
+    tree.remove(3, true);
+    AssertJUnit.assertFalse(tree.contains(3));
+    AssertJUnit.assertEquals(tree.successor(1).intValue(), 4);
+    AssertJUnit.assertEquals(tree.predecessor(4).intValue(), 1);
+    AssertJUnit.assertTrue(tree.isValidTree());
+    tree.remove(7, true);
+    AssertJUnit.assertFalse(tree.contains(7));
+    AssertJUnit.assertNull(tree.successor(6));
+    AssertJUnit.assertTrue(tree.isValidTree());
+
+    tree.insert(3);
+    tree.insert(7);
+
     DurableTree<Integer> restoredTree = DurableTreeFactory.restore(m_act, null, gtypes, handler, false);
 
     AssertJUnit.assertTrue(restoredTree.isValidTree());
@@ -131,8 +145,7 @@ public class DurableTreeNGTest {
     AssertJUnit.assertNull(restoredTree.successor(7));
 
     restoredTree.insert(10);
-    restoredTree.insert(2);
-    AssertJUnit.assertEquals(restoredTree.successor(1).intValue(), 2);
+    AssertJUnit.assertEquals(restoredTree.successor(1).intValue(), 3);
     AssertJUnit.assertEquals(restoredTree.predecessor(10).intValue(), 7);
 
     restoredTree.destroy();
@@ -166,6 +179,13 @@ public class DurableTreeNGTest {
     AssertJUnit.assertEquals(tree.predecessor("Fun"), "Ele");
     AssertJUnit.assertNull(tree.successor("bob"));
 
+    tree.remove("Cat", true);
+    AssertJUnit.assertEquals(tree.predecessor("Dog"), "Alice");
+    AssertJUnit.assertEquals(tree.successor("Alice"), "Dog");
+    AssertJUnit.assertTrue(tree.isValidTree());
+    tree.remove("Alice", true);
+    AssertJUnit.assertNull(tree.predecessor("Dog"));
+
     tree.destroy();
   }
 
@@ -181,6 +201,41 @@ public class DurableTreeNGTest {
       AssertJUnit.assertTrue(tree.contains(rand));
     }
     AssertJUnit.assertTrue(tree.isValidTree());
+    tree.destroy();
+  }
+
+  @Test(enabled = true)
+  public void testInsertRemoveBigTrees() {
+    DurableType gtypes[] = {DurableType.INTEGER};
+    DurableTree<Integer> tree = DurableTreeFactory.create(m_act, null, gtypes, false);
+
+    Long handler = tree.getHandler();
+    for (int i = 0; i < 10 * 1024; i++) {
+      tree.insert(i);
+      AssertJUnit.assertTrue(tree.contains(i));
+    }
+
+    AssertJUnit.assertTrue(tree.isValidTree());
+
+    for (int i = 0; i < 5 * 1024; i++) {
+      AssertJUnit.assertTrue(tree.remove(i, true));
+    }
+    AssertJUnit.assertTrue(tree.isValidTree());
+
+    for (int i = 0; i < 10 * 1024; i++) {
+      if (i < 5 * 1024) {
+        AssertJUnit.assertFalse(tree.contains(i));
+        tree.insert(i);
+      } else {
+        AssertJUnit.assertTrue(tree.contains(i));
+      }
+    }
+
+    for (int i = 0; i < 10 * 1024; i++) {
+      AssertJUnit.assertTrue(tree.contains(i));
+    }
+    AssertJUnit.assertTrue(tree.isValidTree());
+
     tree.destroy();
   }
 

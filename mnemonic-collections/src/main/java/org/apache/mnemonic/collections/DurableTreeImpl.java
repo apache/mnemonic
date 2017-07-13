@@ -183,6 +183,125 @@ public class DurableTreeImpl<A extends RestorableAllocator<A>, E extends Compara
     }
   }
 
+  /**
+   * removes a specific element from the tree
+   *
+   * @param item
+   *          the item to be removed
+   *
+   * @return true if element is removed
+   */
+  public boolean remove(E item, boolean destroy) {
+    TreeNode<E> currentNode = findNode(item);
+    if (null == currentNode) {
+      return false;
+    }
+    TreeNode<E> tmp, ref = currentNode;
+    boolean col = ref.getColor();
+    if (null == currentNode.getLeft()) {
+      tmp = currentNode.getRight();
+      replace(currentNode, currentNode.getRight());
+    } else if (null == currentNode.getRight()) {
+      tmp = currentNode.getLeft();
+      replace(currentNode, currentNode.getLeft());
+    } else {
+      ref = findMinimum(currentNode.getRight());
+      col = ref.getColor();
+      tmp = ref.getRight();
+      if (ref.getParent().equals(currentNode)) {
+        tmp.setParent(ref, false);
+      } else {
+        replace(ref, ref.getRight());
+        ref.setRight(currentNode.getRight(), false);
+        ref.getRight().setParent(ref, false);
+      }
+      replace(currentNode, ref);
+      ref.setLeft(currentNode.getLeft(), false);
+      ref.getLeft().setParent(ref, false);
+      ref.setColor(currentNode.getColor());
+    }
+    if (col == BLACK && tmp != null) {
+      fixDelete(tmp);
+    }
+    if (destroy) {
+      currentNode.setLeft(null, false);
+      currentNode.setRight(null, false);
+      currentNode.setParent(null, false);
+      currentNode.destroy();
+    }
+    return true;
+  }
+
+  protected void fixDelete(TreeNode<E> currentNode) {
+    while (!currentNode.equals(root) && currentNode.getColor() == BLACK) {
+      if (currentNode.equals(currentNode.getParent().getLeft())) {
+        TreeNode<E> other = currentNode.getParent().getRight();
+        if (other.getColor() == RED) {
+          other.setColor(BLACK);
+          currentNode.getParent().setColor(RED);
+          rotateLeft(currentNode.getParent());
+          other = currentNode.getParent().getRight();
+        }
+        if (other.getLeft().getColor() == BLACK && other.getRight().getColor() == BLACK) {
+          other.setColor(RED);
+          currentNode = currentNode.getParent();
+          continue;
+        } else if (other.getRight().getColor() == BLACK) {
+          other.getLeft().setColor(BLACK);
+          other.setColor(RED);
+          rotateRight(other);
+          other = currentNode.getParent().getRight();
+        }
+        if (other.getRight().getColor() == RED) {
+          other.setColor(currentNode.getParent().getColor());
+          currentNode.getParent().setColor(BLACK);
+          other.getRight().setColor(BLACK);
+          rotateLeft(currentNode.getParent());
+          currentNode = root;
+        }
+      } else {
+        TreeNode other = currentNode.getParent().getLeft();
+        if (other.getColor() == RED) {
+          other.setColor(BLACK);
+          currentNode.getParent().setColor(RED);
+          rotateRight(currentNode.getParent());
+          other = currentNode.getParent().getLeft();
+        }
+        if (other.getRight().getColor() == BLACK && other.getLeft().getColor() == BLACK) {
+          other.setColor(RED);
+          currentNode = currentNode.getParent();
+          continue;
+        } else if (other.getLeft().getColor() == BLACK) {
+          other.getRight().setColor(BLACK);
+          other.setColor(RED);
+          rotateLeft(other);
+          other = currentNode.getParent().getLeft();
+        }
+        if (other.getLeft().getColor() == RED) {
+          other.setColor(currentNode.getParent().getColor());
+          currentNode.getParent().setColor(BLACK);
+          other.getLeft().setColor(BLACK);
+          rotateRight(currentNode.getParent());
+          currentNode = root;
+        }
+      }
+    }
+    currentNode.setColor(BLACK);
+  }
+
+  protected void replace(TreeNode<E> first, TreeNode<E> second) {
+    if (null == first.getParent()) {
+      root = second;
+      unsafe.putLong(holder.get(), root.getHandler());
+    } else if (first.equals(first.getParent().getLeft())) {
+      first.getParent().setLeft(second, false);
+    } else {
+      first.getParent().setRight(second, false);
+    }
+    if (second != null) {
+      second.setParent(first.getParent(), false);
+    }
+  }
 
   /**
    * checks if tree contains the specified element
@@ -190,7 +309,7 @@ public class DurableTreeImpl<A extends RestorableAllocator<A>, E extends Compara
    * @param item
    *          the item to be set
    *
-   * @return tree if set contains the element
+   * @return true if tree contains the element
    */
   public boolean contains(E item) {
     return findNode(item) == null ? false : true;
