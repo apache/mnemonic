@@ -26,6 +26,7 @@ import org.apache.mnemonic.RestoreDurableEntityError;
 import org.apache.mnemonic.RetrieveDurableEntityError;
 import org.apache.mnemonic.Utils;
 
+import org.apache.commons.lang3.ArrayUtils;
 import sun.misc.Unsafe;
 import java.util.Iterator;
 
@@ -38,9 +39,10 @@ public class DurableHashSetImpl<A extends RestorableAllocator<A>, E>
   private EntityFactoryProxy[] factoryProxy;
   private DurableType[] genericType;
   private volatile boolean autoReclaim;
-  private DurableHashMap<E, Object> map;
+  private DurableHashMap<E, Boolean> map;
   private A allocator;
   private long initialCapacity;
+  private static final Boolean DEFAULT = Boolean.TRUE;
 
   public void setCapacityHint(long capacity) {
     initialCapacity = capacity;
@@ -53,31 +55,37 @@ public class DurableHashSetImpl<A extends RestorableAllocator<A>, E>
   /**
    * adds a specific element to the set
    *
+   * @param item
+   *          the item to be added
+   *
    * @return true if set did not already contain the element
    */
   public boolean add(E item) {
-    //add logic for adding item
-    return true;
+    return map.put(item, DEFAULT) == null;
   }
 
   /**
    * removes a specific element from the set
    *
+   * @param item
+   *          the item to be removed
+   *
    * @return true if set contained the element
    */
-  public boolean remove(E value) {
-    //add logic for removing item
-    return true;
+  public boolean remove(E item) {
+    return map.remove(item) == DEFAULT;
   }
 
   /**
    * checks if set contains the specified element
    *
+   * @param item
+   *          the item to be searched
+   *
    * @return true if set contains the element
    */
   public boolean contains(E item) {
-    //add logic to check if set contains the item
-    return true;
+    return map.get(item) != null;
   }
 
   @Override
@@ -143,7 +151,7 @@ public class DurableHashSetImpl<A extends RestorableAllocator<A>, E>
     if (0L == phandler) {
       throw new RestoreDurableEntityError("Input handler is null on restoreDurableEntity.");
     }
-    map = DurableHashMapFactory.restore(allocator, factoryProxy, gType, phandler, autoReclaim);
+    map = DurableHashMapFactory.restore(allocator, this.factoryProxy, this.genericType, phandler, autoReclaim);
     if (null == map) {
       throw new RestoreDurableEntityError("Retrieve Entity Failure!");
     }
@@ -155,9 +163,10 @@ public class DurableHashSetImpl<A extends RestorableAllocator<A>, E>
   public void initializeDurableEntity(A allocator, EntityFactoryProxy[] factoryProxy,
               DurableType[] gType, boolean autoReclaim) {
     this.allocator = allocator;
-    this.factoryProxy = factoryProxy;
-    this.genericType = gType;
     this.autoReclaim = autoReclaim;
+    DurableType gftypes[] = {DurableType.BOOLEAN};
+    this.genericType = ArrayUtils.addAll(gType, gftypes);
+    this.factoryProxy = ArrayUtils.addAll(factoryProxy, null);
     try {
       this.unsafe = Utils.getUnsafe();
     } catch (Exception e) {
@@ -169,12 +178,38 @@ public class DurableHashSetImpl<A extends RestorableAllocator<A>, E>
   public void createDurableEntity(A allocator, EntityFactoryProxy[] factoryProxy,
               DurableType[] gType, boolean autoReclaim) throws OutOfHybridMemory {
     initializeDurableEntity(allocator, factoryProxy, gType, autoReclaim);
-    map = DurableHashMapFactory.create(allocator, factoryProxy, gType, initialCapacity, autoReclaim); 
+    map = DurableHashMapFactory.create(allocator, this.factoryProxy, this.genericType, initialCapacity, autoReclaim);
     initializeAfterCreate();
   }
 
   @Override
   public Iterator<E> iterator() {
-    return null;
+    return new HashSetItr(map.iterator());
+  }
+
+  private class HashSetItr implements Iterator<E> {
+
+    Iterator<MapEntry<E, Boolean>> mapItr;
+
+    HashSetItr(Iterator<MapEntry<E, Boolean>> itr) {
+      this.mapItr = itr;
+    }
+
+    @Override
+    public boolean hasNext() {
+      return mapItr.hasNext();
+    }
+
+    @Override
+    public E next() {
+      return mapItr.next().getKey();
+    }
+
+    @Override
+    public void remove() {
+      mapItr.remove();
+    }
+
+
   }
 }

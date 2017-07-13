@@ -69,12 +69,18 @@ public abstract class DurableHashSet<E> implements Durable, Iterable<E> {
   /**
    * checks if set contains the specified element
    *
+   * @param item
+   *          the item to be searched
+   *
    * @return true if set contains the element
    */
   public abstract boolean contains(E item);
 
   /**
    * adds a specific element to the set
+   *
+   * @param item
+   *          the item to be added
    *
    * @return true if set did not already contain the element
    */
@@ -83,9 +89,12 @@ public abstract class DurableHashSet<E> implements Durable, Iterable<E> {
   /**
    * removes a specific element from the set
    *
+   * @param item
+   *          the item to be removed
+   *
    * @return true if set contained the element
    */
-  public abstract boolean remove(E value);
+  public abstract boolean remove(E item);
 
   /**
    * Get the number of elements in the set

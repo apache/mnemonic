@@ -17,27 +17,26 @@
 
 package org.apache.mnemonic.collections;
 
+import java.util.Iterator;
 import java.nio.ByteBuffer;
 import java.util.Random;
 import java.util.zip.Checksum;
-//import java.util.zip.CRC32;
-//import org.apache.commons.lang3.tuple.Pair;
-//import org.apache.commons.lang3.ArrayUtils;
 
 import org.apache.mnemonic.Utils;
 import org.apache.mnemonic.NonVolatileMemAllocator;
-//import org.apache.mnemonic.RestorableAllocator;
+import org.apache.mnemonic.RestorableAllocator;
+import org.apache.mnemonic.ParameterHolder;
 import org.apache.mnemonic.OutOfHybridMemory;
 import org.apache.mnemonic.DurableBuffer;
 import org.apache.mnemonic.DurableChunk;
 import org.apache.mnemonic.DurableType;
-//import org.apache.mnemonic.Durable;
-//import org.apache.mnemonic.EntityFactoryProxy;
+import org.apache.mnemonic.EntityFactoryProxy;
 import org.apache.mnemonic.Reclaim;
 import org.apache.commons.lang3.RandomUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import org.testng.AssertJUnit;
 import org.testng.Assert;
 
 import sun.misc.Unsafe;
@@ -126,33 +125,182 @@ public class DurableHashSetNGTest {
   }
 
   @Test(enabled = true)
-  public void testAddRemoveSetPrimitives() {
+  public void testAddRemoveSetIntegers() {
     DurableType gtypes[] = {DurableType.INTEGER};
     DurableHashSet<Integer> set = DurableHashSetFactory.create(m_act, null, gtypes, initialCapacity, false);
 
     Long handler = set.getHandler();
     boolean val;
-    /*for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 10; i++) {
       val = set.add(i);
-      Assert.assertFalse(val)
+      Assert.assertTrue(val);
     }
 
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 10; i++) {
       val = set.contains(i);
-      Assert.assertTrue(val)
+      Assert.assertTrue(val);
     }
 
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 10; i++) {
       val = set.remove(i);
-      Assert.assertTrue(val)
+      Assert.assertTrue(val);
     }
 
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 10; i++) {
       val = set.contains(i);
-      Assert.assertFalse(val)
-    }*/
+      Assert.assertFalse(val);
+    }
 
     set.destroy();
   }
+
+  @Test(enabled = true)
+  public void testAddRemoveSetStrings() {
+    DurableType gtypes[] = {DurableType.STRING};
+    DurableHashSet<String> set = DurableHashSetFactory.create(m_act, null, gtypes, initialCapacity, false);
+
+    Long handler = set.getHandler();
+    boolean val;
+    for (int i = 0; i < 10; i++) {
+      val = set.add("str" + i);
+      Assert.assertTrue(val);
+    }
+
+    for (int i = 0; i < 10; i++) {
+      val = set.contains("str" + i);
+      Assert.assertTrue(val);
+    }
+
+    for (int i = 0; i < 10; i++) {
+      val = set.remove("str" + i);
+      Assert.assertTrue(val);
+    }
+
+    for (int i = 0; i < 10; i++) {
+      val = set.contains("str" + i);
+      Assert.assertFalse(val);
+    }
+
+    set.destroy();
+  }
+
+  @Test(enabled = true)
+  public void testAddRemoveDurable() {
+    DurableType gtypes[] = {DurableType.DURABLE};
+    EntityFactoryProxy efproxies[] = {new EntityFactoryProxy() {
+      @Override
+      public <A extends RestorableAllocator<A>> Person<Long> restore(
+          A allocator, EntityFactoryProxy[] factoryproxys,
+          DurableType[] gfields, long phandler, boolean autoreclaim) {
+        return PersonFactory.restore(allocator, factoryproxys, gfields, phandler, autoreclaim);
+      }
+      @Override
+      public <A extends RestorableAllocator<A>> Person<Long> restore(ParameterHolder<A> ph) {
+        return PersonFactory.restore(ph.getAllocator(),
+                ph.getEntityFactoryProxies(), ph.getGenericTypes(), ph.getHandler(), ph.getAutoReclaim());
+      }
+      @Override
+      public <A extends RestorableAllocator<A>> Person<Long> create(
+          A allocator, EntityFactoryProxy[] factoryproxys,
+          DurableType[] gfields, boolean autoreclaim) {
+        return PersonFactory.create(allocator, factoryproxys, gfields, autoreclaim);
+      }
+      @Override
+      public <A extends RestorableAllocator<A>> Person<Long> create(ParameterHolder<A> ph) {
+        return PersonFactory.create(ph.getAllocator(),
+                ph.getEntityFactoryProxies(), ph.getGenericTypes(), ph.getAutoReclaim());
+      }
+    } };
+
+    Person<Long> person =  (Person<Long>) efproxies[0].create(m_act, null, null, false);
+    person.setAge((short) 31);
+    person.setName("Bob", true);
+
+    Person<Long> anotherPerson =  (Person<Long>) efproxies[0].create(m_act, null, null, false);
+    anotherPerson.setAge((short) 30);
+    anotherPerson.setName("Alice", true);
+
+    DurableHashSet<Person<Long>> set = DurableHashSetFactory.create(m_act, efproxies, gtypes, initialCapacity, false);
+    boolean val = set.add(person);
+    AssertJUnit.assertTrue(val);
+    val = set.contains(person);
+    AssertJUnit.assertTrue(val);
+    val = set.contains(anotherPerson);
+    AssertJUnit.assertFalse(val);
+    val = set.add(anotherPerson);
+    AssertJUnit.assertTrue(val);
+    val = set.contains(anotherPerson);
+    AssertJUnit.assertTrue(val);
+
+    val = set.remove(person);
+    AssertJUnit.assertTrue(val);
+    val = set.contains(person);
+    AssertJUnit.assertFalse(val);
+    val = set.contains(anotherPerson);
+    AssertJUnit.assertTrue(val);
+
+    val = set.remove(anotherPerson);
+    AssertJUnit.assertTrue(val);
+    val = set.contains(anotherPerson);
+    AssertJUnit.assertFalse(val);
+
+    set.destroy();
+  }
+
+  @Test(enabled = true)
+  public void testSetIterator() {
+    DurableType gtypes[] = {DurableType.STRING};
+    DurableHashSet<String> set = DurableHashSetFactory.create(m_act, null, gtypes, initialCapacity, false);
+
+    Long handler = set.getHandler();
+    set.add("hello");
+    set.add("world");
+    AssertJUnit.assertEquals(set.getSize(), 2);
+
+    Iterator<String> iter = set.iterator();
+    int count = 0;
+    String entry = "";
+    while (iter.hasNext()) {
+      entry = iter.next();
+      count++;
+      if (entry.equals("world")) {
+        iter.remove();
+      }
+    }
+    AssertJUnit.assertEquals(count, 2);
+    AssertJUnit.assertEquals(set.getSize(), 1);
+    iter = set.iterator();
+    count = 0;
+    while (iter.hasNext()) {
+      entry = iter.next();
+      iter.remove();
+      count++;
+    }
+    AssertJUnit.assertEquals(count, 1);
+    AssertJUnit.assertEquals(set.getSize(), 0);
+    AssertJUnit.assertEquals(entry, "hello");
+
+    iter = set.iterator();
+    count = 0;
+    while (iter.hasNext()) {
+      entry = iter.next();
+      count++;
+    }
+    AssertJUnit.assertEquals(count, 0);
+    set.add("hello");
+    set.add("world");
+    AssertJUnit.assertEquals(set.getSize(), 2);
+
+    iter = set.iterator();
+    count = 0;
+    while (iter.hasNext()) {
+      entry = iter.next();
+      count++;
+    }
+    AssertJUnit.assertEquals(count, 2);
+
+    set.destroy();
+  }
+
 }
 
