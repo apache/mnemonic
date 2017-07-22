@@ -17,11 +17,15 @@
 
 package org.apache.mnemonic.service.memoryservice.internal;
 
-import org.apache.mnemonic.service.memoryservice.VolatileMemoryAllocatorService;
 import org.apache.mnemonic.ConfigurationException;
-import org.flowcomputing.commons.primitives.NativeLibraryLoader;
+import org.apache.mnemonic.service.memoryservice.VolatileMemoryAllocatorService;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,11 +44,11 @@ public class JavaVMemServiceImpl implements VolatileMemoryAllocatorService {
   public long init(long capacity, String uri, boolean isnew) {
     FileChannel channel = null;
     RandomAccessFile mappedFile = null;
-    long cp = null;
-    long ret = null;
+    long cp = -1;
+    long ret = -1;
 
 
-    if (uri == null || uri.length == 0) {
+    if (uri == null || uri.length() == 0) {
       throw new ConfigurationException(String.format("Please supply the file path: %s.", uri));
     }
     if (capacity <= 0) {
@@ -66,16 +70,27 @@ public class JavaVMemServiceImpl implements VolatileMemoryAllocatorService {
           throw new ConfigurationException(String.format("Failed to delete the file: %s.", uri));
         }
       }
-      mappedFile = new RandomAccessFile(file, "rw");
-      mappedFile.setLength(capacity);
+      try {
+        mappedFile = new RandomAccessFile(file, "rw");
+        mappedFile.setLength(capacity);
+        cp = mappedFile.length();
+      } catch (Exception ex) { }
     } else {
-      mappedFile = new RandomAccessFile(file, "rw");
+      if (!file.exists()) {
+        throw new ConfigurationException(String.format("File doesn't exist under the specifiled uri: %s", uri));
+      }
+      try {
+        mappedFile = new RandomAccessFile(file, "rw");
+        cp = mappedFile.length();
+      } catch (Exception ex) { }
     }
 
-    cp = file.length();
-    mem_pool.add(mappedFile);
-    ret = mem_pool.length - 1;
-    m_info.put(ret, cp);
+
+    if (mappedFile != null) {
+      mem_pool.add(mappedFile);
+      ret = mem_pool.size() - 1;
+      m_info.put(ret, cp);
+    }
 
     return ret;
   }
@@ -87,9 +102,14 @@ public class JavaVMemServiceImpl implements VolatileMemoryAllocatorService {
 
   @Override
   public void close(long id) {
-    if (mem_pool.get(id) != null) {
-      mem_pool.get(id).close();
-      mem_pool.get(id) = null;
+    int idx = (int) id;
+    if (mem_pool.get(idx) != null) {
+      try {
+        mem_pool.get(idx).close();
+      } catch (IOException e) {
+      } finally {
+        mem_pool.set(idx, null);
+      }
     }
   }
 
@@ -146,17 +166,17 @@ public class JavaVMemServiceImpl implements VolatileMemoryAllocatorService {
   @Override
   public ByteBuffer retrieveByteBuffer(long id, long handler) {
     ByteBuffer myByteBuffer = null;
-    return myByteBuffer;//need change
+    return myByteBuffer; //need change
   }
 
   @Override
   public long retrieveSize(long id, long handler) {
-    return 1L;//need change
+    return 1L; //need change
   }
 
   @Override
   public long getByteBufferHandler(long id, ByteBuffer buf) {
-    return 1L;//need change
+    return 1L; //need change
   }
 
   @Override
@@ -176,7 +196,7 @@ public class JavaVMemServiceImpl implements VolatileMemoryAllocatorService {
 
   @Override
   public long getBaseAddress(long id) {
-    return 1L;//need change
+    return 1L; //need change
   }
 
   @Override
@@ -197,5 +217,12 @@ public class JavaVMemServiceImpl implements VolatileMemoryAllocatorService {
   @Override
   public boolean isInTransaction() {
     throw new UnsupportedOperationException("Not support transaction");
+  }
+
+  public Map<Long, Long> getMInfo() {
+    return this.m_info;
+  }
+  public ArrayList<RandomAccessFile> getMemPool() {
+    return this.mem_pool;
   }
 }
