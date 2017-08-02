@@ -34,6 +34,30 @@ public class ParameterHolder<A extends RetrievableAllocator<A>> {
         handler = 0;
     }
 
+    public ParameterHolder(A n) {
+        this.allocator = n;
+        this.durableType = new DurableType[]{};
+        this.entityFactoryProxy = null;
+        this.autoReclaim = true;
+        this.handler = 0;
+    }
+
+    public ParameterHolder(A n, DurableType[] d) {
+        this.allocator = n;
+        this.durableType = d;
+        this.entityFactoryProxy = null;
+        this.autoReclaim = true;
+        this.handler = 0;
+    }
+
+    public ParameterHolder(A n, DurableType[] d, EntityFactoryProxy[] e) {
+        this.allocator = n;
+        this.durableType = d;
+        this.entityFactoryProxy = e;
+        this.autoReclaim = true;
+        this.handler = 0;
+    }
+
     public ParameterHolder(A n, DurableType[] d, EntityFactoryProxy[] e, boolean b, long h) {
         this.allocator = n;
         this.durableType = d;
