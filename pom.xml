@@ -96,6 +96,7 @@
     <module>mnemonic-sessions</module>
     <module>mnemonic-hadoop</module>
     <module>mnemonic-spark</module>
+    <module>mnemonic-query</module>
   </modules>
 
   <properties>
