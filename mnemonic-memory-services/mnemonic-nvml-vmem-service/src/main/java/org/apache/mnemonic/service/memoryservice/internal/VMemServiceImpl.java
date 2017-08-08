@@ -17,6 +17,7 @@
 
 package org.apache.mnemonic.service.memoryservice.internal;
 
+import org.apache.mnemonic.service.memoryservice.MemoryServiceFeature;
 import org.apache.mnemonic.service.memoryservice.VolatileMemoryAllocatorService;
 import org.flowcomputing.commons.primitives.NativeLibraryLoader;
 
@@ -24,6 +25,8 @@ import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
 
 public class VMemServiceImpl implements VolatileMemoryAllocatorService {
   static {
@@ -152,6 +155,13 @@ public class VMemServiceImpl implements VolatileMemoryAllocatorService {
   @Override
   public boolean isInTransaction() {
     throw new UnsupportedOperationException("Not support transaction");
+  }
+
+  @Override
+  public Set<MemoryServiceFeature> getFeatures() {
+    Set<MemoryServiceFeature> ret = new HashSet<MemoryServiceFeature>();
+    ret.add(MemoryServiceFeature.VOLATILE);
+    return ret;
   }
 
   protected native long ninit(long capacity, String uri, boolean isnew);

@@ -18,6 +18,7 @@
 package org.apache.mnemonic.service.memoryservice;
 
 import java.nio.ByteBuffer;
+import java.util.Set;
 
 public interface VolatileMemoryAllocatorService {
 
@@ -296,5 +297,12 @@ public interface VolatileMemoryAllocatorService {
    * @return the true if it is in a transaction
    */
   boolean isInTransaction();
+
+  /**
+   * provide a set of features that the memory service can offer
+   *
+   * @return a set of features that supported by this memory service
+   */
+  Set<MemoryServiceFeature> getFeatures();
 
 }

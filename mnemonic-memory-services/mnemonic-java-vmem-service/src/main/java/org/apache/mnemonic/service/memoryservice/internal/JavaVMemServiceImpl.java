@@ -18,6 +18,7 @@
 package org.apache.mnemonic.service.memoryservice.internal;
 
 import org.apache.mnemonic.ConfigurationException;
+import org.apache.mnemonic.service.memoryservice.MemoryServiceFeature;
 import org.apache.mnemonic.service.memoryservice.VolatileMemoryAllocatorService;
 
 import java.io.File;
@@ -29,6 +30,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
 
 public class JavaVMemServiceImpl implements VolatileMemoryAllocatorService {
 
@@ -217,6 +220,13 @@ public class JavaVMemServiceImpl implements VolatileMemoryAllocatorService {
   @Override
   public boolean isInTransaction() {
     throw new UnsupportedOperationException("Not support transaction");
+  }
+
+  @Override
+  public Set<MemoryServiceFeature> getFeatures() {
+    Set<MemoryServiceFeature> ret = new HashSet<MemoryServiceFeature>();
+    ret.add(MemoryServiceFeature.VOLATILE);
+    return ret;
   }
 
   public Map<Long, Long> getMInfo() {

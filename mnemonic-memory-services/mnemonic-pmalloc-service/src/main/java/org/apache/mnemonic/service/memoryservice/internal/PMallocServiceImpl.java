@@ -17,10 +17,13 @@
 
 package org.apache.mnemonic.service.memoryservice.internal;
 
+import org.apache.mnemonic.service.memoryservice.MemoryServiceFeature;
 import org.apache.mnemonic.service.memoryservice.NonVolatileMemoryAllocatorService;
 import org.flowcomputing.commons.primitives.NativeLibraryLoader;
 
 import java.nio.ByteBuffer;
+import java.util.HashSet;
+import java.util.Set;
 
 public class PMallocServiceImpl implements NonVolatileMemoryAllocatorService {
   static {
@@ -159,6 +162,14 @@ public class PMallocServiceImpl implements NonVolatileMemoryAllocatorService {
   @Override
   public boolean isInTransaction() {
     throw new UnsupportedOperationException("Not support transaction");
+  }
+
+  @Override
+  public Set<MemoryServiceFeature> getFeatures() {
+    Set<MemoryServiceFeature> ret = new HashSet<MemoryServiceFeature>();
+    ret.add(MemoryServiceFeature.VOLATILE);
+    ret.add(MemoryServiceFeature.NONVOLATILE);
+    return ret;
   }
 
   protected native long ninit(long capacity, String uri, boolean isnew);

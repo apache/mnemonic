@@ -17,11 +17,12 @@
 
 package org.apache.mnemonic;
 
-import java.nio.ByteBuffer;
-
+import org.apache.mnemonic.service.memoryservice.MemoryServiceFeature;
 import org.apache.mnemonic.service.memoryservice.VolatileMemoryAllocatorService;
 import org.flowcomputing.commons.resgc.ResCollector;
 import org.flowcomputing.commons.resgc.ResReclaim;
+
+import java.nio.ByteBuffer;
 
 /**
  * manage a big native memory pool through libvmem.so that is provied by Intel
@@ -56,6 +57,9 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
   public VolatileMemAllocator(VolatileMemoryAllocatorService vmasvc, long capacity, String uri) {
     if (null == vmasvc) {
       throw new IllegalArgumentException("VolatileMemoryAllocatorService object is null");
+    }
+    if (!vmasvc.getFeatures().contains(MemoryServiceFeature.VOLATILE)) {
+      throw new ConfigurationException("The specified memory service does not support volatile feature");
     }
     if (capacity <= 0) {
       throw new IllegalArgumentException("VolatileMemAllocator cannot be initialized with capacity <= 0.");

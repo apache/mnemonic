@@ -17,10 +17,12 @@
 
 package org.apache.mnemonic;
 
-import java.nio.ByteBuffer;
+import org.apache.mnemonic.service.memoryservice.MemoryServiceFeature;
 import org.apache.mnemonic.service.memoryservice.NonVolatileMemoryAllocatorService;
 import org.flowcomputing.commons.resgc.ResCollector;
 import org.flowcomputing.commons.resgc.ResReclaim;
+
+import java.nio.ByteBuffer;
 
 /**
  * manage a big native persistent memory pool through libpmalloc.so provided by
@@ -59,6 +61,9 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
   public NonVolatileMemAllocator(NonVolatileMemoryAllocatorService nvmasvc, long capacity, String uri, boolean isnew) {
     if (null == nvmasvc) {
       throw new IllegalArgumentException("NonVolatileMemoryAllocatorService object is null");
+    }
+    if (!nvmasvc.getFeatures().contains(MemoryServiceFeature.NONVOLATILE)) {
+      throw new ConfigurationException("The specified memory service does not support non-volatile feature");
     }
     if (isnew && capacity <= 0) {
       throw new IllegalArgumentException("NonVolatileMemAllocator cannot be initialized with capacity <= 0.");
