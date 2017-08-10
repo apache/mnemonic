@@ -17,8 +17,9 @@
 
 package org.apache.mnemonic;
 
-import org.apache.mnemonic.service.memoryservice.MemoryServiceFeature;
-import org.apache.mnemonic.service.memoryservice.VolatileMemoryAllocatorService;
+import org.apache.mnemonic.query.memory.Queryable;
+import org.apache.mnemonic.service.memory.MemoryServiceFeature;
+import org.apache.mnemonic.service.memory.VolatileMemoryAllocatorService;
 import org.flowcomputing.commons.resgc.ResCollector;
 import org.flowcomputing.commons.resgc.ResReclaim;
 
@@ -536,5 +537,13 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
   @Override
   public boolean isInTransaction() {
     return m_vmasvc.isInTransaction();
+  }
+
+  /**
+   *
+   * @return
+   */
+  Queryable useQuery() {
+    return null;
   }
 }

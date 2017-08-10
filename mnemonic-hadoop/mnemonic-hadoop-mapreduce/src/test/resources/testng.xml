@@ -30,5 +30,5 @@
 
 
 <!--
-      <class name="org.apache.mnemonic.service.computingservice.DurableSinglyLinkedListNGPrintTest"/> 
+      <class name="org.apache.mnemonic.service.computing.DurableSinglyLinkedListNGPrintTest"/>
  -->

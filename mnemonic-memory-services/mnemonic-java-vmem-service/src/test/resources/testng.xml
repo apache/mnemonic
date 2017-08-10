@@ -22,7 +22,7 @@
 <suite name="Mnenomic Memory Service test Suite" verbose="1" parallel="tests" thread-count="1">
     <test name="Java Memory Service" >
         <classes>
-            <class name="org.apache.mnemonic.service.memoryservice.internal.JavaVMemServiceImplNGTest" />
+            <class name="org.apache.mnemonic.service.memory.internal.JavaVMemServiceImplNGTest" />
         </classes>
     </test>
 </suite>

@@ -76,7 +76,7 @@ struct NValueInfo *constructNValInfo(JNIEnv* env, jobject vinfoobj) {
 
   if (0 == inited) {
     inited = 1;
-    vinfocls = (*env)->FindClass(env, "org/apache/mnemonic/service/computingservice/ValueInfo");
+    vinfocls = (*env)->FindClass(env, "org/apache/mnemonic/service/computing/ValueInfo");
     dutenum = (*env)->FindClass(env, "org/apache/mnemonic/DurableType");
     if (NULL != vinfocls && NULL != dutenum) {
       handler_fid = (*env)->GetFieldID(env, vinfocls, "handler", "J");

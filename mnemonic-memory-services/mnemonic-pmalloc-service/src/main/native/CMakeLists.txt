@@ -45,7 +45,7 @@ if (NOT LIBPMALLOC_LIBRARIES)
    message(FATAL_ERROR "not found pmalloc library")
 endif (NOT LIBPMALLOC_LIBRARIES)
 
-add_library(pmallocallocator SHARED common.c org_apache_mnemonic_service_memoryservice_internal_PMallocServiceImpl.c)
+add_library(pmallocallocator SHARED common.c org_apache_mnemonic_service_memory_internal_PMallocServiceImpl.c)
 target_include_directories(pmallocallocator PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(pmallocallocator ${LIBPMALLOC_LIBRARIES})
 

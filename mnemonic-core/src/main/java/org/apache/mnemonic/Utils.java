@@ -17,6 +17,13 @@
 
 package org.apache.mnemonic;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.mnemonic.service.computing.GeneralComputingService;
+import org.apache.mnemonic.service.memory.NonVolatileMemoryAllocatorService;
+import org.apache.mnemonic.service.memory.VolatileMemoryAllocatorService;
+import sun.misc.Unsafe;
+
 import java.io.File;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
@@ -24,18 +31,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Random;
-import java.util.UUID;
-
-import sun.misc.Unsafe;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.ServiceLoader;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.mnemonic.service.memoryservice.VolatileMemoryAllocatorService;
-import org.apache.mnemonic.service.computingservice.GeneralComputingService;
-import org.apache.mnemonic.service.memoryservice.NonVolatileMemoryAllocatorService;
+import java.util.UUID;
 
 /**
  * <p>

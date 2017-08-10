@@ -37,8 +37,8 @@ find_package(Threads REQUIRED)
 include_directories(${CMAKE_THREAD_LIBS_INIT})
 
 add_library(utilitiescomputing SHARED common.c
-  org_apache_mnemonic_service_computingservice_internal_SortServiceImpl.c
-  org_apache_mnemonic_service_computingservice_internal_PrintServiceImpl.c)
+  org_apache_mnemonic_service_computing_internal_SortServiceImpl.c
+  org_apache_mnemonic_service_computing_internal_PrintServiceImpl.c)
 target_include_directories(utilitiescomputing PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 include (InstallRequiredSystemLibraries)

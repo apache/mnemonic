@@ -17,8 +17,8 @@
 
 package org.apache.mnemonic;
 
-import org.apache.mnemonic.service.memoryservice.MemoryServiceFeature;
-import org.apache.mnemonic.service.memoryservice.NonVolatileMemoryAllocatorService;
+import org.apache.mnemonic.service.memory.MemoryServiceFeature;
+import org.apache.mnemonic.service.memory.NonVolatileMemoryAllocatorService;
 import org.flowcomputing.commons.resgc.ResCollector;
 import org.flowcomputing.commons.resgc.ResReclaim;
 

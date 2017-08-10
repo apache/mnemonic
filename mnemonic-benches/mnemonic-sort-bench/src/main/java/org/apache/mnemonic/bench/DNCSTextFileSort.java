@@ -17,21 +17,21 @@
 
 package org.apache.mnemonic.bench;
 
+import org.apache.mnemonic.DurableType;
+import org.apache.mnemonic.EntityFactoryProxy;
+import org.apache.mnemonic.Utils;
+import org.apache.mnemonic.VolatileMemAllocator;
+import org.apache.mnemonic.collections.DurableSinglyLinkedList;
+import org.apache.mnemonic.collections.DurableSinglyLinkedListFactory;
+import org.apache.mnemonic.service.computing.GeneralComputingService;
+import org.apache.mnemonic.service.computing.ValueInfo;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import org.apache.mnemonic.VolatileMemAllocator;
-import org.apache.mnemonic.EntityFactoryProxy;
-import org.apache.mnemonic.Utils;
-import org.apache.mnemonic.DurableType;
-import org.apache.mnemonic.collections.DurableSinglyLinkedList;
-import org.apache.mnemonic.collections.DurableSinglyLinkedListFactory;
-import org.apache.mnemonic.service.computingservice.GeneralComputingService;
-import org.apache.mnemonic.service.computingservice.ValueInfo;
 
 public class DNCSTextFileSort implements TextFileSort {
   private String uri = "";

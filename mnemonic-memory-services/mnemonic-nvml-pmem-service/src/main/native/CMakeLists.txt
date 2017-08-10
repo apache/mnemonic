@@ -48,7 +48,7 @@ if (NOT LIBPMEMOBJ_LIBRARIES)
    message(FATAL_ERROR "not found pmemobj library")
 endif (NOT LIBPMEMOBJ_LIBRARIES)
 
-add_library(pmemallocator SHARED common.c org_apache_mnemonic_service_memoryservice_internal_PMemServiceImpl.c)
+add_library(pmemallocator SHARED common.c org_apache_mnemonic_service_memory_internal_PMemServiceImpl.c)
 target_include_directories(pmemallocator PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(pmemallocator ${LIBPMEMOBJ_LIBRARIES} ${LIBPMEM_LIBRARIES})
 

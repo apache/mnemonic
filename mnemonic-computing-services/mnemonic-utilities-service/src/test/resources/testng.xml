@@ -23,12 +23,12 @@
 <suite name="Suite" verbose="1" parallel="tests" thread-count="1">
   <test name="Test">
     <classes>
-      <class name="org.apache.mnemonic.service.computingservice.DurableSinglyLinkedListNGPrintTest"/> 
+      <class name="org.apache.mnemonic.service.computing.DurableSinglyLinkedListNGPrintTest"/>
     </classes>
   </test> <!-- Test -->
 </suite> <!-- Suite -->
 
 
 <!--
-      <class name="org.apache.mnemonic.service.computingservice.DurableSinglyLinkedListNGPrintTest"/> 
+      <class name="org.apache.mnemonic.service.computing.DurableSinglyLinkedListNGPrintTest"/>
  -->
