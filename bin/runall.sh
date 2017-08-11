@@ -61,14 +61,14 @@ fi
 
 if [ ! -d "testlog" ]
 then
-mkdir testlog
+  mkdir testlog
 fi
 
 mvn clean package install > testlog/build.log
 if [ $? -gt 0 ]
 then
-echo [ERROR] Build failed, please check package dependency and refer to testlog/build.log for error messages.
-exit 1
+  echo [ERROR] Build failed, please check package dependency and refer to testlog/build.log for error messages.
+  exit 1
 fi
 echo [SUCCESS] Build Success!
 
@@ -76,11 +76,11 @@ echo [INFO] Running mnemonic example...
 mvn exec:exec -Pexample -pl mnemonic-examples > testlog/mnemonic-example.log
 if [ $? -gt 0 ]
 then
-echo [ERROR] This example requires \"vmem\" memory service to run, please check if \"vmem\" has been configured correctly! If \"vmem\" is installed, please refer to testlog/mnemonic-example.log for detailed information.
-exit 1
+  echo [ERROR] This example requires \"vmem\" memory service to run, please check if \"vmem\" has been configured correctly! If \"vmem\" is installed, please refer to testlog/mnemonic-example.log for detailed information.
+  exit 1
 fi
 echo [SUCCESS] Mnemonic example is completed!
 
-python bin/runTestCases.py
+python bin/runTestCases.py || { echo "Test failed"; exit 33; }
 
 popd

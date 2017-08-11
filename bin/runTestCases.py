@@ -27,6 +27,7 @@ testLogDir = "testlog/"
 if not os.path.exists(testLogDir):
     os.makedirs(testLogDir)
 
+cleanupCmd = r'find mnemonic-* -type f \( -name "*.mne" -o -name "*.dat" \) -exec rm {} \;'
 testCmdFile = 'bin/test.conf'
 tcCmdReg = re.compile('^mvn\s.*$')
 tcNameReg = re.compile('-D(?:test|suites)=(.+?)\s')
@@ -40,6 +41,7 @@ with open(testCmdFile) as fp:
             try:
                 #maven build
                 subprocess.check_call(match[0] + ">" + logFilePath, stderr=subprocess.STDOUT, shell=True)
+                subprocess.call(cleanupCmd, stderr=subprocess.STDOUT, shell=True)
                 print("[SUCCESS] Test case " + tcNameReg.findall(line)[0] + " for \"" + tcModuleReg.findall(line)[0]+ "\" is completed!")
             except subprocess.CalledProcessError as e:
                 print("[ERROR] This test case requires \"pmalloc\" memory service to pass, please check if \"pmalloc\" has been configured correctly! If \"pmalloc\" is installed, please refer to testlog/" + tcNameReg.findall(line)[0] + ".log for detailed information.")
