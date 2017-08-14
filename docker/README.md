@@ -1,4 +1,4 @@
-<img src="http://nonvolatilecomputing.github.io/Mnemonic/images/mnemonic_logo.png" width=200 />
+<img src="https://mnemonic.incubator.apache.org/img/mnemonic_logo.png" width=200 />
 
 ================================ 
 
