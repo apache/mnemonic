@@ -205,14 +205,14 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
         <version>1.13</version>
-        <executions>
+        <!--executions>
           <execution>
             <id>download-licenses</id>
             <goals>
               <goal>download-licenses</goal>
             </goals>
           </execution>
-        </executions>
+        </executions-->
       </plugin>
       <!--plugin>
         <groupId>org.apache.maven.plugins</groupId>
