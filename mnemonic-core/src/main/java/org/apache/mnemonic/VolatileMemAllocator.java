@@ -17,17 +17,22 @@
 
 package org.apache.mnemonic;
 
+import org.apache.mnemonic.query.memory.EntityInfo;
 import org.apache.mnemonic.query.memory.Queryable;
+import org.apache.mnemonic.query.memory.ResultSet;
+import org.apache.mnemonic.service.computing.ValueInfo;
 import org.apache.mnemonic.service.memory.MemoryServiceFeature;
 import org.apache.mnemonic.service.memory.VolatileMemoryAllocatorService;
 import org.flowcomputing.commons.resgc.ResCollector;
 import org.flowcomputing.commons.resgc.ResReclaim;
 
 import java.nio.ByteBuffer;
+import java.util.Set;
+
+import static org.apache.mnemonic.service.memory.MemoryServiceFeature.QUERYABLE;
 
 /**
- * manage a big native memory pool through libvmem.so that is provied by Intel
- * nvml library.
+ * manage a big native memory pool through underlying memory service.
  * 
  *
  */
@@ -38,6 +43,8 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
   private long m_nid = -1;
   private long[][] m_ttable;
   private VolatileMemoryAllocatorService m_vmasvc = null;
+  private Queryable m_querable = null;
+  private Set<MemoryServiceFeature> m_features = null;
 
   /**
    * Constructor, it initializes and allocate a memory pool from specified uri
@@ -59,7 +66,8 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
     if (null == vmasvc) {
       throw new IllegalArgumentException("VolatileMemoryAllocatorService object is null");
     }
-    if (!vmasvc.getFeatures().contains(MemoryServiceFeature.VOLATILE)) {
+    m_features = vmasvc.getFeatures();
+    if (!m_features.contains(MemoryServiceFeature.VOLATILE)) {
       throw new ConfigurationException("The specified memory service does not support volatile feature");
     }
     if (capacity <= 0) {
@@ -539,11 +547,59 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
     return m_vmasvc.isInTransaction();
   }
 
+  class MemoryQueryAdapter implements Queryable {
+
+    @Override
+    public String[] getClassNames() {
+      return m_vmasvc.getClassNames(m_nid);
+    }
+
+    @Override
+    public String[] getEntityNames(String clsname) {
+      return m_vmasvc.getEntityNames(m_nid, clsname);
+    }
+
+    @Override
+    public EntityInfo getEntityInfo(String clsname, String etyname) {
+      return m_vmasvc.getEntityInfo(m_nid, clsname, etyname);
+    }
+
+    @Override
+    public void createEntity(EntityInfo entityinfo) {
+      m_vmasvc.createEntity(m_nid, entityinfo);
+    }
+
+    @Override
+    public void destroyEntity(String clsname, String etyname) {
+      m_vmasvc.destroyEntity(m_nid, clsname, etyname);
+    }
+
+    @Override
+    public void updateQueryableInfo(String clsname, String etyname, ValueInfo updobjs) {
+      m_vmasvc.updateQueryableInfo(m_nid, clsname, etyname, updobjs);
+    }
+
+    @Override
+    public void deleteQueryableInfo(String clsname, String etyname, ValueInfo updobjs) {
+      m_vmasvc.deleteQueryableInfo(m_nid, clsname, etyname, updobjs);
+    }
+
+    @Override
+    public ResultSet query(String querystr) {
+      return m_vmasvc.query(m_nid, querystr);
+    }
+  }
+
   /**
    *
    * @return
    */
   Queryable useQuery() {
-    return null;
+    if (null == m_querable) {
+      if (m_features.contains(QUERYABLE)) {
+        m_querable = new MemoryQueryAdapter();
+      }
+    }
+    return m_querable;
   }
 }

@@ -17,6 +17,9 @@
 
 package org.apache.mnemonic.service.memory.internal;
 
+import org.apache.mnemonic.query.memory.EntityInfo;
+import org.apache.mnemonic.query.memory.ResultSet;
+import org.apache.mnemonic.service.computing.ValueInfo;
 import org.apache.mnemonic.service.memory.MemoryServiceFeature;
 import org.apache.mnemonic.service.memory.NonVolatileMemoryAllocatorService;
 import org.flowcomputing.commons.primitives.NativeLibraryLoader;
@@ -211,5 +214,47 @@ public class PMemServiceImpl implements NonVolatileMemoryAllocatorService {
   protected native void ndrain(long id);
 
   protected native long ngetBaseAddress(long id);
+
+  /* Optional Queryable Service */
+
+  @Override
+  public String[] getClassNames(long id) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public String[] getEntityNames(long id, String clsname) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public EntityInfo getEntityInfo(long id, String clsname, String etyname) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void createEntity(long id, EntityInfo entityinfo) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void destroyEntity(long id, String clsname, String etyname) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void updateQueryableInfo(long id, String clsname, String etyname, ValueInfo updobjs) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public void deleteQueryableInfo(long id, String clsname, String etyname, ValueInfo updobjs) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public ResultSet query(long id, String querystr) {
+    throw new UnsupportedOperationException();
+  }
 
 }
