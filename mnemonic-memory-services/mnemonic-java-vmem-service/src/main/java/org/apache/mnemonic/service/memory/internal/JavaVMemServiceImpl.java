@@ -17,6 +17,7 @@
 
 package org.apache.mnemonic.service.memory.internal;
 
+
 import org.apache.mnemonic.ConfigurationException;
 import org.apache.mnemonic.service.memory.MemoryServiceFeature;
 import org.apache.mnemonic.service.memory.VolatileMemoryAllocatorService;
@@ -24,19 +25,24 @@ import org.apache.mnemonic.service.memory.VolatileMemoryAllocatorService;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.lang.reflect.Field;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
+import java.nio.channels.FileChannel.MapMode;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.BitSet;
 import java.util.Set;
-import java.util.HashSet;
+
 
 public class JavaVMemServiceImpl implements VolatileMemoryAllocatorService {
 
-  protected Map<Long, Long> m_info = Collections.synchronizedMap(new HashMap<Long, Long>());
-  protected ArrayList<RandomAccessFile> mem_pool = new ArrayList<RandomAccessFile>();
+  protected static final int CHUNK_BLOCK_SIZE = 512;
+  protected static final MapMode MAP_MODE = MapMode.READ_WRITE;
+  protected static final int MAX_BUFFER_BLOCK_SIZE = Integer.MAX_VALUE;
+
+  protected ArrayList<MemoryInfo> mem_pools = new ArrayList<MemoryInfo>();
 
   @Override
   public String getServiceId() {
@@ -49,7 +55,6 @@ public class JavaVMemServiceImpl implements VolatileMemoryAllocatorService {
     RandomAccessFile mappedFile = null;
     long cp = -1;
     long ret = -1;
-
 
     if (uri == null || uri.length() == 0) {
       throw new ConfigurationException(String.format("Please supply the file path: %s.", uri));
@@ -90,10 +95,31 @@ public class JavaVMemServiceImpl implements VolatileMemoryAllocatorService {
 
 
     if (mappedFile != null) {
-      mem_pool.add(mappedFile);
-      ret = mem_pool.size() - 1;
-      m_info.put(ret, cp);
-    }
+      FileChannel fc = mappedFile.getChannel();
+      MemoryInfo mi = new MemoryInfo();
+      mi.setMemCapacity(cp);
+      mi.setRandomAccessFile(mappedFile);
+      mi.setFileChannel(fc);
+
+
+      if (cp <= MAX_BUFFER_BLOCK_SIZE) {
+        mi.setByteBufferBlocksList(createBufferBlockInfo(fc, 0L, (int)cp));
+      } else {
+        int bid;
+        for (bid = 0; bid < cp / MAX_BUFFER_BLOCK_SIZE; bid++) {
+          mi.setByteBufferBlocksList(
+                  createBufferBlockInfo(fc, bid * MAX_BUFFER_BLOCK_SIZE, MAX_BUFFER_BLOCK_SIZE));
+        }
+        if (cp % MAX_BUFFER_BLOCK_SIZE > 0) {
+          mi.setByteBufferBlocksList(
+                  createBufferBlockInfo(fc, bid * MAX_BUFFER_BLOCK_SIZE, (int)cp - MAX_BUFFER_BLOCK_SIZE * bid));
+        }
+      }
+
+      getMemPools().add(mi);
+      ret = this.getMemPools().size() - 1;
+
+     }
 
     return ret;
   }
@@ -106,12 +132,21 @@ public class JavaVMemServiceImpl implements VolatileMemoryAllocatorService {
   @Override
   public void close(long id) {
     int idx = (int) id;
-    if (mem_pool.get(idx) != null) {
+    MemoryInfo mi = this.getMemPools().get(idx);
+    if (mi.getFileChannel() != null) {
       try {
-        mem_pool.get(idx).close();
-      } catch (IOException e) {
+        mi.getFileChannel().close();
+      } catch (Exception e) {
       } finally {
-        mem_pool.set(idx, null);
+        mi.setFileChannel(null);
+      }
+    }
+    if (mi.getRandomAccessFile() != null) {
+      try {
+        mi.getRandomAccessFile().close();
+      } catch (Exception e) {
+      } finally {
+        mi.setRandomAccessFile(null);
       }
     }
   }
@@ -123,68 +158,193 @@ public class JavaVMemServiceImpl implements VolatileMemoryAllocatorService {
 
   @Override
   public long capacity(long id) {
-    return m_info.get(id);
+    MemoryInfo mi = this.getMemPools().get((int)id);
+    return mi.getMemCapacity();
   }
 
   @Override
   public long allocate(long id, long size, boolean initzero) {
-    return 1L; //need detail
+    ByteBuffer bb = null;
+    long handler = 0L;
+    int bufSize = (int)size;
+    MemoryInfo mi = this.getMemPools().get((int)id);
+    FileChannel fc = mi.getFileChannel();
+    ArrayList<BufferBlockInfo> bufferBlockInfo = mi.getByteBufferBlocksList();
+    int requiredBlocks = (int)Math.ceil((double)bufSize / CHUNK_BLOCK_SIZE);
+
+    if (size > MAX_BUFFER_BLOCK_SIZE) {
+      throw new ConfigurationException("Buffer size should be less than 2G.");
+    }
+    for (int blockIdx = 0; blockIdx < bufferBlockInfo.size(); blockIdx++) {
+      BitSet chunksMap = bufferBlockInfo.get(blockIdx).bufferBlockChunksMap;
+      int startIdx = findStartIdx(chunksMap, requiredBlocks);
+      if (startIdx > -1) {
+        handler = bufferBlockInfo.get(blockIdx).getBufferBlockBaseAddress() + startIdx * CHUNK_BLOCK_SIZE;
+        bb = createChunkBuffer(handler, bufSize);
+        if (initzero) {
+          for (int i = 0; i < bufSize; i++) {
+            bb.put((byte)0);
+          }
+        }
+        markUsed(chunksMap, startIdx, requiredBlocks);
+        mi.getByteBufferBlocksList().get(blockIdx).setChunkSizeMap(handler, bufSize);
+        break;
+      }
+    }
+
+    return handler;
   }
 
   @Override
   public long reallocate(long id, long addr, long size, boolean initzero) {
-    return 1L; //need detail
+    long handler = 0L;
+    ByteBuffer originalBytebuf = retrieveByteBuffer(id, addr);
+    ByteBuffer newBytebuf = createByteBuffer(id, size);
+    if (initzero) {
+      for (int i = 0; i < (int)size; i++) {
+        newBytebuf.put((byte)0);
+      }
+    }
+    originalBytebuf.rewind();
+    newBytebuf.rewind();
+    newBytebuf.put(originalBytebuf);
+    destroyByteBuffer(id, originalBytebuf);
+    handler = getByteBufferHandler(id, newBytebuf);
+    return handler;
   }
 
   @Override
   public void free(long id, long addr) {
-    ///mem_pool.get(id) = null;//need change//allocateVS free
+    MemoryInfo mi = this.getMemPools().get((int)id);
+    FileChannel channel = mi.getFileChannel();
+    int startIdx, requiredblocks, size;
+    long baseAddr;
+    try {
+      for (int blockIdx = 0; blockIdx < mi.getByteBufferBlocksList().size(); blockIdx++) {
+        BufferBlockInfo bufferBlock = mi.getByteBufferBlocksList().get(blockIdx);
+        if (bufferBlock.getChunkSizeMap().containsKey(addr)) {
+          size = bufferBlock.getChunkSizeMap().get(addr);
+          BitSet chunksMap = bufferBlock.getBufferBlockChunksMap();
+          baseAddr = bufferBlock.getBufferBlockBaseAddress();
+          startIdx = (int)Math.floor((double)((addr - baseAddr) / CHUNK_BLOCK_SIZE));
+          requiredblocks = (int)Math.ceil((double)size / CHUNK_BLOCK_SIZE);
+          markFree(chunksMap, startIdx, requiredblocks);
+          bufferBlock.getChunkSizeMap().remove(addr);
+          break;
+        }
+      }
+    } catch (Exception e) {
+    }
   }
 
   @Override
   public ByteBuffer createByteBuffer(long id, long size) {
-    ByteBuffer myByteBuffer = null;
-    /*try {
-    MapMode mapMode = readWrite ? MapMode.READ_WRITE : MapMode.READ_ONLY;
-    FileChannel channel = mem_pool.get(id).getChannel();
-    myByteBuffers = channel.map(mapMode, XXXXX, size);
-    } catch (Exception e) {
-        myBytebuffers = null;
-    }*///need change
+    ByteBuffer bb = null;
+    MemoryInfo mi = this.getMemPools().get((int)id);
+    FileChannel fc = mi.getFileChannel();
+    ArrayList<BufferBlockInfo> bufferBlockInfo = mi.getByteBufferBlocksList();
+    int bufSize = (int)size;
+    int requiredBlocks = (int)Math.ceil((double)bufSize / CHUNK_BLOCK_SIZE);
+    long startAddress;
 
-    return myByteBuffer;
+    if (size > MAX_BUFFER_BLOCK_SIZE) {
+      throw new ConfigurationException("Buffer size should be less than 2G.");
+    }
+    for (int blockIdx = 0; blockIdx < bufferBlockInfo.size(); blockIdx++) {
+      BitSet chunksMap = bufferBlockInfo.get(blockIdx).bufferBlockChunksMap;
+      int startIdx = findStartIdx(chunksMap, requiredBlocks);
+      if (startIdx > -1) {
+        startAddress = bufferBlockInfo.get(blockIdx).getBufferBlockBaseAddress() + startIdx * CHUNK_BLOCK_SIZE;
+        bb = createChunkBuffer(startAddress, bufSize);
+        markUsed(chunksMap, startIdx, requiredBlocks);
+        mi.getByteBufferBlocksList().get(blockIdx).setChunkSizeMap(startAddress, bufSize);
+        break;
+      }
+    }
+
+    return bb;
   }
 
   @Override
   public ByteBuffer resizeByteBuffer(long id, ByteBuffer bytebuf, long size) {
-    ByteBuffer myByteBuffer = null;
-    return myByteBuffer; //need change
+    ByteBuffer bb = createByteBuffer(id, size);
+    bytebuf.rewind();
+    bb.put(bytebuf);
+    destroyByteBuffer(id, bytebuf);
+    return bb;
   }
 
   @Override
   public void destroyByteBuffer(long id, ByteBuffer bytebuf) {
-    //more detail
+    MemoryInfo mi = this.getMemPools().get((int)id);
+    FileChannel channel = mi.getFileChannel();
+    int startIdx, requiredblocks;
+    long handler, baseAddr;
+    try {
+      handler = getByteBufferHandler(id, bytebuf);
+      for (int blockIdx = 0; blockIdx < mi.getByteBufferBlocksList().size(); blockIdx++) {
+        BufferBlockInfo bufferBlock = mi.getByteBufferBlocksList().get(blockIdx);
+        if (bufferBlock.getChunkSizeMap().containsKey(handler)) {
+          BitSet chunksMap = bufferBlock.getBufferBlockChunksMap();
+          baseAddr = bufferBlock.getBufferBlockBaseAddress();
+          startIdx = (int)Math.floor((double)((handler - baseAddr) / CHUNK_BLOCK_SIZE));
+          requiredblocks = (int)Math.ceil((double)bytebuf.capacity() / CHUNK_BLOCK_SIZE);
+          markFree(chunksMap, startIdx, requiredblocks);
+          bufferBlock.getChunkSizeMap().remove(handler);
+          break;
+        }
+      }
+    } catch (Exception e) {
+    }
   }
 
   @Override
   public ByteBuffer retrieveByteBuffer(long id, long handler) {
-    ByteBuffer myByteBuffer = null;
-    return myByteBuffer; //need change
+    ByteBuffer bb = null;
+    MemoryInfo mi = this.getMemPools().get((int)id);
+    int size;
+    for (int blockIdx = 0; blockIdx < mi.getByteBufferBlocksList().size(); blockIdx++) {
+      BufferBlockInfo blockInfo = mi.getByteBufferBlocksList().get(blockIdx);
+      if (blockInfo.getChunkSizeMap().containsKey(handler)) {
+        size = blockInfo.getChunkSizeMap().get(handler);
+        bb = createChunkBuffer(handler, size);
+      }
+    }
+
+    return bb;
   }
 
   @Override
   public long retrieveSize(long id, long handler) {
-    return 1L; //need change
+    int size = 0;
+    MemoryInfo mi = this.getMemPools().get((int)id);
+    for (int blockIdx = 0; blockIdx < mi.getByteBufferBlocksList().size(); blockIdx++) {
+      BufferBlockInfo blockInfo = mi.getByteBufferBlocksList().get(blockIdx);
+      if (blockInfo.getChunkSizeMap().containsKey(handler)) {
+        size = blockInfo.getChunkSizeMap().get(handler);
+      }
+    }
+    return size;
   }
 
   @Override
   public long getByteBufferHandler(long id, ByteBuffer buf) {
-    return 1L; //need change
+    long handler = 0L;
+    try {
+      Field addressField = Buffer.class.getDeclaredField("address");
+      addressField.setAccessible(true);
+      handler = addressField.getLong(buf);
+    } catch (NoSuchFieldException e) {
+      throw new ConfigurationException("Buffer fields not found.");
+    } catch (IllegalAccessException e) {
+      throw new ConfigurationException("Buffer fields cannot be accessed.");
+    }
+    return handler;
   }
 
   @Override
   public void setHandler(long id, long key, long handler) {
-    throw new UnsupportedOperationException("Unsupported to set handler");
+    throw new UnsupportedOperationException("Unrsupported to set handler");
   }
 
   @Override
@@ -199,7 +359,7 @@ public class JavaVMemServiceImpl implements VolatileMemoryAllocatorService {
 
   @Override
   public long getBaseAddress(long id) {
-    return 1L; //need change
+    throw new UnsupportedOperationException("Not support transaction");
   }
 
   @Override
@@ -224,15 +384,78 @@ public class JavaVMemServiceImpl implements VolatileMemoryAllocatorService {
 
   @Override
   public Set<MemoryServiceFeature> getFeatures() {
-    Set<MemoryServiceFeature> ret = new HashSet<MemoryServiceFeature>();
-    ret.add(MemoryServiceFeature.VOLATILE);
-    return ret;
+    return null;
   }
 
-  public Map<Long, Long> getMInfo() {
-    return this.m_info;
+  public ArrayList<MemoryInfo> getMemPools() {
+    return this.mem_pools;
   }
-  public ArrayList<RandomAccessFile> getMemPool() {
-    return this.mem_pool;
+
+  public int findStartIdx(BitSet blocksMap, int requiredBlocks) {
+    int startIdx = -1, blocks = 0, idx = 0;
+    for (idx = 0; idx < blocksMap.size(); ++idx) {
+      if (!blocksMap.get(idx)) {
+         blocks++;
+      } else {
+         blocks = 0;
+      }
+      if (blocks == requiredBlocks) {
+        break;
+      }
+    }
+    if (blocks == requiredBlocks) {
+      startIdx = idx - blocks + 1;
+    }
+    return startIdx;
   }
+
+  protected void markUsed(BitSet blocksMap, int startIdx, int requiredBlocks) {
+    for (int idx = startIdx; idx < (startIdx + requiredBlocks); idx++) {
+      blocksMap.set(idx);
+    }
+  }
+
+  protected void markFree(BitSet blocksMap, int startIdx, int requiredBlocks) {
+    for (int idx = startIdx; idx < (startIdx + requiredBlocks); idx++) {
+      blocksMap.clear(idx);
+    }
+  }
+
+  protected BufferBlockInfo createBufferBlockInfo(FileChannel fc, long position, int blockSize) {
+    BufferBlockInfo bufferBlockInfo = new BufferBlockInfo();
+    try {
+      ByteBuffer bb = fc.map(MAP_MODE, position, blockSize);
+      if (bufferBlockInfo.getBufferBlockBaseAddress() == 0L) {
+        bufferBlockInfo.setBufferBlockBaseAddress(getByteBufferHandler(0L, bb));
+      }
+      bufferBlockInfo.setBufferBlockSize(blockSize);
+      bufferBlockInfo.setBufferBlock(bb);
+      int chunkBlockQty = (int)Math.ceil((double)blockSize / CHUNK_BLOCK_SIZE);
+      BitSet chunksMap = new BitSet(chunkBlockQty);
+      bufferBlockInfo.setBufferBlockChunksMap(chunksMap);
+    } catch (IOException e) {
+    }
+
+    return bufferBlockInfo;
+  }
+
+  protected ByteBuffer createChunkBuffer(long handler, int size) {
+    ByteBuffer bb = ByteBuffer.allocateDirect(0).order(ByteOrder.nativeOrder());
+    Field address, capacity;
+    try {
+      address = Buffer.class.getDeclaredField("address");
+      address.setAccessible(true);
+      capacity = Buffer.class.getDeclaredField("capacity");
+      capacity.setAccessible(true);
+      address.setLong(bb, handler);
+      capacity.setInt(bb, size);
+      bb.limit(size);
+    } catch (NoSuchFieldException e) {
+      throw new ConfigurationException("Buffer fields not found.");
+    } catch (IllegalAccessException e) {
+      throw new ConfigurationException("Buffer fields cannot be accessed.");
+    }
+    return bb;
+  }
+
 }
