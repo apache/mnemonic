@@ -17,16 +17,22 @@
 
 package org.apache.mnemonic;
 
+import org.apache.mnemonic.query.memory.EntityInfo;
+import org.apache.mnemonic.query.memory.Queryable;
+import org.apache.mnemonic.query.memory.ResultSet;
+import org.apache.mnemonic.service.computing.ValueInfo;
 import org.apache.mnemonic.service.memory.MemoryServiceFeature;
 import org.apache.mnemonic.service.memory.NonVolatileMemoryAllocatorService;
 import org.flowcomputing.commons.resgc.ResCollector;
 import org.flowcomputing.commons.resgc.ResReclaim;
 
 import java.nio.ByteBuffer;
+import java.util.Set;
+
+import static org.apache.mnemonic.service.memory.MemoryServiceFeature.QUERYABLE;
 
 /**
- * manage a big native persistent memory pool through libpmalloc.so provided by
- * pmalloc project.
+ * manage a big native persistent memory pool through underlying memory service.
  * 
  *
  */
@@ -38,6 +44,8 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
   private long m_nid = -1;
   private long[][] m_ttable;
   private NonVolatileMemoryAllocatorService m_nvmasvc = null;
+  private Queryable m_querable = null;
+  private Set<MemoryServiceFeature> m_features = null;
 
   /**
    * Constructor, it initializes and allocate a memory pool from specified uri
@@ -62,7 +70,8 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
     if (null == nvmasvc) {
       throw new IllegalArgumentException("NonVolatileMemoryAllocatorService object is null");
     }
-    if (!nvmasvc.getFeatures().contains(MemoryServiceFeature.NONVOLATILE)) {
+    m_features = nvmasvc.getFeatures();
+    if (!m_features.contains(MemoryServiceFeature.NONVOLATILE)) {
       throw new ConfigurationException("The specified memory service does not support non-volatile feature");
     }
     if (isnew && capacity <= 0) {
@@ -633,5 +642,65 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
   @Override
   public boolean isInTransaction() {
     return m_nvmasvc.isInTransaction();
+  }
+
+  /**
+   * The class is used as an adapter object for memory service based query operations 
+   */
+  class MemoryQueryAdapter implements Queryable {
+
+    @Override
+    public String[] getClassNames() {
+      return m_nvmasvc.getClassNames(m_nid);
+    }
+
+    @Override
+    public String[] getEntityNames(String clsname) {
+      return m_nvmasvc.getEntityNames(m_nid, clsname);
+    }
+
+    @Override
+    public EntityInfo getEntityInfo(String clsname, String etyname) {
+      return m_nvmasvc.getEntityInfo(m_nid, clsname, etyname);
+    }
+
+    @Override
+    public void createEntity(EntityInfo entityinfo) {
+      m_nvmasvc.createEntity(m_nid, entityinfo);
+    }
+
+    @Override
+    public void destroyEntity(String clsname, String etyname) {
+      m_nvmasvc.destroyEntity(m_nid, clsname, etyname);
+    }
+
+    @Override
+    public void updateQueryableInfo(String clsname, String etyname, ValueInfo updobjs) {
+      m_nvmasvc.updateQueryableInfo(m_nid, clsname, etyname, updobjs);
+    }
+
+    @Override
+    public void deleteQueryableInfo(String clsname, String etyname, ValueInfo updobjs) {
+      m_nvmasvc.deleteQueryableInfo(m_nid, clsname, etyname, updobjs);
+    }
+
+    @Override
+    public ResultSet query(String querystr) {
+      return m_nvmasvc.query(m_nid, querystr);
+    }
+  }
+
+  /**
+   * Get a queryable object
+   *
+   * @return a queryable object
+   */
+  Queryable useQuery() {
+    if (null == m_querable) {
+      if (m_features.contains(QUERYABLE)) {
+        m_querable = new MemoryQueryAdapter();
+      }
+    }
+    return m_querable;
   }
 }

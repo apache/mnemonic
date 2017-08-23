@@ -547,6 +547,9 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
     return m_vmasvc.isInTransaction();
   }
 
+  /**
+   * The class is used as an adapter object for memory service based query operations
+   */
   class MemoryQueryAdapter implements Queryable {
 
     @Override
@@ -591,8 +594,9 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
   }
 
   /**
+   * Get a queryable object
    *
-   * @return
+   * @return a queryable object
    */
   Queryable useQuery() {
     if (null == m_querable) {
