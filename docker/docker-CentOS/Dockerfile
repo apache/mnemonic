@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-FROM centos:latest
+FROM centos:7
 MAINTAINER Gang Wang (garyw@apache.org)
 
 #set up your proxy below, please refer to readme in the Docker folder
