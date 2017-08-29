@@ -17,53 +17,49 @@
 
 package org.apache.mnemonic;
 
+import org.apache.commons.lang3.tuple.MutablePair;
+
 public class ParameterHolder<A extends RetrievableAllocator<A>> {
 
     private A allocator;
-    private DurableType[] durableType;
-    private EntityFactoryProxy[] entityFactoryProxy;
     private boolean autoReclaim;
     private long handler;
+    private MutablePair<DurableType[], EntityFactoryProxy[]> dpt;
 
 
     public ParameterHolder() {
-        allocator = null;
-        durableType = new DurableType[]{};
-        entityFactoryProxy = null;
-        autoReclaim = true;
-        handler = 0;
+        this.allocator = null;
+        this.autoReclaim = true;
+        this.handler = 0;
+        this.dpt = new MutablePair<DurableType[], EntityFactoryProxy[]>(new DurableType[]{}, null);
     }
 
     public ParameterHolder(A n) {
         this.allocator = n;
-        this.durableType = new DurableType[]{};
-        this.entityFactoryProxy = null;
         this.autoReclaim = true;
         this.handler = 0;
+        this.dpt = new MutablePair<DurableType[], EntityFactoryProxy[]>(new DurableType[]{}, null);
     }
 
     public ParameterHolder(A n, DurableType[] d) {
         this.allocator = n;
-        this.durableType = d;
-        this.entityFactoryProxy = null;
         this.autoReclaim = true;
         this.handler = 0;
+        this.dpt = new MutablePair<DurableType[], EntityFactoryProxy[]>(d, null);
     }
 
     public ParameterHolder(A n, DurableType[] d, EntityFactoryProxy[] e) {
         this.allocator = n;
-        this.durableType = d;
-        this.entityFactoryProxy = e;
         this.autoReclaim = true;
         this.handler = 0;
+        this.dpt = new MutablePair<DurableType[], EntityFactoryProxy[]>(d, e);
     }
 
     public ParameterHolder(A n, DurableType[] d, EntityFactoryProxy[] e, boolean b, long h) {
         this.allocator = n;
-        this.durableType = d;
-        this.entityFactoryProxy = e;
         this.autoReclaim = b;
         this.handler = h;
+        this.dpt = new MutablePair<DurableType[], EntityFactoryProxy[]>(d, e);
     }
 
     public void setAllocator(A n) {
@@ -75,11 +71,11 @@ public class ParameterHolder<A extends RetrievableAllocator<A>> {
     }
 
     public void setEntityFactoryProxies(EntityFactoryProxy[] e) {
-        entityFactoryProxy = e;
+        dpt.setRight(e);
     }
 
     public EntityFactoryProxy[] getEntityFactoryProxies() {
-        return entityFactoryProxy;
+        return dpt.getRight();
     }
 
     public void setAutoReclaim(boolean b) {
@@ -91,11 +87,11 @@ public class ParameterHolder<A extends RetrievableAllocator<A>> {
     }
 
     public void setGenericTypes(DurableType[] d) {
-        durableType = d;
+        dpt.setLeft(d);
     }
 
     public DurableType[] getGenericTypes() {
-        return durableType;
+        return dpt.getLeft();
     }
 
     public void setHandler(long h) {
@@ -104,5 +100,14 @@ public class ParameterHolder<A extends RetrievableAllocator<A>> {
 
     public long getHandler() {
         return handler;
+    }
+
+    public void setGenericTypeAndEntityFactoryProxyPair(DurableType[] d, EntityFactoryProxy[] e) {
+        dpt.setLeft(d);
+        dpt.setRight(e);
+    }
+
+    public MutablePair<DurableType[], EntityFactoryProxy[]> getGenericTypeAndEntityFactoryProxyPair() {
+        return dpt;
     }
 }
