@@ -17,6 +17,8 @@
 
 package org.apache.mnemonic;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 public class ParameterHolder<A extends RetrievableAllocator<A>> {
 
     private A allocator;
@@ -24,14 +26,16 @@ public class ParameterHolder<A extends RetrievableAllocator<A>> {
     private EntityFactoryProxy[] entityFactoryProxy;
     private boolean autoReclaim;
     private long handler;
+    private Pair<DurableType[], EntityFactoryProxy[]> dpt;
 
 
     public ParameterHolder() {
-        allocator = null;
-        durableType = new DurableType[]{};
-        entityFactoryProxy = null;
-        autoReclaim = true;
-        handler = 0;
+        this.allocator = null;
+        this.durableType = new DurableType[]{};
+        this.entityFactoryProxy = null;
+        this.autoReclaim = true;
+        this.handler = 0;
+        this.dpt = new Pair<this.durableType, this.entityFactoryProxy>();
     }
 
     public ParameterHolder(A n) {
@@ -40,6 +44,7 @@ public class ParameterHolder<A extends RetrievableAllocator<A>> {
         this.entityFactoryProxy = null;
         this.autoReclaim = true;
         this.handler = 0;
+        this.dpt = new Pair<this.durableType, this.entityFactoryProxy>();
     }
 
     public ParameterHolder(A n, DurableType[] d) {
@@ -48,6 +53,7 @@ public class ParameterHolder<A extends RetrievableAllocator<A>> {
         this.entityFactoryProxy = null;
         this.autoReclaim = true;
         this.handler = 0;
+        this.dpt = new Pair<d, this.entityFactoryProxy>();
     }
 
     public ParameterHolder(A n, DurableType[] d, EntityFactoryProxy[] e) {
@@ -56,6 +62,7 @@ public class ParameterHolder<A extends RetrievableAllocator<A>> {
         this.entityFactoryProxy = e;
         this.autoReclaim = true;
         this.handler = 0;
+        this.dpt = new Pair<d, e>();
     }
 
     public ParameterHolder(A n, DurableType[] d, EntityFactoryProxy[] e, boolean b, long h) {
@@ -64,6 +71,7 @@ public class ParameterHolder<A extends RetrievableAllocator<A>> {
         this.entityFactoryProxy = e;
         this.autoReclaim = b;
         this.handler = h;
+        this.dpt = new Pair<d, e>();
     }
 
     public void setAllocator(A n) {
@@ -104,5 +112,21 @@ public class ParameterHolder<A extends RetrievableAllocator<A>> {
 
     public long getHandler() {
         return handler;
+    }
+
+    public void setGenericTypeAndEntityFactoryProxyPair(DurableType[] d, EntityFactoryProxy[] e) {
+        dpt = new Pair<d, e>();
+    }
+
+    public DurableType[] getGenericTypeFromPair() {
+        return dpt.getLeft();
+    }
+
+    public EntityFactoryProxy[] getEntityFactoryProxyFromPair() {
+        return dpt.getRight();
+    }
+
+    public Pair<DurableType[], EntityFactoryProxy[]> getGenericTypeAndEntityFactoryProxyPair() {
+        return dpt;
     }
 }
