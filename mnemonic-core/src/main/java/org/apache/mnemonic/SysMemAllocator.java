@@ -17,17 +17,16 @@
 
 package org.apache.mnemonic;
 
+import org.flowcomputing.commons.resgc.ResCollector;
+import org.flowcomputing.commons.resgc.ResReclaim;
+import sun.misc.Cleaner;
+import sun.misc.Unsafe;
+
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
-
-import org.flowcomputing.commons.resgc.ResCollector;
-import org.flowcomputing.commons.resgc.ResReclaim;
-
-import sun.misc.Unsafe;
-import sun.misc.Cleaner;
 
 /**
  * manage a system memory pool as a internal volatile allocator
@@ -152,8 +151,14 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
    * sync. dirty data to memory
    *
    * @param addr
+   *          specify the address
+   *
    * @param length
+   *          specify the length
+   *
    * @param autodetect
+   *          detect the length of specified memory block
+   *
    */
   @Override
   public void sync(long addr, long length, boolean autodetect) {

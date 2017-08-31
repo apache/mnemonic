@@ -610,7 +610,7 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
   /**
    * start a transaction
    *
-   * @param readOnly 
+   * @param readOnly
    *          specify if the transaction is readonly
    */
   @Override

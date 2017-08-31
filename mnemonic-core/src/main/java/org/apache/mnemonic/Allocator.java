@@ -32,6 +32,15 @@ public interface Allocator<A extends CommonAllocator<A>> extends Allocatable<A> 
   /**
    * sync. dirty data to memory
    *
+   * @param addr
+   *          specify the address
+   *
+   * @param length
+   *          specify the length
+   *
+   * @param autodetect
+   *          detect the length of this memory block
+   *
    */
   void sync(long addr, long length, boolean autodetect);
 
