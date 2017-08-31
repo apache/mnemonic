@@ -348,6 +348,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
   /**
    * Recomputes the size of the map during restore without persistence
    * 
+   *  @return size of the map
    */
   protected long recomputeMapSize() {
     long size = 0;

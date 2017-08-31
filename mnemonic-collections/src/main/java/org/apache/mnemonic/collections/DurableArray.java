@@ -74,6 +74,9 @@ public abstract class DurableArray<E> implements Durable, Iterable<E> {
   /**
    * get the item at a given index
    *
+   * @param index
+   *          the index of the array
+   *
    * @return the item value of this node
    */
   public abstract E get(int index);
@@ -81,13 +84,19 @@ public abstract class DurableArray<E> implements Durable, Iterable<E> {
   /**
    * set a value at a given index
    *
+   * @param index
+   *          the index of the array
+   *
    * @param value
    *          the value to be set
    */
   public abstract void set(int index, E value);
 
   /**
-   * set a value at a given index
+   * set a value at a given index with destroy flag
+   *
+   * @param index
+   *          the index of the array
    *
    * @param value
    *          the value to be set

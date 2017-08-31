@@ -169,9 +169,6 @@ public abstract class TreeNode<E extends Comparable<E>> implements Durable, Comp
    *
    * @param color
    *          the color to be set
-   *
-   * @param destroy
-   *          true if want to destroy the exist node
    */
   @DurableSetter
   public abstract void setColor(boolean color);
