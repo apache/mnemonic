@@ -37,6 +37,7 @@
         <include>org.apache.mnemonic:mnemonic-collections</include>
         <include>org.apache.mnemonic:mnemonic-sessions</include>
         <include>org.apache.mnemonic:mnemonic-examples</include>
+        <include>org.apache.mnemonic:mnemonic-query</include>
       </includes>
       <sources>
         <fileSets>
