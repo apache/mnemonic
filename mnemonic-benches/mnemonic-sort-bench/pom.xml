@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.apache.mnemonic</groupId>
     <artifactId>mnemonic-benches</artifactId>
-    <version>0.9.0-incubating-SNAPSHOT</version>
+    <version>0.9.0-incubating</version>
   </parent>
 
   <artifactId>mnemonic-sort-bench</artifactId>
