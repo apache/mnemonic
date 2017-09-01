@@ -82,7 +82,8 @@ git checkout -b branch-${RELEASE_VERSION} || { echo "Create branch failed"; exit
 mvn versions:set -DgenerateBackupPoms=false -DnewVersion=${RELEASE_VERSION}-incubating
 git commit . -m "Prepare for releasing ${RELEASE_VERSION}-incubating ${RELEASE_CANDIDATE_ID}"
 
-git tag -s v${RELEASE_VERSION}-incubating -m "Release ${RELEASE_VERSION}-incubating ${RELEASE_CANDIDATE_ID}"
+git tag -s v${RELEASE_VERSION}-incubating -m "Release ${RELEASE_VERSION}-incubating ${RELEASE_CANDIDATE_ID}" ||
+    { echo "Tagging with signing failed"; exit 35; }
 
 rm -rf target/
 git clean -xdf
