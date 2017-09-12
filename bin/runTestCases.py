@@ -44,7 +44,7 @@ with open(testCmdFile) as fp:
                 subprocess.call(cleanupCmd, stderr=subprocess.STDOUT, shell=True)
                 print("[SUCCESS] Test case " + tcNameReg.findall(line)[0] + " for \"" + tcModuleReg.findall(line)[0]+ "\" is completed!")
             except subprocess.CalledProcessError as e:
-                print("[ERROR] This test case requires \"pmalloc\" memory service to pass, please check if \"pmalloc\" has been configured correctly! If \"pmalloc\" is installed, please refer to testlog/" + tcNameReg.findall(line)[0] + ".log for detailed information.")
+                print("[ERROR] Please refer to testlog/" + tcNameReg.findall(line)[0] + ".log for detailed information.")
                 sys.exit(1)
-print("[DONE] All test cases are completed! Log files are available under folder testlog!")
+print("[DONE] All test cases are completed! Log files are available under folder testlog.")
 
