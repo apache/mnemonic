@@ -33,6 +33,11 @@
   <name>mnemonic-examples</name>
   <packaging>jar</packaging>
 
+  <properties>
+    <example.name>Main</example.name>
+    <example.args></example.args>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.mnemonic</groupId>
@@ -198,7 +203,8 @@
                 <argument>-ea</argument>
                 <argument>-classpath</argument>
                 <classpath />
-                <argument>${project.groupId}.examples.Main</argument>
+                <argument>${project.groupId}.examples.${example.name}</argument>
+                <commandlineArgs>${example.args}</commandlineArgs>
               </arguments>
             </configuration>
           </plugin>
