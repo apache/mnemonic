@@ -389,3 +389,86 @@ long handleValueInfo(JNIEnv* env, struct NValueInfo *nvinfo, valueHandler valhan
   return nvinfo->handler;
 }
 
+long handleVectorInfo(JNIEnv* env, struct NValueInfo *nvinfo, vecValueHandler valhandler, long dc_handler, long dc_size, long* count) {
+  if (NULL == nvinfo->frames || 0 >= nvinfo->framessz) {
+    return 0L;
+  }
+  void *chk_addr = to_e(env, nvinfo, dc_handler); 
+  size_t dims[nvinfo->framessz];
+  long *itmaddrs[nvinfo->framessz];
+  long *nxtfitmaddrs[nvinfo->framessz];
+  long pendings[nvinfo->framessz];
+  long hdls[nvinfo->framessz];
+  long position = 0;
+  size_t i;
+  for (i = 0; i < nvinfo->framessz; ++i) {
+    dims[i] = 0;
+    itmaddrs[i] = NULL;
+    nxtfitmaddrs[i] = NULL;
+    pendings[i] = 0L;
+    hdls[i] = 0L;
+  }
+  hdls[0] = nvinfo->handler;
+  itmaddrs[0] = &nvinfo->handler;
+  vectorIterTensor(env, nvinfo, dims, itmaddrs, &nxtfitmaddrs, &pendings, hdls, -1, chk_addr, dc_size, &position, count);
+  return nvinfo->handler;
+}
+
+void vectorIterTensor(JNIEnv* env, struct NValueInfo *nvinfo,
+    size_t dims[], long *itmaddrs[], long *(* const nxtfitmaddrs)[],
+    long (* const pendings)[], long hdls[],
+    size_t dimidx, vecValueHandler valhandler, void *chkaddr, long chksize, long *vposition, long *vcount) {
+  if (++dimidx >= nvinfo->framessz) {
+    return;
+  }
+  long *iatmp;
+  long curoff = (nvinfo->frames + dimidx)->nextoff;
+  long curnloff = (nvinfo->frames + dimidx)->nlvloff;
+  long curnlsz = (nvinfo->frames + dimidx)->nlvlsz;
+  void *addr = NULL;
+  if (dimidx < nvinfo->framessz - 1) {
+    iatmp = itmaddrs[dimidx];
+    while (1) {
+      (*pendings)[dimidx] = 0L;
+      while(0L != hdls[dimidx]) {
+        itmaddrs[dimidx + 1] = (long*)(to_e(env, nvinfo, hdls[dimidx]) + curnloff);
+        hdls[dimidx + 1] = *itmaddrs[dimidx + 1];
+        (*nxtfitmaddrs)[dimidx] = (long*)(to_e(env, nvinfo, hdls[dimidx]) + curoff);
+        vectorIterTensor(env, nvinfo, dims, itmaddrs, nxtfitmaddrs, pendings, hdls, dimidx, valhandler, chkaddr, chksize, *vposition, vcount);
+        itmaddrs[dimidx] = (*nxtfitmaddrs)[dimidx];
+        hdls[dimidx] = *itmaddrs[dimidx];
+        ++dims[dimidx];
+      }
+      dims[dimidx] = 0;
+      if (0L == (*pendings)[dimidx]) {
+        break;
+      }
+      itmaddrs[dimidx] = iatmp;
+      hdls[dimidx] = *iatmp;
+    }
+  } else {
+    if (-1L != curoff) {
+      iatmp = itmaddrs[dimidx];
+      while (1) {
+        (*pendings)[dimidx] = 0L;
+        while(0L != hdls[dimidx]) {
+          addr = to_e(env, nvinfo, hdls[dimidx]) + curnloff;
+          (*nxtfitmaddrs)[dimidx] = (long*)(to_e(env, nvinfo, hdls[dimidx]) + curoff);
+          valhandler(env, dims, dimidx, itmaddrs, nxtfitmaddrs, pendings, addr, curnlsz, nvinfo->dtype, chkaddr, chksize, vposition, vcount);
+          itmaddrs[dimidx] = (*nxtfitmaddrs)[dimidx];
+          hdls[dimidx] = *itmaddrs[dimidx];
+          ++dims[dimidx];
+        }
+        dims[dimidx] = 0;
+        if (0L == (*pendings)[dimidx]) {
+          break;
+        }
+        itmaddrs[dimidx] = iatmp;
+        hdls[dimidx] = *iatmp;
+      }
+    } else {
+      addr = to_e(env, nvinfo, hdls[dimidx]) + curnloff;
+      valhandler(env, dims, dimidx - 1, itmaddrs, nxtfitmaddrs, pendings, addr, curnlsz, nvinfo->dtype, chkaddr, chksize, vposition, vcount);
+    }
+  }
+}

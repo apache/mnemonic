@@ -86,6 +86,10 @@ typedef void (*valueHandler)(JNIEnv* env, size_t dims[], size_t dimidx,
     long *itmaddrs[], long *(* const nxtfitmaddrs)[], long (* const pendings)[],
     void *addr, size_t sz, int dtype);
 
+typedef void (*vecValueHandler)(JNIEnv* env, size_t dims[], size_t dimidx,
+    long *itmaddrs[], long *(* const nxtfitmaddrs)[], long (* const pendings)[],
+    void *addr, size_t sz, int dtype, void *dc_addr, long dc_size, long *position, long *count);
+
 /**
  * construct a list of native value info structure from Java array object.
  */
