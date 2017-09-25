@@ -29,7 +29,7 @@
 inline void
 throw(JNIEnv* env, const char* msg) {
   if (msg == NULL)
-    msg = sys_errlist[errno];
+    msg = strerror(errno);
 
   jclass xklass = (*env)->FindClass(env, "java/lang/RuntimeException");
   (*env)->ThrowNew(env, xklass, msg);

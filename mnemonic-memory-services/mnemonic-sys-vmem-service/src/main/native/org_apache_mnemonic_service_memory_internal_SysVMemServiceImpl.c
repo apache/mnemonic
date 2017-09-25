@@ -75,8 +75,8 @@ jlong JNICALL Java_org_apache_mnemonic_service_memory_internal_SysVMemServiceImp
     JNIEnv* env,
     jobject this, jlong id)
 {
-  SysVMPool *pool;
-  pool = g_sysvmpool_arr + id;
+//  SysVMPool *pool;
+//  pool = g_sysvmpool_arr + id;
   return 0L;
 }
 
@@ -196,11 +196,11 @@ JNIEXPORT
 jlong JNICALL Java_org_apache_mnemonic_service_memory_internal_SysVMemServiceImpl_ninit(JNIEnv *env, jclass this,
     jlong capacity, jstring pathname, jboolean isnew) {
   pthread_rwlock_wrlock(&g_sysvmem_rwlock);
-  SysVMPool *pool;
+//  SysVMPool *pool;
   size_t ret = -1;
   g_sysvmpool_arr = realloc(g_sysvmpool_arr, (g_sysvmpool_count + 1) * sizeof(SysVMPool));
   if (NULL != g_sysvmpool_arr) {
-    pool = g_sysvmpool_arr + g_sysvmpool_count;
+//    pool = g_sysvmpool_arr + g_sysvmpool_count;
     ret = g_sysvmpool_count;
     g_sysvmpool_count++;
   } else {
@@ -215,20 +215,20 @@ JNIEXPORT
 void JNICALL Java_org_apache_mnemonic_service_memory_internal_SysVMemServiceImpl_nclose
 (JNIEnv *env, jobject this, jlong id)
 {
-  SysVMPool *pool;
-  pthread_rwlock_wrlock(&g_sysvmem_rwlock);
-  pool = g_sysvmpool_arr + id;
-  pthread_rwlock_unlock(&g_sysvmem_rwlock);
+//  SysVMPool *pool;
+//  pthread_rwlock_wrlock(&g_sysvmem_rwlock);
+//  pool = g_sysvmpool_arr + id;
+//  pthread_rwlock_unlock(&g_sysvmem_rwlock);
 }
 
 __attribute__((destructor)) void fini(void) {
-  int i;
-  SysVMPool *pool;
+//  int i;
+//  SysVMPool *pool;
   pthread_rwlock_wrlock(&g_sysvmem_rwlock);
   if (NULL != g_sysvmpool_arr) {
-    for (i = 0; i < g_sysvmpool_count; ++i) {
-      pool = g_sysvmpool_arr + i;
-    }
+//    for (i = 0; i < g_sysvmpool_count; ++i) {
+//      pool = g_sysvmpool_arr + i;
+//    }
     free(g_sysvmpool_arr);
     g_sysvmpool_arr = NULL;
     g_sysvmpool_count = 0;
