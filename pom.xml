@@ -97,6 +97,7 @@
     <module>mnemonic-hadoop</module>
     <module>mnemonic-spark</module>
     <module>mnemonic-query</module>
+    <module>mnemonic-common</module>
   </modules>
 
   <properties>
