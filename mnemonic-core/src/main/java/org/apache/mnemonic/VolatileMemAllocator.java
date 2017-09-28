@@ -27,7 +27,6 @@ import org.flowcomputing.commons.resgc.ResCollector;
 import org.flowcomputing.commons.resgc.ResReclaim;
 
 import java.nio.ByteBuffer;
-import java.util.Set;
 
 import static org.apache.mnemonic.service.memory.MemoryServiceFeature.QUERYABLE;
 
@@ -44,7 +43,6 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
   private long[][] m_ttable;
   private VolatileMemoryAllocatorService m_vmasvc = null;
   private Queryable m_querable = null;
-  private Set<MemoryServiceFeature> m_features = null;
 
   /**
    * Constructor, it initializes and allocate a memory pool from specified uri
@@ -70,6 +68,7 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
     if (!m_features.contains(MemoryServiceFeature.VOLATILE)) {
       throw new ConfigurationException("The specified memory service does not support volatile feature");
     }
+    m_absaddr = m_features.contains(MemoryServiceFeature.ABSTRACTADDRESSING);
     if (capacity <= 0) {
       throw new IllegalArgumentException("VolatileMemAllocator cannot be initialized with capacity <= 0.");
     }

@@ -21,7 +21,8 @@ public enum MemoryServiceFeature {
   VOLATILE(1),
   NONVOLATILE(2),
   TRANSACTABLE(3),
-  QUERYABLE(4);
+  QUERYABLE(4),
+  ABSTRACTADDRESSING(5);
 
   private int value;
 

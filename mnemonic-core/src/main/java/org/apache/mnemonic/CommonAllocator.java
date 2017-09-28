@@ -17,9 +17,11 @@
 
 package org.apache.mnemonic;
 
-import java.nio.ByteBuffer;
-
+import org.apache.mnemonic.service.memory.MemoryServiceFeature;
 import org.flowcomputing.commons.resgc.ResCollector;
+
+import java.nio.ByteBuffer;
+import java.util.Set;
 
 /**
  * an abstract common class for memory allocator to provide common
@@ -33,6 +35,13 @@ public abstract class CommonAllocator<A extends CommonAllocator<A>> implements A
 
   protected ResCollector<MemChunkHolder<A>, Long> m_chunkcollector = null;
   protected ResCollector<MemBufferHolder<A>, ByteBuffer> m_bufcollector = null;
+
+  protected Set<MemoryServiceFeature> m_features = null;
+  protected boolean m_absaddr = false;
+
+  public boolean useAbstractAddressing() {
+    return m_absaddr;
+  }
 
   /**
    * set a reclaimer to reclaim memory buffer

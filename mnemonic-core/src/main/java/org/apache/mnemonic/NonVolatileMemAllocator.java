@@ -27,7 +27,6 @@ import org.flowcomputing.commons.resgc.ResCollector;
 import org.flowcomputing.commons.resgc.ResReclaim;
 
 import java.nio.ByteBuffer;
-import java.util.Set;
 
 import static org.apache.mnemonic.service.memory.MemoryServiceFeature.QUERYABLE;
 
@@ -45,7 +44,6 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
   private long[][] m_ttable;
   private NonVolatileMemoryAllocatorService m_nvmasvc = null;
   private Queryable m_querable = null;
-  private Set<MemoryServiceFeature> m_features = null;
 
   /**
    * Constructor, it initializes and allocate a memory pool from specified uri
@@ -74,6 +72,7 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
     if (!m_features.contains(MemoryServiceFeature.NONVOLATILE)) {
       throw new ConfigurationException("The specified memory service does not support non-volatile feature");
     }
+    m_absaddr = m_features.contains(MemoryServiceFeature.ABSTRACTADDRESSING);
     if (isnew && capacity <= 0) {
       throw new IllegalArgumentException("NonVolatileMemAllocator cannot be initialized with capacity <= 0.");
     }
