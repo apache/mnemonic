@@ -28,6 +28,7 @@ import org.flowcomputing.commons.resgc.ResReclaim;
 
 import java.nio.ByteBuffer;
 
+import static org.apache.mnemonic.service.memory.MemoryServiceFeature.EXPANDABLE;
 import static org.apache.mnemonic.service.memory.MemoryServiceFeature.QUERYABLE;
 
 /**
@@ -701,5 +702,18 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
       }
     }
     return m_querable;
+  }
+
+  @Override
+  public long expand(long size) {
+    long ret = 0L;
+    if (null != m_features) {
+      if (m_features.contains(EXPANDABLE)) {
+        return m_nvmasvc.adjustCapacity(m_nid, size);
+      }
+    } else {
+      throw new ConfigurationException("Do not support expand operation");
+    }
+    return ret;
   }
 }
