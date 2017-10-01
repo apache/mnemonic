@@ -54,6 +54,11 @@ public class SortServiceImpl implements GeneralComputingService {
     return ret;
   }
 
+  @Override
+  public long[] perform(String mode, ValueInfo[] valinfos, long dcHandler, long dcSize) {
+    throw new UnsupportedOperationException("Invalid operation for sort.");
+  }
+
   /**
    * A native function to fulfill the action of print in native level.
    * @param valinfos an array of value info, some of them could be set as NULL

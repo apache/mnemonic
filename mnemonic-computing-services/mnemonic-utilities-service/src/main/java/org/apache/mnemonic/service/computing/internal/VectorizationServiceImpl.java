@@ -21,7 +21,7 @@ import org.apache.mnemonic.service.computing.GeneralComputingService;
 import org.apache.mnemonic.service.computing.ValueInfo;
 import org.flowcomputing.commons.primitives.NativeLibraryLoader;
 
-public class PrintServiceImpl implements GeneralComputingService {
+public class VectorizationServiceImpl implements GeneralComputingService {
   static {
     try {
       NativeLibraryLoader.loadFromJar("utilitiescomputing");
@@ -35,24 +35,24 @@ public class PrintServiceImpl implements GeneralComputingService {
    */
   @Override
   public String getServiceId() {
-    return "print";
+    return "vectorize";
+  }
+
+  @Override
+  public long[] perform(String mode, ValueInfo[] valinfos) {
+    throw new UnsupportedOperationException("Invalid operation for vectorize.");
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public long[] perform(String mode, ValueInfo[] valinfos) {
+  public long[] perform(String mode, ValueInfo[] valinfos, long dcHandler, long dcSize) {
     long[] ret = null;
     if (null != valinfos) {
-      ret = nperformPrint(valinfos);
+      ret = nperformVectorization(valinfos, dcHandler, dcSize);
     }
     return ret;
-  }
-
-  @Override
-  public long[] perform(String mode, ValueInfo[] valinfos, long dcHandler, long dcSize) {
-    throw new UnsupportedOperationException("Invalid operation for print.");
   }
 
   /**
@@ -60,6 +60,6 @@ public class PrintServiceImpl implements GeneralComputingService {
    * @param valinfos an array of value info, some of them could be set as NULL
    * @return an array of handler returned by native level
    */
-  protected native long[] nperformPrint(ValueInfo[] valinfos);
+  protected native long[] nperformVectorization(ValueInfo[] valinfos, long dcHandler, long dcSize);
 
 }

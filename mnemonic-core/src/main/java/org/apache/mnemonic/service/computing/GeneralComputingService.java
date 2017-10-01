@@ -48,4 +48,6 @@ public interface GeneralComputingService {
    */
   long[] perform(String mode, ValueInfo[] valinfos);
 
+  long[] perform(String mode, ValueInfo[] valinfos, long dcHandler, long dcSize);
+
 }
