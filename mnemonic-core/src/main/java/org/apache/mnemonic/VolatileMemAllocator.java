@@ -25,6 +25,7 @@ import org.apache.mnemonic.service.memory.MemoryServiceFeature;
 import org.apache.mnemonic.service.memory.VolatileMemoryAllocatorService;
 import org.flowcomputing.commons.resgc.ResCollector;
 import org.flowcomputing.commons.resgc.ResReclaim;
+import org.flowcomputing.commons.resgc.ReclaimContext;
 
 import java.nio.ByteBuffer;
 
@@ -83,7 +84,8 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
      */
     m_bufcollector = new ResCollector<MemBufferHolder<VolatileMemAllocator>, ByteBuffer>(new ResReclaim<ByteBuffer>() {
       @Override
-      public void reclaim(ByteBuffer mres) {
+      public void reclaim(ReclaimContext<ByteBuffer> rctx) {
+        ByteBuffer mres = rctx.getRes();
         boolean cb_reclaimed = false;
         if (null != m_bufferreclaimer) {
           cb_reclaimed = m_bufferreclaimer.reclaim(mres, Long.valueOf(mres.capacity()));
@@ -101,7 +103,8 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
      */
     m_chunkcollector = new ResCollector<MemChunkHolder<VolatileMemAllocator>, Long>(new ResReclaim<Long>() {
       @Override
-      public void reclaim(Long mres) {
+      public void reclaim(ReclaimContext<Long> rctx) {
+        Long mres = rctx.getRes();
         // System.out.println(String.format("Reclaim: %X", mres));
         boolean cb_reclaimed = false;
         if (null != m_chunkreclaimer) {

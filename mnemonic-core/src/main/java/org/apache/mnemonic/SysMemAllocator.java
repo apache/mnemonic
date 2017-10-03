@@ -19,6 +19,8 @@ package org.apache.mnemonic;
 
 import org.flowcomputing.commons.resgc.ResCollector;
 import org.flowcomputing.commons.resgc.ResReclaim;
+import org.flowcomputing.commons.resgc.ReclaimContext;
+
 import sun.misc.Cleaner;
 import sun.misc.Unsafe;
 
@@ -67,7 +69,8 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
      */
     m_bufcollector = new ResCollector<MemBufferHolder<SysMemAllocator>, ByteBuffer>(new ResReclaim<ByteBuffer>() {
       @Override
-      public synchronized void reclaim(ByteBuffer mres) {
+      public synchronized void reclaim(ReclaimContext<ByteBuffer> rctx) {
+        ByteBuffer mres = rctx.getRes();
         Long sz = Long.valueOf(mres.capacity());
         boolean cb_reclaimed = false;
         if (null != m_bufferreclaimer) {
@@ -95,7 +98,8 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
      */
     m_chunkcollector = new ResCollector<MemChunkHolder<SysMemAllocator>, Long>(new ResReclaim<Long>() {
       @Override
-      public synchronized void reclaim(Long mres) {
+      public synchronized void reclaim(ReclaimContext<Long> rctx) {
+        Long mres = rctx.getRes();
         // System.out.println(String.format("Reclaim: %X ...", mres));
         Long sz = m_chunksize.remove(mres);
         boolean cb_reclaimed = false;
