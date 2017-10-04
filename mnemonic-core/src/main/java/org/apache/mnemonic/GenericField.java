@@ -17,6 +17,7 @@
 
 package org.apache.mnemonic;
 
+import org.flowcomputing.commons.resgc.ReclaimContext;
 import sun.misc.Unsafe;
 
 /**
@@ -330,17 +331,22 @@ public class GenericField<A extends RestorableAllocator<A>, E> implements Durabl
    */
   @Override
   public void registerAutoReclaim() {
+    registerAutoReclaim(null);
+  }
+
+  @Override
+  public void registerAutoReclaim(ReclaimContext rctx) {
     if (null != m_field) {
-      m_field.registerAutoReclaim();
+      m_field.registerAutoReclaim(rctx);
     }
     if (null != m_strfield) {
-      m_strfield.registerAutoReclaim();
+      m_strfield.registerAutoReclaim(rctx);
     }
     if (null != m_chunkfield) {
-      m_chunkfield.registerAutoReclaim();
+      m_chunkfield.registerAutoReclaim(rctx);
     }
     if (null != m_bufferfield) {
-      m_bufferfield.registerAutoReclaim();
+      m_bufferfield.registerAutoReclaim(rctx);
     }
     m_autoreclaim = true;
   }

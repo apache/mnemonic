@@ -113,7 +113,7 @@ public class AnnotatedDurableEntityClass {
   private Map<String, FieldInfo> m_dynfieldsinfo = new HashMap<String, FieldInfo>();
   private Map<String, FieldInfo> m_fieldsinfo = new HashMap<String, FieldInfo>();
 
-  private Map<String, MethodInfo> m_durablemtdinfo = new HashMap<String, MethodInfo>();
+  private Map<String, List<MethodInfo>> m_durablemtdinfo = new HashMap<String, List<MethodInfo>>();
   private Map<String, MethodInfo> m_entitymtdinfo = new HashMap<String, MethodInfo>();
 
   private long computeTypeSize(TypeName tname) throws AnnotationProcessingException {
@@ -182,15 +182,15 @@ public class AnnotatedDurableEntityClass {
     m_factoryname = String.format("%s%s", m_elem.getSimpleName(), cFACTORYNAMESUFFIX);
     m_entityname = String.format("%s%s_%s", cPMEMNAMEPREFIX, m_elem.getSimpleName(), Utils.genRandomString());
 
-    m_durablemtdinfo.put("cancelAutoReclaim", new MethodInfo());
-    m_durablemtdinfo.put("registerAutoReclaim", new MethodInfo());
-    m_durablemtdinfo.put("getHandler", new MethodInfo());
-    m_durablemtdinfo.put("autoReclaim", new MethodInfo());
-    m_durablemtdinfo.put("destroy", new MethodInfo());
-    m_durablemtdinfo.put("sync", new MethodInfo());
-    m_durablemtdinfo.put("persist", new MethodInfo());
-    m_durablemtdinfo.put("flush", new MethodInfo());
-    m_durablemtdinfo.put("getNativeFieldInfo", new MethodInfo());
+    m_durablemtdinfo.put("cancelAutoReclaim", new ArrayList<MethodInfo>());
+    m_durablemtdinfo.put("registerAutoReclaim", new ArrayList<MethodInfo>());
+    m_durablemtdinfo.put("getHandler", new ArrayList<MethodInfo>());
+    m_durablemtdinfo.put("autoReclaim", new ArrayList<MethodInfo>());
+    m_durablemtdinfo.put("destroy", new ArrayList<MethodInfo>());
+    m_durablemtdinfo.put("sync", new ArrayList<MethodInfo>());
+    m_durablemtdinfo.put("persist", new ArrayList<MethodInfo>());
+    m_durablemtdinfo.put("flush", new ArrayList<MethodInfo>());
+    m_durablemtdinfo.put("getNativeFieldInfo", new ArrayList<MethodInfo>());
 
     m_entitymtdinfo.put("initializeDurableEntity", new MethodInfo());
     m_entitymtdinfo.put("createDurableEntity", new MethodInfo());
@@ -327,7 +327,8 @@ public class AnnotatedDurableEntityClass {
         methodname = elem.getSimpleName().toString();
         if (m_durablemtdinfo.containsKey(methodname)) {
           // System.err.printf("**++++++++++ %s ======\n", methodname);
-          methodinfo = m_durablemtdinfo.get(methodname);
+          methodinfo = new MethodInfo();
+          m_durablemtdinfo.get(methodname).add(methodinfo);
           methodinfo.elem = (ExecutableElement) elem;
           methodinfo.specbuilder = MethodSpec.overriding(methodinfo.elem);
         }
@@ -713,74 +714,79 @@ public class AnnotatedDurableEntityClass {
   }
 
   protected void buildDurableMethodSpecs(TypeSpec.Builder typespecbuilder) throws AnnotationProcessingException {
-    MethodInfo methodinfo;
     CodeBlock.Builder code;
     FieldInfo dynfieldinfo;
     String holdername = m_fieldsinfo.get("holder").name;
     String allocname = m_fieldsinfo.get("allocator").name;
     String autoreclaimname = m_fieldsinfo.get("autoreclaim").name;
     for (String name : m_durablemtdinfo.keySet()) {
-      methodinfo = m_durablemtdinfo.get(name);
-      code = CodeBlock.builder();
-      switch (name) {
-      case "cancelAutoReclaim":
-        code.addStatement("$1N.cancelAutoReclaim()", holdername);
-        for (String fname : m_dynfieldsinfo.keySet()) {
-          dynfieldinfo = m_dynfieldsinfo.get(fname);
-          if (!isUnboxPrimitive(dynfieldinfo.type)) {
-            code.beginControlFlow("if (null != $1N)", dynfieldinfo.name);
-            code.addStatement("$1N.cancelAutoReclaim()", dynfieldinfo.name);
-            code.endControlFlow();
-          }
+      for (MethodInfo methodinfo : m_durablemtdinfo.get(name)) {
+        code = CodeBlock.builder();
+        switch (name) {
+          case "cancelAutoReclaim":
+            code.addStatement("$1N.cancelAutoReclaim()", holdername);
+            for (String fname : m_dynfieldsinfo.keySet()) {
+              dynfieldinfo = m_dynfieldsinfo.get(fname);
+              if (!isUnboxPrimitive(dynfieldinfo.type)) {
+                code.beginControlFlow("if (null != $1N)", dynfieldinfo.name);
+                code.addStatement("$1N.cancelAutoReclaim()", dynfieldinfo.name);
+                code.endControlFlow();
+              }
+            }
+            code.addStatement("$1N = false", autoreclaimname);
+            break;
+          case "registerAutoReclaim":
+            if (methodinfo.elem.asType().toString().contains("ReclaimContext")) {
+              VariableElement arg0 = methodinfo.elem.getParameters().get(0);
+              code.addStatement("$1N.registerAutoReclaim($2L)", holdername, arg0);
+              for (String fname : m_dynfieldsinfo.keySet()) {
+                dynfieldinfo = m_dynfieldsinfo.get(fname);
+                if (!isUnboxPrimitive(dynfieldinfo.type)) {
+                  code.beginControlFlow("if (null != $1N)", dynfieldinfo.name);
+                  code.addStatement("$1N.registerAutoReclaim($2L)", dynfieldinfo.name, arg0);
+                  code.endControlFlow();
+                }
+              }
+              code.addStatement("$1N = true", autoreclaimname);
+            } else {
+              code.addStatement("this.registerAutoReclaim(null)");
+            }
+            break;
+          case "getHandler":
+            code.addStatement("return $1N.getChunkHandler($2N)", allocname, holdername);
+            break;
+          case "autoReclaim":
+            code.addStatement("return $1N", autoreclaimname);
+            break;
+          case "sync":
+            code.addStatement("$1N.sync()", holdername);
+            break;
+          case "persist":
+            code.addStatement("$1N.persist()", holdername);
+            break;
+          case "flush":
+            code.addStatement("$1N.flush()", holdername);
+            break;
+          case "destroy":
+            for (String fname : m_dynfieldsinfo.keySet()) {
+              dynfieldinfo = m_dynfieldsinfo.get(fname);
+              if (!isUnboxPrimitive(dynfieldinfo.type)) {
+                code.beginControlFlow("if (null != $1N)", dynfieldinfo.name);
+                code.addStatement("$1N.destroy()", dynfieldinfo.name);
+                code.addStatement("$1N = null", dynfieldinfo.name);
+                code.endControlFlow();
+              }
+            }
+            code.addStatement("$1N.destroy()", holdername);
+            break;
+          case "getNativeFieldInfo":
+            code.addStatement("return $1N", m_fieldsinfo.get("nfieldinfo").name);
+            break;
+          default:
+            throw new AnnotationProcessingException(null, "Method %s is not supported.", name);
         }
-        code.addStatement("$1N = false", autoreclaimname);
-        break;
-      case "registerAutoReclaim":
-        code.addStatement("$1N.registerAutoReclaim()", holdername);
-        for (String fname : m_dynfieldsinfo.keySet()) {
-          dynfieldinfo = m_dynfieldsinfo.get(fname);
-          if (!isUnboxPrimitive(dynfieldinfo.type)) {
-            code.beginControlFlow("if (null != $1N)", dynfieldinfo.name);
-            code.addStatement("$1N.registerAutoReclaim()", dynfieldinfo.name);
-            code.endControlFlow();
-          }
-        }
-        code.addStatement("$1N = true", autoreclaimname);
-        break;
-      case "getHandler":
-        code.addStatement("return $1N.getChunkHandler($2N)", allocname, holdername);
-        break;
-      case "autoReclaim":
-        code.addStatement("return $1N", autoreclaimname);
-        break;
-      case "sync":
-        code.addStatement("$1N.sync()", holdername);
-        break;
-      case "persist":
-        code.addStatement("$1N.persist()", holdername);
-        break;
-      case "flush":
-        code.addStatement("$1N.flush()", holdername);
-        break;
-      case "destroy":
-        for (String fname : m_dynfieldsinfo.keySet()) {
-          dynfieldinfo = m_dynfieldsinfo.get(fname);
-          if (!isUnboxPrimitive(dynfieldinfo.type)) {
-            code.beginControlFlow("if (null != $1N)", dynfieldinfo.name);
-            code.addStatement("$1N.destroy()", dynfieldinfo.name);
-            code.addStatement("$1N = null", dynfieldinfo.name);
-            code.endControlFlow();
-          }
-        }
-        code.addStatement("$1N.destroy()", holdername);
-        break;
-      case "getNativeFieldInfo":
-        code.addStatement("return $1N", m_fieldsinfo.get("nfieldinfo").name);
-        break;
-      default:
-        throw new AnnotationProcessingException(null, "Method %s is not supported.", name);
+        typespecbuilder.addMethod(methodinfo.specbuilder.addCode(code.build()).build());
       }
-      typespecbuilder.addMethod(methodinfo.specbuilder.addCode(code.build()).build());
     }
   }
 

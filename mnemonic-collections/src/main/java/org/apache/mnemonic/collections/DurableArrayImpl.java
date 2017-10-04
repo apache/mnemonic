@@ -29,6 +29,8 @@ import org.apache.mnemonic.RetrieveDurableEntityError;
 import org.apache.mnemonic.Utils;
 
 import java.util.NoSuchElementException;
+
+import org.flowcomputing.commons.resgc.ReclaimContext;
 import sun.misc.Unsafe;
 import java.util.Iterator;
 
@@ -186,7 +188,12 @@ public class DurableArrayImpl<A extends RestorableAllocator<A>, E>
 
   @Override
   public void registerAutoReclaim() {
-    holder.registerAutoReclaim();
+    this.registerAutoReclaim(null);
+  }
+
+  @Override
+  public void registerAutoReclaim(ReclaimContext rctx) {
+    holder.registerAutoReclaim(rctx);
     autoReclaim = true;
   }
 

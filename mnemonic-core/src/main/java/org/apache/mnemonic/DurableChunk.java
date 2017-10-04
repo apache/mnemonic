@@ -17,6 +17,8 @@
 
 package org.apache.mnemonic;
 
+import org.flowcomputing.commons.resgc.ReclaimContext;
+
 public class DurableChunk<A extends RetrievableAllocator<A>> extends MemChunkHolder<A> implements Durable {
   protected Persistence<A> m_persistOps = null;
 
@@ -37,6 +39,11 @@ public class DurableChunk<A extends RetrievableAllocator<A>> extends MemChunkHol
 
   @Override
   public void setupGenericInfo(EntityFactoryProxy[] efproxies, DurableType[] gftypes) {
+  }
+
+  @Override
+  public void registerAutoReclaim(ReclaimContext rctx) {
+    registerAutoReclaim(rctx);
   }
 
   @Override

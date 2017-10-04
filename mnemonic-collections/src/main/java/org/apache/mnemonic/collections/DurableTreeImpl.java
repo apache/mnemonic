@@ -27,6 +27,7 @@ import org.apache.mnemonic.RestoreDurableEntityError;
 import org.apache.mnemonic.RetrieveDurableEntityError;
 import org.apache.mnemonic.Utils;
 
+import org.flowcomputing.commons.resgc.ReclaimContext;
 import sun.misc.Unsafe;
 
 @SuppressWarnings("restriction")
@@ -545,6 +546,11 @@ public class DurableTreeImpl<A extends RestorableAllocator<A>, E extends Compara
 
   @Override
   public void registerAutoReclaim() {
+    this.registerAutoReclaim(null);
+  }
+
+  @Override
+  public void registerAutoReclaim(ReclaimContext rctx) {
     autoReclaim = true;
   }
 

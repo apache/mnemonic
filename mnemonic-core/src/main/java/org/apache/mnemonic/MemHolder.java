@@ -17,6 +17,7 @@
 
 package org.apache.mnemonic;
 
+import org.flowcomputing.commons.resgc.ReclaimContext;
 import org.flowcomputing.commons.resgc.ResHolder;
 
 /**
@@ -74,4 +75,11 @@ public abstract class MemHolder<A extends CommonAllocator<A>, T, H extends MemHo
    */
   public abstract void registerAutoReclaim();
 
+  /**
+   * register its held resource for auto-reclaim
+   *
+   * @param rctx
+   *          specify a reclaim context to register
+   */
+  public abstract void registerAutoReclaim(ReclaimContext<T> rctx);
 }

@@ -31,6 +31,7 @@ import org.apache.mnemonic.ParameterHolder;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.ArrayUtils;
+import org.flowcomputing.commons.resgc.ReclaimContext;
 import sun.misc.Unsafe;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -434,7 +435,12 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
 
   @Override
   public void registerAutoReclaim() {
-    holder.registerAutoReclaim();
+    this.registerAutoReclaim(null);
+  }
+
+  @Override
+  public void registerAutoReclaim(ReclaimContext rctx) {
+    holder.registerAutoReclaim(rctx);
     autoReclaim = true;
   }
 

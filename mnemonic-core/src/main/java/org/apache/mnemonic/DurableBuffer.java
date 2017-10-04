@@ -17,6 +17,8 @@
 
 package org.apache.mnemonic;
 
+import org.flowcomputing.commons.resgc.ReclaimContext;
+
 import java.nio.ByteBuffer;
 
 public class DurableBuffer<A extends RetrievableAllocator<A>> extends MemBufferHolder<A> implements Durable {
@@ -39,6 +41,11 @@ public class DurableBuffer<A extends RetrievableAllocator<A>> extends MemBufferH
 
   @Override
   public void setupGenericInfo(EntityFactoryProxy[] efproxies, DurableType[] gftypes) {
+  }
+
+  @Override
+  public void registerAutoReclaim(ReclaimContext rctx) {
+    registerAutoReclaim(rctx);
   }
 
   @Override

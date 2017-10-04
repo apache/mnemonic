@@ -17,6 +17,10 @@
 
 package org.apache.mnemonic;
 
+import org.flowcomputing.commons.resgc.ReclaimContext;
+
+import java.nio.ByteBuffer;
+
 /**
  * an interface to allocate memory resources from any underlying memory kind of
  * storage.
@@ -75,8 +79,30 @@ public interface Allocatable<A extends CommonAllocator<A>> {
    *
    * @param mholder
    *          specify a chunk holder to register
+   *
+   * @param rctx
+   *          specify a reclaim context
    */
+  void registerChunkAutoReclaim(MemChunkHolder<A> mholder, ReclaimContext<Long> rctx);
+
+    /**
+     * register a memory chunk for auto-reclaim
+     *
+     * @param mholder
+     *          specify a chunk holder to register
+     */
   void registerChunkAutoReclaim(MemChunkHolder<A> mholder);
+
+  /**
+   * register a memory buffer for auto-reclaim
+   *
+   * @param mholder
+   *          specify a buffer holder to register
+   *
+   * @param rctx
+   *          specify a reclaim context
+   */
+  void registerBufferAutoReclaim(MemBufferHolder<A> mholder, ReclaimContext<ByteBuffer> rctx);
 
   /**
    * register a memory buffer for auto-reclaim

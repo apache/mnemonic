@@ -17,6 +17,8 @@
 
 package org.apache.mnemonic;
 
+import org.flowcomputing.commons.resgc.ReclaimContext;
+
 import java.nio.ByteBuffer;
 
 /**
@@ -67,6 +69,17 @@ public class MemBufferHolder<A extends CommonAllocator<A>> extends MemHolder<A, 
   @Override
   public void registerAutoReclaim() {
     m_allocator.registerBufferAutoReclaim(this);
+  }
+
+  /**
+   * register its held buffer for auto-reclaim
+   *
+   * @param rctx
+   *          specify a reclaim context to register
+   */
+  @Override
+  public void registerAutoReclaim(ReclaimContext<ByteBuffer> rctx) {
+    m_allocator.registerBufferAutoReclaim(this, rctx);
   }
 
 }

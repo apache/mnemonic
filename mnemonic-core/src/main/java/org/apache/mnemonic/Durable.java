@@ -17,6 +17,8 @@
 
 package org.apache.mnemonic;
 
+import org.flowcomputing.commons.resgc.ReclaimContext;
+
 /**
  * this interface defines the interactive functionalities with Mnenomic core
  * part.
@@ -65,6 +67,13 @@ public interface Durable {
    *
    */
   void registerAutoReclaim();
+
+  /**
+   * this function could be called by user code to register this object
+   * with reclaim context for auto-reclaim
+   *
+   */
+  void registerAutoReclaim(ReclaimContext rctx);
 
   /**
    * this function returns its bound handler for this object

@@ -27,6 +27,7 @@ import org.apache.mnemonic.RetrieveDurableEntityError;
 import org.apache.mnemonic.Utils;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.flowcomputing.commons.resgc.ReclaimContext;
 import sun.misc.Unsafe;
 import java.util.Iterator;
 
@@ -135,7 +136,12 @@ public class DurableHashSetImpl<A extends RestorableAllocator<A>, E>
 
   @Override
   public void registerAutoReclaim() {
-    map.registerAutoReclaim();
+    this.registerAutoReclaim(null);
+  }
+
+  @Override
+  public void registerAutoReclaim(ReclaimContext rctx) {
+    map.registerAutoReclaim(rctx);
     autoReclaim = true;
   }
 

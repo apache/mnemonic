@@ -18,6 +18,7 @@
 package org.apache.mnemonic;
 
 import org.apache.mnemonic.service.memory.MemoryServiceFeature;
+import org.flowcomputing.commons.resgc.ReclaimContext;
 import org.flowcomputing.commons.resgc.ResCollector;
 
 import java.nio.ByteBuffer;
@@ -104,10 +105,38 @@ public abstract class CommonAllocator<A extends CommonAllocator<A>> implements A
    *
    * @param mholder
    *          specify a chunk holder to register
+   *
+   * @param rctx
+   *          specify a reclaim context
+   */
+  @Override
+  public void registerChunkAutoReclaim(MemChunkHolder<A> mholder, ReclaimContext<Long> rctx) {
+    m_chunkcollector.register(mholder, rctx);
+  }
+
+  /**
+   * register a memory chunk for auto-reclaim
+   *
+   * @param mholder
+   *          specify a chunk holder to register
    */
   @Override
   public void registerChunkAutoReclaim(MemChunkHolder<A> mholder) {
     m_chunkcollector.register(mholder);
+  }
+
+  /**
+   * register a memory buffer for auto-reclaim
+   *
+   * @param mholder
+   *          specify a buffer holder to register
+   *
+   * @param rctx
+   *          specify a reclaim context
+   */
+  @Override
+  public void registerBufferAutoReclaim(MemBufferHolder<A> mholder, ReclaimContext<ByteBuffer> rctx) {
+    m_bufcollector.register(mholder, rctx);
   }
 
   /**

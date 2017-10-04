@@ -17,6 +17,8 @@
 
 package org.apache.mnemonic;
 
+import org.flowcomputing.commons.resgc.ReclaimContext;
+
 /**
  * holder for a memory chunk.
  * 
@@ -72,4 +74,14 @@ public class MemChunkHolder<A extends CommonAllocator<A>> extends MemHolder<A, L
     m_allocator.registerChunkAutoReclaim(this);
   }
 
+  /**
+   * register its held chunk for auto-reclaim
+   *
+   * @param rctx
+   *          specify a reclaim context to register
+   */
+  @Override
+  public void registerAutoReclaim(ReclaimContext<Long> rctx) {
+    m_allocator.registerChunkAutoReclaim(this, rctx);
+  }
 }
