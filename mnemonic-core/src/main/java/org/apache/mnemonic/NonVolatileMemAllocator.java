@@ -253,10 +253,14 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
    * @param autoreclaim
    *          specify whether or not to reclaim this chunk automatically
    *
+   * @param rctx
+   *          specify a reclaim context
+   *
    * @return a durable chunk contains a memory chunk
    */
   @Override
-  public DurableChunk<NonVolatileMemAllocator> createChunk(long size, boolean autoreclaim) {
+  public DurableChunk<NonVolatileMemAllocator> createChunk(long size, boolean autoreclaim,
+                                                           ReclaimContext<Long> rctx) {
     DurableChunk<NonVolatileMemAllocator> ret = null;
     Long addr = m_nvmasvc.allocate(m_nid, size, true);
     if ((null == addr || 0 == addr) && m_activegc) {
@@ -267,7 +271,7 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
       ret = new DurableChunk<NonVolatileMemAllocator>(this, addr, size);
       ret.setCollector(m_chunkcollector);
       if (autoreclaim) {
-        m_chunkcollector.register(ret);
+        m_chunkcollector.register(ret, rctx);
       }
     }
     return ret;
@@ -282,10 +286,14 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
    * @param autoreclaim
    *          specify whether or not to reclaim this buffer automatically
    *
+   * @param rctx
+   *          specify a reclaim context
+   *
    * @return a durable buffer contains a memory buffer
    */
   @Override
-  public DurableBuffer<NonVolatileMemAllocator> createBuffer(long size, boolean autoreclaim) {
+  public DurableBuffer<NonVolatileMemAllocator> createBuffer(long size, boolean autoreclaim,
+                                                             ReclaimContext<ByteBuffer> rctx) {
     DurableBuffer<NonVolatileMemAllocator> ret = null;
     ByteBuffer bb = m_nvmasvc.createByteBuffer(m_nid, size);
     if (null == bb && m_activegc) {
@@ -296,7 +304,7 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
       ret = new DurableBuffer<NonVolatileMemAllocator>(this, bb);
       ret.setCollector(m_bufcollector);
       if (autoreclaim) {
-        m_bufcollector.register(ret);
+        m_bufcollector.register(ret, rctx);
       }
     }
     return ret;
@@ -311,18 +319,22 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
    * @param autoreclaim
    *          specify whether this retrieved memory buffer can be reclaimed
    *          automatically or not
-   * 
+   *
+   * @param rctx
+   *          specify a reclaim context
+   *
    * @return a durable buffer contains the retrieved memory buffer
    */
   @Override
-  public DurableBuffer<NonVolatileMemAllocator> retrieveBuffer(long phandler, boolean autoreclaim) {
+  public DurableBuffer<NonVolatileMemAllocator> retrieveBuffer(long phandler, boolean autoreclaim,
+                                                               ReclaimContext<ByteBuffer> rctx) {
     DurableBuffer<NonVolatileMemAllocator> ret = null;
     ByteBuffer bb = m_nvmasvc.retrieveByteBuffer(m_nid, getEffectiveAddress(phandler));
     if (null != bb) {
       ret = new DurableBuffer<NonVolatileMemAllocator>(this, bb);
       ret.setCollector(m_bufcollector);
       if (autoreclaim) {
-        m_bufcollector.register(ret);
+        m_bufcollector.register(ret, rctx);
       }
     }
     return ret;
@@ -337,11 +349,15 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
    * @param autoreclaim
    *          specify whether this retrieved memory chunk can be reclaimed
    *          automatically or not
-   * 
+   *
+   * @param rctx
+   *          specify a reclaim context
+   *
    * @return a durable chunk contains the retrieved memory chunk
    */
   @Override
-  public DurableChunk<NonVolatileMemAllocator> retrieveChunk(long phandler, boolean autoreclaim) {
+  public DurableChunk<NonVolatileMemAllocator> retrieveChunk(long phandler, boolean autoreclaim,
+                                                             ReclaimContext<Long> rctx) {
     DurableChunk<NonVolatileMemAllocator> ret = null;
     long eaddr = getEffectiveAddress(phandler);
     long sz = m_nvmasvc.retrieveSize(m_nid, eaddr);
@@ -349,7 +365,7 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
       ret = new DurableChunk<NonVolatileMemAllocator>(this, eaddr, sz);
       ret.setCollector(m_chunkcollector);
       if (autoreclaim) {
-        m_chunkcollector.register(ret);
+        m_chunkcollector.register(ret, rctx);
       }
     }
     return ret;

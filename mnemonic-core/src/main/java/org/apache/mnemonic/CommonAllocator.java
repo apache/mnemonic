@@ -88,16 +88,48 @@ public abstract class CommonAllocator<A extends CommonAllocator<A>> implements A
   }
 
   /**
+   * create a memory chunk that is managed by its holder.
+   *
+   * @param size
+   *          specify the size of memory chunk
+   *
+   * @param autoreclaim
+   *          specify whether or not to reclaim this chunk automatically
+   *
+   * @return a holder contains a memory chunk
+   */
+  @Override
+  public MemChunkHolder<A> createChunk(long size, boolean autoreclaim) {
+    return createChunk(size, autoreclaim, null);
+  }
+
+  /**
    * create a memory buffer that is managed by its holder.
-   * 
+   *
    * @param size
    *          specify the size of memory buffer
-   * 
+   *
    * @return a holder contains a memory buffer
    */
   @Override
   public MemBufferHolder<A> createBuffer(long size) {
     return createBuffer(size, true);
+  }
+
+  /**
+   * create a memory buffer that is managed by its holder.
+   *
+   * @param size
+   *          specify the size of memory buffer
+   *
+   * @param autoreclaim
+   *          specify whether or not to reclaim this chunk automatically
+   *
+   * @return a holder contains a memory buffer
+   */
+  @Override
+  public MemBufferHolder<A> createBuffer(long size, boolean autoreclaim) {
+    return createBuffer(size, autoreclaim, null);
   }
 
   /**

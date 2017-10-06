@@ -256,10 +256,14 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
    * @param autoreclaim
    *          specify whether or not to reclaim this chunk automatically
    *
+   * @param rctx
+   *          specify a reclaim context
+   *
    * @return a durable chunk contains a memory chunk
    */
   @Override
-  public DurableChunk<VolatileMemAllocator> createChunk(long size, boolean autoreclaim) {
+  public DurableChunk<VolatileMemAllocator> createChunk(long size, boolean autoreclaim,
+                                                        ReclaimContext<Long> rctx) {
     DurableChunk<VolatileMemAllocator> ret = null;
     Long addr = m_vmasvc.allocate(m_nid, size, true);
     if (0 == addr && m_activegc) {
@@ -270,7 +274,7 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
       ret = new DurableChunk<VolatileMemAllocator>(this, addr, size);
       ret.setCollector(m_chunkcollector);
       if (autoreclaim) {
-        m_chunkcollector.register(ret);
+        m_chunkcollector.register(ret, rctx);
       }
     }
     return ret;
@@ -285,10 +289,14 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
    * @param autoreclaim
    *          specify whether or not to reclaim this buffer automatically
    *
+   * @param rctx
+   *          specify a reclaim context
+   *
    * @return a durable buffer contains a memory buffer
    */
   @Override
-  public DurableBuffer<VolatileMemAllocator> createBuffer(long size, boolean autoreclaim) {
+  public DurableBuffer<VolatileMemAllocator> createBuffer(long size, boolean autoreclaim,
+                                                          ReclaimContext<ByteBuffer> rctx) {
     DurableBuffer<VolatileMemAllocator> ret = null;
     ByteBuffer bb = m_vmasvc.createByteBuffer(m_nid, size);
     if (null == bb && m_activegc) {
@@ -299,7 +307,7 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
       ret = new DurableBuffer<VolatileMemAllocator>(this, bb);
       ret.setCollector(m_bufcollector);
       if (autoreclaim) {
-        m_bufcollector.register(ret);
+        m_bufcollector.register(ret, rctx);
       }
     }
     return ret;
@@ -314,17 +322,21 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
    * @param autoreclaim
    *          specify whether this retrieved memory buffer can be reclaimed
    *          automatically or not
-   * 
+   *
+   * @param rctx
+   *          specify a reclaim context
+   *
    * @return a durable buffer contains the retrieved memory buffer
    */
   @Override
-  public DurableBuffer<VolatileMemAllocator> retrieveBuffer(long phandler, boolean autoreclaim) {
+  public DurableBuffer<VolatileMemAllocator> retrieveBuffer(long phandler, boolean autoreclaim,
+                                                            ReclaimContext<ByteBuffer> rctx) {
     DurableBuffer<VolatileMemAllocator> ret = null;
     ByteBuffer bb = m_vmasvc.retrieveByteBuffer(m_nid, getEffectiveAddress(phandler));
     if (null != bb) {
       ret = new DurableBuffer<VolatileMemAllocator>(this, bb);
       if (autoreclaim) {
-        m_bufcollector.register(ret);
+        m_bufcollector.register(ret, rctx);
       }
     }
     return ret;
@@ -339,18 +351,22 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
    * @param autoreclaim
    *          specify whether this retrieved memory chunk can be reclaimed
    *          automatically or not
-   * 
+   *
+   * @param rctx
+   *          specify a reclaim context
+   *
    * @return a durable chunk contains the retrieved memory chunk
    */
   @Override
-  public DurableChunk<VolatileMemAllocator> retrieveChunk(long phandler, boolean autoreclaim) {
+  public DurableChunk<VolatileMemAllocator> retrieveChunk(long phandler, boolean autoreclaim,
+                                                          ReclaimContext<Long> rctx) {
     DurableChunk<VolatileMemAllocator> ret = null;
     long eaddr = getEffectiveAddress(phandler);
     long sz = m_vmasvc.retrieveSize(m_nid, eaddr);
     if (sz > 0L) {
       ret = new DurableChunk<VolatileMemAllocator>(this, eaddr, sz);
       if (autoreclaim) {
-        m_chunkcollector.register(ret);
+        m_chunkcollector.register(ret, rctx);
       }
     }
     return ret;

@@ -17,8 +17,24 @@
 
 package org.apache.mnemonic;
 
+import org.flowcomputing.commons.resgc.ReclaimContext;
+
+import java.nio.ByteBuffer;
+
 public abstract class RetrievableAllocator<A extends RetrievableAllocator<A>> extends CommonAllocator<A>
   implements AddressTranslator, HandlerStore, Transaction {
+
+  /**
+   * create a durable chunk that is managed by its holder.
+   *
+   * @param size
+   *          specify the size of memory chunk
+   *
+   * @return a durable chunk contains a memory chunk
+   */
+  public DurableChunk<A> createChunk(long size) {
+    return createChunk(size, true);
+  }
 
   /**
    * create a durable chunk that is managed by its holder.
@@ -31,22 +47,9 @@ public abstract class RetrievableAllocator<A extends RetrievableAllocator<A>> ex
    *
    * @return a durable chunk contains a memory chunk
    */
-  @Override
-  public abstract DurableChunk<A> createChunk(long size, boolean autoreclaim);
-
-  /**
-   * create a durable buffer that is managed by its holder.
-   * 
-   * @param size
-   *          specify the size of memory buffer
-   * 
-   * @param autoreclaim
-   *          specify whether or not to reclaim this buffer automatically
-   *
-   * @return a durable buffer contains a memory buffer
-   */
-  @Override
-  public abstract DurableBuffer<A> createBuffer(long size, boolean autoreclaim);
+  public DurableChunk<A> createChunk(long size, boolean autoreclaim) {
+    return createChunk(size, autoreclaim, null);
+  }
 
   /**
    * create a durable chunk that is managed by its holder.
@@ -54,25 +57,60 @@ public abstract class RetrievableAllocator<A extends RetrievableAllocator<A>> ex
    * @param size
    *          specify the size of memory chunk
    *
+   * @param autoreclaim
+   *          specify whether or not to reclaim this chunk automatically
+   *
+   * @param rctx
+   *          specify a reclaim context
+   *
    * @return a durable chunk contains a memory chunk
    */
   @Override
-  public DurableChunk<A> createChunk(long size) {
-    return createChunk(size, true);
+  public abstract DurableChunk<A> createChunk(long size, boolean autoreclaim, ReclaimContext<Long> rctx);
+
+  /**
+   * create a durable buffer that is managed by its holder.
+   *
+   * @param size
+   *          specify the size of memory buffer
+   *
+   * @return a durable buffer contains a memory buffer
+   */
+  public DurableBuffer<A> createBuffer(long size) {
+    return createBuffer(size, true);
   }
 
   /**
    * create a durable buffer that is managed by its holder.
-   * 
+   *
    * @param size
    *          specify the size of memory buffer
-   * 
+   *
+   * @param autoreclaim
+   *          specify whether or not to reclaim this buffer automatically
+   *
+   * @return a durable buffer contains a memory buffer
+   */
+  public DurableBuffer<A> createBuffer(long size, boolean autoreclaim) {
+    return createBuffer(size, autoreclaim, null);
+  }
+
+  /**
+   * create a durable buffer that is managed by its holder.
+   *
+   * @param size
+   *          specify the size of memory buffer
+   *
+   * @param autoreclaim
+   *          specify whether or not to reclaim this buffer automatically
+   *
+   * @param rctx
+   *          specify a reclaim context
+   *
    * @return a durable buffer contains a memory buffer
    */
   @Override
-  public DurableBuffer<A> createBuffer(long size) {
-    return createBuffer(size, true);
-  }
+  public abstract DurableBuffer<A> createBuffer(long size, boolean autoreclaim, ReclaimContext<ByteBuffer> rctx);
 
   /**
    * retrieve a memory buffer from its backed memory allocator.
@@ -110,7 +148,9 @@ public abstract class RetrievableAllocator<A extends RetrievableAllocator<A>> ex
    * 
    * @return a durable buffer contains the retrieved memory buffer
    */
-  public abstract DurableBuffer<A> retrieveBuffer(long phandler, boolean autoreclaim);
+  public DurableBuffer<A> retrieveBuffer(long phandler, boolean autoreclaim) {
+    return retrieveBuffer(phandler, autoreclaim, null);
+  }
 
   /**
    * retrieve a memory chunk from its backed memory allocator.
@@ -124,7 +164,43 @@ public abstract class RetrievableAllocator<A extends RetrievableAllocator<A>> ex
    * 
    * @return a durable chunk contains the retrieved memory chunk
    */
-  public abstract DurableChunk<A> retrieveChunk(long phandler, boolean autoreclaim);
+  public DurableChunk<A> retrieveChunk(long phandler, boolean autoreclaim) {
+    return retrieveChunk(phandler, autoreclaim, null);
+  }
+
+  /**
+   * retrieve a memory buffer from its backed memory allocator.
+   *
+   * @param phandler
+   *          specify the handler of memory buffer to retrieve
+   *
+   * @param autoreclaim
+   *          specify whether this retrieved memory buffer can be reclaimed
+   *          automatically or not
+   *
+   * @param rctx
+   *          specify a reclaim context
+   *
+   * @return a durable buffer contains the retrieved memory buffer
+   */
+  public abstract DurableBuffer<A> retrieveBuffer(long phandler, boolean autoreclaim, ReclaimContext<ByteBuffer> rctx);
+
+  /**
+   * retrieve a memory chunk from its backed memory allocator.
+   *
+   * @param phandler
+   *          specify the handler of memory chunk to retrieve
+   *
+   * @param autoreclaim
+   *          specify whether this retrieved memory chunk can be reclaimed
+   *          automatically or not
+   *
+   * @param rctx
+   *          specify a reclaim context
+   *
+   * @return a durable chunk contains the retrieved memory chunk
+   */
+  public abstract DurableChunk<A> retrieveChunk(long phandler, boolean autoreclaim, ReclaimContext<Long> rctx);
 
   /**
    * re-size a specified chunk on its backed memory pool.

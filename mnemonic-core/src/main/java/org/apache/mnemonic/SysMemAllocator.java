@@ -282,10 +282,14 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
    * @param autoreclaim
    *          specify whether or not to reclaim this chunk automatically
    *
+   * @param rctx
+   *          specify a reclaim context
+   *
    * @return a holder contains a memory chunk
    */
   @Override
-  public MemChunkHolder<SysMemAllocator> createChunk(long size, boolean autoreclaim) {
+  public MemChunkHolder<SysMemAllocator> createChunk(long size, boolean autoreclaim,
+                                                     ReclaimContext<Long> rctx) {
     MemChunkHolder<SysMemAllocator> ret = null;
     Long addr = null;
     if (currentMemory.get() + size > maxStoreCapacity) {
@@ -300,7 +304,7 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
       ret = new MemChunkHolder<SysMemAllocator>(this, addr, size);
       ret.setCollector(m_chunkcollector);
       if (autoreclaim) {
-        m_chunkcollector.register(ret);
+        m_chunkcollector.register(ret, rctx);
       }
       m_chunksize.put(addr, size);
       currentMemory.getAndAdd(size);
@@ -313,11 +317,15 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
    * 
    * @param size
    *          specify the size of memory buffer
-   * 
+   *
+   * @param rctx
+   *          specify a reclaim context
+   *
    * @return a holder contains a memory buffer
    */
   @Override
-  public MemBufferHolder<SysMemAllocator> createBuffer(long size, boolean autoreclaim) {
+  public MemBufferHolder<SysMemAllocator> createBuffer(long size, boolean autoreclaim,
+                                                       ReclaimContext<ByteBuffer> rctx) {
     MemBufferHolder<SysMemAllocator> ret = null;
     ByteBuffer bb = null;
     if (currentMemory.get() + size > maxStoreCapacity) {
@@ -332,7 +340,7 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
       ret = new MemBufferHolder<SysMemAllocator>(this, bb);
       ret.setCollector(m_bufcollector);
       if (autoreclaim) {
-        m_bufcollector.register(ret);
+        m_bufcollector.register(ret, rctx);
       }
       currentMemory.getAndAdd(size);
     }

@@ -30,10 +30,20 @@ public interface Allocatable<A extends CommonAllocator<A>> {
 
   /**
    * create a memory chunk that is managed by its holder.
-   * 
+   *
    * @param size
    *          specify the size of memory chunk
-   * 
+   *
+   * @return a holder contains a memory chunk
+   */
+  MemChunkHolder<A> createChunk(long size);
+
+  /**
+   * create a memory chunk that is managed by its holder.
+   *
+   * @param size
+   *          specify the size of memory chunk
+   *
    * @param autoreclaim
    *          specify whether or not to reclaim this chunk automatically
    *
@@ -47,16 +57,32 @@ public interface Allocatable<A extends CommonAllocator<A>> {
    * @param size
    *          specify the size of memory chunk
    * 
+   * @param autoreclaim
+   *          specify whether or not to reclaim this chunk automatically
+   *
+   * @param rctx
+   *          specify a reclaim context
+   *
    * @return a holder contains a memory chunk
    */
-  MemChunkHolder<A> createChunk(long size);
+  MemChunkHolder<A> createChunk(long size, boolean autoreclaim, ReclaimContext<Long> rctx);
 
   /**
    * create a memory buffer that is managed by its holder.
-   * 
+   *
    * @param size
    *          specify the size of memory buffer
-   * 
+   *
+   * @return a holder contains a memory buffer
+   */
+  MemBufferHolder<A> createBuffer(long size);
+
+  /**
+   * create a memory buffer that is managed by its holder.
+   *
+   * @param size
+   *          specify the size of memory buffer
+   *
    * @param autoreclaim
    *          specify whether or not to reclaim this buffer automatically
    *
@@ -70,9 +96,15 @@ public interface Allocatable<A extends CommonAllocator<A>> {
    * @param size
    *          specify the size of memory buffer
    * 
+   * @param autoreclaim
+   *          specify whether or not to reclaim this buffer automatically
+   *
+   * @param rctx
+   *          specify a reclaim context
+   *
    * @return a holder contains a memory buffer
    */
-  MemBufferHolder<A> createBuffer(long size);
+  MemBufferHolder<A> createBuffer(long size, boolean autoreclaim, ReclaimContext<ByteBuffer> rctx);
 
   /**
    * register a memory chunk for auto-reclaim

@@ -45,7 +45,7 @@ public class DurableBuffer<A extends RetrievableAllocator<A>> extends MemBufferH
 
   @Override
   public void registerAutoReclaim(ReclaimContext rctx) {
-    registerAutoReclaim(rctx);
+    super.registerAutoReclaim(rctx);
   }
 
   @Override
