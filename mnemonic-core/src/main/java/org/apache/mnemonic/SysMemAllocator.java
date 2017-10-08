@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static org.apache.mnemonic.service.memory.MemoryServiceFeature.EXPANDABLE;
+import static org.apache.mnemonic.service.memory.MemoryServiceFeature.SHRINKABLE;
 
 /**
  * manage a system memory pool as a internal volatile allocator
@@ -352,10 +353,27 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
     long ret = 0L;
     if (null != m_features) {
       if (m_features.contains(EXPANDABLE)) {
-        return ret = size;
+        ret = size;
+      } else {
+        throw new ConfigurationException("Do not support expand operation");
       }
     } else {
-      throw new ConfigurationException("Do not support expand operation");
+      throw new ConfigurationException("Do not support features");
+    }
+    return ret;
+  }
+
+  @Override
+  public long shrink(long size) {
+    long ret = 0L;
+    if (null != m_features) {
+      if (m_features.contains(SHRINKABLE)) {
+        ret = size;
+      } else {
+        throw new ConfigurationException("Do not support shrink operation");
+      }
+    } else {
+      throw new ConfigurationException("Do not support features");
     }
     return ret;
   }

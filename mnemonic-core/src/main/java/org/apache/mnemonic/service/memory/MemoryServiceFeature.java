@@ -23,7 +23,8 @@ public enum MemoryServiceFeature {
   TRANSACTABLE(3),
   QUERYABLE(4),
   ABSTRACTADDRESSING(5),
-  EXPANDABLE(6);
+  EXPANDABLE(6),
+  SHRINKABLE(7);
 
   private int value;
 

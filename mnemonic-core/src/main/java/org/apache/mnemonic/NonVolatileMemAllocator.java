@@ -31,6 +31,7 @@ import java.nio.ByteBuffer;
 
 import static org.apache.mnemonic.service.memory.MemoryServiceFeature.EXPANDABLE;
 import static org.apache.mnemonic.service.memory.MemoryServiceFeature.QUERYABLE;
+import static org.apache.mnemonic.service.memory.MemoryServiceFeature.SHRINKABLE;
 
 /**
  * manage a big native persistent memory pool through underlying memory service.
@@ -728,10 +729,27 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
     long ret = 0L;
     if (null != m_features) {
       if (m_features.contains(EXPANDABLE)) {
-        return m_nvmasvc.adjustCapacity(m_nid, size);
+        ret = m_nvmasvc.adjustCapacity(m_nid, size);
+      } else {
+        throw new ConfigurationException("Do not support expand operation");
       }
     } else {
-      throw new ConfigurationException("Do not support expand operation");
+      throw new ConfigurationException("Do not support features");
+    }
+    return ret;
+  }
+
+  @Override
+  public long shrink(long size) {
+    long ret = 0L;
+    if (null != m_features) {
+      if (m_features.contains(SHRINKABLE)) {
+        ret = m_nvmasvc.adjustCapacity(m_nid, (-1) * size);
+      } else {
+        throw new ConfigurationException("Do not support shrink operation");
+      }
+    } else {
+      throw new ConfigurationException("Do not support features");
     }
     return ret;
   }

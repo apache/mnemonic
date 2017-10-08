@@ -55,6 +55,16 @@ public abstract class CommonAllocator<A extends CommonAllocator<A>> implements A
   public abstract long expand(long size);
 
   /**
+   * shrink this memory pool
+   *
+   * @param size
+   *          specify the size to shrink
+   *
+   * @return the real size shrinked
+   */
+  public abstract long shrink(long size);
+
+  /**
    * set a reclaimer to reclaim memory buffer
    * 
    * @param reclaimer
