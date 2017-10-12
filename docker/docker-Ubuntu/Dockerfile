@@ -46,12 +46,13 @@ RUN cd /ws && git clone https://github.com/NonVolatileComputing/pmalloc.git && \
 RUN cd /ws && git clone https://github.com/pmem/nvml.git && \
     cd nvml && git checkout 630862e82f && make && make install
 
-RUN echo export MAVEN_OPTS="\" $([[ \"x\" != \"x${proxy_host}\" ]] && echo -DproxySet=\\\"true\\\" -DproxyHost=${proxy_host} -DproxyPort=${proxy_port}) \"" \
-    > /etc/profile.d/mvn.sh && chmod +x /etc/profile.d/mvn.sh
-    
-RUN /bin/bash -c "source /etc/profile.d/mvn.sh"
-    
-RUN cd /ws && git clone https://github.com/apache/incubator-mnemonic.git && \
+RUN touch /etc/profile.d/mvn.sh && chmod +x /etc/profile.d/mvn.sh && \
+    if [ "x" != "x${proxy_host}" ]; then echo export MAVEN_OPTS="\" -DproxySet=\\\"true\\\" -DproxyHost=${proxy_host} -DproxyPort=${proxy_port} \"" > /etc/profile.d/mvn.sh; fi
+
+RUN cat /etc/profile.d/mvn.sh > ~/.bash_profile
+RUN cat /etc/profile.d/mvn.sh > ~/.bashrc
+
+RUN . /etc/profile.d/mvn.sh && cd /ws && git clone https://github.com/apache/incubator-mnemonic.git && \
     cd incubator-mnemonic && mvn clean package install
 
 ENV MNEMONIC_HOME /ws/incubator-mnemonic
