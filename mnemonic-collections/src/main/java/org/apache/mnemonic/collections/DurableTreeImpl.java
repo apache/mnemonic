@@ -39,6 +39,7 @@ public class DurableTreeImpl<A extends RestorableAllocator<A>, E extends Compara
   private EntityFactoryProxy[] factoryProxy;
   private DurableType[] genericType;
   private volatile boolean autoReclaim;
+  private volatile ReclaimContext reclaimcontext;
   private A allocator;
   private MemChunkHolder<A> holder;
   private static final long MAX_OBJECT_SIZE = 8;
@@ -54,7 +55,7 @@ public class DurableTreeImpl<A extends RestorableAllocator<A>, E extends Compara
    */
   public void insert(E item) throws OutOfHybridMemory {
     TreeNode<E> tmp = root;
-    TreeNode<E> node = TreeNodeFactory.create(allocator, factoryProxy, genericType, autoReclaim);
+    TreeNode<E> node = TreeNodeFactory.create(allocator, factoryProxy, genericType, autoReclaim, reclaimcontext);
     node.setItem(item, false);
     if (null == root) {
       root = node;
@@ -546,12 +547,13 @@ public class DurableTreeImpl<A extends RestorableAllocator<A>, E extends Compara
 
   @Override
   public void registerAutoReclaim() {
-    this.registerAutoReclaim(null);
+    this.registerAutoReclaim(reclaimcontext);
   }
 
   @Override
   public void registerAutoReclaim(ReclaimContext rctx) {
     autoReclaim = true;
+    reclaimcontext = rctx;
   }
 
   @Override
@@ -561,21 +563,22 @@ public class DurableTreeImpl<A extends RestorableAllocator<A>, E extends Compara
 
   @Override
   public void restoreDurableEntity(A allocator, EntityFactoryProxy[] factoryProxy,
-      DurableType[] gType, long phandler, boolean autoReclaim) throws RestoreDurableEntityError {
-    initializeDurableEntity(allocator, factoryProxy, gType, autoReclaim);
+      DurableType[] gType, long phandler, boolean autoReclaim, ReclaimContext rctx)
+          throws RestoreDurableEntityError {
+    initializeDurableEntity(allocator, factoryProxy, gType, autoReclaim, rctx);
     if (0L == phandler) {
       throw new RestoreDurableEntityError("Input handler is null on restoreDurableEntity.");
     }
     holder = allocator.retrieveChunk(phandler, autoReclaim);
     long rootHandler = unsafe.getLong(holder.get());
-    root = TreeNodeFactory.restore(allocator, factoryProxy, genericType, rootHandler, autoReclaim);
+    root = TreeNodeFactory.restore(allocator, factoryProxy, genericType, rootHandler, autoReclaim, reclaimcontext);
     initializeAfterRestore();
   }
 
 
   @Override
   public void initializeDurableEntity(A allocator, EntityFactoryProxy[] factoryProxy,
-      DurableType[] gType, boolean autoReclaim) {
+      DurableType[] gType, boolean autoReclaim, ReclaimContext rctx) {
     this.allocator = allocator;
     this.factoryProxy = factoryProxy;
     this.genericType = gType;
@@ -589,9 +592,9 @@ public class DurableTreeImpl<A extends RestorableAllocator<A>, E extends Compara
 
   @Override
   public void createDurableEntity(A allocator, EntityFactoryProxy[] factoryProxy,
-      DurableType[] gType, boolean autoReclaim) throws OutOfHybridMemory {
-    initializeDurableEntity(allocator, factoryProxy, gType, autoReclaim);
-    this.holder = allocator.createChunk(MAX_OBJECT_SIZE, autoReclaim);
+      DurableType[] gType, boolean autoReclaim, ReclaimContext rctx) throws OutOfHybridMemory {
+    initializeDurableEntity(allocator, factoryProxy, gType, autoReclaim, rctx);
+    this.holder = allocator.createChunk(MAX_OBJECT_SIZE, autoReclaim, reclaimcontext);
     initializeAfterCreate();
   }
 

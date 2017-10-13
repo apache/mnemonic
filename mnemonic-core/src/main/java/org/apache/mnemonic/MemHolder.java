@@ -81,5 +81,5 @@ public abstract class MemHolder<A extends CommonAllocator<A>, T, H extends MemHo
    * @param rctx
    *          specify a reclaim context to register
    */
-  public abstract void registerAutoReclaim(ReclaimContext<T> rctx);
+  public abstract void registerAutoReclaim(ReclaimContext rctx);
 }

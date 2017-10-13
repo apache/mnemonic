@@ -19,8 +19,6 @@ package org.apache.mnemonic;
 
 import org.flowcomputing.commons.resgc.ReclaimContext;
 
-import java.nio.ByteBuffer;
-
 /**
  * an interface to allocate memory resources from any underlying memory kind of
  * storage.
@@ -65,7 +63,7 @@ public interface Allocatable<A extends CommonAllocator<A>> {
    *
    * @return a holder contains a memory chunk
    */
-  MemChunkHolder<A> createChunk(long size, boolean autoreclaim, ReclaimContext<Long> rctx);
+  MemChunkHolder<A> createChunk(long size, boolean autoreclaim, ReclaimContext rctx);
 
   /**
    * create a memory buffer that is managed by its holder.
@@ -104,7 +102,7 @@ public interface Allocatable<A extends CommonAllocator<A>> {
    *
    * @return a holder contains a memory buffer
    */
-  MemBufferHolder<A> createBuffer(long size, boolean autoreclaim, ReclaimContext<ByteBuffer> rctx);
+  MemBufferHolder<A> createBuffer(long size, boolean autoreclaim, ReclaimContext rctx);
 
   /**
    * register a memory chunk for auto-reclaim
@@ -115,7 +113,7 @@ public interface Allocatable<A extends CommonAllocator<A>> {
    * @param rctx
    *          specify a reclaim context
    */
-  void registerChunkAutoReclaim(MemChunkHolder<A> mholder, ReclaimContext<Long> rctx);
+  void registerChunkAutoReclaim(MemChunkHolder<A> mholder, ReclaimContext rctx);
 
     /**
      * register a memory chunk for auto-reclaim
@@ -134,7 +132,7 @@ public interface Allocatable<A extends CommonAllocator<A>> {
    * @param rctx
    *          specify a reclaim context
    */
-  void registerBufferAutoReclaim(MemBufferHolder<A> mholder, ReclaimContext<ByteBuffer> rctx);
+  void registerBufferAutoReclaim(MemBufferHolder<A> mholder, ReclaimContext rctx);
 
   /**
    * register a memory buffer for auto-reclaim

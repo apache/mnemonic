@@ -23,6 +23,7 @@ import org.apache.mnemonic.query.memory.ResultSet;
 import org.apache.mnemonic.service.computing.ValueInfo;
 import org.apache.mnemonic.service.memory.MemoryServiceFeature;
 import org.apache.mnemonic.service.memory.VolatileMemoryAllocatorService;
+import org.flowcomputing.commons.resgc.ContextWrapper;
 import org.flowcomputing.commons.resgc.ResCollector;
 import org.flowcomputing.commons.resgc.ResReclaim;
 import org.flowcomputing.commons.resgc.ReclaimContext;
@@ -85,7 +86,7 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
      */
     m_bufcollector = new ResCollector<MemBufferHolder<VolatileMemAllocator>, ByteBuffer>(new ResReclaim<ByteBuffer>() {
       @Override
-      public void reclaim(ReclaimContext<ByteBuffer> rctx) {
+      public void reclaim(ContextWrapper<ByteBuffer> rctx) {
         ByteBuffer mres = rctx.getRes();
         boolean cb_reclaimed = false;
         if (null != m_bufferreclaimer) {
@@ -104,7 +105,7 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
      */
     m_chunkcollector = new ResCollector<MemChunkHolder<VolatileMemAllocator>, Long>(new ResReclaim<Long>() {
       @Override
-      public void reclaim(ReclaimContext<Long> rctx) {
+      public void reclaim(ContextWrapper<Long> rctx) {
         Long mres = rctx.getRes();
         // System.out.println(String.format("Reclaim: %X", mres));
         boolean cb_reclaimed = false;
@@ -281,7 +282,7 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
    */
   @Override
   public DurableChunk<VolatileMemAllocator> createChunk(long size, boolean autoreclaim,
-                                                        ReclaimContext<Long> rctx) {
+                                                        ReclaimContext rctx) {
     DurableChunk<VolatileMemAllocator> ret = null;
     Long addr = m_vmasvc.allocate(m_nid, size, true);
     if (0 == addr && m_activegc) {
@@ -314,7 +315,7 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
    */
   @Override
   public DurableBuffer<VolatileMemAllocator> createBuffer(long size, boolean autoreclaim,
-                                                          ReclaimContext<ByteBuffer> rctx) {
+                                                          ReclaimContext rctx) {
     DurableBuffer<VolatileMemAllocator> ret = null;
     ByteBuffer bb = m_vmasvc.createByteBuffer(m_nid, size);
     if (null == bb && m_activegc) {
@@ -348,7 +349,7 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
    */
   @Override
   public DurableBuffer<VolatileMemAllocator> retrieveBuffer(long phandler, boolean autoreclaim,
-                                                            ReclaimContext<ByteBuffer> rctx) {
+                                                            ReclaimContext rctx) {
     DurableBuffer<VolatileMemAllocator> ret = null;
     ByteBuffer bb = m_vmasvc.retrieveByteBuffer(m_nid, getEffectiveAddress(phandler));
     if (null != bb) {
@@ -377,7 +378,7 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
    */
   @Override
   public DurableChunk<VolatileMemAllocator> retrieveChunk(long phandler, boolean autoreclaim,
-                                                          ReclaimContext<Long> rctx) {
+                                                          ReclaimContext rctx) {
     DurableChunk<VolatileMemAllocator> ret = null;
     long eaddr = getEffectiveAddress(phandler);
     long sz = m_vmasvc.retrieveSize(m_nid, eaddr);

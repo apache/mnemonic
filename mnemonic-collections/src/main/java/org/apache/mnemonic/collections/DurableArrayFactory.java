@@ -22,6 +22,7 @@ import org.apache.mnemonic.EntityFactoryProxy;
 import org.apache.mnemonic.OutOfHybridMemory;
 import org.apache.mnemonic.RestorableAllocator;
 import org.apache.mnemonic.RestoreDurableEntityError;
+import org.flowcomputing.commons.resgc.ReclaimContext;
 
 public class DurableArrayFactory {
   public static <A extends RestorableAllocator<A>, E> DurableArray<E>
@@ -36,15 +37,27 @@ public class DurableArrayFactory {
 
   public static <A extends RestorableAllocator<A>, E> DurableArray<E>
               create(A allocator, int size, boolean autoreclaim) throws OutOfHybridMemory {
-    return create(allocator, null, null, size, autoreclaim);
+    return create(allocator, null, null, size, autoreclaim, null);
+  }
+
+  public static <A extends RestorableAllocator<A>, E> DurableArray<E>
+              create(A allocator, int size, boolean autoreclaim, ReclaimContext reclaimcontext)
+          throws OutOfHybridMemory {
+    return create(allocator, null, null, size, autoreclaim, reclaimcontext);
   }
 
   public static <A extends RestorableAllocator<A>, E> DurableArray<E>
               create(A allocator, EntityFactoryProxy[] factoryproxys, DurableType[] gfields,
                    int size, boolean autoreclaim) throws OutOfHybridMemory {
+    return create(allocator, factoryproxys, gfields, size, autoreclaim, null);
+  }
+
+  public static <A extends RestorableAllocator<A>, E> DurableArray<E>
+              create(A allocator, EntityFactoryProxy[] factoryproxys, DurableType[] gfields,
+                   int size, boolean autoreclaim, ReclaimContext reclaimcontext) throws OutOfHybridMemory {
     DurableArrayImpl<A, E> entity = new DurableArrayImpl<A, E>(size);
     entity.setupGenericInfo(factoryproxys, gfields);
-    entity.createDurableEntity(allocator, factoryproxys, gfields, autoreclaim);
+    entity.createDurableEntity(allocator, factoryproxys, gfields, autoreclaim, reclaimcontext);
     return entity;
   }
 
@@ -55,15 +68,29 @@ public class DurableArrayFactory {
 
   public static <A extends RestorableAllocator<A>, E> DurableArray<E>
               restore(A allocator, long phandler, boolean autoreclaim) throws RestoreDurableEntityError {
-    return restore(allocator, null, null, phandler, autoreclaim);
+    return restore(allocator, null, null, phandler, autoreclaim, null);
+  }
+
+  public static <A extends RestorableAllocator<A>, E> DurableArray<E>
+              restore(A allocator, long phandler, boolean autoreclaim, ReclaimContext reclaimcontext)
+          throws RestoreDurableEntityError {
+    return restore(allocator, null, null, phandler, autoreclaim, reclaimcontext);
   }
 
   public static <A extends RestorableAllocator<A>, E> DurableArray<E>
               restore(A allocator, EntityFactoryProxy[] factoryproxys, DurableType[] gfields,
-                   long phandler, boolean autoreclaim) throws RestoreDurableEntityError {
+                   long phandler, boolean autoreclaim)
+          throws RestoreDurableEntityError {
+    return restore(allocator, factoryproxys, gfields, phandler, autoreclaim, null);
+  }
+
+  public static <A extends RestorableAllocator<A>, E> DurableArray<E>
+              restore(A allocator, EntityFactoryProxy[] factoryproxys, DurableType[] gfields,
+                   long phandler, boolean autoreclaim, ReclaimContext reclaimcontext)
+          throws RestoreDurableEntityError {
     DurableArrayImpl<A, E> entity = new DurableArrayImpl<A, E>();
     entity.setupGenericInfo(factoryproxys, gfields);
-    entity.restoreDurableEntity(allocator, factoryproxys, gfields, phandler, autoreclaim);
+    entity.restoreDurableEntity(allocator, factoryproxys, gfields, phandler, autoreclaim, reclaimcontext);
     return entity;
   }
 }

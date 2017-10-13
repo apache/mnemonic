@@ -38,6 +38,7 @@ public class GenericField<A extends RestorableAllocator<A>, E> implements Durabl
   private A m_allocator;
   private Persistence<A> m_persistOps = null;
   private boolean m_autoreclaim;
+  private ReclaimContext m_reclaimcontext = null;
   private EntityFactoryProxy m_defproxy = null;
   private EntityFactoryProxy[] m_efproxies;
   private DurableType[] m_gftypes;
@@ -72,11 +73,12 @@ public class GenericField<A extends RestorableAllocator<A>, E> implements Durabl
    */
   public GenericField(EntityFactoryProxy defproxy, DurableType dgftype,
       EntityFactoryProxy[] efproxies, DurableType[] gftypes,
-      A allocator, Unsafe unsafe, boolean autoreclaim, Long fpos) {
+      A allocator, Unsafe unsafe, boolean autoreclaim, ReclaimContext rctx, Long fpos) {
     m_unsafe = unsafe;
     m_fpos = fpos;
     m_allocator = allocator;
     m_autoreclaim = autoreclaim;
+    m_reclaimcontext = rctx;
     m_efproxies = efproxies;
     m_gftypes = gftypes;
     m_defproxy = defproxy;
@@ -133,7 +135,8 @@ public class GenericField<A extends RestorableAllocator<A>, E> implements Durabl
       if (null == str) {
         m_unsafe.putAddress(m_fpos, 0L);
       } else {
-        m_strfield = m_allocator.createBuffer(str.length() * 2, m_autoreclaim);
+        m_strfield = m_allocator.createBuffer(str.length() * 2,
+                m_autoreclaim, m_reclaimcontext);
         if (null == m_strfield) {
           throw new OutOfHybridMemory("Create Durable String Error!");
         }

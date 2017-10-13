@@ -23,6 +23,7 @@ import org.apache.mnemonic.query.memory.ResultSet;
 import org.apache.mnemonic.service.computing.ValueInfo;
 import org.apache.mnemonic.service.memory.MemoryServiceFeature;
 import org.apache.mnemonic.service.memory.NonVolatileMemoryAllocatorService;
+import org.flowcomputing.commons.resgc.ContextWrapper;
 import org.flowcomputing.commons.resgc.ResCollector;
 import org.flowcomputing.commons.resgc.ResReclaim;
 import org.flowcomputing.commons.resgc.ReclaimContext;
@@ -94,7 +95,7 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
      */
     m_chunkcollector = new ResCollector<MemChunkHolder<NonVolatileMemAllocator>, Long>(new ResReclaim<Long>() {
       @Override
-      public void reclaim(ReclaimContext<Long> rctx) {
+      public void reclaim(ContextWrapper<Long> rctx) {
         Long mres = rctx.getRes();
         // System.out.println(String.format("Reclaim: %X", mres));
         boolean cb_reclaimed = false;
@@ -115,7 +116,7 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
     m_bufcollector = new ResCollector<MemBufferHolder<NonVolatileMemAllocator>, ByteBuffer>(
         new ResReclaim<ByteBuffer>() {
           @Override
-          public void reclaim(ReclaimContext<ByteBuffer> rctx) {
+          public void reclaim(ContextWrapper<ByteBuffer> rctx) {
             ByteBuffer mres = rctx.getRes();
             boolean cb_reclaimed = false;
             if (null != m_bufferreclaimer) {
@@ -261,7 +262,7 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
    */
   @Override
   public DurableChunk<NonVolatileMemAllocator> createChunk(long size, boolean autoreclaim,
-                                                           ReclaimContext<Long> rctx) {
+                                                           ReclaimContext rctx) {
     DurableChunk<NonVolatileMemAllocator> ret = null;
     Long addr = m_nvmasvc.allocate(m_nid, size, true);
     if ((null == addr || 0 == addr) && m_activegc) {
@@ -294,7 +295,7 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
    */
   @Override
   public DurableBuffer<NonVolatileMemAllocator> createBuffer(long size, boolean autoreclaim,
-                                                             ReclaimContext<ByteBuffer> rctx) {
+                                                             ReclaimContext rctx) {
     DurableBuffer<NonVolatileMemAllocator> ret = null;
     ByteBuffer bb = m_nvmasvc.createByteBuffer(m_nid, size);
     if (null == bb && m_activegc) {
@@ -328,7 +329,7 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
    */
   @Override
   public DurableBuffer<NonVolatileMemAllocator> retrieveBuffer(long phandler, boolean autoreclaim,
-                                                               ReclaimContext<ByteBuffer> rctx) {
+                                                               ReclaimContext rctx) {
     DurableBuffer<NonVolatileMemAllocator> ret = null;
     ByteBuffer bb = m_nvmasvc.retrieveByteBuffer(m_nid, getEffectiveAddress(phandler));
     if (null != bb) {
@@ -358,7 +359,7 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
    */
   @Override
   public DurableChunk<NonVolatileMemAllocator> retrieveChunk(long phandler, boolean autoreclaim,
-                                                             ReclaimContext<Long> rctx) {
+                                                             ReclaimContext rctx) {
     DurableChunk<NonVolatileMemAllocator> ret = null;
     long eaddr = getEffectiveAddress(phandler);
     long sz = m_nvmasvc.retrieveSize(m_nid, eaddr);

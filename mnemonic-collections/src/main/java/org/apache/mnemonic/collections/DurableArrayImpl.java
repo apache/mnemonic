@@ -45,6 +45,7 @@ public class DurableArrayImpl<A extends RestorableAllocator<A>, E>
   private EntityFactoryProxy[] factoryProxy;
   private DurableType[] genericType;
   private volatile boolean autoReclaim;
+  private volatile ReclaimContext reclaimcontext;
   private MemChunkHolder<A> holder;
   private A allocator;
 
@@ -77,7 +78,7 @@ public class DurableArrayImpl<A extends RestorableAllocator<A>, E>
         throw new RetrieveDurableEntityError("No Generic Field Type Info.");
       }
       genericField[index] = new GenericField<A, E>(proxy, gftype, factoryProxy, genericType, allocator,
-                                  unsafe, autoReclaim, holder.get() + index * MAX_OBJECT_SIZE);
+                                  unsafe, autoReclaim, reclaimcontext, holder.get() + index * MAX_OBJECT_SIZE);
     }
     if (null != genericField[index]) {
       return ((GenericField<A, E>)genericField[index]).get();
@@ -122,7 +123,7 @@ public class DurableArrayImpl<A extends RestorableAllocator<A>, E>
         throw new RetrieveDurableEntityError("No Generic Field Type Info.");
       }
       genericField[index] = new GenericField<A, E>(proxy, gftype, factoryProxy, genericType, allocator,
-                                  unsafe, autoReclaim, holder.get() + index * MAX_OBJECT_SIZE);
+                                  unsafe, autoReclaim, reclaimcontext, holder.get() + index * MAX_OBJECT_SIZE);
     }
     if (null != genericField[index]) {
       ((GenericField<A, E>)genericField[index]).set(value, destroy);
@@ -188,13 +189,14 @@ public class DurableArrayImpl<A extends RestorableAllocator<A>, E>
 
   @Override
   public void registerAutoReclaim() {
-    this.registerAutoReclaim(null);
+    this.registerAutoReclaim(reclaimcontext);
   }
 
   @Override
   public void registerAutoReclaim(ReclaimContext rctx) {
     holder.registerAutoReclaim(rctx);
     autoReclaim = true;
+    reclaimcontext = rctx;
   }
 
   @Override
@@ -204,12 +206,13 @@ public class DurableArrayImpl<A extends RestorableAllocator<A>, E>
 
   @Override
   public void restoreDurableEntity(A allocator, EntityFactoryProxy[] factoryProxy,
-             DurableType[] gType, long phandler, boolean autoReclaim) throws RestoreDurableEntityError {
-    initializeDurableEntity(allocator, factoryProxy, gType, autoReclaim);
+             DurableType[] gType, long phandler, boolean autoReclaim, ReclaimContext rctx)
+          throws RestoreDurableEntityError {
+    initializeDurableEntity(allocator, factoryProxy, gType, autoReclaim, reclaimcontext);
     if (0L == phandler) {
       throw new RestoreDurableEntityError("Input handler is null on restoreDurableEntity.");
     }
-    holder = allocator.retrieveChunk(phandler, autoReclaim);
+    holder = allocator.retrieveChunk(phandler, autoReclaim, rctx);
     if (null == holder) {
       throw new RestoreDurableEntityError("Retrieve Entity Failure!");
     }
@@ -221,11 +224,12 @@ public class DurableArrayImpl<A extends RestorableAllocator<A>, E>
 
   @Override
   public void initializeDurableEntity(A allocator, EntityFactoryProxy[] factoryProxy,
-              DurableType[] gType, boolean autoReclaim) {
+              DurableType[] gType, boolean autoReclaim, ReclaimContext rctx) {
     this.allocator = allocator;
     this.factoryProxy = factoryProxy;
     this.genericType = gType;
     this.autoReclaim = autoReclaim;
+    this.reclaimcontext = rctx;
     try {
       this.unsafe = Utils.getUnsafe();
     } catch (Exception e) {
@@ -235,9 +239,9 @@ public class DurableArrayImpl<A extends RestorableAllocator<A>, E>
 
   @Override
   public void createDurableEntity(A allocator, EntityFactoryProxy[] factoryProxy,
-              DurableType[] gType, boolean autoReclaim) throws OutOfHybridMemory {
-    initializeDurableEntity(allocator, factoryProxy, gType, autoReclaim);
-    this.holder = allocator.createChunk(MAX_OBJECT_SIZE * arraySize, autoReclaim);
+              DurableType[] gType, boolean autoReclaim, ReclaimContext rctx) throws OutOfHybridMemory {
+    initializeDurableEntity(allocator, factoryProxy, gType, autoReclaim, rctx);
+    this.holder = allocator.createChunk(MAX_OBJECT_SIZE * arraySize, autoReclaim, reclaimcontext);
     if (null == this.holder) {
       throw new OutOfHybridMemory("Create Durable Entity Error!");
     }

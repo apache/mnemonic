@@ -40,6 +40,7 @@ public class DurableHashSetImpl<A extends RestorableAllocator<A>, E>
   private EntityFactoryProxy[] factoryProxy;
   private DurableType[] genericType;
   private volatile boolean autoReclaim;
+  private volatile ReclaimContext reclaimcontext;
   private DurableHashMap<E, Boolean> map;
   private A allocator;
   private long initialCapacity;
@@ -136,13 +137,14 @@ public class DurableHashSetImpl<A extends RestorableAllocator<A>, E>
 
   @Override
   public void registerAutoReclaim() {
-    this.registerAutoReclaim(null);
+    this.registerAutoReclaim(reclaimcontext);
   }
 
   @Override
   public void registerAutoReclaim(ReclaimContext rctx) {
     map.registerAutoReclaim(rctx);
     autoReclaim = true;
+    reclaimcontext = rctx;
   }
 
   @Override
@@ -152,12 +154,14 @@ public class DurableHashSetImpl<A extends RestorableAllocator<A>, E>
 
   @Override
   public void restoreDurableEntity(A allocator, EntityFactoryProxy[] factoryProxy,
-             DurableType[] gType, long phandler, boolean autoReclaim) throws RestoreDurableEntityError {
-    initializeDurableEntity(allocator, factoryProxy, gType, autoReclaim);
+             DurableType[] gType, long phandler, boolean autoReclaim, ReclaimContext rctx)
+          throws RestoreDurableEntityError {
+    initializeDurableEntity(allocator, factoryProxy, gType, autoReclaim, rctx);
     if (0L == phandler) {
       throw new RestoreDurableEntityError("Input handler is null on restoreDurableEntity.");
     }
-    map = DurableHashMapFactory.restore(allocator, this.factoryProxy, this.genericType, phandler, autoReclaim);
+    map = DurableHashMapFactory.restore(allocator, this.factoryProxy, this.genericType, phandler,
+            autoReclaim, reclaimcontext);
     if (null == map) {
       throw new RestoreDurableEntityError("Retrieve Entity Failure!");
     }
@@ -167,7 +171,7 @@ public class DurableHashSetImpl<A extends RestorableAllocator<A>, E>
 
   @Override
   public void initializeDurableEntity(A allocator, EntityFactoryProxy[] factoryProxy,
-              DurableType[] gType, boolean autoReclaim) {
+              DurableType[] gType, boolean autoReclaim, ReclaimContext rctx) {
     this.allocator = allocator;
     this.autoReclaim = autoReclaim;
     DurableType gftypes[] = {DurableType.BOOLEAN};
@@ -182,9 +186,10 @@ public class DurableHashSetImpl<A extends RestorableAllocator<A>, E>
 
   @Override
   public void createDurableEntity(A allocator, EntityFactoryProxy[] factoryProxy,
-              DurableType[] gType, boolean autoReclaim) throws OutOfHybridMemory {
-    initializeDurableEntity(allocator, factoryProxy, gType, autoReclaim);
-    map = DurableHashMapFactory.create(allocator, this.factoryProxy, this.genericType, initialCapacity, autoReclaim);
+              DurableType[] gType, boolean autoReclaim, ReclaimContext rctx) throws OutOfHybridMemory {
+    initializeDurableEntity(allocator, factoryProxy, gType, autoReclaim, rctx);
+    map = DurableHashMapFactory.create(allocator, this.factoryProxy, this.genericType, initialCapacity,
+            autoReclaim, reclaimcontext);
     initializeAfterCreate();
   }
 

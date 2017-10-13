@@ -78,7 +78,7 @@ public class MemBufferHolder<A extends CommonAllocator<A>> extends MemHolder<A, 
    *          specify a reclaim context to register
    */
   @Override
-  public void registerAutoReclaim(ReclaimContext<ByteBuffer> rctx) {
+  public void registerAutoReclaim(ReclaimContext rctx) {
     m_allocator.registerBufferAutoReclaim(this, rctx);
   }
 

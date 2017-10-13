@@ -22,6 +22,7 @@ import org.apache.mnemonic.EntityFactoryProxy;
 import org.apache.mnemonic.OutOfHybridMemory;
 import org.apache.mnemonic.RestorableAllocator;
 import org.apache.mnemonic.RestoreDurableEntityError;
+import org.flowcomputing.commons.resgc.ReclaimContext;
 
 public class DurableTreeFactory {
   public static <A extends RestorableAllocator<A>, E extends Comparable<E>> DurableTree<E>
@@ -31,15 +32,27 @@ public class DurableTreeFactory {
 
   public static <A extends RestorableAllocator<A>, E extends Comparable<E>> DurableTree<E>
               create(A allocator, boolean autoreclaim) throws OutOfHybridMemory {
-    return create(allocator, null, null, autoreclaim);
+    return create(allocator, null, null, autoreclaim, null);
+  }
+
+  public static <A extends RestorableAllocator<A>, E extends Comparable<E>> DurableTree<E>
+              create(A allocator, boolean autoreclaim, ReclaimContext reclaimcontext)
+          throws OutOfHybridMemory {
+    return create(allocator, null, null, autoreclaim, reclaimcontext);
   }
 
   public static <A extends RestorableAllocator<A>, E extends Comparable<E>> DurableTree<E>
               create(A allocator, EntityFactoryProxy[] factoryproxys, DurableType[] gfields,
                    boolean autoreclaim) throws OutOfHybridMemory {
+    return create(allocator, factoryproxys, gfields, autoreclaim, null);
+  }
+
+  public static <A extends RestorableAllocator<A>, E extends Comparable<E>> DurableTree<E>
+              create(A allocator, EntityFactoryProxy[] factoryproxys, DurableType[] gfields,
+                   boolean autoreclaim, ReclaimContext reclaimcontext) throws OutOfHybridMemory {
     DurableTreeImpl<A, E> entity = new DurableTreeImpl<A, E>();
     entity.setupGenericInfo(factoryproxys, gfields);
-    entity.createDurableEntity(allocator, factoryproxys, gfields, autoreclaim);
+    entity.createDurableEntity(allocator, factoryproxys, gfields, autoreclaim, reclaimcontext);
     return entity;
   }
 
@@ -50,15 +63,29 @@ public class DurableTreeFactory {
 
   public static <A extends RestorableAllocator<A>, E extends Comparable<E>> DurableTree<E>
               restore(A allocator, long phandler, boolean autoreclaim) throws RestoreDurableEntityError {
-    return restore(allocator, null, null, phandler, autoreclaim);
+    return restore(allocator, null, null, phandler, autoreclaim, null);
+  }
+
+  public static <A extends RestorableAllocator<A>, E extends Comparable<E>> DurableTree<E>
+              restore(A allocator, long phandler, boolean autoreclaim, ReclaimContext reclaimcontext)
+          throws RestoreDurableEntityError {
+    return restore(allocator, null, null, phandler, autoreclaim, reclaimcontext);
   }
 
   public static <A extends RestorableAllocator<A>, E extends Comparable<E>> DurableTree<E>
               restore(A allocator, EntityFactoryProxy[] factoryproxys, DurableType[] gfields,
-                   long phandler, boolean autoreclaim) throws RestoreDurableEntityError {
+                   long phandler, boolean autoreclaim)
+          throws RestoreDurableEntityError {
+    return restore(allocator, factoryproxys, gfields, phandler, autoreclaim, null);
+  }
+
+  public static <A extends RestorableAllocator<A>, E extends Comparable<E>> DurableTree<E>
+              restore(A allocator, EntityFactoryProxy[] factoryproxys, DurableType[] gfields,
+                   long phandler, boolean autoreclaim, ReclaimContext reclaimcontext)
+          throws RestoreDurableEntityError {
     DurableTreeImpl<A, E> entity = new DurableTreeImpl<A, E>();
     entity.setupGenericInfo(factoryproxys, gfields);
-    entity.restoreDurableEntity(allocator, factoryproxys, gfields, phandler, autoreclaim);
+    entity.restoreDurableEntity(allocator, factoryproxys, gfields, phandler, autoreclaim, reclaimcontext);
     return entity;
   }
 }

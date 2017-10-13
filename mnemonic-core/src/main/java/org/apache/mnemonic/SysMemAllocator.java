@@ -17,6 +17,7 @@
 
 package org.apache.mnemonic;
 
+import org.flowcomputing.commons.resgc.ContextWrapper;
 import org.flowcomputing.commons.resgc.ResCollector;
 import org.flowcomputing.commons.resgc.ResReclaim;
 import org.flowcomputing.commons.resgc.ReclaimContext;
@@ -70,7 +71,7 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
      */
     m_bufcollector = new ResCollector<MemBufferHolder<SysMemAllocator>, ByteBuffer>(new ResReclaim<ByteBuffer>() {
       @Override
-      public synchronized void reclaim(ReclaimContext<ByteBuffer> rctx) {
+      public synchronized void reclaim(ContextWrapper<ByteBuffer> rctx) {
         ByteBuffer mres = rctx.getRes();
         Long sz = Long.valueOf(mres.capacity());
         boolean cb_reclaimed = false;
@@ -99,7 +100,7 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
      */
     m_chunkcollector = new ResCollector<MemChunkHolder<SysMemAllocator>, Long>(new ResReclaim<Long>() {
       @Override
-      public synchronized void reclaim(ReclaimContext<Long> rctx) {
+      public synchronized void reclaim(ContextWrapper<Long> rctx) {
         Long mres = rctx.getRes();
         // System.out.println(String.format("Reclaim: %X ...", mres));
         Long sz = m_chunksize.remove(mres);
@@ -290,7 +291,7 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
    */
   @Override
   public MemChunkHolder<SysMemAllocator> createChunk(long size, boolean autoreclaim,
-                                                     ReclaimContext<Long> rctx) {
+                                                     ReclaimContext rctx) {
     MemChunkHolder<SysMemAllocator> ret = null;
     Long addr = null;
     if (currentMemory.get() + size > maxStoreCapacity) {
@@ -326,7 +327,7 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
    */
   @Override
   public MemBufferHolder<SysMemAllocator> createBuffer(long size, boolean autoreclaim,
-                                                       ReclaimContext<ByteBuffer> rctx) {
+                                                       ReclaimContext rctx) {
     MemBufferHolder<SysMemAllocator> ret = null;
     ByteBuffer bb = null;
     if (currentMemory.get() + size > maxStoreCapacity) {

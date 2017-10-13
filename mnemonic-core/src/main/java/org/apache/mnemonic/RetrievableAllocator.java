@@ -19,8 +19,6 @@ package org.apache.mnemonic;
 
 import org.flowcomputing.commons.resgc.ReclaimContext;
 
-import java.nio.ByteBuffer;
-
 public abstract class RetrievableAllocator<A extends RetrievableAllocator<A>> extends CommonAllocator<A>
   implements AddressTranslator, HandlerStore, Transaction {
 
@@ -66,7 +64,7 @@ public abstract class RetrievableAllocator<A extends RetrievableAllocator<A>> ex
    * @return a durable chunk contains a memory chunk
    */
   @Override
-  public abstract DurableChunk<A> createChunk(long size, boolean autoreclaim, ReclaimContext<Long> rctx);
+  public abstract DurableChunk<A> createChunk(long size, boolean autoreclaim, ReclaimContext rctx);
 
   /**
    * create a durable buffer that is managed by its holder.
@@ -110,7 +108,7 @@ public abstract class RetrievableAllocator<A extends RetrievableAllocator<A>> ex
    * @return a durable buffer contains a memory buffer
    */
   @Override
-  public abstract DurableBuffer<A> createBuffer(long size, boolean autoreclaim, ReclaimContext<ByteBuffer> rctx);
+  public abstract DurableBuffer<A> createBuffer(long size, boolean autoreclaim, ReclaimContext rctx);
 
   /**
    * retrieve a memory buffer from its backed memory allocator.
@@ -183,7 +181,7 @@ public abstract class RetrievableAllocator<A extends RetrievableAllocator<A>> ex
    *
    * @return a durable buffer contains the retrieved memory buffer
    */
-  public abstract DurableBuffer<A> retrieveBuffer(long phandler, boolean autoreclaim, ReclaimContext<ByteBuffer> rctx);
+  public abstract DurableBuffer<A> retrieveBuffer(long phandler, boolean autoreclaim, ReclaimContext rctx);
 
   /**
    * retrieve a memory chunk from its backed memory allocator.
@@ -200,7 +198,7 @@ public abstract class RetrievableAllocator<A extends RetrievableAllocator<A>> ex
    *
    * @return a durable chunk contains the retrieved memory chunk
    */
-  public abstract DurableChunk<A> retrieveChunk(long phandler, boolean autoreclaim, ReclaimContext<Long> rctx);
+  public abstract DurableChunk<A> retrieveChunk(long phandler, boolean autoreclaim, ReclaimContext rctx);
 
   /**
    * re-size a specified chunk on its backed memory pool.

@@ -152,7 +152,7 @@ public abstract class CommonAllocator<A extends CommonAllocator<A>> implements A
    *          specify a reclaim context
    */
   @Override
-  public void registerChunkAutoReclaim(MemChunkHolder<A> mholder, ReclaimContext<Long> rctx) {
+  public void registerChunkAutoReclaim(MemChunkHolder<A> mholder, ReclaimContext rctx) {
     m_chunkcollector.register(mholder, rctx);
   }
 
@@ -177,7 +177,7 @@ public abstract class CommonAllocator<A extends CommonAllocator<A>> implements A
    *          specify a reclaim context
    */
   @Override
-  public void registerBufferAutoReclaim(MemBufferHolder<A> mholder, ReclaimContext<ByteBuffer> rctx) {
+  public void registerBufferAutoReclaim(MemBufferHolder<A> mholder, ReclaimContext rctx) {
     m_bufcollector.register(mholder, rctx);
   }
 

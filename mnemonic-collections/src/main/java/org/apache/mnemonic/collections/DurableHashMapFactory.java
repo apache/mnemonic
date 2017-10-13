@@ -22,6 +22,7 @@ import org.apache.mnemonic.EntityFactoryProxy;
 import org.apache.mnemonic.OutOfHybridMemory;
 import org.apache.mnemonic.RestorableAllocator;
 import org.apache.mnemonic.RestoreDurableEntityError;
+import org.flowcomputing.commons.resgc.ReclaimContext;
 
 public class DurableHashMapFactory {
   public static <A extends RestorableAllocator<A>, K, V> DurableHashMap<K, V>
@@ -36,16 +37,30 @@ public class DurableHashMapFactory {
 
   public static <A extends RestorableAllocator<A>, K, V> DurableHashMap<K, V> 
               create(A allocator, long initialCapacity, boolean autoreclaim) throws OutOfHybridMemory {
-    return create(allocator, null, null, initialCapacity, autoreclaim);
+    return create(allocator, null, null, initialCapacity, autoreclaim, null);
   }
 
-  public static <A extends RestorableAllocator<A>, K, V> DurableHashMap<K, V> 
+  public static <A extends RestorableAllocator<A>, K, V> DurableHashMap<K, V>
+              create(A allocator, long initialCapacity, boolean autoreclaim, ReclaimContext reclaimcontext)
+          throws OutOfHybridMemory {
+    return create(allocator, null, null, initialCapacity, autoreclaim, reclaimcontext);
+  }
+
+  public static <A extends RestorableAllocator<A>, K, V> DurableHashMap<K, V>
+              create(A allocator, EntityFactoryProxy[] factoryproxys, DurableType[] gfields,
+                   long initialCapacity, boolean autoreclaim)
+          throws OutOfHybridMemory {
+    return create(allocator, factoryproxys, gfields, initialCapacity, autoreclaim, null);
+  }
+
+  public static <A extends RestorableAllocator<A>, K, V> DurableHashMap<K, V>
               create(A allocator, EntityFactoryProxy[] factoryproxys, DurableType[] gfields, 
-                   long initialCapacity, boolean autoreclaim) throws OutOfHybridMemory {
+                   long initialCapacity, boolean autoreclaim, ReclaimContext reclaimcontext)
+          throws OutOfHybridMemory {
     DurableHashMapImpl<A, K, V> entity = new DurableHashMapImpl<A, K, V>();
     entity.setCapacityHint(initialCapacity);
     entity.setupGenericInfo(factoryproxys, gfields);
-    entity.createDurableEntity(allocator, factoryproxys, gfields, autoreclaim);
+    entity.createDurableEntity(allocator, factoryproxys, gfields, autoreclaim, reclaimcontext);
     return entity;
   }
 
@@ -56,15 +71,29 @@ public class DurableHashMapFactory {
 
   public static <A extends RestorableAllocator<A>, K, V> DurableHashMap<K, V> 
               restore(A allocator, long phandler, boolean autoreclaim) throws RestoreDurableEntityError {
-    return restore(allocator, null, null, phandler, autoreclaim);
+    return restore(allocator, null, null, phandler, autoreclaim, null);
   }
 
-  public static <A extends RestorableAllocator<A>, K, V> DurableHashMap<K, V> 
+  public static <A extends RestorableAllocator<A>, K, V> DurableHashMap<K, V>
+              restore(A allocator, long phandler, boolean autoreclaim, ReclaimContext reclaimcontext)
+          throws RestoreDurableEntityError {
+    return restore(allocator, null, null, phandler, autoreclaim, reclaimcontext);
+  }
+
+  public static <A extends RestorableAllocator<A>, K, V> DurableHashMap<K, V>
               restore(A allocator, EntityFactoryProxy[] factoryproxys, DurableType[] gfields,
-                   long phandler, boolean autoreclaim) throws RestoreDurableEntityError {
+                   long phandler, boolean autoreclaim)
+          throws RestoreDurableEntityError {
+    return restore(allocator, factoryproxys, gfields, phandler, autoreclaim, null);
+  }
+
+  public static <A extends RestorableAllocator<A>, K, V> DurableHashMap<K, V>
+              restore(A allocator, EntityFactoryProxy[] factoryproxys, DurableType[] gfields,
+                   long phandler, boolean autoreclaim, ReclaimContext reclaimcontext)
+          throws RestoreDurableEntityError {
     DurableHashMapImpl<A, K, V> entity = new DurableHashMapImpl<A, K, V>();
     entity.setupGenericInfo(factoryproxys, gfields);
-    entity.restoreDurableEntity(allocator, factoryproxys, gfields, phandler, autoreclaim);
+    entity.restoreDurableEntity(allocator, factoryproxys, gfields, phandler, autoreclaim, reclaimcontext);
     return entity;
   }
 }

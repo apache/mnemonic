@@ -81,7 +81,7 @@ public class MemChunkHolder<A extends CommonAllocator<A>> extends MemHolder<A, L
    *          specify a reclaim context to register
    */
   @Override
-  public void registerAutoReclaim(ReclaimContext<Long> rctx) {
+  public void registerAutoReclaim(ReclaimContext rctx) {
     m_allocator.registerChunkAutoReclaim(this, rctx);
   }
 }

@@ -51,6 +51,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
   private DurableType[] listgftypes;
   private volatile boolean autoResize = true;
   private volatile boolean autoReclaim;
+  private volatile ReclaimContext reclaimcontext;
   private MemChunkHolder<A> holder;
   private MemChunkHolder<A> chunkAddr;
   private A allocator;
@@ -116,8 +117,8 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
       DurableSinglyLinkedList<MapEntry<K, V>> head = null;
       MapEntry<K, V> entry = null;
       try {
-        head = DurableSinglyLinkedListFactory.create(allocator, listefproxies, listgftypes, false);
-        entry = MapEntryFactory.create(allocator, factoryProxy, genericField, false);
+        head = DurableSinglyLinkedListFactory.create(allocator, listefproxies, listgftypes, false, reclaimcontext);
+        entry = MapEntryFactory.create(allocator, factoryProxy, genericField, false, reclaimcontext);
       } catch (OutOfHybridMemory fe) {
         if (null != head) {
           head.destroy();
@@ -134,7 +135,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
       mapSize++;
     } else {
       DurableSinglyLinkedList<MapEntry<K, V>> head = DurableSinglyLinkedListFactory.restore(allocator,
-          listefproxies, listgftypes, handler, false);
+          listefproxies, listgftypes, handler, false, reclaimcontext);
       DurableSinglyLinkedList<MapEntry<K, V>> prev = head;
       boolean found = false;
       while (null != head) {
@@ -157,8 +158,9 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
         DurableSinglyLinkedList<MapEntry<K, V>> newNode = null;
         MapEntry<K, V> entry = null;
         try {
-          newNode = DurableSinglyLinkedListFactory.create(allocator, listefproxies, listgftypes, false);
-          entry = MapEntryFactory.create(allocator, factoryProxy, genericField, false);
+          newNode = DurableSinglyLinkedListFactory.create(allocator, listefproxies, listgftypes,
+                  false, reclaimcontext);
+          entry = MapEntryFactory.create(allocator, factoryProxy, genericField, false, reclaimcontext);
         } catch (OutOfHybridMemory fe) {
           if (null != newNode) {
             newNode.destroy();
@@ -210,7 +212,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
     long handler = unsafe.getAddress(bucketAddr);
     if (0L != handler) {
       DurableSinglyLinkedList<MapEntry<K, V>> head = DurableSinglyLinkedListFactory.restore(allocator,
-          listefproxies, listgftypes, handler, false);
+          listefproxies, listgftypes, handler, false, reclaimcontext);
       while (null != head) {
         MapEntry<K, V> mapEntry = head.getItem();
         K entryKey = mapEntry.getKey();
@@ -256,7 +258,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
     long handler = unsafe.getAddress(bucketAddr);
     if (0L != handler) {
       DurableSinglyLinkedList<MapEntry<K, V>> head = DurableSinglyLinkedListFactory.restore(allocator,
-          listefproxies, listgftypes, handler, false);
+          listefproxies, listgftypes, handler, false, reclaimcontext);
       DurableSinglyLinkedList<MapEntry<K, V>> prev = null;
       boolean found = false;
       while (null != head) {
@@ -312,7 +314,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
       long handler = unsafe.getAddress(bucketAddr);
       if (0L != handler) {
         DurableSinglyLinkedList<MapEntry<K, V>> head = DurableSinglyLinkedListFactory.restore(allocator,
-            listefproxies, listgftypes, handler, false);
+            listefproxies, listgftypes, handler, false, reclaimcontext);
         DurableSinglyLinkedList<MapEntry<K, V>> curr = head;
         while (null != curr) {
           curr = curr.getNext();
@@ -338,7 +340,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
     long handler = unsafe.getAddress(bucketAddr);
     if (0L != handler) {
       DurableSinglyLinkedList<MapEntry<K, V>> head = DurableSinglyLinkedListFactory.restore(allocator,
-          listefproxies, listgftypes, handler, false);
+          listefproxies, listgftypes, handler, false, reclaimcontext);
       elem.setNext(head, false);
     } else {
       elem.setNext(null, false);
@@ -359,7 +361,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
       long handler = unsafe.getAddress(bucketAddr);
       if (0L != handler) {
         DurableSinglyLinkedList<MapEntry<K, V>> head = DurableSinglyLinkedListFactory.restore(allocator,
-            listefproxies, listgftypes, handler, false);
+            listefproxies, listgftypes, handler, false, reclaimcontext);
         while (null != head) {
           size++;
           head = head.getNext();
@@ -413,7 +415,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
       long handler = unsafe.getAddress(bucketAddr);
       if (0L != handler) {
         head = DurableSinglyLinkedListFactory.restore(allocator,
-            listefproxies, listgftypes, handler, false);
+            listefproxies, listgftypes, handler, false, reclaimcontext);
         prev = head;
         while (null != head) {
           head = head.getNext();
@@ -435,13 +437,14 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
 
   @Override
   public void registerAutoReclaim() {
-    this.registerAutoReclaim(null);
+    this.registerAutoReclaim(reclaimcontext);
   }
 
   @Override
   public void registerAutoReclaim(ReclaimContext rctx) {
     holder.registerAutoReclaim(rctx);
     autoReclaim = true;
+    reclaimcontext = rctx;
   }
 
   @Override
@@ -451,14 +454,15 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
 
   @Override
   public void restoreDurableEntity(A allocator, EntityFactoryProxy[] factoryProxy, 
-             DurableType[] gField, long phandler, boolean autoReclaim) throws RestoreDurableEntityError {
-    initializeDurableEntity(allocator, factoryProxy, gField, autoReclaim);
+             DurableType[] gField, long phandler, boolean autoReclaim, ReclaimContext rctx)
+          throws RestoreDurableEntityError {
+    initializeDurableEntity(allocator, factoryProxy, gField, autoReclaim, rctx);
     if (0L == phandler) {
       throw new RestoreDurableEntityError("Input handler is null on restoreDurableEntity.");
     }
-    chunkAddr = allocator.retrieveChunk(phandler, autoReclaim);
+    chunkAddr = allocator.retrieveChunk(phandler, autoReclaim, reclaimcontext);
     long chunkHandler = unsafe.getLong(chunkAddr.get());
-    holder = allocator.retrieveChunk(chunkHandler, autoReclaim);
+    holder = allocator.retrieveChunk(chunkHandler, autoReclaim, reclaimcontext);
     if (null == holder || null == chunkAddr) {
       throw new RestoreDurableEntityError("Retrieve Entity Failure!");
     }
@@ -470,11 +474,12 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
 
   @Override
   public void initializeDurableEntity(A allocator, EntityFactoryProxy[] factoryProxy, 
-              DurableType[] gField, boolean autoReclaim) {
+              DurableType[] gField, boolean autoReclaim, ReclaimContext rctx) {
     this.allocator = allocator;
     this.factoryProxy = factoryProxy;
     this.genericField = gField;
     this.autoReclaim = autoReclaim;
+    this.reclaimcontext = rctx;
     DurableType gftypes[] = {DurableType.DURABLE};
     this.listgftypes = ArrayUtils.addAll(gftypes, genericField);
     EntityFactoryProxy efproxies[] = {new EntityFactoryProxy() {
@@ -483,27 +488,28 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
           A allocator, EntityFactoryProxy[] factoryproxys,
           DurableType[] gfields, long phandler, boolean autoreclaim) {
           Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, 1);
-        return MapEntryFactory.restore(allocator, dpt.getRight(), dpt.getLeft(), phandler, autoreclaim);
+        return MapEntryFactory.restore(allocator, dpt.getRight(), dpt.getLeft(), phandler, autoreclaim, reclaimcontext);
           }
       @Override
       public <A extends RestorableAllocator<A>> MapEntry<K, V> restore(ParameterHolder<A> ph) {
           Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(ph.getGenericTypes(),
               ph.getEntityFactoryProxies(), 1);
         return MapEntryFactory.restore(ph.getAllocator(),
-              dpt.getRight(), dpt.getLeft(), ph.getHandler(), ph.getAutoReclaim());
+              dpt.getRight(), dpt.getLeft(), ph.getHandler(), ph.getAutoReclaim(), reclaimcontext);
           }
       @Override
       public <A extends RestorableAllocator<A>> MapEntry<K, V> create(
           A allocator, EntityFactoryProxy[] factoryproxys,
           DurableType[] gfields, boolean autoreclaim) {
           Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, 1);
-        return MapEntryFactory.create(allocator, dpt.getRight(), dpt.getLeft(), autoreclaim);
+        return MapEntryFactory.create(allocator, dpt.getRight(), dpt.getLeft(), autoreclaim, reclaimcontext);
           }
       @Override
       public <A extends RestorableAllocator<A>> MapEntry<K, V> create(ParameterHolder<A> ph) {
           Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(ph.getGenericTypes(),
               ph.getEntityFactoryProxies(), 1);
-        return MapEntryFactory.create(ph.getAllocator(), dpt.getRight(), dpt.getLeft(), ph.getAutoReclaim());
+        return MapEntryFactory.create(ph.getAllocator(), dpt.getRight(), dpt.getLeft(),
+                ph.getAutoReclaim(), reclaimcontext);
           }
     }
     };
@@ -517,10 +523,10 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
 
   @Override
   public void createDurableEntity(A allocator, EntityFactoryProxy[] factoryProxy, 
-              DurableType[] gField, boolean autoReclaim) throws OutOfHybridMemory {
-    initializeDurableEntity(allocator, factoryProxy, gField, autoReclaim);
-    this.holder = allocator.createChunk(MAX_OBJECT_SIZE * totalCapacity, autoReclaim);
-    this.chunkAddr = allocator.createChunk(MAX_OBJECT_SIZE, autoReclaim);
+              DurableType[] gField, boolean autoReclaim, ReclaimContext rctx) throws OutOfHybridMemory {
+    initializeDurableEntity(allocator, factoryProxy, gField, autoReclaim, rctx);
+    this.holder = allocator.createChunk(MAX_OBJECT_SIZE * totalCapacity, autoReclaim, reclaimcontext);
+    this.chunkAddr = allocator.createChunk(MAX_OBJECT_SIZE, autoReclaim, reclaimcontext);
     unsafe.putLong(chunkAddr.get(), allocator.getChunkHandler(holder));
     if (null == this.holder || null == this.chunkAddr) {
       throw new OutOfHybridMemory("Create Durable Entity Error!");
@@ -559,7 +565,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
         long handler = unsafe.getAddress(currentBucketAddr);
         if (0L != handler) {
           currentNode = DurableSinglyLinkedListFactory.restore(allocator,
-              listefproxies, listgftypes, handler, false);
+              listefproxies, listgftypes, handler, false, reclaimcontext);
           break;
         }
         currentBucketAddr += MAX_OBJECT_SIZE;

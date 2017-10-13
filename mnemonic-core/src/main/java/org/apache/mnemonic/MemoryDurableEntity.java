@@ -17,6 +17,8 @@
 
 package org.apache.mnemonic;
 
+import org.flowcomputing.commons.resgc.ReclaimContext;
+
 /**
  *
  *
@@ -25,12 +27,13 @@ package org.apache.mnemonic;
 public interface MemoryDurableEntity<ALLOC_PMem3C93D24F59 extends RestorableAllocator<ALLOC_PMem3C93D24F59>> {
 
   void initializeDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-      DurableType[] gfields, boolean autoreclaim);
+                               DurableType[] gfields, boolean autoreclaim, ReclaimContext rctx);
 
   void createDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-      DurableType[] gfields, boolean autoreclaim) throws OutOfHybridMemory;
+      DurableType[] gfields, boolean autoreclaim, ReclaimContext rctx) throws OutOfHybridMemory;
 
   void restoreDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-      DurableType[] gfields, long phandler, boolean autoreclaim) throws RestoreDurableEntityError;
+      DurableType[] gfields, long phandler, boolean autoreclaim, ReclaimContext rctx)
+          throws RestoreDurableEntityError;
 
 }
