@@ -31,7 +31,7 @@
  */
 void throw(JNIEnv* env, const char* msg) {
   if (msg == NULL)
-    msg = sys_errlist[errno];
+    msg = strerror(errno);
 
   jclass xklass = (*env)->FindClass(env, "java/lang/RuntimeException");
   (*env)->ThrowNew(env, xklass, msg);
@@ -389,31 +389,6 @@ long handleValueInfo(JNIEnv* env, struct NValueInfo *nvinfo, valueHandler valhan
   return nvinfo->handler;
 }
 
-long handleVectorInfo(JNIEnv* env, struct NValueInfo *nvinfo, vecValueHandler valhandler, long dc_handler, long dc_size, long* count) {
-  if (NULL == nvinfo->frames || 0 >= nvinfo->framessz) {
-    return 0L;
-  }
-  void *chk_addr = to_e(env, nvinfo, dc_handler); 
-  size_t dims[nvinfo->framessz];
-  long *itmaddrs[nvinfo->framessz];
-  long *nxtfitmaddrs[nvinfo->framessz];
-  long pendings[nvinfo->framessz];
-  long hdls[nvinfo->framessz];
-  long position = 0;
-  size_t i;
-  for (i = 0; i < nvinfo->framessz; ++i) {
-    dims[i] = 0;
-    itmaddrs[i] = NULL;
-    nxtfitmaddrs[i] = NULL;
-    pendings[i] = 0L;
-    hdls[i] = 0L;
-  }
-  hdls[0] = nvinfo->handler;
-  itmaddrs[0] = &nvinfo->handler;
-  vectorIterTensor(env, nvinfo, dims, itmaddrs, &nxtfitmaddrs, &pendings, hdls, -1, chk_addr, dc_size, &position, count);
-  return nvinfo->handler;
-}
-
 void vectorIterTensor(JNIEnv* env, struct NValueInfo *nvinfo,
     size_t dims[], long *itmaddrs[], long *(* const nxtfitmaddrs)[],
     long (* const pendings)[], long hdls[],
@@ -434,7 +409,7 @@ void vectorIterTensor(JNIEnv* env, struct NValueInfo *nvinfo,
         itmaddrs[dimidx + 1] = (long*)(to_e(env, nvinfo, hdls[dimidx]) + curnloff);
         hdls[dimidx + 1] = *itmaddrs[dimidx + 1];
         (*nxtfitmaddrs)[dimidx] = (long*)(to_e(env, nvinfo, hdls[dimidx]) + curoff);
-        vectorIterTensor(env, nvinfo, dims, itmaddrs, nxtfitmaddrs, pendings, hdls, dimidx, valhandler, chkaddr, chksize, *vposition, vcount);
+        vectorIterTensor(env, nvinfo, dims, itmaddrs, nxtfitmaddrs, pendings, hdls, dimidx, valhandler, chkaddr, chksize, vposition, vcount);
         itmaddrs[dimidx] = (*nxtfitmaddrs)[dimidx];
         hdls[dimidx] = *itmaddrs[dimidx];
         ++dims[dimidx];
@@ -471,4 +446,29 @@ void vectorIterTensor(JNIEnv* env, struct NValueInfo *nvinfo,
       valhandler(env, dims, dimidx - 1, itmaddrs, nxtfitmaddrs, pendings, addr, curnlsz, nvinfo->dtype, chkaddr, chksize, vposition, vcount);
     }
   }
+}
+
+long handleVectorInfo(JNIEnv* env, struct NValueInfo *nvinfo, vecValueHandler valhandler, long dc_handler, long dc_size, long* count) {
+  if (NULL == nvinfo->frames || 0 >= nvinfo->framessz) {
+    return 0L;
+  }
+  void *chk_addr = to_e(env, nvinfo, dc_handler); 
+  size_t dims[nvinfo->framessz];
+  long *itmaddrs[nvinfo->framessz];
+  long *nxtfitmaddrs[nvinfo->framessz];
+  long pendings[nvinfo->framessz];
+  long hdls[nvinfo->framessz];
+  long position = 0;
+  size_t i;
+  for (i = 0; i < nvinfo->framessz; ++i) {
+    dims[i] = 0;
+    itmaddrs[i] = NULL;
+    nxtfitmaddrs[i] = NULL;
+    pendings[i] = 0L;
+    hdls[i] = 0L;
+  }
+  hdls[0] = nvinfo->handler;
+  itmaddrs[0] = &nvinfo->handler;
+  vectorIterTensor(env, nvinfo, dims, itmaddrs, &nxtfitmaddrs, &pendings, hdls, -1, valhandler, chk_addr, dc_size, &position, count);
+  return nvinfo->handler;
 }

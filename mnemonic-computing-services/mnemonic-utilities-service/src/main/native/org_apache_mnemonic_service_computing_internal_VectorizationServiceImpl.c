@@ -42,48 +42,40 @@ void valVectorizationHandler(JNIEnv* env, size_t dims[], size_t dimidx,
     return;
   }
 
-  char* curr = (char*)dc_addr + *position;
-
   switch(dtype) {
     case DURABLE_BOOLEAN:
     case DURABLE_CHARACTER:
     case DURABLE_BYTE:
-      curr = &*(char*)addr;
       if (*position + 1 < dc_size) {
         *position += 1;
         *count += 1;
       }
       break;
     case DURABLE_SHORT:
-      curr = &*(short*)addr;
       if (*position + 2 < dc_size) {
         *position += 2;
         *count += 1;
       }
       break;
     case DURABLE_INTEGER:
-      curr = &*(int*)addr;
       if (*position + 4 < dc_size) {
         *position += 4;
         *count += 1;
       }
       break;
     case DURABLE_LONG:
-      curr = &*(long*)addr;
       if (*position + 8 < dc_size) {
         *position += 8;
         *count += 1;
       }
       break;
     case DURABLE_FLOAT:
-      curr = &*(float*)addr;
       if (*position + 4 < dc_size) {
         *position += 4;
         *count += 1;
       }
       break;
     case DURABLE_DOUBLE:
-      curr =&*(double*)addr;
       if (*position + 8 < dc_size) {
         *position += 8;
         *count += 1;

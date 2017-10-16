@@ -114,18 +114,20 @@ jlongArray constructJLongArray(JNIEnv* env, long arr[], size_t sz);
 /**
  * translate portable addr. to effective addr.
  */
-inline void *to_e(JNIEnv* env, struct NValueInfo *nvinfo, long p);
+void *to_e(JNIEnv* env, struct NValueInfo *nvinfo, long p);
 
 /**
  * translate effective addr. to portable addr.
  */
-inline long to_p(JNIEnv* env, struct NValueInfo *nvinfo, void *e);
+long to_p(JNIEnv* env, struct NValueInfo *nvinfo, void *e);
 
 /**
  * handle one native value info.
  * call-back value handler for each values of a value matrix.
  */
 long handleValueInfo(JNIEnv* env, struct NValueInfo *nvinfo, valueHandler valhandler);
+
+long handleVectorInfo(JNIEnv* env, struct NValueInfo *nvinfo, vecValueHandler valhandler, long dc_handler, long dc_size, long* count);
 
 #ifdef __cplusplus
 }
