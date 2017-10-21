@@ -187,8 +187,8 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
    *
    */
   @Override
-  public void sync(long addr, long length, boolean autodetect) {
-    m_vmasvc.sync(m_nid, addr, length, autodetect);
+  public void syncToVolatileMemory(long addr, long length, boolean autodetect) {
+    m_vmasvc.syncToVolatileMemory(m_nid, addr, length, autodetect);
   }
 
   /**
@@ -431,8 +431,8 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
    *         specify a buffer to be sync.
    */
   @Override
-  public void sync(MemBufferHolder<VolatileMemAllocator> mbuf) {
-    m_vmasvc.sync(m_nid, getBufferAddress(mbuf), 0L, true);
+  public void syncToVolatileMemory(MemBufferHolder<VolatileMemAllocator> mbuf) {
+    m_vmasvc.syncToVolatileMemory(m_nid, getBufferAddress(mbuf), 0L, true);
   }
 
   /**
@@ -442,8 +442,8 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
    *         specify a chunk to be sync.
    */
   @Override
-  public void sync(MemChunkHolder<VolatileMemAllocator> mchunk) {
-    m_vmasvc.sync(m_nid, getChunkAddress(mchunk), 0L, true);
+  public void syncToVolatileMemory(MemChunkHolder<VolatileMemAllocator> mchunk) {
+    m_vmasvc.syncToVolatileMemory(m_nid, getChunkAddress(mchunk), 0L, true);
   }
 
   /**
@@ -451,7 +451,7 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
    */
   @Override
   public void syncAll() {
-    m_vmasvc.sync(m_nid, 0L, 0L, true);
+    m_vmasvc.syncToVolatileMemory(m_nid, 0L, 0L, true);
   }
 
   /**

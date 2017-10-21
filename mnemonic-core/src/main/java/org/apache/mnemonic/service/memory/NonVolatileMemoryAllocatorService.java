@@ -116,7 +116,7 @@ public interface NonVolatileMemoryAllocatorService extends VolatileMemoryAllocat
    *          if NULL == address and autodetect : persist whole pool
    *          if 0L == length and autodetect : persist block
    */
-  void persist(long id, long addr, long length, boolean autodetect);
+  void syncToNonVolatileMemory(long id, long addr, long length, boolean autodetect);
 
   /**
    * flush processors cache for a memory resource
@@ -134,7 +134,7 @@ public interface NonVolatileMemoryAllocatorService extends VolatileMemoryAllocat
    *          if NULL == address and autodetect : flush whole pool
    *          if 0L == length and autodetect : flush block
    */
-  void flush(long id, long addr, long length, boolean autodetect);
+  void syncToLocal(long id, long addr, long length, boolean autodetect);
 
   /**
    * wait for any memory resource stores to drain from HW buffers.

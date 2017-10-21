@@ -99,7 +99,7 @@ public class DurableHashSetImpl<A extends RestorableAllocator<A>, E>
    * sync. this object
    */
   @Override
-  public void sync() {
+  public void syncToVolatileMemory() {
 
   }
 
@@ -107,7 +107,7 @@ public class DurableHashSetImpl<A extends RestorableAllocator<A>, E>
    * Make any cached changes to this object persistent.
    */
   @Override
-  public void persist() {
+  public void syncToNonVolatileMemory() {
 
   }
 
@@ -115,7 +115,7 @@ public class DurableHashSetImpl<A extends RestorableAllocator<A>, E>
    * flush processors cache for this object
    */
   @Override
-  public void flush() {
+  public void syncToLocal() {
 
   }
 

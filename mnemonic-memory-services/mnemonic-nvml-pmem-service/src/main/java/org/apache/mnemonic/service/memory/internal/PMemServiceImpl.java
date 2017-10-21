@@ -59,7 +59,7 @@ public class PMemServiceImpl implements NonVolatileMemoryAllocatorService {
   }
 
   @Override
-  public void sync(long id, long addr, long length, boolean autodetect) {
+  public void syncToVolatileMemory(long id, long addr, long length, boolean autodetect) {
     nsync(id, addr, length, autodetect);
   }
 
@@ -129,12 +129,12 @@ public class PMemServiceImpl implements NonVolatileMemoryAllocatorService {
   }
 
   @Override
-  public void persist(long id, long addr, long length, boolean autodetect) {
+  public void syncToNonVolatileMemory(long id, long addr, long length, boolean autodetect) {
     npersist(id, addr, length, autodetect);
   }
 
   @Override
-  public void flush(long id, long addr, long length, boolean autodetect) {
+  public void syncToLocal(long id, long addr, long length, boolean autodetect) {
     nflush(id, addr, length, autodetect);
   }
 

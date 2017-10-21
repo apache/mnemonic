@@ -174,7 +174,7 @@ public interface VolatileMemoryAllocatorService extends QueryableService {
    *          if NULL == address and autodetect : sync. whole pool
    *          if 0L == length and autodetect : sync. block
    */
-  void sync(long id, long addr, long length, boolean autodetect);
+  void syncToVolatileMemory(long id, long addr, long length, boolean autodetect);
 
   /**
    * get the capacity of its managed memory space

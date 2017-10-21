@@ -34,7 +34,7 @@ public interface Persistence<A extends RetrievableAllocator<A>> {
      *          if NULL == address and autodetect : persist whole pool
      *          if 0L == length and autodetect : persist block
      */
-    void persist(long addr, long length, boolean autodetect);
+    void syncToNonVolatileMemory(long addr, long length, boolean autodetect);
 
     /**
      * flush processors cache for a memory resource
@@ -49,7 +49,7 @@ public interface Persistence<A extends RetrievableAllocator<A>> {
      *          if NULL == address and autodetect : flush whole pool
      *          if 0L == length and autodetect : flush block
      */
-    void flush(long addr, long length, boolean autodetect);
+    void syncToLocal(long addr, long length, boolean autodetect);
 
     /**
      * persist a buffer to persistent memory.
@@ -57,7 +57,7 @@ public interface Persistence<A extends RetrievableAllocator<A>> {
      * @param mbuf
      *         specify a buffer to be persisted
      */
-    void persist(MemBufferHolder<A> mbuf);
+    void syncToNonVolatileMemory(MemBufferHolder<A> mbuf);
 
     /**
      * persist a chunk to persistent memory.
@@ -65,7 +65,7 @@ public interface Persistence<A extends RetrievableAllocator<A>> {
      * @param mchunk
      *         specify a chunk to be persisted
      */
-    void persist(MemChunkHolder<A> mchunk);
+    void syncToNonVolatileMemory(MemChunkHolder<A> mchunk);
 
     /**
      * persist the memory pool to persistent memory.
@@ -78,7 +78,7 @@ public interface Persistence<A extends RetrievableAllocator<A>> {
      * @param mbuf
      *         specify a buffer to be flushed
      */
-    void flush(MemBufferHolder<A> mbuf);
+    void syncToLocal(MemBufferHolder<A> mbuf);
 
     /**
      * flush a chunk to persistent memory.
@@ -86,7 +86,7 @@ public interface Persistence<A extends RetrievableAllocator<A>> {
      * @param mchunk
      *         specify a chunk to be flushed
      */
-    void flush(MemChunkHolder<A> mchunk);
+    void syncToLocal(MemChunkHolder<A> mchunk);
 
     /**
      * flush the memory pool to persistent memory.

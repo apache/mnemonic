@@ -66,7 +66,7 @@ public class VMemServiceImpl implements VolatileMemoryAllocatorService {
   }
 
   @Override
-  public void sync(long id, long addr, long length, boolean autodetect) {
+  public void syncToVolatileMemory(long id, long addr, long length, boolean autodetect) {
     nsync(id, addr, length, autodetect);
   }
 

@@ -189,9 +189,9 @@ public class AnnotatedDurableEntityClass {
     m_durablemtdinfo.put("getHandler", new ArrayList<MethodInfo>());
     m_durablemtdinfo.put("autoReclaim", new ArrayList<MethodInfo>());
     m_durablemtdinfo.put("destroy", new ArrayList<MethodInfo>());
-    m_durablemtdinfo.put("sync", new ArrayList<MethodInfo>());
-    m_durablemtdinfo.put("persist", new ArrayList<MethodInfo>());
-    m_durablemtdinfo.put("flush", new ArrayList<MethodInfo>());
+    m_durablemtdinfo.put("syncToVolatileMemory", new ArrayList<MethodInfo>());
+    m_durablemtdinfo.put("syncToNonVolatileMemory", new ArrayList<MethodInfo>());
+    m_durablemtdinfo.put("syncToLocal", new ArrayList<MethodInfo>());
     m_durablemtdinfo.put("getNativeFieldInfo", new ArrayList<MethodInfo>());
 
     m_entitymtdinfo.put("initializeDurableEntity", new MethodInfo());
@@ -771,14 +771,14 @@ public class AnnotatedDurableEntityClass {
           case "autoReclaim":
             code.addStatement("return $1N", autoreclaimname);
             break;
-          case "sync":
-            code.addStatement("$1N.sync()", holdername);
+          case "syncToVolatileMemory":
+            code.addStatement("$1N.syncToVolatileMemory()", holdername);
             break;
-          case "persist":
-            code.addStatement("$1N.persist()", holdername);
+          case "syncToNonVolatileMemory":
+            code.addStatement("$1N.syncToNonVolatileMemory()", holdername);
             break;
-          case "flush":
-            code.addStatement("$1N.flush()", holdername);
+          case "syncToLocal":
+            code.addStatement("$1N.syncToLocal()", holdername);
             break;
           case "destroy":
             for (String fname : m_dynfieldsinfo.keySet()) {

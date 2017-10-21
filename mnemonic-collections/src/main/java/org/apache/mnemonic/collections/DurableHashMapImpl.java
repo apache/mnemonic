@@ -381,7 +381,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
    * sync. this object
    */
   @Override
-  public void sync() {
+  public void syncToVolatileMemory() {
 
   }
 
@@ -389,7 +389,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
    * Make any cached changes to this object persistent.
    */
   @Override
-  public void persist() {
+  public void syncToNonVolatileMemory() {
 
   }
 
@@ -397,7 +397,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
    * flush processors cache for this object
    */
   @Override
-  public void flush() {
+  public void syncToLocal() {
 
   }
 

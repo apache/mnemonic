@@ -156,7 +156,7 @@ public class JavaVMemServiceImpl implements VolatileMemoryAllocatorService {
   }
 
   @Override
-  public void sync(long id, long addr, long length, boolean autodetect) {
+  public void syncToVolatileMemory(long id, long addr, long length, boolean autodetect) {
     throw new UnsupportedOperationException("Unsupported to synchronization operation");
   }
 

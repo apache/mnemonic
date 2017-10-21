@@ -55,17 +55,17 @@ public class DurableChunk<A extends RetrievableAllocator<A>> extends MemChunkHol
    * sync. this object
    */
   @Override
-  public void sync() {
-    m_allocator.sync(this);
+  public void syncToVolatileMemory() {
+    m_allocator.syncToVolatileMemory(this);
   }
 
   /**
    * Make any cached changes to this object persistent.
    */
   @Override
-  public void persist() {
+  public void syncToNonVolatileMemory() {
     if (null != m_persistOps) {
-      m_persistOps.persist(this);
+      m_persistOps.syncToNonVolatileMemory(this);
     }
   }
 
@@ -73,9 +73,9 @@ public class DurableChunk<A extends RetrievableAllocator<A>> extends MemChunkHol
    * flush processors cache for this object
    */
   @Override
-  public void flush() {
+  public void syncToLocal() {
     if (null != m_persistOps) {
-      m_persistOps.flush(this);
+      m_persistOps.syncToLocal(this);
     }
   }
 

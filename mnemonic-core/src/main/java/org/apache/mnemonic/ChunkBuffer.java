@@ -67,23 +67,23 @@ public class ChunkBuffer<A extends RetrievableAllocator<A>> {
     return m_dchunk;
   }
 
-  public void persist() {
+  public void syncToNonVolatileMemory() {
     if (m_dchunk.getAllocator() instanceof NonVolatileMemAllocator) {
       NonVolatileMemAllocator alloc = (NonVolatileMemAllocator) m_dchunk.getAllocator();
-      alloc.persist(m_dchunk.get() + m_offset, m_size, false);
+      alloc.syncToNonVolatileMemory(m_dchunk.get() + m_offset, m_size, false);
     } else {
       throw new UnsupportedOperationException("The ChunkBuffer does not backed by a non-volatile allocator");
       }
     }
 
-  public void sync() {
-    m_dchunk.getAllocator().sync(m_dchunk.get() + m_offset, m_size, false);
+  public void syncToVolatileMemory() {
+    m_dchunk.getAllocator().syncToVolatileMemory(m_dchunk.get() + m_offset, m_size, false);
   }
 
-  public void flush() {
+  public void syncToLocal() {
     if (m_dchunk.getAllocator() instanceof NonVolatileMemAllocator) {
       NonVolatileMemAllocator alloc = (NonVolatileMemAllocator) m_dchunk.getAllocator();
-      alloc.flush(m_dchunk.get() + m_offset, m_size, false);
+      alloc.syncToLocal(m_dchunk.get() + m_offset, m_size, false);
     } else {
       throw new UnsupportedOperationException("The ChunkBuffer does not backed by a non-volatile allocator");
     }

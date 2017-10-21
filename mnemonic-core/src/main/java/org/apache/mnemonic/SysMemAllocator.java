@@ -169,7 +169,7 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
    *
    */
   @Override
-  public void sync(long addr, long length, boolean autodetect) {
+  public void syncToVolatileMemory(long addr, long length, boolean autodetect) {
     throw new UnsupportedOperationException("SysMemAllocator doesn't support sync");
   }
 
@@ -179,7 +179,7 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
    * @param mbuf specify a buffer to be sync.
    */
   @Override
-  public void sync(MemBufferHolder<SysMemAllocator> mbuf) {
+  public void syncToVolatileMemory(MemBufferHolder<SysMemAllocator> mbuf) {
     throw new UnsupportedOperationException("SysMemAllocator doesn't support sync");
   }
 
@@ -189,7 +189,7 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
    * @param mchunk specify a chunk to be sync.
    */
   @Override
-  public void sync(MemChunkHolder<SysMemAllocator> mchunk) {
+  public void syncToVolatileMemory(MemChunkHolder<SysMemAllocator> mchunk) {
     throw new UnsupportedOperationException("SysMemAllocator doesn't support sync");
   }
 

@@ -92,17 +92,17 @@ public interface Durable {
   /**
    * sync. this object
    */
-  void sync();
+  void syncToVolatileMemory();
 
   /**
    * Make any cached changes to this object persistent.
    */
-  void persist();
+  void syncToNonVolatileMemory();
 
   /**
    * flush processors cache for this object
    */
-  void flush();
+  void syncToLocal();
 
   /**
    * manually destroy this object and release its memory resource

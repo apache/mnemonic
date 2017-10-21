@@ -42,7 +42,7 @@ public interface Allocator<A extends CommonAllocator<A>> extends Allocatable<A> 
    *          detect the length of this memory block
    *
    */
-  void sync(long addr, long length, boolean autodetect);
+  void syncToVolatileMemory(long addr, long length, boolean autodetect);
 
   /**
    * sync. a buffer to memory.
@@ -50,7 +50,7 @@ public interface Allocator<A extends CommonAllocator<A>> extends Allocatable<A> 
    * @param mbuf
    *         specify a buffer to be sync.
    */
-  void sync(MemBufferHolder<A> mbuf);
+  void syncToVolatileMemory(MemBufferHolder<A> mbuf);
 
   /**
    * sync. a chunk to memory.
@@ -58,7 +58,7 @@ public interface Allocator<A extends CommonAllocator<A>> extends Allocatable<A> 
    * @param mchunk
    *         specify a chunk to be sync.
    */
-  void sync(MemChunkHolder<A> mchunk);
+  void syncToVolatileMemory(MemChunkHolder<A> mchunk);
 
   void syncAll();
 

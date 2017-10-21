@@ -165,8 +165,8 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
    *
    */
   @Override
-  public void sync(long addr, long length, boolean autodetect) {
-    m_nvmasvc.sync(m_nid, addr, length, autodetect);
+  public void syncToVolatileMemory(long addr, long length, boolean autodetect) {
+    m_nvmasvc.syncToVolatileMemory(m_nid, addr, length, autodetect);
   }
 
   /**
@@ -413,8 +413,8 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
    *         specify a buffer to be sync.
    */
   @Override
-  public void sync(MemBufferHolder<NonVolatileMemAllocator> mbuf) {
-    m_nvmasvc.sync(m_nid, getBufferAddress(mbuf), 0L, true);
+  public void syncToVolatileMemory(MemBufferHolder<NonVolatileMemAllocator> mbuf) {
+    m_nvmasvc.syncToVolatileMemory(m_nid, getBufferAddress(mbuf), 0L, true);
   }
 
   /**
@@ -424,8 +424,8 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
    *         specify a chunk to be sync.
    */
   @Override
-  public void sync(MemChunkHolder<NonVolatileMemAllocator> mchunk) {
-    m_nvmasvc.sync(m_nid, getChunkAddress(mchunk), 0L, true);
+  public void syncToVolatileMemory(MemChunkHolder<NonVolatileMemAllocator> mchunk) {
+    m_nvmasvc.syncToVolatileMemory(m_nid, getChunkAddress(mchunk), 0L, true);
   }
 
   /**
@@ -433,7 +433,7 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
    */
   @Override
   public void syncAll() {
-    m_nvmasvc.sync(m_nid, 0L, 0L, true);
+    m_nvmasvc.syncToVolatileMemory(m_nid, 0L, 0L, true);
   }
 
   /**
@@ -444,8 +444,8 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
    * @param autodetect if NULL == address and autodetect : persist whole pool
    */
   @Override
-  public void persist(long addr, long length, boolean autodetect) {
-    m_nvmasvc.persist(m_nid, addr, length, autodetect);
+  public void syncToNonVolatileMemory(long addr, long length, boolean autodetect) {
+    m_nvmasvc.syncToNonVolatileMemory(m_nid, addr, length, autodetect);
   }
 
   /**
@@ -456,8 +456,8 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
    * @param autodetect if NULL == address and autodetect : flush whole pool
    */
   @Override
-  public void flush(long addr, long length, boolean autodetect) {
-    m_nvmasvc.flush(m_nid, addr, length, autodetect);
+  public void syncToLocal(long addr, long length, boolean autodetect) {
+    m_nvmasvc.syncToLocal(m_nid, addr, length, autodetect);
   }
 
   /**
@@ -467,8 +467,8 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
    *         specify a buffer to be persisted
    */
   @Override
-  public void persist(MemBufferHolder<NonVolatileMemAllocator> mbuf) {
-    m_nvmasvc.persist(m_nid, getBufferAddress(mbuf), 0L, true);
+  public void syncToNonVolatileMemory(MemBufferHolder<NonVolatileMemAllocator> mbuf) {
+    m_nvmasvc.syncToNonVolatileMemory(m_nid, getBufferAddress(mbuf), 0L, true);
   }
 
   /**
@@ -478,8 +478,8 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
    *         specify a chunk to be persisted
    */
   @Override
-  public void persist(MemChunkHolder<NonVolatileMemAllocator> mchunk) {
-    m_nvmasvc.persist(m_nid, getChunkAddress(mchunk), 0L, true);
+  public void syncToNonVolatileMemory(MemChunkHolder<NonVolatileMemAllocator> mchunk) {
+    m_nvmasvc.syncToNonVolatileMemory(m_nid, getChunkAddress(mchunk), 0L, true);
   }
 
   /**
@@ -487,7 +487,7 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
    */
   @Override
   public void persistAll() {
-    m_nvmasvc.persist(m_nid, 0L, 0L, true);
+    m_nvmasvc.syncToNonVolatileMemory(m_nid, 0L, 0L, true);
   }
 
   /**
@@ -497,8 +497,8 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
    *         specify a buffer to be flushed
    */
   @Override
-  public void flush(MemBufferHolder<NonVolatileMemAllocator> mbuf) {
-    m_nvmasvc.flush(m_nid, getBufferAddress(mbuf), 0L, true);
+  public void syncToLocal(MemBufferHolder<NonVolatileMemAllocator> mbuf) {
+    m_nvmasvc.syncToLocal(m_nid, getBufferAddress(mbuf), 0L, true);
   }
 
   /**
@@ -508,8 +508,8 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
    *         specify a chunk to be flushed
    */
   @Override
-  public void flush(MemChunkHolder<NonVolatileMemAllocator> mchunk) {
-    m_nvmasvc.flush(m_nid, getChunkAddress(mchunk), 0L, true);
+  public void syncToLocal(MemChunkHolder<NonVolatileMemAllocator> mchunk) {
+    m_nvmasvc.syncToLocal(m_nid, getChunkAddress(mchunk), 0L, true);
   }
 
   /**
@@ -517,7 +517,7 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
    */
   @Override
   public void flushAll() {
-    m_nvmasvc.flush(m_nid, 0L, 0L, true);
+    m_nvmasvc.syncToLocal(m_nid, 0L, 0L, true);
   }
 
   /**
@@ -720,7 +720,7 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
 
   /**
    * Get a queryable object
-   *
+   *f
    * @return a queryable object
    */
   Queryable useQuery() {

@@ -497,7 +497,7 @@ public class DurableTreeImpl<A extends RestorableAllocator<A>, E extends Compara
    * sync. this object
    */
   @Override
-  public void sync() {
+  public void syncToVolatileMemory() {
 
   }
 
@@ -505,7 +505,7 @@ public class DurableTreeImpl<A extends RestorableAllocator<A>, E extends Compara
    * Make any cached changes to this object persistent.
    */
   @Override
-  public void persist() {
+  public void syncToNonVolatileMemory() {
 
   }
 
@@ -513,7 +513,7 @@ public class DurableTreeImpl<A extends RestorableAllocator<A>, E extends Compara
    * flush processors cache for this object
    */
   @Override
-  public void flush() {
+  public void syncToLocal() {
 
   }
 
