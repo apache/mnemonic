@@ -44,6 +44,16 @@ public interface AddressTranslator {
   long getEffectiveAddress(long addr);
 
   /**
+   * calculate the abstract address from portable address
+   *
+   * @param addr
+   *          the portable address
+   *
+   * @return the abstract address
+   */
+  long getAbstractAddress(long addr);
+
+  /**
    * set address translate table
    *
    * @param tbl

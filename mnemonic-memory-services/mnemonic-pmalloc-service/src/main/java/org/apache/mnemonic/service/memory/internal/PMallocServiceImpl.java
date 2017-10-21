@@ -23,6 +23,7 @@ import org.apache.mnemonic.service.computing.ValueInfo;
 import org.apache.mnemonic.service.memory.MemoryServiceFeature;
 import org.apache.mnemonic.service.memory.NonVolatileMemoryAllocatorService;
 import org.flowcomputing.commons.primitives.NativeLibraryLoader;
+import org.flowcomputing.commons.resgc.ReclaimContext;
 
 import java.nio.ByteBuffer;
 import java.util.HashSet;
@@ -78,7 +79,7 @@ public class PMallocServiceImpl implements NonVolatileMemoryAllocatorService {
   }
 
   @Override
-  public void free(long id, long addr) {
+  public void free(long id, long addr, ReclaimContext rctx) {
     nfree(id, addr);
   }
 
@@ -93,7 +94,7 @@ public class PMallocServiceImpl implements NonVolatileMemoryAllocatorService {
   }
 
   @Override
-  public void destroyByteBuffer(long id, ByteBuffer bytebuf) {
+  public void destroyByteBuffer(long id, ByteBuffer bytebuf, ReclaimContext rctx) {
     ndestroyByteBuffer(id, bytebuf);
   }
 
@@ -173,6 +174,11 @@ public class PMallocServiceImpl implements NonVolatileMemoryAllocatorService {
     ret.add(MemoryServiceFeature.VOLATILE);
     ret.add(MemoryServiceFeature.NONVOLATILE);
     return ret;
+  }
+
+  @Override
+  public long getAbstractAddress(long addr) {
+    throw new UnsupportedOperationException("Unrsupported to get abstract address");
   }
 
   protected native long ninit(long capacity, String uri, boolean isnew);

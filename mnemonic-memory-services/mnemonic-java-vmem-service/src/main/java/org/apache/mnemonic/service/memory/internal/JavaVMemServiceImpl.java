@@ -24,6 +24,7 @@ import org.apache.mnemonic.query.memory.ResultSet;
 import org.apache.mnemonic.service.computing.ValueInfo;
 import org.apache.mnemonic.service.memory.MemoryServiceFeature;
 import org.apache.mnemonic.service.memory.VolatileMemoryAllocatorService;
+import org.flowcomputing.commons.resgc.ReclaimContext;
 
 import java.io.File;
 import java.io.IOException;
@@ -211,13 +212,13 @@ public class JavaVMemServiceImpl implements VolatileMemoryAllocatorService {
     originalBytebuf.rewind();
     newBytebuf.rewind();
     newBytebuf.put(originalBytebuf);
-    destroyByteBuffer(id, originalBytebuf);
+    destroyByteBuffer(id, originalBytebuf, null);
     handler = getByteBufferHandler(id, newBytebuf);
     return handler;
   }
 
   @Override
-  public void free(long id, long addr) {
+  public void free(long id, long addr, ReclaimContext rctx) {
     MemoryInfo mi = this.getMemPools().get((int)id);
     FileChannel channel = mi.getFileChannel();
     int startIdx, requiredblocks, size;
@@ -273,12 +274,12 @@ public class JavaVMemServiceImpl implements VolatileMemoryAllocatorService {
     ByteBuffer bb = createByteBuffer(id, size);
     bytebuf.rewind();
     bb.put(bytebuf);
-    destroyByteBuffer(id, bytebuf);
+    destroyByteBuffer(id, bytebuf, null);
     return bb;
   }
 
   @Override
-  public void destroyByteBuffer(long id, ByteBuffer bytebuf) {
+  public void destroyByteBuffer(long id, ByteBuffer bytebuf, ReclaimContext rctx) {
     MemoryInfo mi = this.getMemPools().get((int)id);
     FileChannel channel = mi.getFileChannel();
     int startIdx, requiredblocks;
@@ -388,6 +389,11 @@ public class JavaVMemServiceImpl implements VolatileMemoryAllocatorService {
   @Override
   public Set<MemoryServiceFeature> getFeatures() {
     return null;
+  }
+
+  @Override
+  public long getAbstractAddress(long addr) {
+    throw new UnsupportedOperationException("Unrsupported to get abstract address");
   }
 
   public ArrayList<MemoryInfo> getMemPools() {

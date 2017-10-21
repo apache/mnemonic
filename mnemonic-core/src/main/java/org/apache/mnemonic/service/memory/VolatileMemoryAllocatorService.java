@@ -17,6 +17,8 @@
 
 package org.apache.mnemonic.service.memory;
 
+import org.flowcomputing.commons.resgc.ReclaimContext;
+
 import java.nio.ByteBuffer;
 import java.util.Set;
 
@@ -227,8 +229,11 @@ public interface VolatileMemoryAllocatorService extends QueryableService {
    * 
    * @param addr
    *          the address of allocated memory block.
+   *
+   * @param rctx
+   *          the reclaim context.
    */
-  void free(long id, long addr);
+  void free(long id, long addr, ReclaimContext rctx);
 
   /**
    * create a ByteBuffer object which backed buffer is coming from backed native
@@ -272,8 +277,11 @@ public interface VolatileMemoryAllocatorService extends QueryableService {
    * 
    * @param bytebuf
    *          the specified ByteBuffer object to be destroyed
+   *
+   * @param rctx
+   *          the reclaim context.
    */
-  void destroyByteBuffer(long id, ByteBuffer bytebuf);
+  void destroyByteBuffer(long id, ByteBuffer bytebuf, ReclaimContext rctx);
 
   /**
    * begin a transaction
@@ -304,5 +312,15 @@ public interface VolatileMemoryAllocatorService extends QueryableService {
    * @return a set of features that supported by this memory service
    */
   Set<MemoryServiceFeature> getFeatures();
+
+  /**
+   * calculate the abstract address from portable address
+   *
+   * @param addr
+   *          the portable address
+   *
+   * @return the abstract address
+   */
+  long getAbstractAddress(long addr);
 
 }

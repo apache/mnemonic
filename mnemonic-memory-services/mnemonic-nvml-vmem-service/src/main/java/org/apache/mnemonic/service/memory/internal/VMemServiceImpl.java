@@ -23,6 +23,7 @@ import org.apache.mnemonic.service.computing.ValueInfo;
 import org.apache.mnemonic.service.memory.MemoryServiceFeature;
 import org.apache.mnemonic.service.memory.VolatileMemoryAllocatorService;
 import org.flowcomputing.commons.primitives.NativeLibraryLoader;
+import org.flowcomputing.commons.resgc.ReclaimContext;
 
 import java.nio.ByteBuffer;
 import java.util.Collections;
@@ -85,7 +86,7 @@ public class VMemServiceImpl implements VolatileMemoryAllocatorService {
   }
 
   @Override
-  public void free(long id, long addr) {
+  public void free(long id, long addr, ReclaimContext rctx) {
     nfree(id, addr);
   }
 
@@ -100,7 +101,7 @@ public class VMemServiceImpl implements VolatileMemoryAllocatorService {
   }
 
   @Override
-  public void destroyByteBuffer(long id, ByteBuffer bytebuf) {
+  public void destroyByteBuffer(long id, ByteBuffer bytebuf, ReclaimContext rctx) {
     ndestroyByteBuffer(id, bytebuf);
   }
 
@@ -165,6 +166,11 @@ public class VMemServiceImpl implements VolatileMemoryAllocatorService {
     Set<MemoryServiceFeature> ret = new HashSet<MemoryServiceFeature>();
     ret.add(MemoryServiceFeature.VOLATILE);
     return ret;
+  }
+
+  @Override
+  public long getAbstractAddress(long addr) {
+    throw new UnsupportedOperationException("Unrsupported to get abstract address");
   }
 
   protected native long ninit(long capacity, String uri, boolean isnew);

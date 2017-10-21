@@ -219,7 +219,7 @@ public class JavaVMemServiceImplNGTest {
     assertTrue(blockInfo.getBufferBlockChunksMap().size() == 10 * 1024 * 1024 / 512);
     assertTrue(blockInfo.getBufferBlockChunksMap().get(0) == true);
     assertTrue(blockInfo.getBufferBlockChunksMap().get(1) == false);
-    vms.destroyByteBuffer(memPool, bytebuffer);
+    vms.destroyByteBuffer(memPool, bytebuffer, null);
     vms.close(memPool);
     Files.delete(Paths.get(dest));
   }
@@ -243,7 +243,7 @@ public class JavaVMemServiceImplNGTest {
     assertTrue(blockInfo.getBufferBlockChunksMap().size() == 10 * 1024 * 1024 / 512);
     assertTrue(blockInfo.getBufferBlockChunksMap().get(0) == true);
     assertTrue(blockInfo.getBufferBlockChunksMap().get(1) == false);
-    vms.destroyByteBuffer(memPool, bytebuffer);
+    vms.destroyByteBuffer(memPool, bytebuffer, null);
     vms.close(memPool);
     Files.delete(Paths.get(dest));
   }
@@ -269,7 +269,7 @@ public class JavaVMemServiceImplNGTest {
     assertTrue(blockInfo.getBufferBlockChunksMap().get(1) == true);
     assertTrue(blockInfo.getBufferBlockChunksMap().get(2) == true);
     assertTrue(blockInfo.getBufferBlockChunksMap().get(3) == false);
-    vms.destroyByteBuffer(memPool, bytebuffer);
+    vms.destroyByteBuffer(memPool, bytebuffer, null);
     vms.close(memPool);
     Files.delete(Paths.get(dest));
   }
@@ -293,7 +293,7 @@ public class JavaVMemServiceImplNGTest {
     assertTrue(blockInfo.getBufferBlockChunksMap().size() == 10 * 1024 * 1024 / 512);
     assertTrue(blockInfo.getBufferBlockChunksMap().get(0) == true);
     assertTrue(blockInfo.getBufferBlockChunksMap().get(10 * 1024 * 1024 / 512 - 1) == true);
-    vms.destroyByteBuffer(memPool, bytebuffer);
+    vms.destroyByteBuffer(memPool, bytebuffer, null);
     vms.close(memPool);
     Files.delete(Paths.get(dest));
   }
@@ -331,8 +331,8 @@ public class JavaVMemServiceImplNGTest {
     }
     assertTrue(keys.get(0) != keys.get(1));
 
-    vms.destroyByteBuffer(memPool, bytebuffer1);
-    vms.destroyByteBuffer(memPool, bytebuffer2);
+    vms.destroyByteBuffer(memPool, bytebuffer1, null);
+    vms.destroyByteBuffer(memPool, bytebuffer2, null);
     vms.close(memPool);
     Files.delete(Paths.get(dest));
   }
@@ -369,7 +369,7 @@ public class JavaVMemServiceImplNGTest {
     assertTrue(blocksMap.get(10 * 1024 * 1024 / 512 - 1) == false);
     assertTrue(blockInfo.getChunkSizeMap().size() == 1);
 
-    vms.destroyByteBuffer(memPool, bytebuffer1);
+    vms.destroyByteBuffer(memPool, bytebuffer1, null);
     vms.close(memPool);
     Files.delete(Paths.get(dest));
   }
@@ -392,12 +392,12 @@ public class JavaVMemServiceImplNGTest {
     ByteBuffer bytebuffer2 = vms.createByteBuffer(memPool, 10 * 1024 * 1024 - 1024);
 
     // Destroy bytebuffer2 first, then destroy bytebuffer1
-    vms.destroyByteBuffer(memPool, bytebuffer2);
+    vms.destroyByteBuffer(memPool, bytebuffer2, null);
     assertTrue(blockInfo.getChunkSizeMap().size() == 1);
     assertTrue(blockInfo.getBufferBlockChunksMap().get(2) == false);
     assertTrue(blockInfo.getBufferBlockChunksMap().get(10 * 1024 * 1024 / 512 - 1) == false);
 
-    vms.destroyByteBuffer(memPool, bytebuffer1);
+    vms.destroyByteBuffer(memPool, bytebuffer1, null);
     assertTrue(blockInfo.getChunkSizeMap().size() == 0);
     assertTrue(blockInfo.getBufferBlockChunksMap().get(0) == false);
     assertTrue(blockInfo.getBufferBlockChunksMap().get(1) == false);
@@ -430,7 +430,7 @@ public class JavaVMemServiceImplNGTest {
       Assert.assertEquals(bytebuffer2.get(i), (byte)i);
     }
 
-    vms.destroyByteBuffer(memPool, bytebuffer2);
+    vms.destroyByteBuffer(memPool, bytebuffer2, null);
     vms.close(memPool);
     Files.delete(Paths.get(dest));
   }
@@ -453,7 +453,7 @@ public class JavaVMemServiceImplNGTest {
     assertTrue(blockInfo.getBufferBlockBaseAddress() > 0);
     ByteBuffer bb = vms.retrieveByteBuffer(memPool, blockInfo.getBufferBlockBaseAddress());
     Assert.assertEquals(bb, bytebuffer);
-    vms.destroyByteBuffer(memPool, bytebuffer);
+    vms.destroyByteBuffer(memPool, bytebuffer, null);
     vms.close(memPool);
     Files.delete(Paths.get(dest));
   }
@@ -476,7 +476,7 @@ public class JavaVMemServiceImplNGTest {
     assertTrue(blockInfo.getBufferBlockBaseAddress() > 0);
     long size = vms.retrieveSize(memPool, blockInfo.getBufferBlockBaseAddress());
     Assert.assertEquals((int)size, 512);
-    vms.destroyByteBuffer(memPool, bytebuffer);
+    vms.destroyByteBuffer(memPool, bytebuffer, null);
     vms.close(memPool);
     Files.delete(Paths.get(dest));
   }
@@ -499,7 +499,7 @@ public class JavaVMemServiceImplNGTest {
     assertTrue(blockInfo.getBufferBlockBaseAddress() > 0);
     long handler = vms.getByteBufferHandler(memPool, bytebuffer);
     Assert.assertEquals(handler, blockInfo.getBufferBlockBaseAddress());
-    vms.destroyByteBuffer(memPool, bytebuffer);
+    vms.destroyByteBuffer(memPool, bytebuffer, null);
     vms.close(memPool);
     Files.delete(Paths.get(dest));
   }
@@ -524,7 +524,7 @@ public class JavaVMemServiceImplNGTest {
     for (int i = 0; i < 513; i++) {
       Assert.assertEquals(bb.get(i), (byte)0); //initiate to zero regardless of whether initzero = false
     }
-    vms.destroyByteBuffer(memPool, bb);
+    vms.destroyByteBuffer(memPool, bb, null);
     vms.close(memPool);
     Files.delete(Paths.get(dest));
   }
@@ -549,7 +549,7 @@ public class JavaVMemServiceImplNGTest {
     for (int i = 0; i < bb.capacity(); i++) {
       Assert.assertEquals(bb.get(i), (byte)0);
     }
-    vms.destroyByteBuffer(memPool, bb);
+    vms.destroyByteBuffer(memPool, bb, null);
     vms.close(memPool);
     Files.delete(Paths.get(dest));
   }
@@ -575,7 +575,7 @@ public class JavaVMemServiceImplNGTest {
     for (int i = 0; i < bb.capacity(); i++) {
       Assert.assertEquals(bb.get(i), (byte)0);
     }
-    vms.destroyByteBuffer(memPool, bb);
+    vms.destroyByteBuffer(memPool, bb, null);
     vms.close(memPool);
     Files.delete(Paths.get(dest));
   }
@@ -602,7 +602,7 @@ public class JavaVMemServiceImplNGTest {
     for (int i = 0; i < bb.capacity(); i++) {
       Assert.assertEquals(bb.get(i), (byte)0);
     }
-    vms.destroyByteBuffer(memPool, bb);
+    vms.destroyByteBuffer(memPool, bb, null);
     vms.close(memPool);
     Files.delete(Paths.get(dest));
   }

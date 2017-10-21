@@ -30,10 +30,6 @@ import org.flowcomputing.commons.resgc.ReclaimContext;
 
 import java.nio.ByteBuffer;
 
-import static org.apache.mnemonic.service.memory.MemoryServiceFeature.EXPANDABLE;
-import static org.apache.mnemonic.service.memory.MemoryServiceFeature.QUERYABLE;
-import static org.apache.mnemonic.service.memory.MemoryServiceFeature.SHRINKABLE;
-
 /**
  * manage a big native memory pool through underlying memory service.
  * 
@@ -86,14 +82,14 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
      */
     m_bufcollector = new ResCollector<MemBufferHolder<VolatileMemAllocator>, ByteBuffer>(new ResReclaim<ByteBuffer>() {
       @Override
-      public void reclaim(ContextWrapper<ByteBuffer> rctx) {
-        ByteBuffer mres = rctx.getRes();
+      public void reclaim(ContextWrapper<ByteBuffer> cw) {
+        ByteBuffer mres = cw.getRes();
         boolean cb_reclaimed = false;
         if (null != m_bufferreclaimer) {
           cb_reclaimed = m_bufferreclaimer.reclaim(mres, Long.valueOf(mres.capacity()));
         }
         if (!cb_reclaimed) {
-          m_vmasvc.destroyByteBuffer(m_nid, mres);
+          m_vmasvc.destroyByteBuffer(m_nid, mres, cw.getContext());
           mres = null;
         }
       }
@@ -105,15 +101,15 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
      */
     m_chunkcollector = new ResCollector<MemChunkHolder<VolatileMemAllocator>, Long>(new ResReclaim<Long>() {
       @Override
-      public void reclaim(ContextWrapper<Long> rctx) {
-        Long mres = rctx.getRes();
+      public void reclaim(ContextWrapper<Long> cw) {
+        Long mres = cw.getRes();
         // System.out.println(String.format("Reclaim: %X", mres));
         boolean cb_reclaimed = false;
         if (null != m_chunkreclaimer) {
           cb_reclaimed = m_chunkreclaimer.reclaim(mres, null);
         }
         if (!cb_reclaimed) {
-          m_vmasvc.free(m_nid, mres);
+          m_vmasvc.free(m_nid, mres, cw.getContext());
           mres = null;
         }
       }
@@ -151,7 +147,7 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
   public long expand(long size) {
     long ret = 0L;
     if (null != m_features) {
-      if (m_features.contains(EXPANDABLE)) {
+      if (m_features.contains(MemoryServiceFeature.EXPANDABLE)) {
         ret = m_vmasvc.adjustCapacity(m_nid, size);
       } else {
         throw new ConfigurationException("Do not support expand operation");
@@ -166,7 +162,7 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
   public long shrink(long size) {
     long ret = 0L;
     if (null != m_features) {
-      if (m_features.contains(SHRINKABLE)) {
+      if (m_features.contains(MemoryServiceFeature.SHRINKABLE)) {
         ret = m_vmasvc.adjustCapacity(m_nid, (-1) * size);
       } else {
         throw new ConfigurationException("Do not support shrink operation");
@@ -539,6 +535,17 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
     throw new AddressTranslateError("Effective Address Translate Error");
   }
 
+  @Override
+  public long getAbstractAddress(long addr) {
+    long ret = 0L;
+    if (m_absaddr) {
+      ret = m_vmasvc.getAbstractAddress(addr);
+    } else {
+      throw new ConfigurationException("Do not support get abstract address operation");
+    }
+    return ret;
+  }
+
   /**
    * get the address translate table
    *
@@ -651,7 +658,7 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
    */
   Queryable useQuery() {
     if (null == m_querable) {
-      if (m_features.contains(QUERYABLE)) {
+      if (m_features.contains(MemoryServiceFeature.QUERYABLE)) {
         m_querable = new MemoryQueryAdapter();
       }
     }
