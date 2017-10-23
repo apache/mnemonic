@@ -575,6 +575,9 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
    */
   @Override
   public long getPortableAddress(long addr) {
+    if (useAbstractAddressing()) {
+      return m_nvmasvc.getPortableAddress(addr);
+    }
     int i;
     for (i = 0; i < m_ttable.length; ++i) {
       if (addr >= m_ttable[i][2] && addr < m_ttable[i][1] + m_ttable[i][2]) {
@@ -594,6 +597,9 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
    */
   @Override
   public long getEffectiveAddress(long addr) {
+    if (useAbstractAddressing()) {
+      return m_nvmasvc.getEffectiveAddress(addr);
+    }
     int i;
     for (i = 0; i < m_ttable.length; ++i) {
       if (addr >= m_ttable[i][0] && addr < m_ttable[i][1]) {
@@ -604,9 +610,9 @@ public class NonVolatileMemAllocator extends RestorableAllocator<NonVolatileMemA
   }
 
   @Override
-  public long getAbstractAddress(long addr) {
-    long ret = 0L;
-    if (m_absaddr) {
+  public byte[] getAbstractAddress(long addr) {
+    byte[] ret;
+    if (useAbstractAddressing()) {
       ret = m_nvmasvc.getAbstractAddress(addr);
     } else {
       throw new ConfigurationException("Do not support get abstract address operation");

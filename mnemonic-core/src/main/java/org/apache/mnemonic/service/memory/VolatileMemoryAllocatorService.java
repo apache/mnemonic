@@ -321,6 +321,26 @@ public interface VolatileMemoryAllocatorService extends QueryableService {
    *
    * @return the abstract address
    */
-  long getAbstractAddress(long addr);
+  byte[] getAbstractAddress(long addr);
+
+  /**
+   * translate the portable address
+   *
+   * @param addr
+   *          the address to be translated
+   *
+   * @return the portable address
+   */
+  long getPortableAddress(long addr);
+
+  /**
+   * translate the effective address
+   *
+   * @param addr
+   *          the address to be translated
+   *
+   * @return the effective address
+   */
+  long getEffectiveAddress(long addr);
 
 }

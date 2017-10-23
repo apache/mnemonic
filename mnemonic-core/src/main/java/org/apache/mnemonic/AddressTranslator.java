@@ -51,7 +51,7 @@ public interface AddressTranslator {
    *
    * @return the abstract address
    */
-  long getAbstractAddress(long addr);
+  byte[] getAbstractAddress(long addr);
 
   /**
    * set address translate table

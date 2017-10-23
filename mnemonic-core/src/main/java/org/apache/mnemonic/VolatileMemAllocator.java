@@ -501,6 +501,9 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
    */
   @Override
   public long getPortableAddress(long addr) {
+    if (useAbstractAddressing()) {
+      return m_vmasvc.getPortableAddress(addr);
+    }
     int i;
     if (null == m_ttable) {
       return addr;
@@ -523,6 +526,9 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
    */
   @Override
   public long getEffectiveAddress(long addr) {
+    if (useAbstractAddressing()) {
+      return m_vmasvc.getEffectiveAddress(addr);
+    }
     int i;
     if (null == m_ttable) {
       return addr;
@@ -536,9 +542,9 @@ public class VolatileMemAllocator extends RestorableAllocator<VolatileMemAllocat
   }
 
   @Override
-  public long getAbstractAddress(long addr) {
-    long ret = 0L;
-    if (m_absaddr) {
+  public byte[] getAbstractAddress(long addr) {
+    byte[] ret;
+    if (useAbstractAddressing()) {
       ret = m_vmasvc.getAbstractAddress(addr);
     } else {
       throw new ConfigurationException("Do not support get abstract address operation");

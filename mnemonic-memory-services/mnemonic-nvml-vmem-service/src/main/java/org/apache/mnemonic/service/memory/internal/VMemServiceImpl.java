@@ -169,8 +169,18 @@ public class VMemServiceImpl implements VolatileMemoryAllocatorService {
   }
 
   @Override
-  public long getAbstractAddress(long addr) {
+  public byte[] getAbstractAddress(long addr) {
     throw new UnsupportedOperationException("Unrsupported to get abstract address");
+  }
+
+  @Override
+  public long getPortableAddress(long addr) {
+    throw new UnsupportedOperationException("Unrsupported to get portable address");
+  }
+
+  @Override
+  public long getEffectiveAddress(long addr) {
+    throw new UnsupportedOperationException("Unrsupported to get effective address");
   }
 
   protected native long ninit(long capacity, String uri, boolean isnew);
