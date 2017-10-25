@@ -40,12 +40,18 @@
 
   <modules>
     <module>mnemonic-sort-bench</module>
+    <module>mnemonic-spark-kmeans-bench</module>
   </modules>
 
   <dependencies>
     <dependency>
       <groupId>org.apache.mnemonic</groupId>
       <artifactId>mnemonic-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.mnemonic</groupId>
+      <artifactId>mnemonic-spark-core</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
