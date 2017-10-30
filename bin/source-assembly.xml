@@ -165,6 +165,7 @@
     <moduleSet>
       <includes>
         <include>org.apache.mnemonic:mnemonic-sort-bench</include>
+        <include>org.apache.mnemonic:mnemonic-spark-kmeans-bench</include>
       </includes>
       <sources>
         <fileSets>
