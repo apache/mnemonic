@@ -191,6 +191,11 @@ public class PMemServiceImpl implements NonVolatileMemoryAllocatorService {
     throw new UnsupportedOperationException("Unrsupported to get effective address");
   }
 
+  @Override
+  public long[] getMemoryFunctions() {
+    return new long[0];
+  }
+
   protected native long ninit(long capacity, String uri, boolean isnew);
 
   protected native void nclose(long id);

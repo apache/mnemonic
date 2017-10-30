@@ -55,6 +55,9 @@ void destructNValInfo(struct NValueInfo *nvinfo) {
     if (NULL != nvinfo->transtable) {
       free(nvinfo->transtable);
     }
+    if (NULL != nvinfo->memfuncs) {
+      free(nvinfo->memfuncs);
+    }
     if (NULL != nvinfo->frames) {
       free(nvinfo->frames);
     }
@@ -67,7 +70,8 @@ struct NValueInfo *constructNValInfo(JNIEnv* env, jobject vinfoobj) {
 
   static int inited = 0;
   static jclass vinfocls = NULL, dutenum = NULL;
-  static jfieldID handler_fid = NULL, transtable_fid = NULL, frames_fid = NULL, dtype_fid = NULL;
+  static jfieldID handler_fid = NULL, transtable_fid = NULL, memfuncs_fid = NULL;
+  static jfieldID frames_fid = NULL, dtype_fid = NULL;
   static jmethodID getval_mtd = NULL;
 
   if (NULL == vinfoobj) {
@@ -81,6 +85,7 @@ struct NValueInfo *constructNValInfo(JNIEnv* env, jobject vinfoobj) {
     if (NULL != vinfocls && NULL != dutenum) {
       handler_fid = (*env)->GetFieldID(env, vinfocls, "handler", "J");
       transtable_fid = (*env)->GetFieldID(env, vinfocls, "transtable", "[[J");
+      memfuncs_fid = (*env)->GetFieldID(env, vinfocls, "memfuncs", "[J");
       frames_fid = (*env)->GetFieldID(env, vinfocls, "frames", "[[J");
       dtype_fid = (*env)->GetFieldID(env, vinfocls, "dtype",
           "Lorg/apache/mnemonic/DurableType;");
@@ -91,7 +96,7 @@ struct NValueInfo *constructNValInfo(JNIEnv* env, jobject vinfoobj) {
   }
 
   if (NULL == vinfocls || NULL == handler_fid ||
-      NULL == transtable_fid || NULL == frames_fid ||
+      NULL == transtable_fid || NULL == memfuncs_fid || NULL == frames_fid ||
       NULL == dtype_fid || NULL == getval_mtd) {
     return NULL;
   }
@@ -129,6 +134,26 @@ struct NValueInfo *constructNValInfo(JNIEnv* env, jobject vinfoobj) {
             return NULL;
           }
         }
+      } else {
+        destructNValInfo(ret);
+        return NULL;
+      }
+    }
+
+    jobjectArray mfarr = (*env)->GetObjectField(env, vinfoobj, memfuncs_fid);
+    jsize mfarrlen = 0;
+    ret->memfuncssz = 0;
+    if (NULL != mfarr) {
+      mfarrlen = (*env)->GetArrayLength(env, mfarr);
+    }
+    if (mfarrlen > 0){
+      ret->memfuncs = (void* *)calloc(
+          mfarrlen, sizeof(jlong));
+      if (NULL != ret->memfuncs) {
+        ret->memfuncssz = mfarrlen;
+        itms = (*env)->GetLongArrayElements(env, mfarr, NULL);
+        memcpy(ret->memfuncs, itms, mfarrlen * sizeof(jlong));
+        (*env)->ReleaseLongArrayElements(env, mfarr, itms, JNI_ABORT);
       } else {
         destructNValInfo(ret);
         return NULL;

@@ -343,4 +343,11 @@ public interface VolatileMemoryAllocatorService extends QueryableService {
    */
   long getEffectiveAddress(long addr);
 
+  /**
+   * retrieve an array of memory functions
+   *
+   * @return an memory function array
+   */
+  long[] getMemoryFunctions();
+
 }

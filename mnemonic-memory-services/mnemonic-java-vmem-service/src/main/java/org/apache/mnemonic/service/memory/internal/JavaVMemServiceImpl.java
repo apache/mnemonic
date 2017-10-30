@@ -406,6 +406,11 @@ public class JavaVMemServiceImpl implements VolatileMemoryAllocatorService {
     throw new UnsupportedOperationException("Unrsupported to get effective address");
   }
 
+  @Override
+  public long[] getMemoryFunctions() {
+    return new long[0];
+  }
+
   public ArrayList<MemoryInfo> getMemPools() {
     return this.mem_pools;
   }

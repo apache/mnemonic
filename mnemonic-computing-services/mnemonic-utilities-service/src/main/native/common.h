@@ -74,6 +74,8 @@ struct NValueInfo {
   long handler;
   struct transitem *transtable;
   size_t transtablesz;
+  void **memfuncs;
+  size_t memfuncssz;
   struct frameitem *frames;
   size_t framessz;
   int dtype;

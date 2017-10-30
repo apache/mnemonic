@@ -30,7 +30,12 @@ public class ValueInfo {
    * a table for native address mapping
    */
   public long[][] transtable;
-  
+
+  /**
+   * an array of memory service functions
+   */
+  public long[] memfuncs;
+
   /**
    * a list of frame of native parameter
    */
