@@ -18,28 +18,10 @@
 
 package org.apache.mnemonic.sessions;
 
-import java.util.Iterator;
-
-import org.apache.mnemonic.CloseableIterator;
 import org.apache.mnemonic.RestorableAllocator;
 
-public interface SessionIterator<V, A extends RestorableAllocator<A>, T, S>
-    extends CloseableIterator<V>, DurableComputable<A> {
+public interface TransformFunction<V, A extends RestorableAllocator<A>, T> {
 
-  void setAllocator(A alloc);
-
-  void setHandler(long hdl);
-
-  void setIterator(Iterator<V> iter);
-
-  Iterator<V> getIterator();
-
-  void setSourceIterator(Iterator<T> iter);
-
-  Iterator<T> getSourceIterator();
-
-  S getState();
-
-  void setState(S state);
+  V transform(T value, ObjectCreator<V, A> objcreator);
 
 }

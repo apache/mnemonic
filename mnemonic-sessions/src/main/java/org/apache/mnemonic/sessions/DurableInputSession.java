@@ -21,11 +21,12 @@ package org.apache.mnemonic.sessions;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import org.apache.mnemonic.ConfigurationException;
 import org.apache.mnemonic.DurableType;
 import org.apache.mnemonic.EntityFactoryProxy;
 import org.apache.mnemonic.RestorableAllocator;
 
-public abstract class DurableInputSession<V, A extends RestorableAllocator<A>>
+public abstract class DurableInputSession<V, A extends RestorableAllocator<A>, T, S>
     implements InputSession<V> {
 
   private String serviceName;
@@ -33,12 +34,22 @@ public abstract class DurableInputSession<V, A extends RestorableAllocator<A>>
   private EntityFactoryProxy[] entityFactoryProxies;
   private long slotKeyId;
 
+  private DurableOutputSession outSession;
+  private TransformFunction<V, A, T> transformFunction;
+
   /**
    * Initialize the next pool, must be called before use
    *
    * @return true if success
    */
-  protected abstract boolean initNextPool(SessionIterator<V, A> sessiter);
+  protected abstract boolean init(SessionIterator<V, A, T, S> sessiter);
+
+  /**
+   * Initialize the next pool, must be called before using pool
+   *
+   * @return true if success
+   */
+  protected abstract boolean initNextPool(SessionIterator<V, A, T, S> sessiter);
 
   /**
    * One session can only manage one iterator instance at a time for the simplicity
@@ -47,9 +58,11 @@ public abstract class DurableInputSession<V, A extends RestorableAllocator<A>>
    *
    */
   @Override
-  public SessionIterator<V, A> iterator() {
-    SessionIterator<V, A> ret = new Intr();
-    initNextPool(ret);
+  public SessionIterator<V, A, T, S> iterator() {
+    SessionIterator<V, A, T, S> ret = new Intr();
+    if (!init(ret)) {
+      throw new ConfigurationException("Input Session Iterator init. failure");
+    }
     return ret;
   }
 
@@ -57,11 +70,13 @@ public abstract class DurableInputSession<V, A extends RestorableAllocator<A>>
    * this class defines a iterator for multiple pools read
    *
    */
-  private class Intr implements SessionIterator<V, A> {
+  private class Intr implements SessionIterator<V, A, T, S> {
 
     protected long m_handler;
     protected A m_act;
     protected Iterator<V> m_iter;
+    protected Iterator<T> m_srciter;
+    protected S m_state;
 
     /**
      * determine the existing of next
@@ -71,14 +86,25 @@ public abstract class DurableInputSession<V, A extends RestorableAllocator<A>>
      */
     @Override
     public boolean hasNext() {
-      if (null == m_iter) {
-        return false;
-      }
-      boolean ret = m_iter.hasNext();
-      if (!ret) {
-        if (initNextPool(this)) {
-          ret = m_iter.hasNext();
+      boolean ret = false;
+      if (null == m_iter && null == m_srciter) {
+        if (!initNextPool(this)) {
+          close();
+          return false;
         }
+      }
+      if (null != m_iter) {
+        ret = m_iter.hasNext();
+        if (!ret) {
+          if (initNextPool(this)) {
+            ret = m_iter.hasNext();
+          }
+        }
+      } else if (null != m_srciter) {
+        ret = m_srciter.hasNext();
+      }
+      if (!ret) {
+        close();
       }
       return ret;
     }
@@ -90,10 +116,18 @@ public abstract class DurableInputSession<V, A extends RestorableAllocator<A>>
      */
     @Override
     public V next() {
-      if (null == m_iter) {
-        throw new NoSuchElementException();
+      V ret;
+      if (null != m_iter) {
+        ret = m_iter.next();
+      } else if (null != m_srciter) {
+        ret = (V)transformFunction.transform(m_srciter.next(), outSession);
+        if (null != ret) {
+          outSession.post(ret);
+        }
+      } else {
+        throw new NoSuchElementException("Input Session lost it's iterator");
       }
-      return m_iter.next();
+      return ret;
     }
 
     /**
@@ -133,6 +167,11 @@ public abstract class DurableInputSession<V, A extends RestorableAllocator<A>>
     public void close() {
       if (null != m_act) {
         m_act.close();
+        m_act = null;
+      }
+      if (null != outSession) {
+        outSession.close();
+        outSession = null;
       }
     }
 
@@ -141,6 +180,25 @@ public abstract class DurableInputSession<V, A extends RestorableAllocator<A>>
       return m_iter;
     }
 
+    @Override
+    public void setSourceIterator(Iterator<T> iter) {
+      m_srciter = iter;
+    }
+
+    @Override
+    public Iterator<T> getSourceIterator() {
+      return m_srciter;
+    }
+
+    @Override
+    public S getState() {
+      return m_state;
+    }
+
+    @Override
+    public void setState(S state) {
+      m_state = state;
+    }
   }
 
   public String getServiceName() {
@@ -173,6 +231,31 @@ public abstract class DurableInputSession<V, A extends RestorableAllocator<A>>
 
   public void setSlotKeyId(long slotKeyId) {
     this.slotKeyId = slotKeyId;
+  }
+
+  public DurableOutputSession getOutSession() {
+    return outSession;
+  }
+
+  /**
+   * the lifecycle of outSession will be managed here.
+   *
+   * @param outSession
+   *           specify a output sessoin object that is used to generate durable objects as output
+   */
+  public void setOutSession(DurableOutputSession outSession) {
+    this.outSession = outSession;
+  }
+
+  public TransformFunction<V, A, T> getTransformFunction() {
+    return transformFunction;
+  }
+
+  public void setTransformFunction(TransformFunction<V, A, T> transformFunction) {
+    this.transformFunction = transformFunction;
+  }
+
+  public void close() {
   }
 
 }

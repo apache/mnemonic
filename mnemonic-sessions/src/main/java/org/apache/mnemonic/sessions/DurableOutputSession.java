@@ -18,6 +18,7 @@
 
 package org.apache.mnemonic.sessions;
 
+import org.apache.mnemonic.ConfigurationException;
 import org.apache.mnemonic.Durable;
 import org.apache.mnemonic.DurableType;
 import org.apache.mnemonic.EntityFactoryProxy;
@@ -120,6 +121,11 @@ public abstract class DurableOutputSession<V, A extends RestorableAllocator<A>>
   public V newDurableObjectRecord(long size) {
     V ret = null;
     DurableSinglyLinkedList<V> nv = null;
+    if (null == m_act) {
+      if (!initNextPool()) {
+        throw new ConfigurationException("init next pool failure");
+      }
+    }
     try {
       nv = createDurableNode();
       ret = createDurableObjectRecord(size);
@@ -146,6 +152,8 @@ public abstract class DurableOutputSession<V, A extends RestorableAllocator<A>>
             ret = null;
           }
         }
+      } else {
+        throw new ConfigurationException("try to init new next pool failure");
       }
     }
     if (null != ret && null != nv) {
@@ -172,6 +180,11 @@ public abstract class DurableOutputSession<V, A extends RestorableAllocator<A>>
   @Override
   public void post(V v) {
     DurableSinglyLinkedList<V> nv = null;
+    if (null == m_act) {
+      if (!initNextPool()) {
+        throw new ConfigurationException("init next pool failure in post");
+      }
+    }
     if (null == v) {
       return;
     }
@@ -227,6 +240,7 @@ public abstract class DurableOutputSession<V, A extends RestorableAllocator<A>>
     if (null != m_act) {
       destroyAllPendingRecords();
       m_act.close();
+      m_act = null;
     }
   }
 

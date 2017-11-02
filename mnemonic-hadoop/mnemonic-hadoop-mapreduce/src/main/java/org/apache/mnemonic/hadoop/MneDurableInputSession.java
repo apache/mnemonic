@@ -38,7 +38,7 @@ import org.apache.mnemonic.sessions.DurableInputSession;
 import org.apache.mnemonic.sessions.SessionIterator;
 
 public class MneDurableInputSession<V>
-    extends DurableInputSession<V, NonVolatileMemAllocator> {
+    extends DurableInputSession<V, NonVolatileMemAllocator, Void, Void> {
 
   private TaskAttemptContext taskAttemptContext;
   private Configuration configuration;
@@ -95,7 +95,12 @@ public class MneDurableInputSession<V>
   }
 
   @Override
-  protected boolean initNextPool(SessionIterator<V, NonVolatileMemAllocator> sessiter) {
+  protected boolean init(SessionIterator<V, NonVolatileMemAllocator, Void, Void> sessiter) {
+    return true;
+  }
+
+  @Override
+  protected boolean initNextPool(SessionIterator<V, NonVolatileMemAllocator, Void, Void> sessiter) {
     boolean ret = false;
     if (sessiter.getAllocator() != null) {
       sessiter.getAllocator().close();

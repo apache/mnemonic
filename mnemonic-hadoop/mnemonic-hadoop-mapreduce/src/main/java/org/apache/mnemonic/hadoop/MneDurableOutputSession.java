@@ -56,7 +56,6 @@ public class MneDurableOutputSession<V>
 
   public void initialize(String prefix) {
     readConfig(prefix);
-    initNextPool();
   }
 
   public void validateConfig() {

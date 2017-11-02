@@ -17,10 +17,10 @@
 
 package org.apache.mnemonic.spark
 
-import java.io.File
-import scala.reflect.{ classTag, ClassTag }
-import scala.collection.mutable.ArrayBuffer
+import java.io.{File, FileOutputStream}
 
+import scala.reflect.{ClassTag, classTag}
+import scala.collection.mutable.ArrayBuffer
 import org.apache.mnemonic.ConfigurationException
 import org.apache.mnemonic.DurableType
 import org.apache.mnemonic.EntityFactoryProxy
@@ -42,27 +42,17 @@ private[spark] class MneDurableOutputSession[V: ClassTag] (
 
   val memPools: ArrayBuffer[File] = new ArrayBuffer[File]
   private var _outidx: Long = 0L
+  var lockFile: File = null
 
-  initialize(serviceName, durableTypes, entityFactoryProxies,
-      slotKeyId, partitionPoolSize, durableDirectory, outputMemFileNameGen)
+  initialize
 
-  def initialize(
-    serviceName: String,
-    durableTypes: Array[DurableType],
-    entityFactoryProxies: Array[EntityFactoryProxy],
-    slotKeyId: Long,
-    partitionPoolSize: Long,
-    durableDirectory: String,
-    outputMemFileNameGen: (Long)=>String) {
+  def initialize: Unit = {
     setServiceName(serviceName)
     setDurableTypes(durableTypes)
     setEntityFactoryProxies(entityFactoryProxies)
     setSlotKeyId(slotKeyId)
     setPoolSize(partitionPoolSize)
-    m_recparmpair = Utils.shiftDurableParams(getDurableTypes, getEntityFactoryProxies, 1);
-    if (!initNextPool) {
-      throw new DurableException("Firstly init next pool failed")
-    }
+    m_recparmpair = Utils.shiftDurableParams(getDurableTypes, getEntityFactoryProxies, 1)
   }
 
   protected def genNextPoolFile(): File = {
@@ -72,23 +62,50 @@ private[spark] class MneDurableOutputSession[V: ClassTag] (
     file
   }
 
-  override def initNextPool(): Boolean = {
-    var ret: Boolean = false
-    if (null != getAllocator) {
-      getAllocator.close()
-      setAllocator(null)
-    }
-    val outputFile = genNextPoolFile
+  def tryLockPart(outputFile: File): File = {
     if (outputFile.exists) {
       throw new DurableException(s"Durable memory file already exists ${outputFile}")
     }
-    m_act = new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService(getServiceName),
-      getPoolSize, outputFile.toString, true);
-    if (null != getAllocator) {
-      m_newpool = true;
+    val lckf = new File(outputFile.toString + ".lck")
+    if (lckf.exists) {
+      throw new DurableException(s"${outputFile.toString} has been exclusively locked by another process")
+    }
+    new FileOutputStream(lckf).close
+    lckf
+  }
+
+  override def initNextPool(): Boolean = {
+    var ret: Boolean = false
+    val outputFile = genNextPoolFile
+    val lckf = tryLockPart(outputFile)
+    clear
+    lockFile = lckf
+    val act = new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService(getServiceName),
+      getPoolSize, outputFile.toString, true)
+    if (null != act) {
+      setAllocator(act)
+      m_newpool = true
       ret = true
+    } else {
+      throw new DurableException(s"${outputFile.toString} cannot be opened by allocator")
     }
     ret
+  }
+
+  def clear(): Unit = {
+    if (null != getAllocator) {
+      getAllocator.close
+      setAllocator(null)
+    }
+    if (null != lockFile) {
+      lockFile.delete
+      lockFile = null
+    }
+  }
+
+  override def close: Unit = {
+    clear
+    super.close
   }
 
 }

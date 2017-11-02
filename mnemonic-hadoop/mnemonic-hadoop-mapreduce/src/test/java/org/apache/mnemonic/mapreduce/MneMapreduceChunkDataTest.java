@@ -231,7 +231,7 @@ public class MneMapreduceChunkDataTest {
     MneDurableInputSession<DurableChunk<?>> m_session =
         new MneDurableInputSession<DurableChunk<?>>(m_tacontext, null,
         paths.toArray(new Path[0]), MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX);
-    SessionIterator<DurableChunk<?>, ?> m_iter = m_session.iterator();
+    SessionIterator<DurableChunk<?>, ?, Void, Void> m_iter = m_session.iterator();
     DurableChunk<?> val = null;
     while (m_iter.hasNext()) {
       val = m_iter.next();

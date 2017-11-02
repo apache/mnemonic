@@ -44,6 +44,7 @@ private[spark] class DurableRDD[D: ClassTag, T: ClassTag] (
   preservesPartitioning: Boolean = false)
     extends RDD[D](_sc, deps) {
 
+  private var inSess: MneDurableInputSession[D, _] = null
   private val isInputOnly =  Nil == deps
 
   private var durdddir:String = _
@@ -74,27 +75,44 @@ private[spark] class DurableRDD[D: ClassTag, T: ClassTag] (
     }
   }
 
-  override def compute(split: Partition, context: TaskContext): Iterator[D] = {
-    val mempListOpt: Option[Array[File]] =
-      DurableRDD.collectMemPoolFileList(durdddir, DurableRDD.genDurableFileName(context.partitionId)_)
-    val memplist = mempListOpt match {
-      case None => {
-        if (isInputOnly) {
-          logWarning(s"Not found any mem pool files related to the partition #${context.partitionId}")
-          Array[File]()
-        } else {
-          val mplst = DurableRDD.prepareDurablePartition[D, T](durdddir,
-            serviceName, durableTypes, entityFactoryProxies, slotKeyId,
-            partitionPoolSize, f)(context, firstParent[T].iterator(split, context))
-          logInfo(s"Done transformed RDD #${firstParent[T].id} to durableRDD #${id} on ${durdddir}")
-          mplst
-        }
-      }
-      case Some(mplst) => mplst
+  override def compute(split: Partition, context: TaskContext): InterruptibleIterator[D] = {
+    context.addTaskCompletionListener { context =>
+      logInfo(s"Task of #${context.partitionId} completion")
+      close
     }
-    val insess = MneDurableInputSession[D](serviceName,
-        durableTypes, entityFactoryProxies, slotKeyId, memplist)
-    insess.iterator.asScala
+
+    val mempoollistgen = ()=>DurableRDD.collectMemPoolFileList(durdddir,
+                                        DurableRDD.genDurableFileName(context.partitionId)_)
+    val insess = if (isInputOnly) {
+      logInfo(s"Input only #${context.partitionId}")
+      updateInputSession(MneDurableInputSession[D](
+        serviceName, durableTypes, entityFactoryProxies, slotKeyId, mempoollistgen ))
+    } else {
+      logInfo(s"Starting transform RDD #${firstParent[T].id}_${split.index} to durableRDD #${id} on ${durdddir}")
+      val outsess = MneDurableOutputSession[D](serviceName,
+        durableTypes, entityFactoryProxies, slotKeyId,
+        partitionPoolSize, durdddir,
+        DurableRDD.genDurableFileName(context.partitionId)_)
+      val ins = MneDurableInputSession[D, T](serviceName, durableTypes, entityFactoryProxies,
+        slotKeyId, mempoollistgen,
+        outsess, firstParent[T].iterator(split, context), f,
+        new File(durdddir, DurableRDD.durablePartClaimFileNameTemplate.format(context.partitionId)))
+      //insess.transformAhead
+      updateInputSession(ins)
+    }
+    new InterruptibleIterator(context, insess.iterator.asScala)
+  }
+
+  def updateInputSession(insess: MneDurableInputSession[D, _]): MneDurableInputSession[D, _] = {
+    if (null != inSess) {
+      inSess.close
+    }
+    inSess = insess
+    inSess
+  }
+
+  def close: Unit = {
+    updateInputSession(null)
   }
 
   override def clearDependencies {
@@ -114,9 +132,14 @@ object DurableRDD {
 
   val durableSubDirNameTemplate = "durable-rdd-%010d"
   val durableFileNameTemplate = "mem_%010d_%010d.mne"
+  val durablePartClaimFileNameTemplate = "claim_%010d"
   val durableFileNamePartitionRegex = raw".*mem_(\d{10})_0000000000.mne".r
 
   private var durableDir: Option[String] = None
+
+  def genDurableFileName(splitId: Long)(mempidx: Long): String = {
+    durableFileNameTemplate.format(splitId, mempidx)
+  }
 
   def getDefaultDurableBaseDir(sc: SparkContext): String = {
     try {
@@ -168,10 +191,6 @@ object DurableRDD {
     if (dir.exists) {
       FileUtils.deleteDirectory(dir)
     }
-  }
-
-  def genDurableFileName(splitId: Long)(mempidx: Long): String = {
-    durableFileNameTemplate.format(splitId, mempidx)
   }
 
   def collectMemPoolPartitionList(path: String): Option[Array[Partition]] = {
