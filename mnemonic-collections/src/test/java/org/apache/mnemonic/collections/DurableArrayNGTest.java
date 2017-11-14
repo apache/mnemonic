@@ -355,7 +355,7 @@ public class DurableArrayNGTest {
     int val = rand.nextInt();
     int capacity = 10;
     DurableType gtypes[] = {DurableType.INTEGER};
-    DurableSinglyLinkedList<Integer> plln = DurableSinglyLinkedListFactory.create(m_act, null, gtypes, false);
+    SinglyLinkedNode<Integer> plln = SinglyLinkedNodeFactory.create(m_act, null, gtypes, false);
     plln.setItem(val, true);
 
     DurableType arraytypes[] = {DurableType.DURABLE, DurableType.INTEGER};
@@ -364,13 +364,13 @@ public class DurableArrayNGTest {
       public <A extends RestorableAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
           DurableType[] gfields, long phandler, boolean autoreclaim) {
         Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, 1);
-        return DurableSinglyLinkedListFactory.restore(allocator, dpt.getRight(), dpt.getLeft(), phandler, autoreclaim);
+        return SinglyLinkedNodeFactory.restore(allocator, dpt.getRight(), dpt.getLeft(), phandler, autoreclaim);
       }
       @Override
       public <A extends RestorableAllocator<A>> Durable restore(ParameterHolder<A> ph) {
         Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(ph.getGenericTypes(),
             ph.getEntityFactoryProxies(), 1);
-        return DurableSinglyLinkedListFactory.restore(ph.getAllocator(),
+        return SinglyLinkedNodeFactory.restore(ph.getAllocator(),
             dpt.getRight(), dpt.getLeft(), ph.getHandler(), ph.getAutoReclaim());
       }
       @Override
@@ -378,18 +378,18 @@ public class DurableArrayNGTest {
           A allocator, EntityFactoryProxy[] factoryproxys,
           DurableType[] gfields, boolean autoreclaim) {
         Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, 1);
-        return DurableSinglyLinkedListFactory.create(allocator, dpt.getRight(), dpt.getLeft(), autoreclaim);
+        return SinglyLinkedNodeFactory.create(allocator, dpt.getRight(), dpt.getLeft(), autoreclaim);
       }
       @Override     
       public <A extends RestorableAllocator<A>> Durable create(ParameterHolder<A> ph) {
         Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(ph.getGenericTypes(),
             ph.getEntityFactoryProxies(), 1);
-        return DurableSinglyLinkedListFactory.create(ph.getAllocator(),
+        return SinglyLinkedNodeFactory.create(ph.getAllocator(),
             dpt.getRight(), dpt.getLeft(), ph.getAutoReclaim());
       }
     }
     };
-    DurableArray<DurableSinglyLinkedList<Integer>> array = DurableArrayFactory.create(m_act, arrayproxies,
+    DurableArray<SinglyLinkedNode<Integer>> array = DurableArrayFactory.create(m_act, arrayproxies,
                                         arraytypes, capacity, false);
 
     int index = rand.nextInt(capacity);
@@ -397,7 +397,7 @@ public class DurableArrayNGTest {
     array.set(index, plln);
 
     Assert.assertEquals(array.get(index).getItem().intValue(), val);
-    DurableArray<DurableSinglyLinkedList<Integer>> restoredArray = DurableArrayFactory.restore(m_act, arrayproxies,
+    DurableArray<SinglyLinkedNode<Integer>> restoredArray = DurableArrayFactory.restore(m_act, arrayproxies,
                                         arraytypes, handler, false);
     Assert.assertEquals(restoredArray.get(index).getItem().intValue(), val);
     restoredArray.destroy();

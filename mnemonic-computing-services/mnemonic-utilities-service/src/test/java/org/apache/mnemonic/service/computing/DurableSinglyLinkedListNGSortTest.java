@@ -34,6 +34,8 @@ import org.apache.mnemonic.DurableType;
 import org.apache.mnemonic.ParameterHolder;
 import org.apache.mnemonic.collections.DurableSinglyLinkedList;
 import org.apache.mnemonic.collections.DurableSinglyLinkedListFactory;
+import org.apache.mnemonic.collections.SinglyLinkedNode;
+import org.apache.mnemonic.collections.SinglyLinkedNodeFactory;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -99,14 +101,14 @@ public class DurableSinglyLinkedListNGSortTest {
       }
     } };
 
-    DurableSinglyLinkedList<Person<Long>> firstnv = DurableSinglyLinkedListFactory.create(m_act, listefproxies, 
+    SinglyLinkedNode<Person<Long>> firstnv = SinglyLinkedNodeFactory.create(m_act, listefproxies,
         listgftypes, false);
 
-    DurableSinglyLinkedList<Person<Long>> nextnv = firstnv;
+    SinglyLinkedNode<Person<Long>> nextnv = firstnv;
 
     Person<Long> person = null;
     long val;
-    DurableSinglyLinkedList<Person<Long>> newnv;
+    SinglyLinkedNode<Person<Long>> newnv;
     for (int i = 0; i < elem_count; ++i) {
       person = (Person<Long>) listefproxies[0].create(m_act, null, null, false);
       person.setAge((short) m_rand.nextInt(50));
@@ -115,13 +117,13 @@ public class DurableSinglyLinkedListNGSortTest {
       if (i + 1 == elem_count) {
         break;
       }
-      newnv = DurableSinglyLinkedListFactory.create(m_act, listefproxies, listgftypes, false);
+      newnv = SinglyLinkedNodeFactory.create(m_act, listefproxies, listgftypes, false);
       nextnv.setNext(newnv, false);
       nextnv = newnv;
     }
 
     Person<Long> eval;
-    DurableSinglyLinkedList<Person<Long>> iternv = firstnv;
+    SinglyLinkedNode<Person<Long>> iternv = firstnv;
     System.out.printf(" --- Stage 1 Generated---\n");
     long agesum1 = 0L;
     while (null != iternv) {
@@ -135,12 +137,12 @@ public class DurableSinglyLinkedListNGSortTest {
 
     long handler = firstnv.getHandler();
 
-    DurableSinglyLinkedList<Person<Long>> firstnv2 = DurableSinglyLinkedListFactory.restore(m_act, listefproxies, 
+    DurableSinglyLinkedList<Person<Long>> list2 = DurableSinglyLinkedListFactory.restore(m_act, listefproxies,
         listgftypes, handler, false);
 
     System.out.printf("--- Stage 2 Restored--- \n");
     long agesum2 = 0L;
-    for (Person<Long> eval2 : firstnv2) {
+    for (Person<Long> eval2 : list2) {
       Assert.assertNotNull(eval2);
       eval2.testOutputAge();
       agesum2 += eval2.getAge();
@@ -165,13 +167,13 @@ public class DurableSinglyLinkedListNGSortTest {
     long handler2 = ret[0];
     Assert.assertNotEquals(0L, handler2);
 
-    DurableSinglyLinkedList<Person<Long>> firstnv3 = DurableSinglyLinkedListFactory.restore(m_act, listefproxies, 
+    DurableSinglyLinkedList<Person<Long>> list3 = DurableSinglyLinkedListFactory.restore(m_act, listefproxies,
         listgftypes, handler2, false);
 
     System.out.printf("--- Stage 3 Sorted--- \n");
     long agesum3 = 0L;
     int preage = -1;
-    for (Person<Long> eval3 : firstnv3) {
+    for (Person<Long> eval3 : list3) {
       Assert.assertNotNull(eval3);
       eval3.testOutputAge();
       agesum3 += eval3.getAge();
@@ -187,6 +189,7 @@ public class DurableSinglyLinkedListNGSortTest {
   @Test(enabled = true)
   public void testDurableSinglyLinkedListValue() {
 
+    long[][] fieldinfo = null;
     int elem_count = 20;
     long slotKeyId = 10;
 
@@ -199,6 +202,37 @@ public class DurableSinglyLinkedListNGSortTest {
       public <A extends RestorableAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
           DurableType[] gfields, long phandler, boolean autoreclaim) {
         Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, 1);
+        return SinglyLinkedNodeFactory.restore(allocator, dpt.getRight(), dpt.getLeft(), phandler, autoreclaim);
+      }
+      @Override
+      public <A extends RestorableAllocator<A>> Durable restore(ParameterHolder<A> ph) {
+        Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(ph.getGenericTypes(),
+                ph.getEntityFactoryProxies(), 1);
+        return SinglyLinkedNodeFactory.restore(ph.getAllocator(),
+                dpt.getRight(), dpt.getLeft(), ph.getHandler(), ph.getAutoReclaim());
+      }
+      @Override
+      public <A extends RestorableAllocator<A>> Durable create(A allocator, EntityFactoryProxy[] factoryproxys,
+          DurableType[] gfields, boolean autoreclaim) {
+        Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, 1);
+        return SinglyLinkedNodeFactory.create(allocator, dpt.getRight(), dpt.getLeft(), autoreclaim);
+      }
+      @Override
+      public <A extends RestorableAllocator<A>> Durable create(ParameterHolder<A> ph) {
+        Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(ph.getGenericTypes(),
+                ph.getEntityFactoryProxies(), 1);
+        return SinglyLinkedNodeFactory.create(ph.getAllocator(),
+                dpt.getRight(), dpt.getLeft(), ph.getAutoReclaim());
+      }
+    } };
+
+    DurableType listgftypes[] = {DurableType.DURABLE, DurableType.DOUBLE};
+    EntityFactoryProxy listefproxies[] = {new EntityFactoryProxy() {
+      @Override
+      public <A extends RestorableAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
+                                                                DurableType[] gfields,
+                                                                long phandler, boolean autoreclaim) {
+        Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, 1);
         return DurableSinglyLinkedListFactory.restore(allocator, dpt.getRight(), dpt.getLeft(), phandler, autoreclaim);
       }
       @Override
@@ -210,7 +244,7 @@ public class DurableSinglyLinkedListNGSortTest {
       }
       @Override
       public <A extends RestorableAllocator<A>> Durable create(A allocator, EntityFactoryProxy[] factoryproxys,
-          DurableType[] gfields, boolean autoreclaim) {
+                                                               DurableType[] gfields, boolean autoreclaim) {
         Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, 1);
         return DurableSinglyLinkedListFactory.create(allocator, dpt.getRight(), dpt.getLeft(), autoreclaim);
       }
@@ -223,8 +257,8 @@ public class DurableSinglyLinkedListNGSortTest {
       }
     } };
 
-    DurableSinglyLinkedList<DurableSinglyLinkedList<Double>> nextnv = null, pre_nextnv = null;
-    DurableSinglyLinkedList<Double> elem = null, pre_elem = null, first_elem = null;
+    SinglyLinkedNode<SinglyLinkedNode<Double>> nextnv = null, pre_nextnv = null;
+    SinglyLinkedNode<Double> elem = null, pre_elem = null, first_elem = null;
 
     Long linkhandler = 0L;
 
@@ -237,7 +271,7 @@ public class DurableSinglyLinkedListNGSortTest {
       first_elem = null;
       pre_elem = null;
       for (int v = 0; v < 12; ++v) {
-        elem = DurableSinglyLinkedListFactory.create(m_act, elem_efproxies, elem_gftypes, false);
+        elem = SinglyLinkedNodeFactory.create(m_act, elem_efproxies, elem_gftypes, false);
         val = m_rand.nextDouble();
         elem.setItem(val, false);
         if (null == pre_elem) {
@@ -250,10 +284,11 @@ public class DurableSinglyLinkedListNGSortTest {
         valsum1 += val;
       }
 
-      nextnv = DurableSinglyLinkedListFactory.create(m_act, linkedefproxies, linkedgftypes, false);
+      nextnv = SinglyLinkedNodeFactory.create(m_act, linkedefproxies, linkedgftypes, false);
       nextnv.setItem(first_elem, false);
       if (null == pre_nextnv) {
         linkhandler = nextnv.getHandler();
+        fieldinfo = nextnv.getNativeFieldInfo();
       } else {
         pre_nextnv.setNext(nextnv, false);
       }
@@ -265,7 +300,7 @@ public class DurableSinglyLinkedListNGSortTest {
     long handler = m_act.getHandler(slotKeyId);
 
     DurableSinglyLinkedList<DurableSinglyLinkedList<Double>> linkedvals = DurableSinglyLinkedListFactory.restore(m_act,
-        linkedefproxies, linkedgftypes, handler, false);
+        listefproxies, listgftypes, handler, false);
     Iterator<DurableSinglyLinkedList<Double>> iter = linkedvals.iterator();
     Iterator<Double> elemiter = null;
 
@@ -285,8 +320,8 @@ public class DurableSinglyLinkedListNGSortTest {
     GeneralComputingService gcsvr = Utils.getGeneralComputingService("sort");
     ValueInfo vinfo = new ValueInfo();
     List<long[][]> objstack = new ArrayList<long[][]>();
-    objstack.add(linkedvals.getNativeFieldInfo());
-    objstack.add(linkedvals.getNativeFieldInfo());
+    objstack.add(fieldinfo);
+    objstack.add(fieldinfo);
     long[][] fidinfostack = {{2L, 1L}, {2L, 1L}};
     vinfo.handler = handler;
     vinfo.transtable = m_act.getTranslateTable();
@@ -297,7 +332,7 @@ public class DurableSinglyLinkedListNGSortTest {
 
     // Assert.assert, expected);(plist, plist2);
     DurableSinglyLinkedList<DurableSinglyLinkedList<Double>> linkedvals3 = DurableSinglyLinkedListFactory.restore(m_act,
-        linkedefproxies, linkedgftypes, handler, false);
+        listefproxies, listgftypes, handler, false);
     Iterator<DurableSinglyLinkedList<Double>> iter3 = linkedvals3.iterator();
     Iterator<Double> elemiter3 = null;
 

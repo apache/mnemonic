@@ -84,11 +84,11 @@ public class DurableSinglyLinkedListNGTest {
   public void testSingleNodeValueWithInteger() {
     int val = m_rand.nextInt();
     DurableType gtypes[] = {DurableType.INTEGER};
-    DurableSinglyLinkedList<Integer> plln = DurableSinglyLinkedListFactory.create(m_act, null, gtypes, false);
+    SinglyLinkedNode<Integer> plln = SinglyLinkedNodeFactory.create(m_act, null, gtypes, false);
     plln.setItem(val, false);
     Long handler = plln.getHandler();
     System.err.println("-------------Start to Restore Integer -----------");
-    DurableSinglyLinkedList<Integer> plln2 = DurableSinglyLinkedListFactory.restore(m_act, null, gtypes, handler, 
+    SinglyLinkedNode<Integer> plln2 = SinglyLinkedNodeFactory.restore(m_act, null, gtypes, handler, 
         false);
     AssertJUnit.assertEquals(val, (int) plln2.getItem());
   }
@@ -97,11 +97,11 @@ public class DurableSinglyLinkedListNGTest {
   public void testNodeValueWithString() {
     String val = Utils.genRandomString();
     DurableType gtypes[] = {DurableType.STRING};
-    DurableSinglyLinkedList<String> plln = DurableSinglyLinkedListFactory.create(m_act, null, gtypes, false);
+    SinglyLinkedNode<String> plln = SinglyLinkedNodeFactory.create(m_act, null, gtypes, false);
     plln.setItem(val, false);
     Long handler = plln.getHandler();
     System.err.println("-------------Start to Restore String-----------");
-    DurableSinglyLinkedList<String> plln2 = DurableSinglyLinkedListFactory.restore(m_act, null, gtypes, handler, 
+    SinglyLinkedNode<String> plln2 = SinglyLinkedNodeFactory.restore(m_act, null, gtypes, handler, 
         false);
     AssertJUnit.assertEquals(val, plln2.getItem());
   }
@@ -139,11 +139,11 @@ public class DurableSinglyLinkedListNGTest {
     Person<Long> person =  (Person<Long>) efproxies[0].create(m_act, null, null, false);
     person.setAge((short) 31);
 
-    DurableSinglyLinkedList<Person<Long>> plln = DurableSinglyLinkedListFactory.create(m_act, efproxies, gtypes, false);
+    SinglyLinkedNode<Person<Long>> plln = SinglyLinkedNodeFactory.create(m_act, efproxies, gtypes, false);
     plln.setItem(person, false);
     Long handler = plln.getHandler();
 
-    DurableSinglyLinkedList<Person<Long>> plln2 = DurableSinglyLinkedListFactory.restore(m_act, efproxies, gtypes, 
+    SinglyLinkedNode<Person<Long>> plln2 = SinglyLinkedNodeFactory.restore(m_act, efproxies, gtypes, 
         handler, false);
     AssertJUnit.assertEquals(31, (int) plln2.getItem().getAge());
 
@@ -182,26 +182,28 @@ public class DurableSinglyLinkedListNGTest {
       }
     } };
 
-    DurableSinglyLinkedList<Person<Long>> firstnv = DurableSinglyLinkedListFactory.create(m_act, listefproxies, 
-        listgftypes, false);
+    DurableSinglyLinkedList<Person<Long>> list = DurableSinglyLinkedListFactory.create(m_act, listefproxies,
+            listgftypes, false);
 
-    DurableSinglyLinkedList<Person<Long>> nextnv = firstnv;
+    SinglyLinkedNode<Person<Long>> firstnv = list.createNode();
+
+    SinglyLinkedNode<Person<Long>> nextnv = firstnv;
 
     Person<Long> person;
     long val;
-    DurableSinglyLinkedList<Person<Long>> newnv;
+    SinglyLinkedNode<Person<Long>> newnv;
     for (int i = 0; i < elem_count; ++i) {
       person = (Person<Long>) listefproxies[0].create(m_act, null, null, false);
       person.setAge((short) m_rand.nextInt(50));
       person.setName(String.format("Name: [%s]", Utils.genRandomString()), true);
       nextnv.setItem(person, false);
-      newnv = DurableSinglyLinkedListFactory.create(m_act, listefproxies, listgftypes, false);
+      newnv = SinglyLinkedNodeFactory.create(m_act, listefproxies, listgftypes, false);
       nextnv.setNext(newnv, false);
       nextnv = newnv;
     }
 
     Person<Long> eval;
-    DurableSinglyLinkedList<Person<Long>> iternv = firstnv;
+    SinglyLinkedNode<Person<Long>> iternv = firstnv;
     while (null != iternv) {
       System.out.printf(" Stage 1 --->\n");
       eval = iternv.getItem();
@@ -213,10 +215,10 @@ public class DurableSinglyLinkedListNGTest {
 
     long handler = firstnv.getHandler();
 
-    DurableSinglyLinkedList<Person<Long>> firstnv2 = DurableSinglyLinkedListFactory.restore(m_act, listefproxies, 
+    DurableSinglyLinkedList<Person<Long>> list2 = DurableSinglyLinkedListFactory.restore(m_act, listefproxies,
         listgftypes, handler, false);
 
-    for (Person<Long> eval2 : firstnv2) {
+    for (Person<Long> eval2 : list2) {
       System.out.printf(" Stage 2 ---> \n");
       if (null != eval2) {
         eval2.testOutput();
@@ -242,6 +244,38 @@ public class DurableSinglyLinkedListNGTest {
       public <A extends RestorableAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
           DurableType[] gfields, long phandler, boolean autoreclaim) {
         Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, 1);
+        return SinglyLinkedNodeFactory.restore(allocator, dpt.getRight(), dpt.getLeft(), phandler, autoreclaim);
+      }
+      @Override
+      public <A extends RestorableAllocator<A>> Durable restore(ParameterHolder<A> ph) {
+        Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(ph.getGenericTypes(),
+                ph.getEntityFactoryProxies(), 1);
+        return SinglyLinkedNodeFactory.restore(ph.getAllocator(),
+                dpt.getRight(), dpt.getLeft(), ph.getHandler(), ph.getAutoReclaim());
+      }
+      @Override
+      public <A extends RestorableAllocator<A>> Durable create(
+          A allocator, EntityFactoryProxy[] factoryproxys,
+          DurableType[] gfields, boolean autoreclaim) {
+        Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, 1);
+        return SinglyLinkedNodeFactory.create(allocator, dpt.getRight(), dpt.getLeft(), autoreclaim);
+      }
+      @Override
+      public <A extends RestorableAllocator<A>> Durable create(ParameterHolder<A> ph) {
+        Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(ph.getGenericTypes(),
+                ph.getEntityFactoryProxies(), 1);
+        return SinglyLinkedNodeFactory.create(ph.getAllocator(),
+                dpt.getRight(), dpt.getLeft(), ph.getAutoReclaim());
+      }
+    } };
+
+    DurableType listgftypes[] = {DurableType.DURABLE, DurableType.DOUBLE};
+    EntityFactoryProxy listefproxies[] = {new EntityFactoryProxy() {
+      @Override
+      public <A extends RestorableAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
+                                                                DurableType[] gfields,
+                                                                long phandler, boolean autoreclaim) {
+        Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, 1);
         return DurableSinglyLinkedListFactory.restore(allocator, dpt.getRight(), dpt.getLeft(), phandler, autoreclaim);
       }
       @Override
@@ -253,8 +287,8 @@ public class DurableSinglyLinkedListNGTest {
       }
       @Override
       public <A extends RestorableAllocator<A>> Durable create(
-          A allocator, EntityFactoryProxy[] factoryproxys,
-          DurableType[] gfields, boolean autoreclaim) {
+              A allocator, EntityFactoryProxy[] factoryproxys,
+              DurableType[] gfields, boolean autoreclaim) {
         Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, 1);
         return DurableSinglyLinkedListFactory.create(allocator, dpt.getRight(), dpt.getLeft(), autoreclaim);
       }
@@ -267,8 +301,8 @@ public class DurableSinglyLinkedListNGTest {
       }
     } };
 
-    DurableSinglyLinkedList<DurableSinglyLinkedList<Double>> nextnv = null, pre_nextnv = null;
-    DurableSinglyLinkedList<Double> elem = null, pre_elem = null, first_elem = null;
+    SinglyLinkedNode<SinglyLinkedNode<Double>> nextnv = null, pre_nextnv = null;
+    SinglyLinkedNode<Double> elem = null, pre_elem = null, first_elem = null;
 
     Long linkhandler = 0L;
 
@@ -280,7 +314,7 @@ public class DurableSinglyLinkedListNGTest {
       first_elem = null;
       pre_elem = null;
       for (int v = 0; v < 3; ++v) {
-        elem = DurableSinglyLinkedListFactory.create(m_act, elem_efproxies, elem_gftypes, false);
+        elem = SinglyLinkedNodeFactory.create(m_act, elem_efproxies, elem_gftypes, false);
         val = m_rand.nextDouble();
         elem.setItem(val, false);
         if (null == pre_elem) {
@@ -292,7 +326,7 @@ public class DurableSinglyLinkedListNGTest {
         System.out.printf("%f ", val);
       }
 
-      nextnv = DurableSinglyLinkedListFactory.create(m_act, linkedefproxies, linkedgftypes, false);
+      nextnv = SinglyLinkedNodeFactory.create(m_act, linkedefproxies, linkedgftypes, false);
       nextnv.setItem(first_elem, false);
       if (null == pre_nextnv) {
         linkhandler = nextnv.getHandler();
@@ -307,13 +341,16 @@ public class DurableSinglyLinkedListNGTest {
     long handler = m_act.getHandler(slotKeyId);
 
     DurableSinglyLinkedList<DurableSinglyLinkedList<Double>> linkedvals = DurableSinglyLinkedListFactory.restore(m_act,
-        linkedefproxies, linkedgftypes, handler, false);
+            listefproxies, listgftypes, handler, false);
+
+
     Iterator<DurableSinglyLinkedList<Double>> iter = linkedvals.iterator();
     Iterator<Double> elemiter = null;
 
     System.out.printf(" Stage 2 -testLinkedNodeValueWithLinkedNodeValue--> \n");
     while (iter.hasNext()) {
-      elemiter = iter.next().iterator();
+      DurableSinglyLinkedList<Double> innerlist = iter.next();
+      elemiter = innerlist.iterator();
       while (elemiter.hasNext()) {
         System.out.printf("%f ", elemiter.next());
       }

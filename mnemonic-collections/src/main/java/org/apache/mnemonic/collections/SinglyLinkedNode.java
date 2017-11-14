@@ -17,23 +17,22 @@
 
 package org.apache.mnemonic.collections;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-
 import org.apache.mnemonic.Durable;
 import org.apache.mnemonic.EntityFactoryProxy;
 import org.apache.mnemonic.DurableType;
+import org.apache.mnemonic.DurableEntity;
+import org.apache.mnemonic.DurableGetter;
+import org.apache.mnemonic.DurableSetter;
 
 /**
  * this class defines a non-volatile node for a generic value to form a
  * unidirectional link
  *
  */
-public abstract class DurableSinglyLinkedList<E> implements Durable, Iterable<E> {
+@DurableEntity
+public abstract class SinglyLinkedNode<E> implements Durable {
   protected transient EntityFactoryProxy[] m_node_efproxies;
   protected transient DurableType[] m_node_gftypes;
-  protected long pheadhandler = 0L;
-  protected SinglyLinkedNode<E> m_cur_node;
 
   /**
    * creation callback for initialization
@@ -70,89 +69,46 @@ public abstract class DurableSinglyLinkedList<E> implements Durable, Iterable<E>
     m_node_gftypes = gftypes;
   }
 
-
-  public abstract SinglyLinkedNode<E> createNode();
+  /**
+   * get the item value of this node
+   *
+   * @return the item value of this node
+   */
+  @DurableGetter(Id = 1L, EntityFactoryProxies = "m_node_efproxies", GenericFieldTypes = "m_node_gftypes")
+  public abstract E getItem();
 
   /**
-   * get current node
+   * set a value to this node item
    *
-   * @return the current node
+   * @param value
+   *          the value to be set
+   *
+   * @param destroy
+   *          true if want to destroy exist one
    *
    */
-  public SinglyLinkedNode<E> getCurrentNode() {
-    return m_cur_node;
-  }
-
-  public abstract boolean forwardNode();
-
-  public abstract SinglyLinkedNode<E> getNode(long handler);
-
-  public abstract boolean addNode(SinglyLinkedNode<E> newnode);
-
-  public abstract boolean add(E item);
+  @DurableSetter
+  public abstract void setItem(E value, boolean destroy);
 
   /**
-   * can be used to release list chain
-   */
-  public void reset() {
-    m_cur_node = null;
-  }
-
-  public void setHeadHandler(long handler) {
-    pheadhandler = handler;
-  }
-
-  /**
-   * get an iterator instance of this list
+   * get next node
    *
-   * @return an iterator of this list
-   */
-  @Override
-  public Iterator<E> iterator() {
-    return new Intr();
-  }
-
-  /**
-   * this class defines a iterator for this non-volatile list
+   * @return the next node
    *
    */
-  private class Intr implements Iterator<E> {
+  @DurableGetter(Id = 2L, EntityFactoryProxies = "m_node_efproxies", GenericFieldTypes = "m_node_gftypes")
+  public abstract SinglyLinkedNode<E> getNext();
 
-    protected boolean gotNext = false;
-    protected SinglyLinkedNode<E> next = null;
+  /**
+   * set next node
+   *
+   * @param next
+   *          specify the next node
+   *
+   * @param destroy
+   *          true if want to destroy the exist node
+   */
+  @DurableSetter
+  public abstract void setNext(SinglyLinkedNode<E> next, boolean destroy);
 
-    /**
-     * determine the existing of next
-     *
-     * @return true if there is a next node
-     *
-     */
-    @Override
-    public boolean hasNext() {
-      if (!gotNext) {
-        if (null == next) {
-          next = getNode(pheadhandler);
-        } else {
-          next = next.getNext();
-        }
-        gotNext = true;
-      }
-      return null != next;
-    }
-
-    /**
-     * get next node
-     *
-     * @return the next node
-     */
-    @Override
-    public E next() {
-      if (!hasNext()) {
-        throw new NoSuchElementException("End of stream");
-      }
-      gotNext = false;
-      return next.getItem();
-    }
-
-  }
 }

@@ -26,6 +26,8 @@ import org.apache.mnemonic.OutOfHybridMemory;
 import org.apache.mnemonic.RestorableAllocator;
 import org.apache.mnemonic.collections.DurableSinglyLinkedList;
 import org.apache.mnemonic.collections.DurableSinglyLinkedListFactory;
+import org.apache.mnemonic.collections.SinglyLinkedNode;
+import org.apache.mnemonic.collections.SinglyLinkedNodeFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,12 +43,12 @@ public abstract class DurableOutputSession<V, A extends RestorableAllocator<A>>
   private EntityFactoryProxy[] entityFactoryProxies;
   private long slotKeyId;
 
-  protected Map<V, DurableSinglyLinkedList<V>> m_recordmap =
-      new HashMap<V, DurableSinglyLinkedList<V>>();
+  protected Map<V, SinglyLinkedNode<V>> m_recordmap =
+      new HashMap<V, SinglyLinkedNode<V>>();
   protected boolean m_newpool;
   protected long m_poolidx = 0L;
   protected Pair<DurableType[], EntityFactoryProxy[]> m_recparmpair;
-  protected DurableSinglyLinkedList<V> m_listnode;
+  protected DurableSinglyLinkedList<V> m_list;
   protected A m_act;
 
   /**
@@ -68,8 +70,8 @@ public abstract class DurableOutputSession<V, A extends RestorableAllocator<A>>
   @Override
   public long getHandler() {
     long ret = 0L;
-    if (null != m_listnode) {
-      m_listnode.getHandler();
+    if (null != m_list) {
+      m_list.getHandler();
     }
     return ret;
   }
@@ -120,7 +122,7 @@ public abstract class DurableOutputSession<V, A extends RestorableAllocator<A>>
   @Override
   public V newDurableObjectRecord(long size) {
     V ret = null;
-    DurableSinglyLinkedList<V> nv = null;
+    SinglyLinkedNode<V> nv = null;
     if (null == m_act) {
       if (!initNextPool()) {
         throw new ConfigurationException("init next pool failure");
@@ -171,15 +173,15 @@ public abstract class DurableOutputSession<V, A extends RestorableAllocator<A>>
     return ret;
   }
 
-  protected DurableSinglyLinkedList<V> createDurableNode() {
-    DurableSinglyLinkedList<V> ret = null;
-    ret = DurableSinglyLinkedListFactory.create(m_act, getEntityFactoryProxies(), getDurableTypes(), false);
+  protected SinglyLinkedNode<V> createDurableNode() {
+    SinglyLinkedNode<V> ret = null;
+    ret = SinglyLinkedNodeFactory.create(m_act, getEntityFactoryProxies(), getDurableTypes(), false);
     return ret;
   }
 
   @Override
   public void post(V v) {
-    DurableSinglyLinkedList<V> nv = null;
+    SinglyLinkedNode<V> nv = null;
     if (null == m_act) {
       if (!initNextPool()) {
         throw new ConfigurationException("init next pool failure in post");
@@ -214,10 +216,11 @@ public abstract class DurableOutputSession<V, A extends RestorableAllocator<A>>
     if (m_newpool) {
       m_act.setHandler(getSlotKeyId(), nv.getHandler());
       m_newpool = false;
-    } else {
-      m_listnode.setNext(nv, false);
+      m_list = DurableSinglyLinkedListFactory.create(
+              m_act, getEntityFactoryProxies(), getDurableTypes(), false);
     }
-    m_listnode = nv;
+    m_list.addNode(nv);
+    m_list.forwardNode();
   }
 
   @Override
