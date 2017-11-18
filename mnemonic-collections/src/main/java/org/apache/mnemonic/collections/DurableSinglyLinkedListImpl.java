@@ -129,6 +129,7 @@ public class DurableSinglyLinkedListImpl<A extends RestorableAllocator<A>, E>
 
   @Override
   public void destroy() throws RetrieveDurableEntityError {
+    getNode(pheadhandler).destroy();
   }
 
   @Override
@@ -139,6 +140,9 @@ public class DurableSinglyLinkedListImpl<A extends RestorableAllocator<A>, E>
   @Override
   public void cancelAutoReclaim() {
     autoReclaim = false;
+    if (null != getCurrentNode()) {
+      getCurrentNode().cancelAutoReclaim();
+    }
   }
 
   @Override
@@ -150,6 +154,9 @@ public class DurableSinglyLinkedListImpl<A extends RestorableAllocator<A>, E>
   public void registerAutoReclaim(ReclaimContext rctx) {
     autoReclaim = true;
     reclaimcontext = rctx;
+    if (null != getCurrentNode()) {
+      getCurrentNode().registerAutoReclaim(rctx);
+    }
   }
 
   @Override
