@@ -117,6 +117,7 @@ public class AnnotatedDurableEntityClass {
 
   private Map<String, List<MethodInfo>> m_durablemtdinfo = new HashMap<String, List<MethodInfo>>();
   private Map<String, MethodInfo> m_entitymtdinfo = new HashMap<String, MethodInfo>();
+  private Map<String, MethodInfo> m_extramtdinfo = new HashMap<String, MethodInfo>();
 
   private long computeTypeSize(TypeName tname) throws AnnotationProcessingException {
     long ret = 0L;
@@ -197,6 +198,8 @@ public class AnnotatedDurableEntityClass {
     m_entitymtdinfo.put("initializeDurableEntity", new MethodInfo());
     m_entitymtdinfo.put("createDurableEntity", new MethodInfo());
     m_entitymtdinfo.put("restoreDurableEntity", new MethodInfo());
+    
+    m_extramtdinfo.put("getNativeFieldInfo_static", new MethodInfo());
 
   }
 
@@ -355,7 +358,67 @@ public class AnnotatedDurableEntityClass {
         }
       }
     }
+
+    if (m_extramtdinfo.containsKey("getNativeFieldInfo_static")) {
+      methodinfo = m_extramtdinfo.get("getNativeFieldInfo_static");
+      assert null != methodinfo;
+      assert m_durablemtdinfo.containsKey("getNativeFieldInfo");
+      MethodInfo mi = m_durablemtdinfo.get("getNativeFieldInfo").get(0);
+      assert null != mi;
+      methodinfo.elem = mi.elem;
+      methodinfo.specbuilder = createFrom(mi.elem, "getNativeFieldInfo_static")
+              .addModifiers(Modifier.STATIC);
+    }
+
     genNFieldInfo();
+  }
+
+  public static Builder createFrom(ExecutableElement method, String methodName) {
+
+    Set<Modifier> modifiers = method.getModifiers();
+    if (modifiers.contains(Modifier.PRIVATE)
+            || modifiers.contains(Modifier.FINAL)
+            || modifiers.contains(Modifier.STATIC)) {
+      throw new IllegalArgumentException("cannot override method with modifiers: " + modifiers);
+    }
+
+    MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(methodName);
+
+    for (AnnotationMirror mirror : method.getAnnotationMirrors()) {
+      AnnotationSpec annotationSpec = AnnotationSpec.get(mirror);
+      methodBuilder.addAnnotation(annotationSpec);
+    }
+
+    modifiers = new LinkedHashSet<>(modifiers);
+    modifiers.remove(Modifier.ABSTRACT);
+    methodBuilder.addModifiers(modifiers);
+
+    for (TypeParameterElement typeParameterElement : method.getTypeParameters()) {
+      TypeVariable var = (TypeVariable) typeParameterElement.asType();
+      methodBuilder.addTypeVariable(TypeVariableName.get(var));
+    }
+
+    methodBuilder.returns(TypeName.get(method.getReturnType()));
+
+    List<? extends VariableElement> parameters = method.getParameters();
+    for (VariableElement parameter : parameters) {
+      TypeName type = TypeName.get(parameter.asType());
+      String name = parameter.getSimpleName().toString();
+      Set<Modifier> parameterModifiers = parameter.getModifiers();
+      ParameterSpec.Builder parameterBuilder = ParameterSpec.builder(type, name)
+              .addModifiers(parameterModifiers.toArray(new Modifier[parameterModifiers.size()]));
+      for (AnnotationMirror mirror : parameter.getAnnotationMirrors()) {
+        parameterBuilder.addAnnotation(AnnotationSpec.get(mirror));
+      }
+      methodBuilder.addParameter(parameterBuilder.build());
+    }
+    methodBuilder.varargs(method.isVarArgs());
+
+    for (TypeMirror thrownType : method.getThrownTypes()) {
+      methodBuilder.addException(TypeName.get(thrownType));
+    }
+
+    return methodBuilder;
   }
 
   protected String transTypeToUnsafeMethod(TypeName tname, boolean isget) throws AnnotationProcessingException {
@@ -885,6 +948,23 @@ public class AnnotatedDurableEntityClass {
     }
   }
 
+  protected void buildExtraMethodSpecs(TypeSpec.Builder typespecbuilder) throws AnnotationProcessingException {
+    MethodInfo methodinfo;
+    CodeBlock.Builder code;
+    for (String name : m_extramtdinfo.keySet()) {
+      methodinfo = m_extramtdinfo.get(name);
+      code = CodeBlock.builder();
+      switch (name) {
+        case "getNativeFieldInfo_static":
+          code.addStatement("return $1N", m_fieldsinfo.get("nfieldinfo").name);
+          break;
+        default:
+          throw new AnnotationProcessingException(null, "Method %s is not supported.", name);
+      }
+      typespecbuilder.addMethod(methodinfo.specbuilder.addCode(code.build()).build());
+    }
+  }
+
   protected void buildFieldSpecs(TypeSpec.Builder typespecbuilder, Map<String, FieldInfo> fieldinfos) {
     FieldInfo fieldinfo;
     for (String name : fieldinfos.keySet()) {
@@ -1045,6 +1125,7 @@ public class AnnotatedDurableEntityClass {
 
     buildDurableMethodSpecs(entitybuilder);
     buildEntityMethodSpecs(entitybuilder);
+    buildExtraMethodSpecs(entitybuilder);
 
     TypeSpec entityspec = entitybuilder.build();
 
