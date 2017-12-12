@@ -32,7 +32,7 @@
   <artifactId>mnemonic-memory-services</artifactId>
   <name>mnemonic-memory-services</name>
   <packaging>pom</packaging>
-  <url>http://mnemonic.incubator.apache.org</url>
+  <url>http://mnemonic.apache.org</url>
 
   <properties>
     <service.basedir>${project.parent.basedir}</service.basedir>

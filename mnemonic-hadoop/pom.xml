@@ -32,7 +32,7 @@
   <artifactId>mnemonic-hadoop</artifactId>
   <name>mnemonic-hadoop</name>
   <packaging>pom</packaging>
-  <url>http://mnemonic.incubator.apache.org</url>
+  <url>http://mnemonic.apache.org</url>
 
   <properties>
 	<hadoop.version>2.7.3</hadoop.version>

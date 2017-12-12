@@ -32,7 +32,7 @@
   <artifactId>mnemonic-spark</artifactId>
   <name>mnemonic-spark</name>
   <packaging>pom</packaging>
-  <url>http://mnemonic.incubator.apache.org</url>
+  <url>http://mnemonic.apache.org</url>
 
   <properties>
     <spark.version>2.1.1</spark.version>
