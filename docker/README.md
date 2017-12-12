@@ -1,4 +1,4 @@
-<img src="https://mnemonic.incubator.apache.org/img/mnemonic_logo.png" width=200 />
+<img src="https://mnemonic.apache.org/img/mnemonic_logo.png" width=200 />
 
 ================================ 
 
@@ -33,8 +33,8 @@ For old version docker v1.10 below, Please replace ARG with ENV and set its valu
 Build from git repository
 
 ```bash
-  $ docker build -t NAME[:TAG] https://github.com/apache/incubator-mnemonic.git#:docker/docker-CentOS
-  $ docker build -t NAME[:TAG] https://github.com/apache/incubator-mnemonic.git#:docker/docker-Ubuntu
+  $ docker build -t NAME[:TAG] https://github.com/apache/mnemonic.git#:docker/docker-CentOS
+  $ docker build -t NAME[:TAG] https://github.com/apache/mnemonic.git#:docker/docker-Ubuntu
 ```
 
 -- OR --
@@ -68,7 +68,7 @@ Run image:
 ### Sharing host project folder to Dock container for IDEs e.g. Eclipse, Intellij IDEA
 
 ```bash
-  $ docker run -v <hostdir>/incubator-mnemonic:/ws/incubator-mnemonic -it NAME[:TAG]
+  $ docker run -v <hostdir>/mnemonic:/ws/mnemonic -it NAME[:TAG]
 ```
 Note: this command will override the container's project folder, you can use another name to avoid it.
 

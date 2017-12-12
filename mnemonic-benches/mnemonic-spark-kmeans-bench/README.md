@@ -30,8 +30,8 @@ spark.jars <dir>/target/service-dist/mnemonic-pmalloc-service-<version>-linux-x8
 
 ```bash
   # regular version
-  $ $SPARK_HOME/bin/spark-submit --class org.apache.mnemonic.bench.RegularKMeans --conf spark.durable-basedir=./mne incubator-mnemonic/mnemonic-benches/mnemonic-spark-kmeans-bench/target/mnemonic-spark-kmeans-bench-<version>.jar <path-to-dataset-file>
+  $ $SPARK_HOME/bin/spark-submit --class org.apache.mnemonic.bench.RegularKMeans --conf spark.durable-basedir=./mne mnemonic/mnemonic-benches/mnemonic-spark-kmeans-bench/target/mnemonic-spark-kmeans-bench-<version>.jar <path-to-dataset-file>
 
   # durable version
-  $ $SPARK_HOME/bin/spark-submit --class org.apache.mnemonic.bench.DurableKMeans --conf spark.durable-basedir=./mne incubator-mnemonic/mnemonic-benches/mnemonic-spark-kmeans-bench/target/mnemonic-spark-kmeans-bench-<version>.jar <path-to-dataset-file>
+  $ $SPARK_HOME/bin/spark-submit --class org.apache.mnemonic.bench.DurableKMeans --conf spark.durable-basedir=./mne mnemonic/mnemonic-benches/mnemonic-spark-kmeans-bench/target/mnemonic-spark-kmeans-bench-<version>.jar <path-to-dataset-file>
 ```

@@ -1,6 +1,6 @@
 # Mnemonic Examples
 
-The examples demonstrate how to use the [Mnemonic](http://mnemonic.incubator.apache.org/).
+The examples demonstrate how to use the [Mnemonic](http://mnemonic.apache.org/).
 
 To run the default example [Main](src/main/java/org/apache/mnemonic/examples/Main.java):
 ```bash
@@ -15,4 +15,4 @@ To run a specific example by providing the example name under the [examples](src
 ```
 
 
-For how to run the examples in the [Docker](https://www.docker.com), please refer to the [Docker usage](http://mnemonic.incubator.apache.org/docs/docker.html) at the documentation of Mnemonic.
+For how to run the examples in the [Docker](https://www.docker.com), please refer to the [Docker usage](http://mnemonic.apache.org/docs/docker.html) at the documentation of Mnemonic.

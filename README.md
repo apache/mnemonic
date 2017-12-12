@@ -1,8 +1,8 @@
-<img src="https://mnemonic.incubator.apache.org/img/mnemonic_logo.png" width=200 />
+<img src="https://mnemonic.apache.org/img/mnemonic_logo.png" width=200 />
 
 ================================
 
-## <a href="https://mnemonic.incubator.apache.org/" target="_blank">Mnemonic Official Website</a>
+## <a href="https://mnemonic.apache.org/" target="_blank">Mnemonic Official Website</a>
 
 [![Build Status](https://travis-ci.org/NonVolatileComputing/incubator-mnemonic.svg?branch=master)](https://travis-ci.org/NonVolatileComputing/incubator-mnemonic)
 
