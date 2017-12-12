@@ -25,10 +25,10 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.mnemonic</groupId>
   <artifactId>mnemonic-parent</artifactId>
-  <version>0.10.0-incubating-SNAPSHOT</version>
+  <version>0.10.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>mnemonic-parent</name>
-  <url>http://mnemonic.incubator.apache.org</url>
+  <url>http://mnemonic.apache.org</url>
 
   <parent>
     <groupId>org.apache</groupId>
@@ -47,23 +47,23 @@
   <mailingLists>
     <mailingList>
       <name>Dev</name>
-      <subscribe>dev-subscribe@mnemonic.incubator.apache.org</subscribe>
-      <unsubscribe>dev-unsubscribe@mnemonic.incubator.apache.org</unsubscribe>
-      <post>dev@mnemonic.incubator.apache.org</post>
+      <subscribe>dev-subscribe@mnemonic.apache.org</subscribe>
+      <unsubscribe>dev-unsubscribe@mnemonic.apache.org</unsubscribe>
+      <post>dev@mnemonic.apache.org</post>
       <archive>http://mail-archives.apache.org/mod_mbox/mnemonic-dev</archive>
     </mailingList>
     <mailingList>
       <name>Users</name>
-      <subscribe>users-subscribe@mnemonic.incubator.apache.org</subscribe>
-      <unsubscribe>users-unsubscribe@mnemonic.incubator.apache.org</unsubscribe>
-      <post>users@mnemonic.incubator.apache.org</post>
+      <subscribe>users-subscribe@mnemonic.apache.org</subscribe>
+      <unsubscribe>users-unsubscribe@mnemonic.apache.org</unsubscribe>
+      <post>users@mnemonic.apache.org</post>
       <archive>http://mail-archives.apache.org/mod_mbox/mnemonic-users</archive>
     </mailingList>
     <mailingList>
       <name>Commits</name>
-      <subscribe>commits-subscribe@mnemonic.incubator.apache.org</subscribe>
-      <unsubscribe>commits-unsubscribe@mnemonic.incubator.apache.org</unsubscribe>
-      <post>commits@mnemonic.incubator.apache.org</post>
+      <subscribe>commits-subscribe@mnemonic.apache.org</subscribe>
+      <unsubscribe>commits-unsubscribe@mnemonic.apache.org</unsubscribe>
+      <post>commits@mnemonic.apache.org</post>
       <archive>http://mail-archives.apache.org/mod_mbox/mnemonic-commits</archive>
     </mailingList>
   </mailingLists>
@@ -73,9 +73,9 @@
   </prerequisites>
 
   <scm>
-    <url>https://git-wip-us.apache.org/repos/asf/incubator-mnemonic.git</url>
-    <connection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-mnemonic.git</connection>
-    <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-mnemonic.git</developerConnection>
+    <url>https://git-wip-us.apache.org/repos/asf/mnemonic.git</url>
+    <connection>scm:git:https://git-wip-us.apache.org/repos/asf/mnemonic.git</connection>
+    <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/mnemonic.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
 
