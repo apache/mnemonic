@@ -61,7 +61,7 @@ git checkout master
 
 if [ "${RELEASE_VERSION}" == "${NEXT_RELEASE_VERSION}" ]; then
     IS_SAME_VERSION=true
-    echo "You are trying to prepare a same version candidate so going to clean up existing branch <branch-${RELEASE_VERSION}> and tag <v${RELEASE_VERSION}-incubating> if exists"
+    echo "You are trying to prepare a same version candidate so going to clean up existing branch <branch-${RELEASE_VERSION}> and tag <v${RELEASE_VERSION}> if exists"
     continueprompt
     git branch -d branch-${RELEASE_VERSION}
     if [ $? -ne 0 ]; then
@@ -70,8 +70,8 @@ if [ "${RELEASE_VERSION}" == "${NEXT_RELEASE_VERSION}" ]; then
       git branch -D branch-${RELEASE_VERSION}
     fi
     git push upstream --delete branch-${RELEASE_VERSION}
-    git tag -d v${RELEASE_VERSION}-incubating
-    git push upstream --delete v${RELEASE_VERSION}-incubating
+    git tag -d v${RELEASE_VERSION}
+    git push upstream --delete v${RELEASE_VERSION}
 fi
 
 echo "Preparing to create a branch branch-${RELEASE_VERSION} for release"
@@ -79,10 +79,10 @@ continueprompt
 
 git checkout -b branch-${RELEASE_VERSION} || { echo "Create branch failed"; exit 30; }
 
-mvn versions:set -DgenerateBackupPoms=false -DnewVersion=${RELEASE_VERSION}-incubating
-git commit . -m "Prepare for releasing ${RELEASE_VERSION}-incubating ${RELEASE_CANDIDATE_ID}"
+mvn versions:set -DgenerateBackupPoms=false -DnewVersion=${RELEASE_VERSION}
+git commit . -m "Prepare for releasing ${RELEASE_VERSION} ${RELEASE_CANDIDATE_ID}"
 
-git tag -s v${RELEASE_VERSION}-incubating -m "Release ${RELEASE_VERSION}-incubating ${RELEASE_CANDIDATE_ID}" ||
+git tag -s v${RELEASE_VERSION} -m "Release ${RELEASE_VERSION} ${RELEASE_CANDIDATE_ID}" ||
     { echo "Tagging with signing failed"; exit 35; }
 
 rm -rf target/
@@ -92,7 +92,7 @@ mvn clean prepare-package -DskipTests -Dremoteresources.skip=true &&
 mvn prepare-package -DskipTests -Dremoteresources.skip=true &&
 mvn deploy -DskipTests -Dremoteresources.skip=true -P apache-release || { echo "Preparation failed"; exit 40; }
 
-RELEASEBASENAME=apache-mnemonic-${RELEASE_VERSION}-incubating
+RELEASEBASENAME=apache-mnemonic-${RELEASE_VERSION}
 RELEASESRCBASENAME=${RELEASEBASENAME}-src
 RELEASESRCPKGFULLNAME=${RELEASESRCBASENAME}.tar.gz
 
@@ -123,20 +123,20 @@ echo "Push release branch & label to upstream branch <branch-${RELEASE_VERSION}>
 continueprompt
 
 git push upstream branch-${RELEASE_VERSION}
-git push upstream v${RELEASE_VERSION}-incubating
+git push upstream v${RELEASE_VERSION}
 
-echo "Merge release branch <branch-${RELEASE_VERSION}> to master & Commit next version <${NEXT_RELEASE_VERSION}-incubating-SNAPSHOT>."
+echo "Merge release branch <branch-${RELEASE_VERSION}> to master & Commit next version <${NEXT_RELEASE_VERSION}-SNAPSHOT>."
 continueprompt
 
 git checkout master
 git merge --no-ff branch-${RELEASE_VERSION}
 
 if [ "$IS_SAME_VERSION" = true ]; then
-  NEXT_RELEASE_VERSION_POM="${RELEASE_VERSION}-incubating-SNAPSHOT"
-  NEXT_RELEASE_VERSION_COMMIT="Version ${RELEASE_VERSION}-incubating ${RELEASE_CANDIDATE_ID}"
+  NEXT_RELEASE_VERSION_POM="${RELEASE_VERSION}-SNAPSHOT"
+  NEXT_RELEASE_VERSION_COMMIT="Version ${RELEASE_VERSION} ${RELEASE_CANDIDATE_ID}"
 else
-  NEXT_RELEASE_VERSION_POM="${NEXT_RELEASE_VERSION}-incubating-SNAPSHOT"
-  NEXT_RELEASE_VERSION_COMMIT="Bump version to ${NEXT_RELEASE_VERSION}-incubating-SNAPSHOT"
+  NEXT_RELEASE_VERSION_POM="${NEXT_RELEASE_VERSION}-SNAPSHOT"
+  NEXT_RELEASE_VERSION_COMMIT="Bump version to ${NEXT_RELEASE_VERSION}-SNAPSHOT"
 fi
 mvn versions:set -DgenerateBackupPoms=false -DnewVersion="${NEXT_RELEASE_VERSION_POM}"
 git commit . -m "${NEXT_RELEASE_VERSION_COMMIT}"
