@@ -31,7 +31,7 @@ def findHomeDir():
       if not pathdeco[1]:
         print "Not found mnemonic home directory, please check \$MNEMONIC_HOME"
         sys.exit(1)
-      if pathdeco[1] == 'incubator-mnemonic':
+      if pathdeco[1] == 'mnemonic':
         break
       else:
         path = pathdeco[0]
