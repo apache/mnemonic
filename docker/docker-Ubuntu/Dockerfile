@@ -52,12 +52,12 @@ RUN touch /etc/profile.d/mvn.sh && chmod +x /etc/profile.d/mvn.sh && \
 RUN cat /etc/profile.d/mvn.sh > ~/.bash_profile
 RUN cat /etc/profile.d/mvn.sh > ~/.bashrc
 
-RUN . /etc/profile.d/mvn.sh && cd /ws && git clone https://github.com/apache/incubator-mnemonic.git && \
-    cd incubator-mnemonic && mvn clean package install
+RUN . /etc/profile.d/mvn.sh && cd /ws && git clone https://github.com/apache/mnemonic.git && \
+    cd mnemonic && mvn clean package install
 
-ENV MNEMONIC_HOME /ws/incubator-mnemonic
+ENV MNEMONIC_HOME /ws/mnemonic
 
-#RUN cd /ws/incubator-mnemonic && bin/runall.sh -y
+#RUN cd /ws/mnemonic && bin/runall.sh -y
 
 WORKDIR /ws
 
