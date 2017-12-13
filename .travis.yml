@@ -29,7 +29,7 @@ branches:
     - master
 
 before_install:
-  - docker pull mnemonic/mneci
+  - docker pull mnemonic/mneci:v2
   - docker images
 
 install:
@@ -37,6 +37,6 @@ install:
 
 script:
   - ls -l $TRAVIS_BUILD_DIR
-  - docker run -v $TRAVIS_BUILD_DIR:/ws/incubator-mnemonic --rm -t mnemonic/mneci /bin/bash -c "cd /ws/incubator-mnemonic; git log -1 --stat; git clean -xdf; mvn clean install && mvn javadoc:javadoc"
+  - docker run -v $TRAVIS_BUILD_DIR:/ws/mnemonic --rm -t mnemonic/mneci:v2 /bin/bash -c "cd /ws/mnemonic; git log -1 --stat; git clean -xdf; mvn clean install && mvn javadoc:javadoc"
 #  the runall cannot be fulfilled using free plan since it needs more resource to run.
-#  - docker run -v $TRAVIS_BUILD_DIR:/ws/incubator-mnemonic --rm -t mnemonic/mneci /bin/bash -c "cd /ws/incubator-mnemonic; git log -1 --stat; bin/runall.sh"
+#  - docker run -v $TRAVIS_BUILD_DIR:/ws/mnemonic --rm -t mnemonic/mneci:v2 /bin/bash -c "cd /ws/mnemonic; git log -1 --stat; bin/runall.sh"

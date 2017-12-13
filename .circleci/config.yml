@@ -18,9 +18,9 @@
 version: 2
 jobs:
   build:
-    working_directory: /ws/incubator-mnemonic
+    working_directory: /ws/mnemonic
     docker:
-      - image: mnemonic/mneci
+      - image: mnemonic/mneci:v2
     branches:
       only:
         - master
@@ -28,7 +28,7 @@ jobs:
       - run:
           name: Clean up
           command: |
-            rm -rf /ws/incubator-mnemonic
+            rm -rf /ws/mnemonic
       - checkout
       - run:
           name: Run tests
