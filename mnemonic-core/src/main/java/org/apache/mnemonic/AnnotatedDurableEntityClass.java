@@ -366,6 +366,7 @@ public class AnnotatedDurableEntityClass {
       MethodInfo mi = m_durablemtdinfo.get("getNativeFieldInfo").get(0);
       assert null != mi;
       methodinfo.elem = mi.elem;
+      methodinfo.rettype = TypeName.get(mi.elem.getReturnType());
       methodinfo.specbuilder = createFrom(mi.elem, "getNativeFieldInfo_static")
               .addModifiers(Modifier.STATIC);
     }
@@ -1102,6 +1103,18 @@ public class AnnotatedDurableEntityClass {
         .addParameter(gfieldsparam).addParameter(phandlerparam)
         .addParameter(autoreclaimparam).addParameter(reclaimctxparam).addCode(code).build();
     typespecbuilder.addMethod(methodspec);
+
+    MethodInfo mi = m_extramtdinfo.get("getNativeFieldInfo_static");
+    assert null != mi;
+    code = CodeBlock.builder().addStatement("return $1T.getNativeFieldInfo_static()",
+            ClassName.get(m_packagename, m_entityname))
+            .build();
+    methodspec = MethodSpec.methodBuilder("getNativeFieldInfo")
+            .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+            .returns(mi.rettype).addCode(code)
+            .build();
+    typespecbuilder.addMethod(methodspec);
+
   }
 
   public void generateCode(Filer filer) throws IOException, AnnotationProcessingException {
