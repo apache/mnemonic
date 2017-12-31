@@ -22,10 +22,10 @@ import org.flowcomputing.commons.resgc.ResCollector;
 import org.flowcomputing.commons.resgc.ResReclaim;
 import org.flowcomputing.commons.resgc.ReclaimContext;
 
-import sun.misc.Cleaner;
 import sun.misc.Unsafe;
 
-import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -47,6 +47,27 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
   private AtomicLong currentMemory = new AtomicLong(0L);
   private long maxStoreCapacity = 0L;
   private Map<Long, Long> m_chunksize = new ConcurrentHashMap<Long, Long>();
+
+  static final Method CLEANMETHOD;
+
+  static {
+    try {
+      Class<?> cleanerOrCleanable;
+      try {
+        cleanerOrCleanable = Class.forName("sun.misc.Cleaner");
+      } catch (ClassNotFoundException e1) {
+        try {
+          cleanerOrCleanable = Class.forName("java.lang.ref.Cleaner$Cleanable");
+        } catch (ClassNotFoundException e2) {
+          e2.addSuppressed(e1);
+          throw e2;
+        }
+      }
+      CLEANMETHOD = cleanerOrCleanable.getDeclaredMethod("clean");
+    } catch (Exception e) {
+      throw new Error(e);
+    }
+  }
 
   /**
    * Constructor, it initialize and allocate a memory pool from Java off-heap
@@ -80,13 +101,12 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
         }
         if (!cb_reclaimed) {
           try {
-            Field cleanerField;
-            cleanerField = mres.getClass().getDeclaredField("cleaner");
-            cleanerField.setAccessible(true);
-            Cleaner cleaner = (Cleaner) cleanerField.get(mres);
-            cleaner.clean();
-          } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-            e.printStackTrace();
+            final Object bufferCleaner = ((sun.nio.ch.DirectBuffer) mres).cleaner();
+            if (null != bufferCleaner) {
+              CLEANMETHOD.invoke(bufferCleaner);
+            }
+          } catch (InvocationTargetException | IllegalAccessException e) {
+            throw new Error(e);
           }
           mres = null;
         }
