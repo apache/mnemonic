@@ -321,7 +321,7 @@
               <exclude>**/native/dist/**/*</exclude>
               <exclude>**/service-dist/**</exclude>
               <exclude>**/*.iml</exclude>
-              <exclude>**/*.patch</exclude>
+	          <exclude>**/*.patch</exclude>
             </excludes>
           </configuration>
           <executions>
