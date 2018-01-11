@@ -307,9 +307,9 @@
           <configuration>
             <excludes>
               <exclude>.git/**/*</exclude>
-	      <exclude>**/.project</exclude>
+              <exclude>**/.project</exclude>
               <exclude>**/*.</exclude>
-	      <exclude>**/target/**/*</exclude>
+              <exclude>**/target/**/*</exclude>
               <exclude>**/README*</exclude>
               <exclude>**/LICENSE*</exclude>
               <exclude>**/*.log</exclude>
@@ -320,7 +320,8 @@
               <exclude>**/native/build/**/*</exclude>
               <exclude>**/native/dist/**/*</exclude>
               <exclude>**/service-dist/**</exclude>
-	      <exclude>**/*.patch</exclude>
+              <exclude>**/*.iml</exclude>
+              <exclude>**/*.patch</exclude>
             </excludes>
           </configuration>
           <executions>
