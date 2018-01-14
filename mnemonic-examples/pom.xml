@@ -36,12 +36,19 @@
   <properties>
     <example.name>Main</example.name>
     <example.args></example.args>
+    <helloworld.name>HelloWorld</helloworld.name>
+    <helloworld.args></helloworld.args>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>org.apache.mnemonic</groupId>
       <artifactId>mnemonic-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.mnemonic</groupId>
+      <artifactId>mnemonic-collections</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- logging dependencies -->
@@ -205,6 +212,41 @@
                 <classpath />
                 <argument>${project.groupId}.examples.${example.name}</argument>
                 <commandlineArgs>${example.args}</commandlineArgs>
+              </arguments>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>helloworld</id>
+      <activation>
+        <property>
+          <name>helloworld</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <executable>java</executable>
+              <arguments>
+                <!-- replace it with ${project.build.directory}/service-dist in client POM -->
+                <argument>-Djava.ext.dirs=${memory.service.dist.dir}</argument>
+                <argument>-ea</argument>
+                <argument>-classpath</argument>
+                <classpath />
+                <argument>${project.groupId}.examples.${helloworld.name}</argument>
+                <commandlineArgs>${helloworld.args}</commandlineArgs>
               </arguments>
             </configuration>
           </plugin>
