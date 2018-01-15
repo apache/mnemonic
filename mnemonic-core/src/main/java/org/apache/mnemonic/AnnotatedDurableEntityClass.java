@@ -623,7 +623,7 @@ public class AnnotatedDurableEntityClass {
           code.beginControlFlow("if (0L != phandler)");
           code.addStatement("$1N = $5N.restore($2N, $6L, $7L, phandler, $3N, $4N)", dynfieldinfo.name, allocname,
               autoreclaimname, reclaimctxname, String.format("%s%s",
-                  m_typeutils.asElement(methodinfo.elem.getReturnType()).getSimpleName(), cFACTORYNAMESUFFIX),
+                  m_typeutils.asElement(methodinfo.elem.getReturnType()).toString(), cFACTORYNAMESUFFIX),
               dynfieldinfo.efproxiesname, dynfieldinfo.gftypesname);
           code.endControlFlow();
           code.endControlFlow();
