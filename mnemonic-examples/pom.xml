@@ -38,6 +38,8 @@
     <example.args></example.args>
     <helloworld.name>HelloWorld</helloworld.name>
     <helloworld.args></helloworld.args>
+    <createorder.name>CreateOrder</createorder.name>
+    <createorder.args></createorder.args>
   </properties>
 
   <dependencies>
@@ -84,6 +86,23 @@
       </extension>
     </extensions>
     <plugins>
+      <plugin>
+        <groupId>org.bsc.maven</groupId>
+        <artifactId>maven-processor-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>process</id>
+            <goals><goal>process</goal></goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <compilerArguments>-XDenableSunApiLintControl</compilerArguments>
+              <processors>
+                <processor>${project.groupId}.DurableEntityProcessor</processor>
+              </processors>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -247,6 +266,41 @@
                 <classpath />
                 <argument>${project.groupId}.examples.${helloworld.name}</argument>
                 <commandlineArgs>${helloworld.args}</commandlineArgs>
+              </arguments>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>createorder</id>
+      <activation>
+        <property>
+          <name>createorder</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <executable>java</executable>
+              <arguments>
+                <!-- replace it with ${project.build.directory}/service-dist in client POM -->
+                <argument>-Djava.ext.dirs=${memory.service.dist.dir}</argument>
+                <argument>-ea</argument>
+                <argument>-classpath</argument>
+                <classpath />
+                <argument>${project.groupId}.examples.${createorder.name}</argument>
+                <commandlineArgs>${createorder.args}</commandlineArgs>
               </arguments>
             </configuration>
           </plugin>
