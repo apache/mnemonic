@@ -40,6 +40,8 @@
     <helloworld.args></helloworld.args>
     <createorder.name>CreateOrder</createorder.name>
     <createorder.args></createorder.args>
+    <showorder.name>ShowOrder</showorder.name>
+    <showorder.args></showorder.args>
   </properties>
 
   <dependencies>
@@ -301,6 +303,41 @@
                 <classpath />
                 <argument>${project.groupId}.examples.${createorder.name}</argument>
                 <commandlineArgs>${createorder.args}</commandlineArgs>
+              </arguments>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>showorder</id>
+      <activation>
+        <property>
+          <name>showorder</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <executable>java</executable>
+              <arguments>
+                <!-- replace it with ${project.build.directory}/service-dist in client POM -->
+                <argument>-Djava.ext.dirs=${memory.service.dist.dir}</argument>
+                <argument>-ea</argument>
+                <argument>-classpath</argument>
+                <classpath />
+                <argument>${project.groupId}.examples.${showorder.name}</argument>
+                <commandlineArgs>${showorder.args}</commandlineArgs>
               </arguments>
             </configuration>
           </plugin>

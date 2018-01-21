@@ -31,6 +31,8 @@ import java.util.Date;
 
 @DurableEntity
 public abstract class Order implements Durable {
+  protected transient EntityFactoryProxy[] m_node_efproxies;
+  protected transient DurableType[] m_node_gftypes;
 
   @Override
   public void initializeAfterCreate() {
@@ -42,7 +44,8 @@ public abstract class Order implements Durable {
 
   @Override
   public void setupGenericInfo(EntityFactoryProxy[] efproxies, DurableType[] gftypes) {
-
+    m_node_efproxies = efproxies;
+    m_node_gftypes = gftypes;
   }
 
   @DurableGetter
@@ -74,7 +77,7 @@ public abstract class Order implements Durable {
   @DurableSetter
   public abstract void setCustomer(Customer customer, boolean destroy) throws RetrieveDurableEntityError;
 
-  @DurableGetter
+  @DurableGetter(Id = 2L, EntityFactoryProxies = "m_node_efproxies", GenericFieldTypes = "m_node_gftypes")
   public abstract DurableSinglyLinkedList<Product> getItems() throws RetrieveDurableEntityError;
 
   @DurableSetter
