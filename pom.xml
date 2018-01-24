@@ -92,10 +92,6 @@
     <module>mnemonic-examples</module>
     <module>mnemonic-memory-services</module>
     <module>mnemonic-computing-services</module>
-    <module>mnemonic-benches</module>
-    <module>mnemonic-sessions</module>
-    <module>mnemonic-hadoop</module>
-    <module>mnemonic-spark</module>
     <module>mnemonic-query</module>
     <module>mnemonic-common</module>
   </modules>
@@ -539,7 +535,19 @@
      <properties>
        <javadoc.opts>-Xdoclint:none</javadoc.opts>
      </properties>
-   </profile>
+  </profile>
+  <profile>
+    <id>support-jdk9-modules</id>
+    <activation>
+      <jdk>[1.6,1.8]</jdk>
+    </activation>
+    <modules>
+      <module>mnemonic-benches</module>
+      <module>mnemonic-sessions</module>
+      <module>mnemonic-hadoop</module>
+      <module>mnemonic-spark</module>
+    </modules>
+  </profile>
 </profiles>
 
   <reporting>
