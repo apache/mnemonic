@@ -114,4 +114,12 @@ public abstract class DurableArray<E> implements Durable, Iterable<E> {
    */
   public abstract Iterator<E> iterator();
 
+  /**
+   * get size of the array
+   *
+   * @return size of the array
+   */
+  public int getSize() {
+    return arraySize;
+  }
 }
