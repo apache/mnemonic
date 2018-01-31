@@ -36,15 +36,19 @@ with open(testCmdFile) as fp:
     for line in fp:
         match = tcCmdReg.findall(line)
         if match:
-            logFilePath = testLogDir + tcNameReg.findall(line)[0] + ".log"
-            print("[INFO] Running " + tcNameReg.findall(line)[0] + " test case for \"" + tcModuleReg.findall(line)[0] + "\"...")
-            try:
-                #maven build
-                subprocess.check_call(match[0] + ">" + logFilePath, stderr=subprocess.STDOUT, shell=True)
-                subprocess.call(cleanupCmd, stderr=subprocess.STDOUT, shell=True)
-                print("[SUCCESS] Test case " + tcNameReg.findall(line)[0] + " for \"" + tcModuleReg.findall(line)[0]+ "\" is completed!")
-            except subprocess.CalledProcessError as e:
-                print("[ERROR] Please refer to testlog/" + tcNameReg.findall(line)[0] + ".log for detailed information.")
-                sys.exit(1)
+            tc_module_target_path = tcModuleReg.findall(line)[0] + "/target"
+            if any(fname.endswith('.jar') for fname in os.listdir(tc_module_target_path)):
+                logFilePath = testLogDir + tcNameReg.findall(line)[0] + ".log"
+                print("[INFO] Running " + tcNameReg.findall(line)[0] + " test case for \"" + tcModuleReg.findall(line)[0] + "\"...")
+                try:
+                    #maven build
+                    subprocess.check_call(match[0] + ">" + logFilePath, stderr=subprocess.STDOUT, shell=True)
+                    subprocess.call(cleanupCmd, stderr=subprocess.STDOUT, shell=True)
+                    print("[SUCCESS] Test case " + tcNameReg.findall(line)[0] + " for \"" + tcModuleReg.findall(line)[0]+ "\" is completed!")
+                except subprocess.CalledProcessError as e:
+                    print("[ERROR] Please refer to testlog/" + tcNameReg.findall(line)[0] + ".log for detailed information.")
+                    sys.exit(1)
+            else:
+                print("[WARN] JAR file not found in " + tcNameReg.findall(line)[0] + " test case for \"" + tcModuleReg.findall(line)[0] + "\".")
 print("[DONE] All test cases are completed! Log files are available under folder testlog.")
 

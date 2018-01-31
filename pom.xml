@@ -211,29 +211,22 @@
           </execution>
         </executions-->
       </plugin>
-      <!--plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-clean-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>auto-clean</id>
-            <phase>initialize</phase>
-            <goals>
-              <goal>clean</goal>
-            </goals>
-          </execution>
-        </executions>
+        <version>3.0.0</version>
         <configuration>
           <filesets>
             <fileset>
               <directory>.</directory>
               <includes>
-                <include>*.dat</include>
+                <!-- use to clear all jar files to prevent it from performing test if not built on jdk9 -->
+                <include>**/target/*.jar</include>
               </includes>
             </fileset>
           </filesets>
         </configuration>
-      </plugin-->
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
@@ -361,7 +354,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.19.1</version>
+          <version>2.20.1</version>
           <configuration>
             <skipTests>${skipTests}</skipTests>
             <enableAssertions>true</enableAssertions>
