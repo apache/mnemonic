@@ -26,6 +26,7 @@ import sun.misc.Unsafe;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -536,4 +537,56 @@ public class Utils {
       }
     }
   }
+
+  /**
+   * get the address of an object
+   *
+   * @param unsafe
+   *         an unsafe object
+   * @param o
+   *         an object to retrieve its address
+   *
+   * @return
+   *         the address of this object
+   */
+  public static long addressOf(Unsafe unsafe, Object o) {
+    Object[] array = new Object[] {o};
+
+    long baseOffset = unsafe.arrayBaseOffset(Object[].class);
+    int addressSize = unsafe.addressSize();
+    long objectAddress;
+    switch (addressSize) {
+      case 4:
+        objectAddress = unsafe.getInt(array, baseOffset);
+        break;
+      case 8:
+        objectAddress = unsafe.getLong(array, baseOffset);
+        break;
+      default:
+        throw new Error("unsupported address size: " + addressSize);
+    }
+    return objectAddress;
+  }
+
+
+
+  /**
+   * Gets the address value for the memory that backs a direct byte buffer.
+   *
+   * @param buffer
+   *      A buffer to retrieve its address
+   *
+   * @return
+   *      The system address for the buffers
+   */
+  public static long getAddressFromDirectByteBuffer(ByteBuffer buffer) {
+    try {
+      Field addressField = Buffer.class.getDeclaredField("address");
+      addressField.setAccessible(true);
+      return addressField.getLong(buffer);
+    } catch (Exception e) {
+      throw new RuntimeException("Unable to address field from ByteBuffer", e);
+    }
+  }
+
 }

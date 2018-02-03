@@ -17,6 +17,7 @@
 
 package org.apache.mnemonic.examples;
 
+import org.apache.mnemonic.DurableBuffer;
 import org.apache.mnemonic.NonVolatileMemAllocator;
 import org.apache.mnemonic.Utils;
 import org.apache.mnemonic.collections.DurableString;
@@ -38,6 +39,48 @@ public class HelloWorld {
 
     /* print out the string from this durable string object */
     System.out.println(Utils.ANSI_GREEN + s.getStr() + Utils.ANSI_RESET);
+
+    /* print out the address of string */
+    System.out.println(String.format("The address of this durable string object: 0x%016X",
+        Utils.addressOf(Utils.getUnsafe(), s.getStr())));
+
+    /* print out the hashcode of string */
+    System.out.println(String.format("The hash code of this durable string object: 0x%08X",
+        s.getStr().hashCode()));
+
+    /* create a durable buffer, it is able to store up to 10 characters */
+    DurableBuffer<?> dbuf = act.createBuffer(20);
+
+    /* store a string into this durable buffer*/
+    dbuf.get().asCharBuffer().put("hello");
+
+    /* return a string containing the character sequence in this durable buffer */
+    String dbufstr = dbuf.get().asCharBuffer().toString();
+
+    /* print out this string */
+    System.out.println(String.format("A string returned from the durable buffer: %s", dbufstr));
+
+    /* store another string into the same durable buffer */
+    dbuf.get().asCharBuffer().put("world");
+
+    /* print out the original string */
+    System.out.println(String.format("The original string with the content of this durable buffer changed: %s",
+        dbufstr));
+
+    /* return a new string containing the character sequence in this durable buffer */
+    String dbufstr2 = dbuf.get().asCharBuffer().toString();
+
+    /* print out the new string */
+    System.out.println(String.format("A new string returned from the same durable buffer: %s",
+        dbufstr2));
+
+    /* print out the address of the content of this durable buffer */
+    System.out.println(String.format("The address of the content of this durable buffer: 0x%016X",
+        Utils.getAddressFromDirectByteBuffer(dbuf.get())));
+
+    /* print out the base address of memory space */
+    System.out.println(String.format("The base address of this memory space: 0x%016X",
+        act.getEffectiveAddress(0L)));
 
   }
 }
