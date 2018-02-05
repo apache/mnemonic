@@ -33,12 +33,14 @@ import java.util.Set;
 import java.util.HashSet;
 
 public class SysVMemServiceImpl implements VolatileMemoryAllocatorService {
-  static {
+  private static boolean nativeLoaded = false;
+  static void loadNativeLibrary() {
     try {
       NativeLibraryLoader.loadFromJar("sysvmemallocator");
     } catch (Exception e) {
       throw new Error(e);
     }
+    nativeLoaded = true;
   }
 
   protected Map<Long, Long> m_info = Collections.synchronizedMap(new HashMap<Long, Long>());
@@ -50,6 +52,9 @@ public class SysVMemServiceImpl implements VolatileMemoryAllocatorService {
 
   @Override
   public long init(long capacity, String uri, boolean isnew) {
+    if (!nativeLoaded) {
+      loadNativeLibrary();
+    }
     long ret = ninit(capacity, uri, isnew);
     m_info.put(ret, capacity);
     return ret;

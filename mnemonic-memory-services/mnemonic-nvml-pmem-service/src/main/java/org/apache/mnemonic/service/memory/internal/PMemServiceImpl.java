@@ -30,12 +30,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class PMemServiceImpl implements NonVolatileMemoryAllocatorService {
-  static {
+  private static boolean nativeLoaded = false;
+  static void loadNativeLibrary() {
     try {
       NativeLibraryLoader.loadFromJar("pmemallocator");
     } catch (Exception e) {
       throw new Error(e);
     }
+    nativeLoaded = true;
   }
 
   @Override
@@ -45,6 +47,9 @@ public class PMemServiceImpl implements NonVolatileMemoryAllocatorService {
 
   @Override
   public long init(long capacity, String uri, boolean isnew) {
+    if (!nativeLoaded) {
+      loadNativeLibrary();
+    }
     return ninit(capacity, uri, isnew);
   }
 
