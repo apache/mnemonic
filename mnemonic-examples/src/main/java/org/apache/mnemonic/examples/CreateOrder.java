@@ -19,9 +19,8 @@ package org.apache.mnemonic.examples;
 
 import org.apache.mnemonic.DurableType;
 import org.apache.mnemonic.EntityFactoryProxy;
+import org.apache.mnemonic.EntityFactoryProxyHelper;
 import org.apache.mnemonic.NonVolatileMemAllocator;
-import org.apache.mnemonic.ParameterHolder;
-import org.apache.mnemonic.RestorableAllocator;
 import org.apache.mnemonic.Utils;
 import org.apache.mnemonic.collections.DurableSinglyLinkedList;
 import org.apache.mnemonic.collections.DurableSinglyLinkedListFactory;
@@ -64,30 +63,7 @@ public class CreateOrder {
 
     DurableType listgftypes[] = {DurableType.DURABLE};
 
-    EntityFactoryProxy listefproxies[] = {new EntityFactoryProxy() {
-      @Override
-      public <A extends RestorableAllocator<A>> Product restore(
-          A allocator, EntityFactoryProxy[] factoryproxys,
-          DurableType[] gfields, long phandler, boolean autoreclaim) {
-        return ProductFactory.restore(allocator, factoryproxys, gfields, phandler, autoreclaim);
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> Product restore(ParameterHolder<A> ph) {
-        return ProductFactory.restore(ph.getAllocator(),
-            ph.getEntityFactoryProxies(), ph.getGenericTypes(), ph.getHandler(), ph.getAutoReclaim());
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> Product create(
-          A allocator, EntityFactoryProxy[] factoryproxys,
-          DurableType[] gfields, boolean autoreclaim) {
-        return ProductFactory.create(allocator, factoryproxys, gfields, autoreclaim);
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> Product create(ParameterHolder<A> ph) {
-        return ProductFactory.create(ph.getAllocator(),
-            ph.getEntityFactoryProxies(), ph.getGenericTypes(), ph.getAutoReclaim());
-      }
-    } };
+    EntityFactoryProxy listefproxies[] = {new EntityFactoryProxyHelper<Product>(Product.class) };
 
     System.out.printf("Creating Order info...\n");
     DurableSinglyLinkedList<Product> list1 = DurableSinglyLinkedListFactory.create(act, listefproxies,
