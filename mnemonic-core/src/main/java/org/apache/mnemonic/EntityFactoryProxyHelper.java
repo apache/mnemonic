@@ -18,6 +18,7 @@
 package org.apache.mnemonic;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.flowcomputing.commons.resgc.ReclaimContext;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -27,22 +28,34 @@ public class EntityFactoryProxyHelper<D extends Durable>
 
   protected Method fcreatemtd, frestoremtd;
   protected int shiftnum;
+  protected ReclaimContext rcontext;
 
   public EntityFactoryProxyHelper(Class<D> clazz)
       throws ClassNotFoundException, NoSuchMethodException {
-    this(clazz, 0);
+    this(clazz, 0, null);
+  }
+
+  public EntityFactoryProxyHelper(Class<D> clazz, ReclaimContext rctx)
+      throws ClassNotFoundException, NoSuchMethodException {
+    this(clazz, 0, rctx);
   }
 
   public EntityFactoryProxyHelper(Class<D> clazz, int shiftnum)
+      throws ClassNotFoundException, NoSuchMethodException {
+    this(clazz, shiftnum, null);
+  }
+
+  public EntityFactoryProxyHelper(Class<D> clazz, int shiftnum, ReclaimContext rctx)
       throws ClassNotFoundException, NoSuchMethodException {
     if (shiftnum < 0) {
       throw new OutOfBoundsException("Shift number cannot be negative");
     }
     this.shiftnum = shiftnum;
+    this.rcontext = rctx;
     Class c = Class.forName(clazz.getName() + "Factory");
     Method[] fmtds = c.getDeclaredMethods();
     for (int i = 0; i < fmtds.length; ++i) {
-      if (fmtds[i].getName().equals("create") && fmtds[i].getParameterCount() == 4) {
+      if (fmtds[i].getName().equals("create") && fmtds[i].getParameterCount() == 5) {
         fcreatemtd = fmtds[i];
         break;
       }
@@ -51,7 +64,7 @@ public class EntityFactoryProxyHelper<D extends Durable>
       throw new NoSuchMethodException("Not found proper factory create(...) method");
     }
     for (int i = 0; i < fmtds.length; ++i) {
-      if (fmtds[i].getName().equals("restore") && fmtds[i].getParameterCount() == 5) {
+      if (fmtds[i].getName().equals("restore") && fmtds[i].getParameterCount() == 6) {
         frestoremtd = fmtds[i];
         break;
       }
@@ -65,13 +78,10 @@ public class EntityFactoryProxyHelper<D extends Durable>
   public <A extends RestorableAllocator<A>> D create(
       A allocator, EntityFactoryProxy[] factoryproxys,
       DurableType[] gfields, boolean autoreclaim) {
-    if (shiftnum > gfields.length - 1) {
-      throw new OutOfBoundsException("Shift number is out of the range of generic fields");
-    }
     Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, shiftnum);
     Object o = null;
     try {
-      o = fcreatemtd.invoke(null, allocator, dpt.getRight(), dpt.getLeft(), autoreclaim);
+      o = fcreatemtd.invoke(null, allocator, dpt.getRight(), dpt.getLeft(), autoreclaim, rcontext);
     } catch (IllegalAccessException e) {
       e.printStackTrace();
     } catch (InvocationTargetException e) {
@@ -83,15 +93,12 @@ public class EntityFactoryProxyHelper<D extends Durable>
   @Override
   public <A extends RestorableAllocator<A>> D create(
       ParameterHolder<A> ph) {
-    if (shiftnum > ph.getGenericTypes().length - 1) {
-      throw new OutOfBoundsException("Shift number is out of the range of generic fields");
-    }
     Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(ph.getGenericTypes(),
         ph.getEntityFactoryProxies(), shiftnum);
     Object o = null;
     try {
       o = fcreatemtd.invoke(null, ph.getAllocator(),
-          dpt.getRight(), dpt.getLeft(), ph.getAutoReclaim());
+          dpt.getRight(), dpt.getLeft(), ph.getAutoReclaim(), rcontext);
     } catch (IllegalAccessException e) {
       e.printStackTrace();
     } catch (InvocationTargetException e) {
@@ -104,13 +111,10 @@ public class EntityFactoryProxyHelper<D extends Durable>
   public <A extends RestorableAllocator<A>> D restore(
       A allocator, EntityFactoryProxy[] factoryproxys,
       DurableType[] gfields, long phandler, boolean autoreclaim) {
-    if (shiftnum > gfields.length - 1) {
-      throw new OutOfBoundsException("Shift number is out of the range of generic fields");
-    }
     Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, shiftnum);
     Object o = null;
     try {
-      o = frestoremtd.invoke(null, allocator, dpt.getRight(), dpt.getLeft(), phandler, autoreclaim);
+      o = frestoremtd.invoke(null, allocator, dpt.getRight(), dpt.getLeft(), phandler, autoreclaim, rcontext);
     } catch (IllegalAccessException e) {
       e.printStackTrace();
     } catch (InvocationTargetException e) {
@@ -122,15 +126,12 @@ public class EntityFactoryProxyHelper<D extends Durable>
   @Override
   public <A extends RestorableAllocator<A>> D restore(
       ParameterHolder<A> ph) {
-    if (shiftnum > ph.getGenericTypes().length - 1) {
-      throw new OutOfBoundsException("Shift number is out of the range of generic fields");
-    }
     Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(ph.getGenericTypes(),
         ph.getEntityFactoryProxies(), shiftnum);
     Object o = null;
     try {
       o = frestoremtd.invoke(null, ph.getAllocator(),
-          ph.getEntityFactoryProxies(), dpt.getRight(), dpt.getLeft(), ph.getAutoReclaim());
+          ph.getEntityFactoryProxies(), dpt.getRight(), dpt.getLeft(), ph.getAutoReclaim(), rcontext);
     } catch (IllegalAccessException e) {
       e.printStackTrace();
     } catch (InvocationTargetException e) {
