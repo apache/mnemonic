@@ -518,6 +518,9 @@ public class Utils {
    */
   public static Pair<DurableType[], EntityFactoryProxy[]> shiftDurableParams(
       DurableType[] gtypes, EntityFactoryProxy[] factoryproxies, int len) {
+    if (0 == len) {
+      return Pair.of(gtypes, factoryproxies);
+    }
     DurableType[] ret_gtypes = {};
     EntityFactoryProxy[] ret_proxies = {};
     if (null != gtypes && gtypes.length > len) {
