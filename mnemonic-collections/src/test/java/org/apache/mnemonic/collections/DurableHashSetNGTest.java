@@ -22,10 +22,9 @@ import java.nio.ByteBuffer;
 import java.util.Random;
 import java.util.zip.Checksum;
 
+import org.apache.mnemonic.EntityFactoryProxyHelper;
 import org.apache.mnemonic.Utils;
 import org.apache.mnemonic.NonVolatileMemAllocator;
-import org.apache.mnemonic.RestorableAllocator;
-import org.apache.mnemonic.ParameterHolder;
 import org.apache.mnemonic.OutOfHybridMemory;
 import org.apache.mnemonic.DurableBuffer;
 import org.apache.mnemonic.DurableChunk;
@@ -185,32 +184,9 @@ public class DurableHashSetNGTest {
   }
 
   @Test(enabled = true)
-  public void testAddRemoveDurable() {
+  public void testAddRemoveDurable() throws NoSuchMethodException, ClassNotFoundException {
     DurableType gtypes[] = {DurableType.DURABLE};
-    EntityFactoryProxy efproxies[] = {new EntityFactoryProxy() {
-      @Override
-      public <A extends RestorableAllocator<A>> Person<Long> restore(
-          A allocator, EntityFactoryProxy[] factoryproxys,
-          DurableType[] gfields, long phandler, boolean autoreclaim) {
-        return PersonFactory.restore(allocator, factoryproxys, gfields, phandler, autoreclaim);
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> Person<Long> restore(ParameterHolder<A> ph) {
-        return PersonFactory.restore(ph.getAllocator(),
-                ph.getEntityFactoryProxies(), ph.getGenericTypes(), ph.getHandler(), ph.getAutoReclaim());
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> Person<Long> create(
-          A allocator, EntityFactoryProxy[] factoryproxys,
-          DurableType[] gfields, boolean autoreclaim) {
-        return PersonFactory.create(allocator, factoryproxys, gfields, autoreclaim);
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> Person<Long> create(ParameterHolder<A> ph) {
-        return PersonFactory.create(ph.getAllocator(),
-                ph.getEntityFactoryProxies(), ph.getGenericTypes(), ph.getAutoReclaim());
-      }
-    } };
+    EntityFactoryProxy efproxies[] = {new EntityFactoryProxyHelper<Person>(Person.class)};
 
     Person<Long> person =  (Person<Long>) efproxies[0].create(m_act, null, null, false);
     person.setAge((short) 31);

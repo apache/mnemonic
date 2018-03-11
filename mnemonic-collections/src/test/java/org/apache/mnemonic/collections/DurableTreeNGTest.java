@@ -21,15 +21,14 @@ package org.apache.mnemonic.collections;
 import java.nio.ByteBuffer;
 import java.util.Random;
 
+import org.apache.mnemonic.EntityFactoryProxyHelper;
 import org.apache.mnemonic.Utils;
-import org.apache.mnemonic.RestorableAllocator;
 import org.apache.mnemonic.NonVolatileMemAllocator;
 //import org.apache.mnemonic.OutOfHybridMemory;
 import org.apache.mnemonic.EntityFactoryProxy;
 import org.apache.mnemonic.DurableType;
 import org.apache.mnemonic.Reclaim;
 //import org.apache.mnemonic.Durable;
-import org.apache.mnemonic.ParameterHolder;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -240,32 +239,9 @@ public class DurableTreeNGTest {
   }
 
   @Test(enabled = true)
-  public void testInsertDurable() {
+  public void testInsertDurable() throws NoSuchMethodException, ClassNotFoundException {
     DurableType gtypes[] = {DurableType.DURABLE};
-    EntityFactoryProxy efproxies[] = {new EntityFactoryProxy() {
-      @Override
-      public <A extends RestorableAllocator<A>> Person<Long> restore(
-          A allocator, EntityFactoryProxy[] factoryproxys,
-          DurableType[] gfields, long phandler, boolean autoreclaim) {
-        return PersonFactory.restore(allocator, factoryproxys, gfields, phandler, autoreclaim);
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> Person<Long> restore(ParameterHolder<A> ph) {
-        return PersonFactory.restore(ph.getAllocator(),
-                ph.getEntityFactoryProxies(), ph.getGenericTypes(), ph.getHandler(), ph.getAutoReclaim());
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> Person<Long> create(
-          A allocator, EntityFactoryProxy[] factoryproxys,
-          DurableType[] gfields, boolean autoreclaim) {
-        return PersonFactory.create(allocator, factoryproxys, gfields, autoreclaim);
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> Person<Long> create(ParameterHolder<A> ph) {
-        return PersonFactory.create(ph.getAllocator(),
-                ph.getEntityFactoryProxies(), ph.getGenericTypes(), ph.getAutoReclaim());
-      }
-    } };
+    EntityFactoryProxy efproxies[] = {new EntityFactoryProxyHelper<Person>(Person.class)};
 
     DurableTree<Person<Long>> tree = DurableTreeFactory.create(m_act, efproxies, gtypes, false);
     Long handler = tree.getHandler();

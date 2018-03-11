@@ -23,15 +23,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.mnemonic.EntityFactoryProxyHelper;
 import org.apache.mnemonic.NonVolatileMemAllocator;
-import org.apache.mnemonic.RestorableAllocator;
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.mnemonic.Durable;
 import org.apache.mnemonic.EntityFactoryProxy;
 import org.apache.mnemonic.Reclaim;
 import org.apache.mnemonic.Utils;
 import org.apache.mnemonic.DurableType;
-import org.apache.mnemonic.ParameterHolder;
 import org.testng.AssertJUnit;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -107,33 +104,12 @@ public class DurableSinglyLinkedListNGTest {
   }
 
   @Test(enabled = false)
-  public void testNodeValueWithPerson() {
+  public void testNodeValueWithPerson()
+      throws ClassNotFoundException, NoSuchMethodException {
 
     DurableType gtypes[] = {DurableType.DURABLE};
-    EntityFactoryProxy efproxies[] = {new EntityFactoryProxy() {
-      @Override
-      public <A extends RestorableAllocator<A>> Person<Long> restore(
-          A allocator, EntityFactoryProxy[] factoryproxys,
-          DurableType[] gfields, long phandler, boolean autoreclaim) {
-        return PersonFactory.restore(allocator, factoryproxys, gfields, phandler, autoreclaim);
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> Person<Long> restore(ParameterHolder<A> ph) {
-        return PersonFactory.restore(ph.getAllocator(),
-                ph.getEntityFactoryProxies(), ph.getGenericTypes(), ph.getHandler(), ph.getAutoReclaim());
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> Person<Long> create(
-          A allocator, EntityFactoryProxy[] factoryproxys,
-          DurableType[] gfields, boolean autoreclaim) {
-        return PersonFactory.create(allocator, factoryproxys, gfields, autoreclaim);
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> Person<Long> create(ParameterHolder<A> ph) {
-        return PersonFactory.create(ph.getAllocator(),
-                ph.getEntityFactoryProxies(), ph.getGenericTypes(), ph.getAutoReclaim());
-      }
-    } };
+    EntityFactoryProxy efproxies[] = {
+        new EntityFactoryProxyHelper<Person>(Person.class) };
 
     @SuppressWarnings("unchecked")
     Person<Long> person =  (Person<Long>) efproxies[0].create(m_act, null, null, false);
@@ -151,36 +127,15 @@ public class DurableSinglyLinkedListNGTest {
 
   @SuppressWarnings("unchecked")
   @Test(enabled = false)
-  public void testLinkedNodeValueWithPerson() {
+  public void testLinkedNodeValueWithPerson()
+      throws ClassNotFoundException, NoSuchMethodException {
 
     int elem_count = 10;
     List<Long> referlist = new ArrayList();
 
     DurableType listgftypes[] = {DurableType.DURABLE};
-    EntityFactoryProxy listefproxies[] = {new EntityFactoryProxy() {
-      @Override
-      public <A extends RestorableAllocator<A>> Person<Long> restore(
-          A allocator, EntityFactoryProxy[] factoryproxys,
-          DurableType[] gfields, long phandler, boolean autoreclaim) {
-        return PersonFactory.restore(allocator, factoryproxys, gfields, phandler, autoreclaim);
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> Person<Long> restore(ParameterHolder<A> ph) {
-        return PersonFactory.restore(ph.getAllocator(),
-                ph.getEntityFactoryProxies(), ph.getGenericTypes(), ph.getHandler(), ph.getAutoReclaim());
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> Person<Long> create(
-          A allocator, EntityFactoryProxy[] factoryproxys,
-          DurableType[] gfields, boolean autoreclaim) {
-        return PersonFactory.create(allocator, factoryproxys, gfields, autoreclaim);
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> Person<Long> create(ParameterHolder<A> ph) {
-        return PersonFactory.create(ph.getAllocator(),
-                ph.getEntityFactoryProxies(), ph.getGenericTypes(), ph.getAutoReclaim());
-      }
-    } };
+    EntityFactoryProxy listefproxies[] = {
+        new EntityFactoryProxyHelper<Person>(Person.class) };
 
     DurableSinglyLinkedList<Person<Long>> list = DurableSinglyLinkedListFactory.create(m_act, listefproxies,
             listgftypes, false);
@@ -230,7 +185,8 @@ public class DurableSinglyLinkedListNGTest {
   }
 
   @Test(enabled = true)
-  public void testLinkedNodeValueWithLinkedNodeValue() {
+  public void testLinkedNodeValueWithLinkedNodeValue()
+      throws ClassNotFoundException, NoSuchMethodException {
 
     int elem_count = 10;
     long slotKeyId = 10;
@@ -239,67 +195,12 @@ public class DurableSinglyLinkedListNGTest {
     EntityFactoryProxy[] elem_efproxies = null;
 
     DurableType linkedgftypes[] = {DurableType.DURABLE, DurableType.DOUBLE};
-    EntityFactoryProxy linkedefproxies[] = {new EntityFactoryProxy() {
-      @Override
-      public <A extends RestorableAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
-          DurableType[] gfields, long phandler, boolean autoreclaim) {
-        Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, 1);
-        return SinglyLinkedNodeFactory.restore(allocator, dpt.getRight(), dpt.getLeft(), phandler, autoreclaim);
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> Durable restore(ParameterHolder<A> ph) {
-        Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(ph.getGenericTypes(),
-                ph.getEntityFactoryProxies(), 1);
-        return SinglyLinkedNodeFactory.restore(ph.getAllocator(),
-                dpt.getRight(), dpt.getLeft(), ph.getHandler(), ph.getAutoReclaim());
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> Durable create(
-          A allocator, EntityFactoryProxy[] factoryproxys,
-          DurableType[] gfields, boolean autoreclaim) {
-        Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, 1);
-        return SinglyLinkedNodeFactory.create(allocator, dpt.getRight(), dpt.getLeft(), autoreclaim);
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> Durable create(ParameterHolder<A> ph) {
-        Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(ph.getGenericTypes(),
-                ph.getEntityFactoryProxies(), 1);
-        return SinglyLinkedNodeFactory.create(ph.getAllocator(),
-                dpt.getRight(), dpt.getLeft(), ph.getAutoReclaim());
-      }
-    } };
+    EntityFactoryProxy linkedefproxies[] = {
+        new EntityFactoryProxyHelper<SinglyLinkedNode>(SinglyLinkedNode.class, 1) };
 
     DurableType listgftypes[] = {DurableType.DURABLE, DurableType.DOUBLE};
-    EntityFactoryProxy listefproxies[] = {new EntityFactoryProxy() {
-      @Override
-      public <A extends RestorableAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
-                                                                DurableType[] gfields,
-                                                                long phandler, boolean autoreclaim) {
-        Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, 1);
-        return DurableSinglyLinkedListFactory.restore(allocator, dpt.getRight(), dpt.getLeft(), phandler, autoreclaim);
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> Durable restore(ParameterHolder<A> ph) {
-        Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(ph.getGenericTypes(),
-                ph.getEntityFactoryProxies(), 1);
-        return DurableSinglyLinkedListFactory.restore(ph.getAllocator(),
-                dpt.getRight(), dpt.getLeft(), ph.getHandler(), ph.getAutoReclaim());
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> Durable create(
-              A allocator, EntityFactoryProxy[] factoryproxys,
-              DurableType[] gfields, boolean autoreclaim) {
-        Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, 1);
-        return DurableSinglyLinkedListFactory.create(allocator, dpt.getRight(), dpt.getLeft(), autoreclaim);
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> Durable create(ParameterHolder<A> ph) {
-        Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(ph.getGenericTypes(),
-                ph.getEntityFactoryProxies(), 1);
-        return DurableSinglyLinkedListFactory.create(ph.getAllocator(),
-                dpt.getRight(), dpt.getLeft(), ph.getAutoReclaim());
-      }
-    } };
+    EntityFactoryProxy listefproxies[] = {
+        new EntityFactoryProxyHelper<DurableSinglyLinkedList>(DurableSinglyLinkedList.class, 1) };
 
     SinglyLinkedNode<SinglyLinkedNode<Double>> nextnv = null, pre_nextnv = null;
     SinglyLinkedNode<Double> elem = null, pre_elem = null, first_elem = null;

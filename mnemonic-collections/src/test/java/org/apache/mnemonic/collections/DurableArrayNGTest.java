@@ -22,20 +22,17 @@ import java.util.Random;
 import java.util.zip.Checksum;
 import java.util.zip.CRC32;
 import java.util.Iterator;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.ArrayUtils;
 
+import org.apache.mnemonic.EntityFactoryProxyHelper;
 import org.apache.mnemonic.Utils;
 import org.apache.mnemonic.NonVolatileMemAllocator;
-import org.apache.mnemonic.RestorableAllocator;
 import org.apache.mnemonic.OutOfHybridMemory;
 import org.apache.mnemonic.DurableBuffer;
 import org.apache.mnemonic.DurableChunk;
 import org.apache.mnemonic.DurableType;
-import org.apache.mnemonic.Durable;
 import org.apache.mnemonic.EntityFactoryProxy;
 import org.apache.mnemonic.Reclaim;
-import org.apache.mnemonic.ParameterHolder;
 import org.apache.commons.lang3.RandomUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -299,33 +296,9 @@ public class DurableArrayNGTest {
   }
 
   @Test(enabled = true)
-  public void testGetSetArrayDurable() {
+  public void testGetSetArrayDurable() throws NoSuchMethodException, ClassNotFoundException {
     DurableType gtypes[] = {DurableType.DURABLE};
-    EntityFactoryProxy efproxies[] = {new EntityFactoryProxy() {
-      @Override
-      public <A extends RestorableAllocator<A>> Person<Long> restore(
-          A allocator, EntityFactoryProxy[] factoryproxys,
-          DurableType[] gfields, long phandler, boolean autoreclaim) {
-        return PersonFactory.restore(allocator, factoryproxys, gfields, phandler, autoreclaim);
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> Person<Long> restore(ParameterHolder<A> ph) {
-        return PersonFactory.restore(ph.getAllocator(),
-            ph.getEntityFactoryProxies(), ph.getGenericTypes(), ph.getHandler(), ph.getAutoReclaim());
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> Person<Long> create(
-          A allocator, EntityFactoryProxy[] factoryproxys,
-          DurableType[] gfields, boolean autoreclaim) {
-        return PersonFactory.create(allocator, factoryproxys, gfields, autoreclaim);
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> Person<Long> create(ParameterHolder<A> ph) {
-        return PersonFactory.create(ph.getAllocator(),
-            ph.getEntityFactoryProxies(), ph.getGenericTypes(), ph.getAutoReclaim());
-      } 
-    }
-    };
+    EntityFactoryProxy efproxies[] = {new EntityFactoryProxyHelper<Person>(Person.class)};
 
     Person<Long> person =  (Person<Long>) efproxies[0].create(m_act, null, null, false);
     person.setName("Alice", false);
@@ -351,7 +324,7 @@ public class DurableArrayNGTest {
   }
 
   @Test(enabled = true)
-  public void testGetSetArrayLinkedNodeInteger() {
+  public void testGetSetArrayLinkedNodeInteger() throws NoSuchMethodException, ClassNotFoundException {
     int val = rand.nextInt();
     int capacity = 10;
     DurableType gtypes[] = {DurableType.INTEGER};
@@ -359,36 +332,8 @@ public class DurableArrayNGTest {
     plln.setItem(val, true);
 
     DurableType arraytypes[] = {DurableType.DURABLE, DurableType.INTEGER};
-    EntityFactoryProxy arrayproxies[] = {new EntityFactoryProxy() {
-      @Override
-      public <A extends RestorableAllocator<A>> Durable restore(A allocator, EntityFactoryProxy[] factoryproxys,
-          DurableType[] gfields, long phandler, boolean autoreclaim) {
-        Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, 1);
-        return SinglyLinkedNodeFactory.restore(allocator, dpt.getRight(), dpt.getLeft(), phandler, autoreclaim);
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> Durable restore(ParameterHolder<A> ph) {
-        Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(ph.getGenericTypes(),
-            ph.getEntityFactoryProxies(), 1);
-        return SinglyLinkedNodeFactory.restore(ph.getAllocator(),
-            dpt.getRight(), dpt.getLeft(), ph.getHandler(), ph.getAutoReclaim());
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> Durable create(
-          A allocator, EntityFactoryProxy[] factoryproxys,
-          DurableType[] gfields, boolean autoreclaim) {
-        Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, 1);
-        return SinglyLinkedNodeFactory.create(allocator, dpt.getRight(), dpt.getLeft(), autoreclaim);
-      }
-      @Override     
-      public <A extends RestorableAllocator<A>> Durable create(ParameterHolder<A> ph) {
-        Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(ph.getGenericTypes(),
-            ph.getEntityFactoryProxies(), 1);
-        return SinglyLinkedNodeFactory.create(ph.getAllocator(),
-            dpt.getRight(), dpt.getLeft(), ph.getAutoReclaim());
-      }
-    }
-    };
+    EntityFactoryProxy arrayproxies[] = {
+        new EntityFactoryProxyHelper<SinglyLinkedNode>(SinglyLinkedNode.class, 1)};
     DurableArray<SinglyLinkedNode<Integer>> array = DurableArrayFactory.create(m_act, arrayproxies,
                                         arraytypes, capacity, false);
 
@@ -404,33 +349,9 @@ public class DurableArrayNGTest {
   }
 
   @Test(enabled = true)
-  public void testGetSetArrayofMaps() {
+  public void testGetSetArrayofMaps() throws NoSuchMethodException, ClassNotFoundException {
   DurableType gtypes[] = {DurableType.STRING, DurableType.DURABLE};
-    EntityFactoryProxy efproxies[] = {null, new EntityFactoryProxy() {
-      @Override
-      public <A extends RestorableAllocator<A>> Person<Long> restore(
-          A allocator, EntityFactoryProxy[] factoryproxys,
-          DurableType[] gfields, long phandler, boolean autoreclaim) {
-        return PersonFactory.restore(allocator, factoryproxys, gfields, phandler, autoreclaim);
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> Person<Long> restore(ParameterHolder<A> ph) {
-        return PersonFactory.restore(ph.getAllocator(),
-            ph.getEntityFactoryProxies(), ph.getGenericTypes(), ph.getHandler(), ph.getAutoReclaim());
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> Person<Long> create(
-          A allocator, EntityFactoryProxy[] factoryproxys,
-          DurableType[] gfields, boolean autoreclaim) {
-        return PersonFactory.create(allocator, factoryproxys, gfields, autoreclaim);
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> Person<Long> create(ParameterHolder<A> ph) {
-        return PersonFactory.create(ph.getAllocator(),
-            ph.getEntityFactoryProxies(), ph.getGenericTypes(), ph.getAutoReclaim());
-      }
-    }
-    };
+    EntityFactoryProxy efproxies[] = {null, new EntityFactoryProxyHelper<Person>(Person.class)};
     Person<Long> person =  (Person<Long>) efproxies[1].create(m_act, null, null, false);
     person.setName("Alice", false);
     person.setAge((short) 31);
@@ -447,37 +368,8 @@ public class DurableArrayNGTest {
 
     DurableType arraytypes[] = {DurableType.DURABLE};
     arraytypes = ArrayUtils.addAll(arraytypes, gtypes);
-    EntityFactoryProxy arrayproxies[] = {new EntityFactoryProxy() {
-      @Override
-      public <A extends RestorableAllocator<A>> DurableHashMap<String, Person<Long>> restore(
-          A allocator, EntityFactoryProxy[] factoryproxys,
-          DurableType[] gfields, long phandler, boolean autoreclaim) {
-          Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, 1);
-        return DurableHashMapFactory.restore(allocator, dpt.getRight(), dpt.getLeft(), phandler, autoreclaim);
-          }
-      @Override
-      public <A extends RestorableAllocator<A>> DurableHashMap<String, Person<Long>> restore(ParameterHolder<A> ph) {
-          Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(ph.getGenericTypes(),
-              ph.getEntityFactoryProxies(), 1);
-        return DurableHashMapFactory.restore(ph.getAllocator(),
-              dpt.getRight(), dpt.getLeft(), ph.getHandler(), ph.getAutoReclaim());
-      }
-      @Override
-      public <A extends RestorableAllocator<A>> DurableHashMap<String, Person<Long>> create(
-          A allocator, EntityFactoryProxy[] factoryproxys,
-          DurableType[] gfields, boolean autoreclaim) {
-          Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, 1);
-        return DurableHashMapFactory.create(allocator, dpt.getRight(), dpt.getLeft(), 10, autoreclaim);
-          }
-      @Override
-      public <A extends RestorableAllocator<A>> DurableHashMap<String, Person<Long>> create(ParameterHolder<A> ph) {
-          Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(ph.getGenericTypes(),
-              ph.getEntityFactoryProxies(), 1);
-        return DurableHashMapFactory.create(ph.getAllocator(),
-                dpt.getRight(), dpt.getLeft(), 10, ph.getAutoReclaim());
-      }
-    }
-    };
+    EntityFactoryProxy arrayproxies[] = {
+        new EntityFactoryProxyHelper<DurableHashMap>(DurableHashMap.class, 1)};
     arrayproxies = ArrayUtils.addAll(arrayproxies, efproxies);
 
     DurableArray<DurableHashMap<String, Person<Long>>> array = DurableArrayFactory.create(m_act, arrayproxies,

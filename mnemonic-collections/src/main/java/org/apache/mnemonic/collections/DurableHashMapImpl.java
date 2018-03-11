@@ -17,9 +17,11 @@
 
 package org.apache.mnemonic.collections;
 
+import org.apache.mnemonic.ConfigurationException;
 import org.apache.mnemonic.EntityFactoryProxy;
 import org.apache.mnemonic.DurableType;
 import org.apache.mnemonic.Durable;
+import org.apache.mnemonic.EntityFactoryProxyHelper;
 import org.apache.mnemonic.MemChunkHolder;
 import org.apache.mnemonic.MemoryDurableEntity;
 import org.apache.mnemonic.OutOfHybridMemory;
@@ -27,9 +29,6 @@ import org.apache.mnemonic.RestorableAllocator;
 import org.apache.mnemonic.RestoreDurableEntityError;
 import org.apache.mnemonic.RetrieveDurableEntityError;
 import org.apache.mnemonic.Utils;
-import org.apache.mnemonic.ParameterHolder;
-
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.ArrayUtils;
 import org.flowcomputing.commons.resgc.ReclaimContext;
 import sun.misc.Unsafe;
@@ -482,37 +481,15 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
     this.reclaimcontext = rctx;
     DurableType gftypes[] = {DurableType.DURABLE};
     this.listgftypes = ArrayUtils.addAll(gftypes, genericField);
-    EntityFactoryProxy efproxies[] = {new EntityFactoryProxy() {
-      @Override
-      public <A extends RestorableAllocator<A>> MapEntry<K, V> restore(
-          A allocator, EntityFactoryProxy[] factoryproxys,
-          DurableType[] gfields, long phandler, boolean autoreclaim) {
-          Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, 1);
-        return MapEntryFactory.restore(allocator, dpt.getRight(), dpt.getLeft(), phandler, autoreclaim, reclaimcontext);
-          }
-      @Override
-      public <A extends RestorableAllocator<A>> MapEntry<K, V> restore(ParameterHolder<A> ph) {
-          Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(ph.getGenericTypes(),
-              ph.getEntityFactoryProxies(), 1);
-        return MapEntryFactory.restore(ph.getAllocator(),
-              dpt.getRight(), dpt.getLeft(), ph.getHandler(), ph.getAutoReclaim(), reclaimcontext);
-          }
-      @Override
-      public <A extends RestorableAllocator<A>> MapEntry<K, V> create(
-          A allocator, EntityFactoryProxy[] factoryproxys,
-          DurableType[] gfields, boolean autoreclaim) {
-          Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(gfields, factoryproxys, 1);
-        return MapEntryFactory.create(allocator, dpt.getRight(), dpt.getLeft(), autoreclaim, reclaimcontext);
-          }
-      @Override
-      public <A extends RestorableAllocator<A>> MapEntry<K, V> create(ParameterHolder<A> ph) {
-          Pair<DurableType[], EntityFactoryProxy[]> dpt = Utils.shiftDurableParams(ph.getGenericTypes(),
-              ph.getEntityFactoryProxies(), 1);
-        return MapEntryFactory.create(ph.getAllocator(), dpt.getRight(), dpt.getLeft(),
-                ph.getAutoReclaim(), reclaimcontext);
-          }
+    EntityFactoryProxy efproxies[] = new EntityFactoryProxy[0];
+    try {
+      efproxies = new EntityFactoryProxy[]{
+          new EntityFactoryProxyHelper<MapEntry>(MapEntry.class, 1, reclaimcontext)};
+    } catch (ClassNotFoundException e) {
+      throw new ConfigurationException("Class MapEntry not found");
+    } catch (NoSuchMethodException e) {
+      throw new ConfigurationException("The methods of class MapEntry not found");
     }
-    };
     this.listefproxies = ArrayUtils.addAll(efproxies, factoryProxy);
     try {
       this.unsafe = Utils.getUnsafe();
