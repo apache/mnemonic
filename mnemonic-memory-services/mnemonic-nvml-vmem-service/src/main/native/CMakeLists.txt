@@ -38,7 +38,7 @@ include_directories(${JNI_INCLUDE_DIRS})
 find_package(Threads REQUIRED)
 include_directories(${CMAKE_THREAD_LIBS_INIT})
 
-find_library(LIBVMEM_LIBRARIES NAMES libvmem.a)
+find_library(LIBVMEM_LIBRARIES NAMES libvmem.a libvmem.so)
 if (NOT LIBVMEM_LIBRARIES)
    message(FATAL_ERROR "not found vmem library")
 endif (NOT LIBVMEM_LIBRARIES)
