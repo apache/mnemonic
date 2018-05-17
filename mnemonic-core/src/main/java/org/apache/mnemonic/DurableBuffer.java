@@ -86,4 +86,9 @@ public class DurableBuffer<A extends RetrievableAllocator<A>> extends MemBufferH
     return null;
   }
 
+  @Override
+  public void refbreak() {
+    return;
+  }
+
 }

@@ -406,6 +406,11 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
   }
 
   @Override
+  public void refbreak() {
+    return;
+  }
+
+  @Override
   public void destroy() throws RetrieveDurableEntityError {
     long bucketAddr = holder.get();
     long maxbucketAddr = bucketAddr + MAX_OBJECT_SIZE * totalCapacity;

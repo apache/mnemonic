@@ -194,6 +194,7 @@ public class AnnotatedDurableEntityClass {
     m_durablemtdinfo.put("syncToNonVolatileMemory", new ArrayList<MethodInfo>());
     m_durablemtdinfo.put("syncToLocal", new ArrayList<MethodInfo>());
     m_durablemtdinfo.put("getNativeFieldInfo", new ArrayList<MethodInfo>());
+    m_durablemtdinfo.put("refbreak", new ArrayList<MethodInfo>());
 
     m_entitymtdinfo.put("initializeDurableEntity", new MethodInfo());
     m_entitymtdinfo.put("createDurableEntity", new MethodInfo());
@@ -858,6 +859,9 @@ public class AnnotatedDurableEntityClass {
             break;
           case "getNativeFieldInfo":
             code.addStatement("return $1N", m_fieldsinfo.get("nfieldinfo").name);
+            break;
+          case "refbreak":
+            code.addStatement("return");
             break;
           default:
             throw new AnnotationProcessingException(null, "Method %s is not supported.", name);

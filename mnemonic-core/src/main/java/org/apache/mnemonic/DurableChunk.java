@@ -84,6 +84,11 @@ public class DurableChunk<A extends RetrievableAllocator<A>> extends MemChunkHol
     return null;
   }
 
+  @Override
+  public void refbreak() {
+    return;
+  }
+
   /**
    * Get a buffer backed by a region of DurableChunk
    * @param offset

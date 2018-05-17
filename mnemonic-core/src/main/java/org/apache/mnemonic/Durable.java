@@ -117,4 +117,10 @@ public interface Durable {
    *
    */
   long[][] getNativeFieldInfo();
+
+  /**
+   * break all marked live references
+   */
+  void refbreak();
+
 }

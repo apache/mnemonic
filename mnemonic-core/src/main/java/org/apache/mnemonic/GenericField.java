@@ -571,4 +571,9 @@ public class GenericField<A extends RestorableAllocator<A>, E> implements Durabl
   public long[][] getNativeFieldInfo() {
     throw new UnsupportedOperationException("getNativeFieldInfo() on Generic Field.");
   }
+
+  @Override
+  public void refbreak() {
+    return;
+  }
 }

@@ -523,6 +523,11 @@ public class DurableTreeImpl<A extends RestorableAllocator<A>, E extends Compara
   }
 
   @Override
+  public void refbreak() {
+    return;
+  }
+
+  @Override
   public void destroy() throws RetrieveDurableEntityError {
     destroy(root);
     holder.destroy();

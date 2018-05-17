@@ -123,6 +123,11 @@ public class DurableSinglyLinkedListImpl<A extends RestorableAllocator<A>, E>
   }
 
   @Override
+  public void refbreak() {
+    return;
+  }
+
+  @Override
   public void syncToVolatileMemory() {
     holder.syncToVolatileMemory();
   }

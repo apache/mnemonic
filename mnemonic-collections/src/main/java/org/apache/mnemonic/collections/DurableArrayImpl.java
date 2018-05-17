@@ -167,6 +167,11 @@ public class DurableArrayImpl<A extends RestorableAllocator<A>, E>
   }
 
   @Override
+  public void refbreak() {
+    return;
+  }
+
+  @Override
   public void destroy() throws RetrieveDurableEntityError {
     long startAddr = holder.get();
     long endAddr = startAddr + MAX_OBJECT_SIZE * arraySize;
