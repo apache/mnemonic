@@ -80,6 +80,7 @@ public class AnnotatedDurableEntityClass {
     public String gftypesname;
     public long fieldoff;
     public long fieldsize;
+    public boolean refbreak;
   }
 
   protected final String cFACTORYNAMESUFFIX = "Factory";
@@ -306,6 +307,7 @@ public class AnnotatedDurableEntityClass {
           fieldinfo.efproxiesname = pgetter.EntityFactoryProxies();
           fieldinfo.gftypesname = pgetter.GenericFieldTypes();
           fieldinfo.id = pgetter.Id();
+          fieldinfo.refbreak = elem.getAnnotation(RefBreak.class) != null;
           m_dynfieldsinfo.put(methodname.substring(3), fieldinfo);
 
         }
@@ -861,7 +863,11 @@ public class AnnotatedDurableEntityClass {
             code.addStatement("return $1N", m_fieldsinfo.get("nfieldinfo").name);
             break;
           case "refbreak":
-            code.addStatement("return");
+            for (FieldInfo fldinfo : m_dynfieldsinfo.values()) {
+              if (fldinfo.refbreak && !isUnboxPrimitive(fldinfo.type)) {
+                code.addStatement("$1N = null", fldinfo.name);
+              }
+            }
             break;
           default:
             throw new AnnotationProcessingException(null, "Method %s is not supported.", name);
