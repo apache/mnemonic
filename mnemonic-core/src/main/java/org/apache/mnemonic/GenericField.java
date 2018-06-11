@@ -574,6 +574,9 @@ public class GenericField<A extends RestorableAllocator<A>, E> implements Durabl
 
   @Override
   public void refbreak() {
-    return;
+    m_field = null;
+    m_strfield = null;
+    m_chunkfield = null;
+    m_bufferfield = null;
   }
 }
