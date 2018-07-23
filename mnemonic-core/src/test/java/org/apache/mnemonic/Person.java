@@ -83,12 +83,14 @@ public abstract class Person<E> implements Durable, Comparable<Person<E>> {
   public abstract void setPreference(DurableChunk<?> mch, boolean destroy);
 
   @DurableGetter
+  @RefBreak
   public abstract Person<E> getMother() throws RetrieveDurableEntityError;
 
   @DurableSetter
   public abstract void setMother(Person<E> mother, boolean destroy) throws RetrieveDurableEntityError;
 
   @DurableGetter
+  @RefBreak
   public abstract Person<E> getFather() throws RetrieveDurableEntityError;
 
   @DurableSetter
