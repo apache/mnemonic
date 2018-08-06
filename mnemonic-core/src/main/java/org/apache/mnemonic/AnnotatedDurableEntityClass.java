@@ -865,6 +865,10 @@ public class AnnotatedDurableEntityClass {
           case "refbreak":
             for (FieldInfo fldinfo : m_dynfieldsinfo.values()) {
               if (fldinfo.refbreak && !isUnboxPrimitive(fldinfo.type)) {
+                code.beginControlFlow("if ($1N != null && $1N.autoReclaim())", fldinfo.name);
+                code.addStatement(
+                    "throw new ReferenceBreakingException(\"Not be able to break reference if it is reclaimable.\")");
+                code.endControlFlow();
                 code.addStatement("$1N = null", fldinfo.name);
               }
             }
