@@ -73,17 +73,51 @@ public class ChunkBuffer<A extends RetrievableAllocator<A>> {
       alloc.syncToNonVolatileMemory(m_dchunk.get() + m_offset, m_size, false);
     } else {
       throw new UnsupportedOperationException("The ChunkBuffer does not backed by a non-volatile allocator");
-      }
     }
+  }
+
+  public void syncToNonVolatileMemory(long offset, int length) {
+    if (offset < 0 || length < 0 || offset + length > this.m_size) {
+      throw new OutOfBoundsException("The requested offset and length are out of bounds for this buffer: length = "
+          + length + " , offset = " + offset);
+    }
+    if (m_dchunk.getAllocator() instanceof NonVolatileMemAllocator) {
+      NonVolatileMemAllocator alloc = (NonVolatileMemAllocator) m_dchunk.getAllocator();
+      alloc.syncToNonVolatileMemory(m_dchunk.get() + m_offset + offset, length, false);
+    } else {
+      throw new UnsupportedOperationException("The ChunkBuffer does not backed by a non-volatile allocator");
+    }
+  }
 
   public void syncToVolatileMemory() {
     m_dchunk.getAllocator().syncToVolatileMemory(m_dchunk.get() + m_offset, m_size, false);
+  }
+
+  public void syncToVolatileMemory(long offset, int length) {
+    if (offset < 0 || length < 0 || offset + length > this.m_size) {
+      throw new OutOfBoundsException("The requested offset and length are out of bounds for this buffer: length = "
+          + length + " , offset = " + offset);
+    }
+    m_dchunk.getAllocator().syncToVolatileMemory(m_dchunk.get() + m_offset + offset, length, false);
   }
 
   public void syncToLocal() {
     if (m_dchunk.getAllocator() instanceof NonVolatileMemAllocator) {
       NonVolatileMemAllocator alloc = (NonVolatileMemAllocator) m_dchunk.getAllocator();
       alloc.syncToLocal(m_dchunk.get() + m_offset, m_size, false);
+    } else {
+      throw new UnsupportedOperationException("The ChunkBuffer does not backed by a non-volatile allocator");
+    }
+  }
+
+  public void syncToLocal(long offset, int length) {
+    if (offset < 0 || length < 0 || offset + length > this.m_size) {
+      throw new OutOfBoundsException("The requested offset and length are out of bounds for this buffer: length = "
+          + length + " , offset = " + offset);
+    }
+    if (m_dchunk.getAllocator() instanceof NonVolatileMemAllocator) {
+      NonVolatileMemAllocator alloc = (NonVolatileMemAllocator) m_dchunk.getAllocator();
+      alloc.syncToLocal(m_dchunk.get() + m_offset + offset, length, false);
     } else {
       throw new UnsupportedOperationException("The ChunkBuffer does not backed by a non-volatile allocator");
     }
