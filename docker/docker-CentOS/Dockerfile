@@ -33,9 +33,9 @@ RUN curl -sSL https://s3.amazonaws.com/download.fpcomplete.com/centos/7/fpco.rep
 RUN yum -y update && yum -y groupinstall 'Development Tools' && \
     yum -y install java-devel cmake check check-devel libuuid-devel man zlib-devel wget stack && yum clean all
 
-RUN curl -O http://apache.mirrors.ionfish.org/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz && \
-    tar xvf apache-maven-3.3.9-bin.tar.gz && \
-    mv apache-maven-3.3.9 /usr/local/apache-maven
+RUN curl -O http://apache.mirrors.ionfish.org/maven/maven-3/3.3.9/binaries/apache-maven-3.5.4-bin.tar.gz && \
+    tar xvf apache-maven-3.5.4-bin.tar.gz && \
+    mv apache-maven-3.5.4 /usr/local/apache-maven
 
 ENV M2_HOME /usr/local/apache-maven
 ENV M2 $M2_HOME/bin
