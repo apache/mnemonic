@@ -29,11 +29,15 @@ ENV HTTPS_PROXY ${http_proxy}
 RUN echo The proxy set : ${http_proxy}
 
 RUN apt-get -y update && \
-    apt-get install -y default-jdk cmake check git maven pkg-config autoconf man build-essential gcc g++ uuid-dev pandoc devscripts flex doxygen
+    apt-get install -y default-jdk cmake check git pkg-config autoconf man build-essential gcc g++ uuid-dev pandoc devscripts flex doxygen
 
 RUN apt-get clean
-    
-ENV M2_HOME /usr/share/maven
+
+RUN curl -O http://mirror.cogentco.com/pub/apache/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz && \
+    tar xvf apache-maven-3.5.4-bin.tar.gz && \
+    mv apache-maven-3.5.4 /usr/local/apache-maven
+
+ENV M2_HOME /usr/local/apache-maven
 ENV M2 $M2_HOME/bin
 ENV PATH $M2:$PATH
 ENV JAVA_HOME /usr/lib/jvm/default-java
