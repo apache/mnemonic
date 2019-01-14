@@ -33,6 +33,9 @@ RUN curl -sSL https://s3.amazonaws.com/download.fpcomplete.com/centos/7/fpco.rep
 RUN yum -y update && yum -y groupinstall 'Development Tools' && \
     yum -y install java-devel cmake check check-devel libuuid-devel man zlib-devel wget stack && yum clean all
 
+# required packages by pmdk
+RUN yum install -y which autoconf asciidoc xmlto automake libtool kmod-devel libudev-devel uuid-devel json-c-devel
+
 RUN curl -O http://mirror.cogentco.com/pub/apache/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz && \
     tar xvf apache-maven-3.5.4-bin.tar.gz && \
     mv apache-maven-3.5.4 /usr/local/apache-maven
@@ -57,6 +60,19 @@ RUN cd /ws && git clone https://github.com/NonVolatileComputing/pmalloc.git && \
 
 RUN cd /ws && git clone https://github.com/pmem/nvml.git && \
     cd nvml && git checkout 630862e82f && make && make install
+
+# deploy ndctl required by pmdk
+RUN cd /ws && git clone https://github.com/pmem/ndctl.git && \
+    cd ndctl && git checkout ndctl-60.y && \
+    ./autogen.sh && ./configure CFLAGS='-g -O0' --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib && \
+    make && make check && make install
+
+# deploy pmdk
+RUN cd /ws && git clone https://github.com/pmem/pmdk.git && \
+    cd pmdk && git checkout stable-1.4 && make && \
+#    the test run time is too long
+#    cp src/test/testconfig.sh.example src/test/testconfig.sh && make check && \
+    make install
 
 RUN touch /etc/profile.d/mvn.sh && chmod +x /etc/profile.d/mvn.sh && \
     if [ "x" != "x${proxy_host}" ]; then echo export MAVEN_OPTS="\" -DproxySet=\\\"true\\\" -DproxyHost=${proxy_host} -DproxyPort=${proxy_port} \"" > /etc/profile.d/mvn.sh; fi
