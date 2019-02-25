@@ -16,33 +16,29 @@
  * limitations under the License.
  */
 
-package org.apache.mnemonic.mapreduce;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Random;
+package org.apache.mnemonic.mapred;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapreduce.InputFormat;
-import org.apache.hadoop.mapreduce.OutputFormat;
-import org.apache.hadoop.mapreduce.RecordReader;
-import org.apache.hadoop.mapreduce.RecordWriter;
-import org.apache.hadoop.mapreduce.TaskAttemptContext;
-import org.apache.hadoop.mapreduce.TaskAttemptID;
+import org.apache.hadoop.mapred.InputFormat;
+import org.apache.hadoop.mapred.OutputFormat;
+import org.apache.hadoop.mapred.RecordReader;
+import org.apache.hadoop.mapred.RecordWriter;
+import org.apache.hadoop.mapred.FileSplit;
+import org.apache.hadoop.mapred.TaskAttemptID;
+import org.apache.hadoop.mapred.TaskAttemptContext;
+import org.apache.hadoop.mapred.TaskAttemptContextImpl;
 import org.apache.hadoop.mapreduce.TaskType;
-import org.apache.hadoop.mapreduce.lib.input.FileSplit;
-import org.apache.hadoop.mapreduce.task.TaskAttemptContextImpl;
 import org.apache.mnemonic.DurableType;
 import org.apache.mnemonic.Utils;
 import org.apache.mnemonic.hadoop.MneConfigHelper;
 import org.apache.mnemonic.hadoop.MneDurableInputValue;
 import org.apache.mnemonic.hadoop.MneDurableOutputSession;
 import org.apache.mnemonic.hadoop.MneDurableOutputValue;
-import org.apache.mnemonic.hadoop.mapreduce.MneInputFormat;
-import org.apache.mnemonic.hadoop.mapreduce.MneOutputFormat;
+import org.apache.mnemonic.hadoop.mapred.MneInputFormat;
+import org.apache.mnemonic.hadoop.mapred.MneOutputFormat;
 import org.apache.mnemonic.common.Person;
 import org.apache.mnemonic.common.PersonListEFProxy;
 import org.testng.AssertJUnit;
@@ -50,7 +46,11 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class MneMapreducePersonDataTest {
+import java.io.File;
+import java.io.IOException;
+import java.util.Random;
+
+public class MneMapredPersonDataTest {
 
   private static final String DEFAULT_BASE_WORK_DIR = "target" + File.separator + "test" + File.separator + "tmp";
   private static final String DEFAULT_WORK_DIR = DEFAULT_BASE_WORK_DIR + File.separator + "person-data";
@@ -68,7 +68,7 @@ public class MneMapreducePersonDataTest {
   @BeforeClass
   public void setUp() throws IOException {
     m_workdir = new Path(
-        System.getProperty("test.tmp.dir", DEFAULT_WORK_DIR));
+            System.getProperty("test.tmp.dir", DEFAULT_WORK_DIR));
     m_conf = new JobConf();
     m_rand = Utils.createRandom();
 
@@ -89,17 +89,17 @@ public class MneMapreducePersonDataTest {
     MneConfigHelper.setMemServiceName(m_conf, MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX, SERVICE_NAME);
     MneConfigHelper.setSlotKeyId(m_conf, MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX, SLOT_KEY_ID);
     MneConfigHelper.setDurableTypes(m_conf,
-        MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX, new DurableType[] {DurableType.DURABLE});
+            MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX, new DurableType[]{DurableType.DURABLE});
     MneConfigHelper.setEntityFactoryProxies(m_conf,
-        MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX, new Class<?>[] {PersonListEFProxy.class});
+            MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX, new Class<?>[]{PersonListEFProxy.class});
     MneConfigHelper.setMemServiceName(m_conf, MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX, SERVICE_NAME);
     MneConfigHelper.setSlotKeyId(m_conf, MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX, SLOT_KEY_ID);
     MneConfigHelper.setMemPoolSize(m_conf,
-        MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX, 1024L * 1024 * 1024 * 4);
+            MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX, 1024L * 1024 * 1024 * 4);
     MneConfigHelper.setDurableTypes(m_conf,
-        MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX, new DurableType[] {DurableType.DURABLE});
+            MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX, new DurableType[]{DurableType.DURABLE});
     MneConfigHelper.setEntityFactoryProxies(m_conf,
-        MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX, new Class<?>[] {PersonListEFProxy.class});
+            MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX, new Class<?>[]{PersonListEFProxy.class});
   }
 
   @AfterClass
@@ -111,14 +111,14 @@ public class MneMapreducePersonDataTest {
   public void testWritePersonData() throws Exception {
     NullWritable nada = NullWritable.get();
     MneDurableOutputSession<Person<Long>> sess =
-        new MneDurableOutputSession<Person<Long>>(m_tacontext, null,
-            MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX);
+            new MneDurableOutputSession<Person<Long>>(m_tacontext, null,
+                    MneConfigHelper.DEFAULT_OUTPUT_CONFIG_PREFIX);
     MneDurableOutputValue<Person<Long>> mdvalue =
-        new MneDurableOutputValue<Person<Long>>(sess);
+            new MneDurableOutputValue<Person<Long>>(sess);
     OutputFormat<NullWritable, MneDurableOutputValue<Person<Long>>> outputFormat =
-        new MneOutputFormat<MneDurableOutputValue<Person<Long>>>();
+            new MneOutputFormat<MneDurableOutputValue<Person<Long>>>();
     RecordWriter<NullWritable, MneDurableOutputValue<Person<Long>>> writer =
-        outputFormat.getRecordWriter(m_tacontext);
+            outputFormat.getRecordWriter(null, m_conf, null, null);
     Person<Long> person = null;
     for (int i = 0; i < m_reccnt; ++i) {
       person = sess.newDurableObjectRecord();
@@ -127,11 +127,11 @@ public class MneMapreducePersonDataTest {
       m_sumage += person.getAge();
       writer.write(nada, mdvalue.of(person));
     }
-    writer.close(m_tacontext);
+    writer.close(null);
     sess.close();
   }
 
-  @Test(enabled = true, dependsOnMethods = { "testWritePersonData" })
+  @Test(enabled = true, dependsOnMethods = {"testWritePersonData"})
   public void testReadPersonData() throws Exception {
     long sumage = 0L;
     long reccnt = 0L;
@@ -139,21 +139,26 @@ public class MneMapreducePersonDataTest {
     File[] listfiles = folder.listFiles();
     for (int idx = 0; idx < listfiles.length; ++idx) {
       if (listfiles[idx].isFile()
-          && listfiles[idx].getName().startsWith(MneConfigHelper.getBaseOutputName(m_conf, null))
-          && listfiles[idx].getName().endsWith(MneConfigHelper.DEFAULT_FILE_EXTENSION)) {
+              && listfiles[idx].getName().startsWith(MneConfigHelper.getBaseOutputName(m_conf, null))
+              && listfiles[idx].getName().endsWith(MneConfigHelper.DEFAULT_FILE_EXTENSION)) {
         System.out.println(String.format("Verifying : %s", listfiles[idx].getName()));
         FileSplit split = new FileSplit(
-            new Path(m_workdir, listfiles[idx].getName()), 0, 0L, new String[0]);
+                new Path(m_workdir, listfiles[idx].getName()), 0, 0L, new String[0]);
         InputFormat<NullWritable, MneDurableInputValue<Person<Long>>> inputFormat =
-            new MneInputFormat<MneDurableInputValue<Person<Long>>, Person<Long>>();
+                new MneInputFormat<MneDurableInputValue<Person<Long>>, Person<Long>>();
         RecordReader<NullWritable, MneDurableInputValue<Person<Long>>> reader =
-            inputFormat.createRecordReader(split, m_tacontext);
+                inputFormat.getRecordReader(split, m_conf, null);
         MneDurableInputValue<Person<Long>> personval = null;
-        while (reader.nextKeyValue()) {
-          personval = reader.getCurrentValue();
-          AssertJUnit.assertTrue(personval.getValue().getAge() < 51);
-          sumage += personval.getValue().getAge();
-          ++reccnt;
+        NullWritable personkey = reader.createKey();
+        while (true) {
+          personval = reader.createValue();
+          if (reader.next(personkey, personval)) {
+            AssertJUnit.assertTrue(personval.getValue().getAge() < 51);
+            sumage += personval.getValue().getAge();
+            ++reccnt;
+          } else {
+            break;
+          }
         }
         reader.close();
       }

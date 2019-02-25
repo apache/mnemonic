@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.mnemonic.mapreduce;
+package org.apache.mnemonic.common;
 
 
 import org.apache.mnemonic.DurableType;
