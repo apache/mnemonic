@@ -30,16 +30,14 @@ import org.apache.mnemonic.hadoop.MneDurableOutputValue;
 
 /**
  * A Mnemonic output format that satisfies the org.apache.hadoop.mapred API.
+ *
  */
+public class MneOutputFormat<MV extends MneDurableOutputValue<?>>
+        extends FileOutputFormat<NullWritable, MV> {
 
-public class MneOutputFormat<MV extends MneDurableOutputValue<?>> extends FileOutputFormat<NullWritable, MV> {
-
-    @Override
-    public RecordWriter<NullWritable, MV> getRecordWriter(FileSystem ignored, JobConf job, String name,
-            Progressable progress) throws IOException {
-        return new MneMapredRecordWriter<MV>();
-    }
-
-
-
+  @Override
+  public RecordWriter<NullWritable, MV> getRecordWriter(FileSystem ignored, JobConf job, String name,
+                                                        Progressable progress) throws IOException {
+    return new MneMapredRecordWriter<MV>();
+  }
 }

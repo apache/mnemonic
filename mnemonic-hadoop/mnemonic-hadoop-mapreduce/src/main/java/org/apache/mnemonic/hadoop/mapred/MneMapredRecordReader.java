@@ -32,61 +32,59 @@ import org.apache.mnemonic.hadoop.MneDurableInputValue;
 /**
  * This record reader implements the org.apache.hadoop.mapred API.
  *
- * @param <V>
- *          the type of the data item
+ * @param <V> the type of the data item
  */
-
 public class MneMapredRecordReader<MV extends MneDurableInputValue<V>, V>
-    implements org.apache.hadoop.mapred.RecordReader<NullWritable, MV> {
-    
-    protected CloseableIterator<V> m_iter;
-    protected MneDurableInputSession<V> m_session;
-    protected FileSplit m_fileSplit;
+        implements org.apache.hadoop.mapred.RecordReader<NullWritable, MV> {
 
-  
-    public MneMapredRecordReader(FileSplit fileSplit, JobConf conf) throws IOException {
-        m_fileSplit = fileSplit;
-        m_session = new MneDurableInputSession<V>(null, conf,
+  protected CloseableIterator<V> m_iter;
+  protected MneDurableInputSession<V> m_session;
+  protected FileSplit m_fileSplit;
+
+
+  public MneMapredRecordReader(FileSplit fileSplit, JobConf conf) throws IOException {
+    m_fileSplit = fileSplit;
+    m_session = new MneDurableInputSession<V>(null, conf,
             new Path[]{m_fileSplit.getPath()}, MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX);
-        m_iter = m_session.iterator();
-    }
-    
-    @Override
-    public boolean next(NullWritable key, MV value) throws IOException {
-      boolean ret = false;
-      if (m_iter.hasNext()) {
-        value.of(m_iter.next());
-        ret = true;
-      }
-      return ret;
-    }
+    m_iter = m_session.iterator();
+  }
 
-    @Override
-    public NullWritable createKey() {
-        return NullWritable.get();
+  @Override
+  public boolean next(NullWritable key, MV value) throws IOException {
+    boolean ret = false;
+    if (m_iter.hasNext()) {
+      value.of(m_iter.next());
+      ret = true;
     }
+    return ret;
+  }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public MV createValue() {
-        return (MV) new MneDurableInputValue<V>(m_session);
-    }
+  @Override
+  public NullWritable createKey() {
+    return NullWritable.get();
+  }
 
-    @Override
-    public long getPos() throws IOException {
-        return m_fileSplit.getLength();
-    }
+  @SuppressWarnings("unchecked")
+  @Override
+  public MV createValue() {
+    return (MV) new MneDurableInputValue<V>(m_session);
+  }
 
-    @Override
-    public void close() throws IOException {
-      if (null != m_iter) {
-        m_iter.close();
-      }
-    }
+  @Override
+  public long getPos() throws IOException {
+    return m_fileSplit.getLength();
+  }
 
-    @Override
-    public float getProgress() throws IOException {
-        return 0.5f; /* TBD */
+  @Override
+  public void close() throws IOException {
+    if (null != m_iter) {
+      m_iter.close();
     }
+  }
+
+  @Override
+  public float getProgress() throws IOException {
+    return 0.5f; /* TBD */
+  }
 
 }

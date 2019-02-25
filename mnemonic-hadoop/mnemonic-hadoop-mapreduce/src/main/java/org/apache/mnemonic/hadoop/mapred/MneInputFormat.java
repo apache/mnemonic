@@ -32,19 +32,16 @@ import org.apache.mnemonic.hadoop.MneDurableInputValue;
 /**
  * A Mnemonic input format that satisfies the org.apache.hadoop.mapred API.
  */
+public class MneInputFormat<MV extends MneDurableInputValue<V>, V> extends FileInputFormat<NullWritable, MV> {
 
-public class MneInputFormat<MV extends MneDurableInputValue<V>, V>
-    extends FileInputFormat<NullWritable, MV> {
-
-    @Override
-    public RecordReader<NullWritable, MV> 
-        getRecordReader(InputSplit inputSpilt, 
-                    JobConf jobConf, 
-                    Reporter reporter
-                    ) throws IOException {
-      MneMapredRecordReader<MV, V> reader = 
+  @Override
+  public RecordReader<NullWritable, MV>
+  getRecordReader(InputSplit inputSpilt,
+                  JobConf jobConf,
+                  Reporter reporter) throws IOException {
+    MneMapredRecordReader<MV, V> reader =
             new MneMapredRecordReader<MV, V>((FileSplit) inputSpilt, jobConf);
-      return reader;
-    }
+    return reader;
+  }
 
 }

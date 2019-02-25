@@ -28,21 +28,19 @@ import org.apache.mnemonic.hadoop.MneDurableOutputValue;
 /**
  * This record writer implements the org.apache.hadoop.mapred API.
  *
- * @param <MV>
- *          the type of the item of value
+ * @param <MV> the type of the item of value
  */
 public class MneMapredRecordWriter<MV extends MneDurableOutputValue<?>>
-    implements RecordWriter<NullWritable, MV> {
-    
+        implements RecordWriter<NullWritable, MV> {
 
-    @Override
-    public void write(NullWritable key, MV value) throws IOException {
-        value.post();
-    }
+  @Override
+  public void write(NullWritable key, MV value) throws IOException {
+    value.post();
+  }
 
-    @Override
-    public void close(Reporter reporter) throws IOException {
-    }
+  @Override
+  public void close(Reporter reporter) throws IOException {
+  }
 }
 
 

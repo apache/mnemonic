@@ -28,10 +28,10 @@ import org.apache.mnemonic.hadoop.MneDurableOutputValue;
 /**
  * This record writer implements the org.apache.hadoop.mapreduce API.
  *
- * @param <MV>
- *          the type of the item of value
+ * @param <MV> the type of the item of value
  */
-public class MneMapreduceRecordWriter<MV extends MneDurableOutputValue<?>> extends RecordWriter<NullWritable, MV> {
+public class MneMapreduceRecordWriter<MV extends MneDurableOutputValue<?>>
+        extends RecordWriter<NullWritable, MV> {
 
   @Override
   public void write(NullWritable nullWritable, MV mdvalue) throws IOException {

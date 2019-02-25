@@ -29,7 +29,8 @@ import org.apache.mnemonic.hadoop.MneDurableOutputValue;
 /**
  * A Mnemonic output format that satisfies the org.apache.hadoop.mapreduce API.
  */
-public class MneOutputFormat<MV extends MneDurableOutputValue<?>> extends FileOutputFormat<NullWritable, MV> {
+public class MneOutputFormat<MV extends MneDurableOutputValue<?>>
+        extends FileOutputFormat<NullWritable, MV> {
 
   @Override
   public RecordWriter<NullWritable, MV> getRecordWriter(TaskAttemptContext taskAttemptContext) throws IOException {

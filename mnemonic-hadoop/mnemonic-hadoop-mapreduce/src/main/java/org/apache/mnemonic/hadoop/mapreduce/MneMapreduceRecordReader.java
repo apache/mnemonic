@@ -32,11 +32,10 @@ import org.apache.mnemonic.hadoop.MneDurableInputValue;
 /**
  * This record reader implements the org.apache.hadoop.mapreduce API.
  *
- * @param <V>
- *          the type of the data item
+ * @param <V> the type of the data item
  */
 public class MneMapreduceRecordReader<MV extends MneDurableInputValue<V>, V>
-    extends org.apache.hadoop.mapreduce.RecordReader<NullWritable, MV> {
+   extends org.apache.hadoop.mapreduce.RecordReader<NullWritable, MV> {
 
   protected CloseableIterator<V> m_iter;
   protected MneDurableInputSession<V> m_session;
@@ -51,8 +50,8 @@ public class MneMapreduceRecordReader<MV extends MneDurableInputValue<V>, V>
   @Override
   public void initialize(InputSplit inputSplit, TaskAttemptContext context) {
     FileSplit split = (FileSplit) inputSplit;
-    m_session = new MneDurableInputSession<V>(context, null,
-        new Path[]{split.getPath()}, MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX);
+    m_session = new MneDurableInputSession<V>(context, null, new Path[]{split.getPath()},
+            MneConfigHelper.DEFAULT_INPUT_CONFIG_PREFIX);
     m_iter = m_session.iterator();
   }
 
