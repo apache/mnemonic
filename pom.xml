@@ -68,10 +68,6 @@
     </mailingList>
   </mailingLists>
 
-  <prerequisites>
-    <maven>${maven.min-version}</maven>
-  </prerequisites>
-
   <scm>
     <url>https://gitbox.apache.org/repos/asf/mnemonic.git</url>
     <connection>scm:git:https://gitbox.apache.org/repos/asf/mnemonic.git</connection>
@@ -101,6 +97,7 @@
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <maven.min-version>3.2.1</maven.min-version>
+    <enforcer.skip>false</enforcer.skip>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <skipTests>true</skipTests>
@@ -198,6 +195,26 @@
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>1.4.1</version>
+        <executions>
+          <execution>
+            <id>enforce-maven-version</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireMavenVersion>
+                  <version>[${maven.min-version},)</version>
+                </requireMavenVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
