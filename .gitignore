@@ -49,3 +49,7 @@ testlog/
 *.mne
 *.iml
 .idea/
+GPATH
+GRTAGS
+GTAGS
+TAGS
