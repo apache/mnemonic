@@ -28,7 +28,7 @@ ENV HTTPS_PROXY ${http_proxy}
 
 RUN echo The proxy set : ${http_proxy}
 
-RUN apt-get -y update && apt-get -y upgrade && \
+RUN apt-get -y update && \
     apt-get install -y default-jdk cmake check git pkg-config autoconf man build-essential gcc g++ uuid-dev pandoc devscripts flex doxygen
 
 # required packages by pmdk
