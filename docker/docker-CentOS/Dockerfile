@@ -30,11 +30,13 @@ RUN echo The proxy set : ${http_proxy}
 
 RUN curl -sSL https://s3.amazonaws.com/download.fpcomplete.com/centos/7/fpco.repo | tee /etc/yum.repos.d/fpco.repo
 
+RUN yum -y install epel-release
 RUN yum -y update && yum -y groupinstall 'Development Tools' && \
     yum -y install java-devel cmake check check-devel libuuid-devel man zlib-devel wget stack && yum clean all
 
 # required packages by pmdk
-RUN yum install -y which autoconf asciidoc xmlto automake libtool kmod-devel libudev-devel uuid-devel json-c-devel
+RUN yum install -y which autoconf asciidoc xmlto automake libtool kmod-devel libudev-devel uuid-devel json-c-devel \
+                   asciidoc asciidoc-doc bash-completion graphviz keyutils-libs-devel asciidoctor ndctl ndctl-devel daxctl daxctl-devel
 
 RUN curl -O http://mirror.cogentco.com/pub/apache/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz && \
     tar xvf apache-maven-3.5.4-bin.tar.gz && \
@@ -62,14 +64,14 @@ RUN cd /ws && git clone https://github.com/pmem/nvml.git && \
     cd nvml && git checkout 630862e82f && make && make install
 
 # deploy ndctl required by pmdk
-RUN cd /ws && git clone https://github.com/pmem/ndctl.git && \
-    cd ndctl && git checkout ndctl-60.y && \
-    ./autogen.sh && ./configure CFLAGS='-g -O0' --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib && \
-    make && make check && make install
+#RUN cd /ws && git clone https://github.com/pmem/ndctl.git && \
+#    cd ndctl && git checkout ndctl-64.y && \
+#    ./autogen.sh && ./configure CFLAGS='-g -O0' --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib && \
+#    make && make check && make install
 
 # deploy pmdk
 RUN cd /ws && git clone https://github.com/pmem/pmdk.git && \
-    cd pmdk && git checkout stable-1.4 && make && \
+    cd pmdk && git checkout stable-1.6 && make && \
 #    the test run time is too long
 #    cp src/test/testconfig.sh.example src/test/testconfig.sh && make check && \
     make install
@@ -89,4 +91,3 @@ ENV MNEMONIC_HOME /ws/mnemonic
 
 WORKDIR /ws
 CMD ["bash"]
-
