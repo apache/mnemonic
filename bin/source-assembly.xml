@@ -82,6 +82,8 @@
         <include>org.apache.mnemonic:mnemonic-nvml-pmem-service</include>
         <include>org.apache.mnemonic:mnemonic-sys-vmem-service</include>
         <include>org.apache.mnemonic:mnemonic-java-vmem-service</include>
+        <include>org.apache.mnemonic:mnemonic-pmdk-vmem-service</include>
+        <include>org.apache.mnemonic:mnemonic-pmdk-pmem-service</include>
       </includes>
       <sources>
         <fileSets>
@@ -281,4 +283,3 @@
     </fileSet>
   </fileSets>
 </assembly>
-
