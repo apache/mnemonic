@@ -18,9 +18,8 @@
 package org.apache.mnemonic;
 
 import org.testng.annotations.Test;
-
 import java.util.Random;
-
+import org.testng.Assert;
 /**
  * test the functionality of VolatileMemAllocator class.
  *
@@ -60,7 +59,7 @@ public class PMDKVolatileMemAllocatorNGTest {
     for (int idx = 1; idx <= 5; ++idx) {
       int size = randomGenerator.nextInt(1024 * 1024) + 1024 * 1024;
       mch = act.createChunk(size);
-      System.out.println(String.format("[Seq.%d] addr : %X", idx, size, mch.get()));
+      Assert.assertNotNull(mch, String.format("[Seq.%d] size: %d ", idx, size));
       mch.destroy();
     }
   }

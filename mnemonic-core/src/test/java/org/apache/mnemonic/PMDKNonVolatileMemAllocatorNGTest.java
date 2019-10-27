@@ -49,9 +49,7 @@ public class PMDKNonVolatileMemAllocatorNGTest {
       for (int i = 0; i < size; i++) {
         mbh.get().put((byte) randomGenerator.nextInt(255));
       }
-      Assert.assertEquals(size, mbh.get().capacity());
-      System.out.println(String.format("[Seq.%d] size %d - %d, (%s)", idx, size, mbh.get().capacity(),
-          size == mbh.get().capacity() ? "Correct" : "Failed!!!"));
+      Assert.assertEquals(mbh.get().capacity(), size, String.format("Seq.%d ", idx));
     }
     act.close();
   }
