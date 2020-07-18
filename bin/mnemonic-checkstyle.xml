@@ -164,7 +164,4 @@
 
     <module name="SuppressionCommentFilter"/>
 
-    <module name="SuppressionFilter">
-      <property name="file" value="bin/suppressions.xml"/>
-    </module>
 </module>
