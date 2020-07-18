@@ -51,7 +51,7 @@
     <dependency>
       <groupId>com.squareup</groupId>
       <artifactId>javapoet</artifactId>
-    </dependency>    
+    </dependency>
     <!-- logging dependencies -->
     <!-- For core, assume all APIs will be used -->
     <dependency>
@@ -184,7 +184,7 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.apache.maven.plugins</groupId> 
+            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <argLine>-Xmx2g -XX:MaxPermSize=1g</argLine>
@@ -192,11 +192,10 @@
                 <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
               </suiteXmlFiles>
             </configuration>
-          </plugin> 
+          </plugin>
         </plugins>
       </build>
     </profile>
   </profiles>
 
 </project>
-
