@@ -18,16 +18,16 @@
 ---
 notifications:
   commits:              commits@mnemonic.apache.org
-  issues:               issues@mnemonic.apache.org
-  pullrequests:         github@mnemonic.apache.org
+  issues:               dev@mnemonic.apache.org
+  pullrequests:         dev@mnemonic.apache.org
   pullrequests_status:  dev@mnemonic.apache.org
-  pullrequests_comment: issues@mnemonic.apache.org
+  pullrequests_comment: dev@mnemonic.apache.org
   jira_options: link label worklog
 
 
 github:
-  description: "Apache Mnemonic - S non-volatile hybrid memory storage oriented library"
-  homepage: https://mnemonic.apache.org/
+  description: "Apache Mnemonic - A non-volatile hybrid memory storage oriented library"
+  homepage: "https://mnemonic.apache.org"
   labels:
     - non-volatile
     - apache
