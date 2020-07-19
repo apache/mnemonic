@@ -26,8 +26,8 @@ notifications:
 
 
 github:
-  description: "Apache Mnemonic - S non-volatile hybrid memory storage oriented library"
-  homepage: https://mnemonic.apache.org/
+  description: "Apache Mnemonic - A non-volatile hybrid memory storage oriented library"
+  homepage: "https://mnemonic.apache.org"
   labels:
     - non-volatile
     - apache
