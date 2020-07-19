@@ -40,6 +40,7 @@ include_directories(${CMAKE_THREAD_LIBS_INIT})
 
 add_library(sysvmemallocator SHARED common.c org_apache_mnemonic_service_memory_internal_SysVMemServiceImpl.c)
 target_include_directories(sysvmemallocator PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(sysvmemallocator ${CMAKE_THREAD_LIBS_INIT})
 
 include (InstallRequiredSystemLibraries)
 set (CPACK_RESOURCE_FILE_LICENSE

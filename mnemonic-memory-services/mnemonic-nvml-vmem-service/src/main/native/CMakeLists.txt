@@ -45,7 +45,7 @@ endif (NOT LIBVMEM_LIBRARIES)
 
 add_library(vmemallocator SHARED common.c org_apache_mnemonic_service_memory_internal_VMemServiceImpl.c)
 target_include_directories(vmemallocator PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(vmemallocator ${LIBVMEM_LIBRARIES})
+target_link_libraries(vmemallocator ${LIBVMEM_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 include (InstallRequiredSystemLibraries)
 set (CPACK_RESOURCE_FILE_LICENSE
