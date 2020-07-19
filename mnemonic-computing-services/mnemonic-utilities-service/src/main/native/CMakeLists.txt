@@ -41,6 +41,7 @@ add_library(utilitiescomputing SHARED common.c
   org_apache_mnemonic_service_computing_internal_PrintServiceImpl.c
   org_apache_mnemonic_service_computing_internal_VectorizationServiceImpl.c)
 target_include_directories(utilitiescomputing PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(utilitiescomputing ${CMAKE_THREAD_LIBS_INIT})
 
 include (InstallRequiredSystemLibraries)
 set (CPACK_RESOURCE_FILE_LICENSE

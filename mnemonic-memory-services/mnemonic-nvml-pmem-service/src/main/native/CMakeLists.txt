@@ -50,7 +50,7 @@ endif (NOT LIBPMEMOBJ_LIBRARIES)
 
 add_library(pmemallocator SHARED common.c org_apache_mnemonic_service_memory_internal_PMemServiceImpl.c)
 target_include_directories(pmemallocator PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(pmemallocator ${LIBPMEMOBJ_LIBRARIES} ${LIBPMEM_LIBRARIES})
+target_link_libraries(pmemallocator ${LIBPMEMOBJ_LIBRARIES} ${LIBPMEM_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 include (InstallRequiredSystemLibraries)
 set (CPACK_RESOURCE_FILE_LICENSE
