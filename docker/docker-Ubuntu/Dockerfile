@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 MAINTAINER Yanhui Zhao (yanhui.zhao@outlook.com)
 
 #set up your proxy below, please refer to readme in the Docker folder
@@ -30,9 +30,6 @@ RUN echo The proxy set : ${http_proxy}
 
 RUN apt-get -y update && \
     apt-get install -y default-jdk cmake check git pkg-config autoconf man build-essential gcc g++ uuid-dev pandoc devscripts flex doxygen
-
-# required packages by pmdk
-RUN apt install -y autoconf asciidoc xmlto automake libtool libkmod-dev libudev-dev uuid-dev libjson-c-dev asciidoctor bash-completion graphviz libkeyutils-dev
 
 RUN apt-get clean
 
@@ -50,22 +47,7 @@ RUN mkdir -p /ws
 RUN cd /ws && git clone https://github.com/NonVolatileComputing/pmalloc.git && \
     cd pmalloc && mkdir build && cd build && cmake .. && make && make install
 
-RUN cd /ws && git clone https://github.com/pmem/nvml.git && \
-    cd nvml && git checkout 630862e82f && make && make install
-
-# deploy ndctl required by pmdk
-RUN cd /ws && git clone https://github.com/pmem/ndctl.git && \
-    cd ndctl && git checkout ndctl-64.y && \
-    ./autogen.sh && ./configure CFLAGS='-g -O0' --prefix=/usr --sysconfdir=/etc --libdir=/usr/lib && \
-    make && make check && make install
-
-# deploy pmdk
-RUN cd /ws && git clone https://github.com/pmem/pmdk.git && \
-    cd pmdk && git checkout stable-1.6 && make && \
-#    the test run time is too long
-#    cp src/test/testconfig.sh.example src/test/testconfig.sh && make check && \
-    make install
-
+RUN apt-get install -y libndctl-dev libpmem-dev libvmem-dev libpmemobj-dev
 
 RUN touch /etc/profile.d/mvn.sh && chmod +x /etc/profile.d/mvn.sh && \
     if [ "x" != "x${proxy_host}" ]; then echo export MAVEN_OPTS="\" -DproxySet=\\\"true\\\" -DproxyHost=${proxy_host} -DproxyPort=${proxy_port} \"" > /etc/profile.d/mvn.sh; fi
