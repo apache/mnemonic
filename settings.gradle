@@ -1,0 +1,49 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+rootProject.name = 'mnemonic-parent'
+include ':mnemonic-core'
+include ':mnemonic-collections'
+include ':mnemonic-examples'
+include ':mnemonic-memory-services:mnemonic-nvml-vmem-service'
+include ':mnemonic-memory-services:mnemonic-nvml-pmem-service'
+include ':mnemonic-memory-services:mnemonic-pmalloc-service'
+include ':mnemonic-memory-services:mnemonic-sys-vmem-service'
+include ':mnemonic-memory-services:mnemonic-java-vmem-service'
+include ':mnemonic-memory-services:mnemonic-pmdk-vmem-service'
+include ':mnemonic-memory-services:mnemonic-pmdk-pmem-service'
+include ':mnemonic-memory-services'
+include ':mnemonic-computing-services:mnemonic-utilities-service'
+include ':mnemonic-computing-services'
+include ':mnemonic-query'
+include ':mnemonic-common'
+
+project(':mnemonic-core').projectDir = "$rootDir/mnemonic-core" as File
+project(':mnemonic-collections').projectDir = "$rootDir/mnemonic-collections" as File
+project(':mnemonic-examples').projectDir = "$rootDir/mnemonic-examples" as File
+project(':mnemonic-memory-services:mnemonic-nvml-vmem-service').projectDir = "$rootDir/mnemonic-memory-services/mnemonic-nvml-vmem-service" as File
+project(':mnemonic-memory-services:mnemonic-nvml-pmem-service').projectDir = "$rootDir/mnemonic-memory-services/mnemonic-nvml-pmem-service" as File
+project(':mnemonic-memory-services:mnemonic-pmalloc-service').projectDir = "$rootDir/mnemonic-memory-services/mnemonic-pmalloc-service" as File
+project(':mnemonic-memory-services:mnemonic-sys-vmem-service').projectDir = "$rootDir/mnemonic-memory-services/mnemonic-sys-vmem-service" as File
+project(':mnemonic-memory-services:mnemonic-java-vmem-service').projectDir = "$rootDir/mnemonic-memory-services/mnemonic-java-vmem-service" as File
+project(':mnemonic-memory-services:mnemonic-pmdk-vmem-service').projectDir = "$rootDir/mnemonic-memory-services/mnemonic-pmdk-vmem-service" as File
+project(':mnemonic-memory-services:mnemonic-pmdk-pmem-service').projectDir = "$rootDir/mnemonic-memory-services/mnemonic-pmdk-pmem-service" as File
+project(':mnemonic-memory-services').projectDir = "$rootDir/mnemonic-memory-services" as File
+project(':mnemonic-computing-services:mnemonic-utilities-service').projectDir = "$rootDir/mnemonic-computing-services/mnemonic-utilities-service" as File
+project(':mnemonic-computing-services').projectDir = "$rootDir/mnemonic-computing-services" as File
+project(':mnemonic-query').projectDir = "$rootDir/mnemonic-query" as File
+project(':mnemonic-common').projectDir = "$rootDir/mnemonic-common" as File

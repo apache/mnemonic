@@ -331,6 +331,11 @@
               <exclude>**/service-dist/**</exclude>
               <exclude>**/*.iml</exclude>
               <exclude>**/*.patch</exclude>
+              <exclude>.gradle/</exclude>
+              <exclude>gradle/</exclude>
+              <exclude>gradlew/</exclude>
+              <exclude>gradlew.bat</exclude>
+              <exclude>**/build/</exclude>
             </excludes>
           </configuration>
           <executions>
