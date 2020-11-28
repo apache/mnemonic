@@ -48,10 +48,10 @@ subprojects {
   }
 
   repositories {
-    maven { url "http://repo.maven.apache.org/maven2" }
+    maven { url "https://repo.maven.apache.org/maven2" }
     mavenCentral()
   }
-
+    
   sourceCompatibility = 1.8
   targetCompatibility = 1.8
   tasks.withType(JavaCompile) {
