@@ -17,6 +17,6 @@
 
 description = 'mnemonic-pmdk-pmem-service'
 dependencies {
-    testCompile group: 'org.testng', name: 'testng', version:'6.8.17'
+    testCompileOnly 'org.testng:testng'
 }
 test.useTestNG()
