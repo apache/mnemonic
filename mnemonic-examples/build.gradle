@@ -17,11 +17,11 @@
 
 description = 'mnemonic-examples'
 dependencies {
-  compile project(':mnemonic-core')
-  compile project(':mnemonic-collections')
-    compile group: 'org.slf4j', name: 'slf4j-api', version:'1.7.21'
-    compile group: 'org.slf4j', name: 'jul-to-slf4j', version:'1.7.21'
-    compile group: 'org.slf4j', name: 'jcl-over-slf4j', version:'1.7.21'
-    compile group: 'log4j', name: 'log4j', version:'1.2.17'
-    compile group: 'org.slf4j', name: 'slf4j-log4j12', version:'1.7.21'
+  compileOnly project(':mnemonic-core')
+  compileOnly project(':mnemonic-collections')
+  compileOnly 'org.slf4j:slf4j-api'
+  compileOnly 'org.slf4j:jul-to-slf4j'
+  compileOnly 'org.slf4j:jcl-over-slf4j'
+  compileOnly 'log4j:log4j'
+  compileOnly 'org.slf4j:slf4j-log4j12'
 }
