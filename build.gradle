@@ -16,8 +16,11 @@
  */
 
 plugins {
-    id "base"
-    id "io.spring.dependency-management" version "1.0.10.RELEASE"
+    id 'base'
+    id 'io.spring.dependency-management' version '1.0.10.RELEASE' apply false
+    id 'net.freudasoft.gradle-cmake-plugin' version '0.0.2' apply false
+    id 'com.github.johnrengelman.shadow' version '6.1.0' apply false
+    id 'com.google.osdetector' version '1.6.2' apply false
 }
 
 allprojects  {
