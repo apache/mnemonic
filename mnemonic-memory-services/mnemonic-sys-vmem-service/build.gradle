@@ -59,6 +59,4 @@ processResources.dependsOn copyResources
 build.dependsOn shadowJar
 clean.dependsOn cmakeClean
 clean.dependsOn cleanDist
-
-}
 test.useTestNG()
