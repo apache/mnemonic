@@ -15,8 +15,25 @@
  * limitations under the License.
  */
 
-description = 'mnemonic-java-vmem-service'
-dependencies {
-    testCompileOnly 'org.testng:testng'
+plugins {
+  id 'com.github.johnrengelman.shadow'
+  id 'com.google.osdetector'
 }
+
+description = 'mnemonic-java-vmem-service'
+
+dependencies {
+  implementation project(':mnemonic-core')
+  implementation 'org.flowcomputing.commons:commons-primitives'
+  testCompileOnly 'org.testng:testng'
+}
+
+shadowJar {
+  minimize()
+  destinationDirectory = file("$projectDir/../service-dist")
+  archiveClassifier = osdetector.classifier
+}
+
+build.dependsOn shadowJar
+
 test.useTestNG()
