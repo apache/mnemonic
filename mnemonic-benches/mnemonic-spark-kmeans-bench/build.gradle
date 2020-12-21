@@ -15,8 +15,46 @@
  * limitations under the License.
  */
 
-description = 'mnemonic-spark-kmeans-bench'
-dependencies {
-    testCompileOnly 'org.testng:testng'
+plugins {
+    id 'scala'
 }
+
+description = 'mnemonic-spark-kmeans-bench'
+
+compileJava {
+  options.compilerArgs = [
+    "-processor", "org.apache.mnemonic.DurableEntityProcessor"
+  ]
+}
+
+compileTestJava {
+  options.compilerArgs = [
+    "-processor", "org.apache.mnemonic.DurableEntityProcessor"
+  ]
+}
+
+dependencies {
+  def spark_version = '2.3.0'
+  def scala_version = '2.11.12'
+  def scala_bin_version = '2.11'
+  def scalatest_version = '3.0.1'
+
+  annotationProcessor project(':mnemonic-core')
+  api project(':mnemonic-spark:mnemonic-spark-core')
+  api 'org.apache.commons:commons-lang3'
+  api 'org.flowcomputing.commons:commons-primitives'
+  implementation "org.apache.spark:spark-core_${scala_bin_version}:${spark_version}"
+  implementation "org.apache.spark:spark-mllib_${scala_bin_version}:${spark_version}"
+  implementation "org.scala-lang:scala-library:${scala_version}"
+  implementation "org.scala-lang:scala-reflect:${scala_version}"
+  implementation "org.scala-lang:scala-actors:${scala_version}"
+  api 'org.slf4j:slf4j-api'
+  api 'org.slf4j:jul-to-slf4j'
+  api 'org.slf4j:jcl-over-slf4j'
+  api 'log4j:log4j'
+  api 'org.slf4j:slf4j-log4j12'
+  testCompileOnly 'org.testng:testng'
+  testImplementation "org.scalatest:scalatest_${scala_bin_version}:${scalatest_version}"
+}
+
 test.useTestNG()
