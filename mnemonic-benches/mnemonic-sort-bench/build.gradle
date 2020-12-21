@@ -16,7 +16,26 @@
  */
 
 description = 'mnemonic-sort-bench'
-dependencies {
-    testCompileOnly 'org.testng:testng'
+
+compileJava {
+  options.compilerArgs = [
+    "-processor", "org.apache.mnemonic.DurableEntityProcessor"
+  ]
 }
+
+dependencies {
+  annotationProcessor project(':mnemonic-core')
+  api project(':mnemonic-collections')
+  api project(':mnemonic-computing-services:mnemonic-utilities-service')
+  api 'commons-cli:commons-cli'
+  api 'org.apache.commons:commons-lang3'
+  api 'org.flowcomputing.commons:commons-primitives'
+  api 'org.slf4j:slf4j-api'
+  api 'org.slf4j:jul-to-slf4j'
+  api 'org.slf4j:jcl-over-slf4j'
+  api 'log4j:log4j'
+  api 'org.slf4j:slf4j-log4j12'
+  testCompileOnly 'org.testng:testng'
+}
+
 test.useTestNG()
