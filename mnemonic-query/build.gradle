@@ -16,15 +16,16 @@
  */
 
 description = 'mnemonic-query'
+
 dependencies {
-  compileOnly project(':mnemonic-core')
-  compileOnly project(':mnemonic-collections')
-  compileOnly 'org.apache.commons:commons-lang3'
-  compileOnly 'org.slf4j:slf4j-api'
-  compileOnly 'org.slf4j:jul-to-slf4j'
-  compileOnly 'org.slf4j:jcl-over-slf4j'
-  compileOnly 'log4j:log4j'
-  compileOnly 'org.slf4j:slf4j-log4j12'
+  api project(':mnemonic-core')
+  api project(':mnemonic-collections')
+  api 'org.apache.commons:commons-lang3'
+  api 'org.slf4j:slf4j-api'
+  api 'org.slf4j:jul-to-slf4j'
+  api 'org.slf4j:jcl-over-slf4j'
+  api 'log4j:log4j'
+  api 'org.slf4j:slf4j-log4j12'
   testCompileOnly 'org.testng:testng'
 }
 test.useTestNG()
