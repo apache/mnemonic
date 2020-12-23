@@ -64,7 +64,3 @@ subprojects {
   configurations.all {
   }
 }
-
-build.doFirst {
-   throw new GradleException('The Gradle is not functional yet.')
-}
