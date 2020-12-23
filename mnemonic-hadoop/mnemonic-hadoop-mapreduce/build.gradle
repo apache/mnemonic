@@ -16,7 +16,36 @@
  */
 
 description = 'mnemonic-hadoop-mapreduce'
-dependencies {
-    testCompileOnly 'org.testng:testng'
+
+compileJava {
+  options.compilerArgs = [
+    "-processor", "org.apache.mnemonic.DurableEntityProcessor"
+  ]
 }
+
+compileTestJava {
+  options.compilerArgs = [
+    "-processor", "org.apache.mnemonic.DurableEntityProcessor"
+  ]
+}
+
+dependencies {
+  def hadoop_version = '2.7.3'
+
+  annotationProcessor project(':mnemonic-core')
+  api project(':mnemonic-collections')
+  api project(':mnemonic-sessions')
+  api 'org.apache.commons:commons-lang3'
+  api 'org.flowcomputing.commons:commons-primitives'
+  implementation "org.apache.hadoop:hadoop-common:${hadoop_version}"
+  implementation "org.apache.hadoop:hadoop-hdfs:${hadoop_version}"
+  implementation "org.apache.hadoop:hadoop-mapreduce-client-core:${hadoop_version}"
+  api 'org.slf4j:slf4j-api'
+  api 'org.slf4j:jul-to-slf4j'
+  api 'org.slf4j:jcl-over-slf4j'
+  api 'log4j:log4j'
+  api 'org.slf4j:slf4j-log4j12'
+  testCompileOnly 'org.testng:testng'
+}
+
 test.useTestNG()
