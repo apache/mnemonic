@@ -16,13 +16,14 @@
  */
 
 description = 'mnemonic-common'
+
 dependencies {
-    implementation 'org.apache.commons:commons-lang3'
-    implementation 'org.slf4j:slf4j-api'
-    implementation 'org.slf4j:jul-to-slf4j'
-    implementation 'org.slf4j:jcl-over-slf4j'
-    implementation 'log4j:log4j'
-    implementation 'org.slf4j:slf4j-log4j12'
-    testImplementation 'org.testng:testng'
+  api 'org.apache.commons:commons-lang3'
+  api 'org.slf4j:slf4j-api'
+  api 'org.slf4j:jul-to-slf4j'
+  api 'org.slf4j:jcl-over-slf4j'
+  api 'log4j:log4j'
+  api 'org.slf4j:slf4j-log4j12'
+  testCompileOnly 'org.testng:testng'
 }
 test.useTestNG()
