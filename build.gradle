@@ -23,6 +23,8 @@ plugins {
     id 'com.google.osdetector' version '1.6.2' apply false
 }
 
+project.gradle.startParameter.excludedTaskNames.add('test')
+
 allprojects  {
   group = 'org.apache.mnemonic'
   version = '0.14.0-SNAPSHOT'
