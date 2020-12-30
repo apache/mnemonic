@@ -17,22 +17,22 @@
 # limitations under the License.
 #
 
-usage(){
-    echo "Usage: $0 Release_Version Next_Release_Version Candidate_Id"
-    echo "e.g. $0 0.2.0 0.2.0 rc2"
-    echo "     $0 0.2.0 0.2.1 rc3"
+usage() {
+    echo "Usage: $0 Release_Version Next_Release_Version Candidate_Id skipTestRun[yes|no]"
+    echo "e.g. $0 0.2.0 0.2.0 rc2 no"
+    echo "     $0 0.2.0 0.2.1 rc3 yes"
     exit 1
 }
 
 continueprompt() {
     while true; do
-	read -p "Do you wish to continue [y/n] ? " yn
-	case $yn in
-	    [Yy]* ) break;;
-	    [Nn]* ) exit 2;;
-	    * ) echo "Please answer yes or no.";;
-	    esac
-	done
+        read -p "Do you wish to continue [y/n] ? " yn
+        case $yn in
+            [Yy]* ) break;;
+            [Nn]* ) exit 2;;
+            * ) echo "Please answer yes or no.";;
+            esac
+        done
 }
 
 if [ -z "${MNEMONIC_HOME}" ]; then
@@ -43,17 +43,24 @@ pushd "$MNEMONIC_HOME" || { echo "the environment variable \$MNEMONIC_HOME conta
 [[ -n "$(git status --porcelain)" ]] &&
     echo "please commit all changes first." && exit 20
 
-[[ $# -ne 3 ]]  && usage
+[[ $# -lt 3 ]]  && usage
 
 RELEASE_VERSION="$1"
 NEXT_RELEASE_VERSION="$2"
 RELEASE_CANDIDATE_ID="$3"
+SKIP_TEST_RUN="${4:-no}"
 IS_SAME_VERSION=false
 
 echo "You have specified:"
 echo "RELEASE_VERSION = ${RELEASE_VERSION}"
 echo "NEXT_RELEASE_VERSION = ${NEXT_RELEASE_VERSION}"
 echo "RELEASE_CANDIDATE_ID = ${RELEASE_CANDIDATE_ID}"
+echo "SKIP_TEST_RUN = ${SKIP_TEST_RUN}"
+if [ "${SKIP_TEST_RUN}" == "no" ]; then
+    echo "It will take long time to run code tests. You can skip it if appropriate, please refer to usage."
+else
+    echo "The test run will be skipped as specified."
+fi
 echo "NOTE: Please ensure there are no uncommitted or untracked files in your local workplace/repo. before continue"
 continueprompt
 
@@ -65,9 +72,9 @@ if [ "${RELEASE_VERSION}" == "${NEXT_RELEASE_VERSION}" ]; then
     continueprompt
     git branch -d branch-${RELEASE_VERSION}
     if [ $? -ne 0 ]; then
-      echo "Request to forcedly delete existing branch <branch-${RELEASE_VERSION}> in case of not fully merged"
-      continueprompt
-      git branch -D branch-${RELEASE_VERSION}
+        echo "Request to forcedly delete existing branch <branch-${RELEASE_VERSION}> in case of not fully merged"
+        continueprompt
+        git branch -D branch-${RELEASE_VERSION}
     fi
     git push upstream --delete branch-${RELEASE_VERSION}
     git tag -d v${RELEASE_VERSION}
@@ -106,7 +113,9 @@ rm -rf ${RELEASEBASENAME}/
 tar xzf target/${RELEASESRCPKGFULLNAME} || { echo "Failed to unpack the source artifact"; exit 80; }
 pushd ${RELEASEBASENAME} || { echo "Unpacked source directory does not exist"; exit 90; }
 mvn clean install || { echo "Failed to compile the packaged source artifact"; exit 100; }
-python bin/runTestCases.py || { echo "Failed to verify the packaged source artifact"; exit 110; }
+if [ "${SKIP_TEST_RUN}" == "no" ]; then
+    python bin/runTestCases.py || { echo "Failed to verify the packaged source artifact"; exit 110; }
+fi
 popd
 rm -rf ${RELEASEBASENAME}/
 
@@ -132,11 +141,11 @@ git checkout master
 git merge --no-ff branch-${RELEASE_VERSION}
 
 if [ "$IS_SAME_VERSION" = true ]; then
-  NEXT_RELEASE_VERSION_POM="${RELEASE_VERSION}-SNAPSHOT"
-  NEXT_RELEASE_VERSION_COMMIT="Version ${RELEASE_VERSION} ${RELEASE_CANDIDATE_ID}"
+    NEXT_RELEASE_VERSION_POM="${RELEASE_VERSION}-SNAPSHOT"
+    NEXT_RELEASE_VERSION_COMMIT="Version ${RELEASE_VERSION} ${RELEASE_CANDIDATE_ID}"
 else
-  NEXT_RELEASE_VERSION_POM="${NEXT_RELEASE_VERSION}-SNAPSHOT"
-  NEXT_RELEASE_VERSION_COMMIT="Bump version to ${NEXT_RELEASE_VERSION}-SNAPSHOT"
+    NEXT_RELEASE_VERSION_POM="${NEXT_RELEASE_VERSION}-SNAPSHOT"
+    NEXT_RELEASE_VERSION_COMMIT="Bump version to ${NEXT_RELEASE_VERSION}-SNAPSHOT"
 fi
 mvn versions:set -DgenerateBackupPoms=false -DnewVersion="${NEXT_RELEASE_VERSION_POM}"
 git commit . -m "${NEXT_RELEASE_VERSION_COMMIT}"
@@ -147,4 +156,3 @@ continueprompt
 git push upstream master
 
 popd
-
