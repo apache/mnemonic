@@ -278,6 +278,7 @@
         <include>pom.xml</include>
         <include>bin/**</include>
         <include>docker/**</include>
+        <include>gradle/**</include>
       </includes>
       <useDefaultExcludes>true</useDefaultExcludes>
     </fileSet>
