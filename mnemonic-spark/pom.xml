@@ -36,7 +36,7 @@
 
   <properties>
     <spark.version>2.3.0</spark.version>
-    <scala.version>2.11.8</scala.version>
+    <scala.version>2.11.12</scala.version>
     <scala.binary.version>2.11</scala.binary.version>
     <scalatest.version>3.0.1</scalatest.version>
     <spark-scope>compile</spark-scope>
@@ -200,7 +200,7 @@
         <plugin>
           <groupId>net.alchim31.maven</groupId>
           <artifactId>scala-maven-plugin</artifactId>
-          <version>3.3.1</version>
+          <version>4.4.0</version>
           <executions>
             <execution>
               <goals>
