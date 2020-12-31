@@ -36,7 +36,7 @@ continueprompt() {
 }
 
 if [ -z "${MNEMONIC_HOME}" ]; then
-  source "$(dirname "$0")/find-mnemonic-home.sh" || { echo "Not found find-mnemonic-home.sh script."; exit 10; }
+    source "$(dirname "$0")/find-mnemonic-home.sh" || { echo "Not found find-mnemonic-home.sh script."; exit 10; }
 fi
 pushd "$MNEMONIC_HOME" || { echo "the environment variable \$MNEMONIC_HOME contains invalid home directory of Mnemonic project."; exit 11; }
 
@@ -51,6 +51,11 @@ RELEASE_CANDIDATE_ID="$3"
 SKIP_TEST_RUN="${4:-no}"
 IS_SAME_VERSION=false
 
+if [ -z ${JAVA_HOME} ]; then
+    JAVA_HOME="$(dirname $(dirname $(readlink -f $(which javac))))"
+    export JAVA_HOME
+fi
+
 echo "You have specified:"
 echo "RELEASE_VERSION = ${RELEASE_VERSION}"
 echo "NEXT_RELEASE_VERSION = ${NEXT_RELEASE_VERSION}"
@@ -61,6 +66,7 @@ if [ "${SKIP_TEST_RUN}" == "no" ]; then
 else
     echo "The test run will be skipped as specified."
 fi
+echo "JAVA_HOME = ${JAVA_HOME}"
 echo "NOTE: Please ensure there are no uncommitted or untracked files in your local workplace/repo. before continue"
 continueprompt
 
@@ -96,7 +102,6 @@ rm -rf target/
 git clean -xdf
 
 mvn clean prepare-package -DskipTests -Dremoteresources.skip=true &&
-mvn prepare-package -DskipTests -Dremoteresources.skip=true &&
 mvn deploy -DskipTests -Dremoteresources.skip=true -P apache-release || { echo "Preparation failed"; exit 40; }
 
 RELEASEBASENAME=apache-mnemonic-${RELEASE_VERSION}
@@ -118,6 +123,8 @@ if [ "${SKIP_TEST_RUN}" == "no" ]; then
 fi
 popd
 rm -rf ${RELEASEBASENAME}/
+
+gpg --verify target/${RELEASESRCPKGFULLNAME}.asc target/${RELEASESRCPKGFULLNAME} || { echo "The signature of target/${RELEASESRCPKGFULLNAME} is invalid."; exit 120; }
 
 echo "Prepared Artifacts:"
 echo `ls target/${RELEASESRCPKGFULLNAME}`
