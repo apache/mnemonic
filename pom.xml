@@ -90,6 +90,10 @@
     <module>mnemonic-computing-services</module>
     <module>mnemonic-query</module>
     <module>mnemonic-common</module>
+    <module>mnemonic-sessions</module>
+    <module>mnemonic-hadoop</module>
+    <module>mnemonic-spark</module>
+    <module>mnemonic-benches</module>
   </modules>
 
   <properties>
@@ -455,6 +459,11 @@
             </execution>
           </executions>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>3.0.0-M1</version>
+        </plugin>
 
       </plugins>
     </pluginManagement>
@@ -500,10 +509,12 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
-          <version>2.4</version>
+          <version>3.3.0</version>
           <configuration>
             <finalName>apache-mnemonic-${project.version}</finalName>
-            <descriptor>bin/source-assembly.xml</descriptor>
+            <descriptors>
+              <descriptor>bin/source-assembly.xml</descriptor>
+            </descriptors>
           </configuration>
         </plugin>
         <plugin>
