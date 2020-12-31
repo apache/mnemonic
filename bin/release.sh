@@ -18,9 +18,15 @@
 #
 
 usage() {
-    echo "Usage: $0 Release_Version Next_Release_Version Candidate_Id skipTestRun[yes|no]"
-    echo "e.g. $0 0.2.0 0.2.0 rc2 no"
-    echo "     $0 0.2.0 0.2.1 rc3 yes"
+    echo "Usage: $0 command <args>..."
+    echo "$0 candidate <release_version> <candidate_id> <skip_test_run[yes|no]>"
+    echo "This command is used to create a specified candidate for release"
+    echo "e.g. $0 candidate 0.2.0 rc2 no"
+    echo "     $0 candidate 0.2.0 rc3 yes"
+    echo "$0 bump <release_version> <candidate_id> <new_version>"
+    echo "This command is used to bring the candidate into effect and bump into new version"
+    echo "e.g. $0 bump 0.2.0 rc2 0.3.0"
+    echo "     $0 bump 0.2.0 rc3 0.3.0"
     exit 1
 }
 
@@ -35,6 +41,75 @@ continueprompt() {
         done
 }
 
+purge_candidate_branch() {
+    git branch -d ${CANDIDATE_BRANCH_NAME}
+    if [ $? -ne 0 ]; then
+        echo "Request to forcedly delete existing branch ${CANDIDATE_BRANCH_NAME} in case of not fully merged"
+        continueprompt
+        git branch -D ${CANDIDATE_BRANCH_NAME}
+    fi
+    git push upstream --delete ${CANDIDATE_BRANCH_NAME}
+    git tag -d ${CANDIDATE_TAG_NAME}
+    git push upstream --delete ${CANDIDATE_TAG_NAME}
+}
+
+build_candidate_branch() {
+    git checkout -b ${CANDIDATE_BRANCH_NAME} || { echo "Create branch failed"; exit 30; }
+
+    mvn versions:set -DgenerateBackupPoms=false -DnewVersion=${RELEASE_VERSION} &&
+    git commit . -m "Prepare for a release v${RELEASE_VERSION}" ||
+        { echo "Set release version failed"; exit 33; }
+
+    git tag -s ${CANDIDATE_TAG_NAME} -m "A release candidate ${CANDIDATE_TAG_NAME}" ||
+        { echo "Tagging with signing failed"; exit 35; }
+
+    rm -rf target/
+    git clean -xdf
+
+    mvn clean prepare-package -DskipTests -Dremoteresources.skip=true &&
+    mvn deploy -DskipTests -Dremoteresources.skip=true -P apache-release || { echo "Preparation failed"; exit 40; }
+
+    RELEASEBASENAME=apache-mnemonic-${RELEASE_VERSION}
+    RELEASESRCBASENAME=${RELEASEBASENAME}-src
+    RELEASESRCPKGFULLNAME=${RELEASESRCBASENAME}.tar.gz
+
+    pushd target || { echo "Generated artifacts not found"; exit 50; }
+    md5sum ${RELEASESRCPKGFULLNAME} > ${RELEASESRCPKGFULLNAME}.md5 || { echo "Generate md5 failed"; exit 60; }
+    shasum -a 512 ${RELEASESRCPKGFULLNAME} > ${RELEASESRCPKGFULLNAME}.sha512 || { echo "Generate sha failed"; exit 70; }
+    popd
+
+    echo "Verifying packaged Source Artifacts"
+    rm -rf ${RELEASEBASENAME}/
+    tar xzf target/${RELEASESRCPKGFULLNAME} || { echo "Failed to unpack the source artifact"; exit 80; }
+    pushd ${RELEASEBASENAME} || { echo "Unpacked source directory does not exist"; exit 90; }
+    mvn clean install || { echo "Failed to compile the packaged source artifact"; exit 100; }
+    if [ "${SKIP_TEST_RUN}" == "no" ]; then
+        python bin/runTestCases.py || { echo "Failed to verify the packaged source artifact"; exit 110; }
+    fi
+    popd
+    rm -rf ${RELEASEBASENAME}/
+
+    gpg --verify target/${RELEASESRCPKGFULLNAME}.asc target/${RELEASESRCPKGFULLNAME} || { echo "The signature of target/${RELEASESRCPKGFULLNAME} is invalid."; exit 120; }
+
+    echo "Prepared Artifacts:"
+    echo `ls target/${RELEASESRCPKGFULLNAME}`
+    echo `ls target/${RELEASESRCPKGFULLNAME}.asc`
+    echo `ls target/${RELEASESRCPKGFULLNAME}.md5`
+    echo `ls target/${RELEASESRCPKGFULLNAME}.sha512`
+    echo "Please upload those artifacts to your stage repository now."
+    continueprompt
+
+    #---------------
+    echo "Push release candidate branch & tag to upstream."
+    continueprompt
+
+    git push upstream ${CANDIDATE_BRANCH_NAME} &&
+    git push upstream ${CANDIDATE_TAG_NAME} ||
+        { echo "Push the release candidate branch & tag to upstream failed."; exit 130; }
+
+    echo "The release candidate branch ${CANDIDATE_BRANCH_NAME} and tag ${CANDIDATE_TAG_NAME} has been built and got upstreamed."
+}
+
 if [ -z "${MNEMONIC_HOME}" ]; then
     source "$(dirname "$0")/find-mnemonic-home.sh" || { echo "Not found find-mnemonic-home.sh script."; exit 10; }
 fi
@@ -45,121 +120,86 @@ pushd "$MNEMONIC_HOME" || { echo "the environment variable \$MNEMONIC_HOME conta
 
 [[ $# -lt 3 ]]  && usage
 
-RELEASE_VERSION="$1"
-NEXT_RELEASE_VERSION="$2"
-RELEASE_CANDIDATE_ID="$3"
-SKIP_TEST_RUN="${4:-no}"
-IS_SAME_VERSION=false
+echo "NOTE: Please ensure to backup all uncommitted or untracked files, and a remote 'upstream' has got set up."
 
+RELEASE_COMMAND="$1"
+RELEASE_VERSION="$2"
+CANDIDATE_ID="$3"
 if [ -z ${JAVA_HOME} ]; then
     JAVA_HOME="$(dirname $(dirname $(readlink -f $(which javac))))"
     export JAVA_HOME
 fi
 
+CANDIDATE_BRANCH_NAME="branch-${RELEASE_VERSION}-${CANDIDATE_ID}"
+CANDIDATE_TAG_NAME="v${RELEASE_VERSION}-${CANDIDATE_ID}"
+RELEASE_TAG_NAME="v${RELEASE_VERSION}"
+
 echo "You have specified:"
-echo "RELEASE_VERSION = ${RELEASE_VERSION}"
-echo "NEXT_RELEASE_VERSION = ${NEXT_RELEASE_VERSION}"
-echo "RELEASE_CANDIDATE_ID = ${RELEASE_CANDIDATE_ID}"
-echo "SKIP_TEST_RUN = ${SKIP_TEST_RUN}"
-if [ "${SKIP_TEST_RUN}" == "no" ]; then
-    echo "It will take long time to run code tests. You can skip it if appropriate, please refer to usage."
-else
-    echo "The test run will be skipped as specified."
-fi
 echo "JAVA_HOME = ${JAVA_HOME}"
-echo "NOTE: Please ensure there are no uncommitted or untracked files in your local workplace/repo. before continue"
-continueprompt
+echo "RELEASE_COMMAND = ${RELEASE_COMMAND}"
+echo "RELEASE_VERSION = ${RELEASE_VERSION}"
+echo "CANDIDATE_ID = ${CANDIDATE_ID}"
 
-git checkout master
-
-if [ "${RELEASE_VERSION}" == "${NEXT_RELEASE_VERSION}" ]; then
-    IS_SAME_VERSION=true
-    echo "You are trying to prepare a same version candidate so going to clean up existing branch <branch-${RELEASE_VERSION}> and tag <v${RELEASE_VERSION}> if exists"
-    continueprompt
-    git branch -d branch-${RELEASE_VERSION}
-    if [ $? -ne 0 ]; then
-        echo "Request to forcedly delete existing branch <branch-${RELEASE_VERSION}> in case of not fully merged"
-        continueprompt
-        git branch -D branch-${RELEASE_VERSION}
+if [ ${RELEASE_COMMAND} == "candidate" ]; then
+    SKIP_TEST_RUN="${4:-no}"
+    echo "SKIP_TEST_RUN = ${SKIP_TEST_RUN}"
+    if [ "${SKIP_TEST_RUN}" == "no" ]; then
+        echo "It will take long time to run code tests. You can skip it if appropriate, please refer to usage."
+    else
+        echo "The test run will be skipped as specified."
     fi
-    git push upstream --delete branch-${RELEASE_VERSION}
-    git tag -d v${RELEASE_VERSION}
-    git push upstream --delete v${RELEASE_VERSION}
+    continueprompt
+
+    git checkout master
+
+    if git rev-list -n 1 ${CANDIDATE_BRANCH_NAME} -- 2> /dev/null; then
+        echo "Found the candidate branch ${CANDIDATE_BRANCH_NAME} that needs to be purged from local and remote."
+        continueprompt
+        purge_candidate_branch
+    fi
+
+    echo "Preparing to create a candidate branch ${CANDIDATE_BRANCH_NAME} for release"
+    continueprompt
+
+    build_candidate_branch
+
+    exit 0;
 fi
 
-echo "Preparing to create a branch branch-${RELEASE_VERSION} for release"
-continueprompt
+if [ ${RELEASE_COMMAND} == "bump" ]; then
+    NEW_VERSION="$4"
+    echo "NEW_VERSION = ${NEW_VERSION}"
+    continueprompt
 
-git checkout -b branch-${RELEASE_VERSION} || { echo "Create branch failed"; exit 30; }
+    git checkout master
 
-mvn versions:set -DgenerateBackupPoms=false -DnewVersion=${RELEASE_VERSION}
-git commit . -m "Prepare for releasing ${RELEASE_VERSION} ${RELEASE_CANDIDATE_ID}"
+    echo "Merge release candidate branch ${CANDIDATE_BRANCH_NAME} to master."
+    continueprompt
+    git merge --ff ${CANDIDATE_BRANCH_NAME} || { echo "The release candidate branch doesn't exist or not the latest candidate."; exit 210; }
 
-git tag -s v${RELEASE_VERSION} -m "Release ${RELEASE_VERSION} ${RELEASE_CANDIDATE_ID}" ||
-    { echo "Tagging with signing failed"; exit 35; }
+    BUMP_VERSION="${NEW_VERSION}-SNAPSHOT"
+    mvn versions:set -DgenerateBackupPoms=false -DnewVersion="${BUMP_VERSION}" &&
+    git commit . -m "Bump version to ${BUMP_VERSION}" ||
+         { echo "Set bump version failed"; exit 220; }
 
-rm -rf target/
-git clean -xdf
+    if git rev-list -n 1 tags/${CANDIDATE_TAG_NAME} -- 2> /dev/null; then
+        REVISION_ID=$(git rev-list -n 1 tags/${CANDIDATE_TAG_NAME} --)
+    else
+        echo "Cannot find the revision of tag ${CANDIDATE_TAG_NAME}."; exit 230;
+    fi
+    git tag -s ${RELEASE_TAG_NAME} -m "A release candidate ${RELEASE_TAG_NAME}" ${REVISION_ID} ||
+        { echo "Tagging with signing failed"; exit 240; }
 
-mvn clean prepare-package -DskipTests -Dremoteresources.skip=true &&
-mvn deploy -DskipTests -Dremoteresources.skip=true -P apache-release || { echo "Preparation failed"; exit 40; }
+    echo "Push the effective release and bump version to upstream."
+    continueprompt
 
-RELEASEBASENAME=apache-mnemonic-${RELEASE_VERSION}
-RELEASESRCBASENAME=${RELEASEBASENAME}-src
-RELEASESRCPKGFULLNAME=${RELEASESRCBASENAME}.tar.gz
+    git push upstream master &&
+    git push upstream ${RELEASE_TAG_NAME} ||
+        { echo "Push new release to upstream failed."; exit 250; }
 
-pushd target || { echo "Artifacts not found"; exit 50; }
-md5sum ${RELEASESRCPKGFULLNAME} > ${RELEASESRCPKGFULLNAME}.md5 || { echo "Generate md5 failed"; exit 60; }
-shasum -a 512 ${RELEASESRCPKGFULLNAME} > ${RELEASESRCPKGFULLNAME}.sha512 || { echo "Generate sha failed"; exit 70; }
-popd
-
-echo "Verifying packaged Source Artifacts"
-rm -rf ${RELEASEBASENAME}/
-tar xzf target/${RELEASESRCPKGFULLNAME} || { echo "Failed to unpack the source artifact"; exit 80; }
-pushd ${RELEASEBASENAME} || { echo "Unpacked source directory does not exist"; exit 90; }
-mvn clean install || { echo "Failed to compile the packaged source artifact"; exit 100; }
-if [ "${SKIP_TEST_RUN}" == "no" ]; then
-    python bin/runTestCases.py || { echo "Failed to verify the packaged source artifact"; exit 110; }
+    exit 0;
 fi
-popd
-rm -rf ${RELEASEBASENAME}/
 
-gpg --verify target/${RELEASESRCPKGFULLNAME}.asc target/${RELEASESRCPKGFULLNAME} || { echo "The signature of target/${RELEASESRCPKGFULLNAME} is invalid."; exit 120; }
-
-echo "Prepared Artifacts:"
-echo `ls target/${RELEASESRCPKGFULLNAME}`
-echo `ls target/${RELEASESRCPKGFULLNAME}.asc`
-echo `ls target/${RELEASESRCPKGFULLNAME}.md5`
-echo `ls target/${RELEASESRCPKGFULLNAME}.sha512`
-echo "Please upload those artifacts to your stage repository now."
-continueprompt
-
-#---------------
-echo "Push release branch & label to upstream branch <branch-${RELEASE_VERSION}>."
-continueprompt
-
-git push upstream branch-${RELEASE_VERSION}
-git push upstream v${RELEASE_VERSION}
-
-echo "Merge release branch <branch-${RELEASE_VERSION}> to master & Commit next version <${NEXT_RELEASE_VERSION}-SNAPSHOT>."
-continueprompt
-
-git checkout master
-git merge --no-ff branch-${RELEASE_VERSION}
-
-if [ "$IS_SAME_VERSION" = true ]; then
-    NEXT_RELEASE_VERSION_POM="${RELEASE_VERSION}-SNAPSHOT"
-    NEXT_RELEASE_VERSION_COMMIT="Version ${RELEASE_VERSION} ${RELEASE_CANDIDATE_ID}"
-else
-    NEXT_RELEASE_VERSION_POM="${NEXT_RELEASE_VERSION}-SNAPSHOT"
-    NEXT_RELEASE_VERSION_COMMIT="Bump version to ${NEXT_RELEASE_VERSION}-SNAPSHOT"
-fi
-mvn versions:set -DgenerateBackupPoms=false -DnewVersion="${NEXT_RELEASE_VERSION_POM}"
-git commit . -m "${NEXT_RELEASE_VERSION_COMMIT}"
-
-echo "Push release merge and new version to upstream."
-continueprompt
-
-git push upstream master
+usage
 
 popd
