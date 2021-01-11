@@ -115,6 +115,13 @@ if [ -z "${MNEMONIC_HOME}" ]; then
 fi
 pushd "$MNEMONIC_HOME" || { echo "the environment variable \$MNEMONIC_HOME contains invalid home directory of Mnemonic project."; exit 11; }
 
+if git remote get-url --push upstream | grep -q "apache/mnemonic"; then
+    echo "Upstream push URL: $(git remote get-url --push upstream)"
+else
+    echo "Upstream push URL is not set correctly, please find one in https://github.com/apache/mnemonic"
+    exit 25;
+fi
+
 [[ -n "$(git status --porcelain)" ]] &&
     echo "please commit all changes first." && exit 20
 
@@ -187,7 +194,7 @@ if [ ${RELEASE_COMMAND} == "bump" ]; then
     else
         echo "Cannot find the revision of tag ${CANDIDATE_TAG_NAME}."; exit 230;
     fi
-    git tag -s ${RELEASE_TAG_NAME} -m "A release candidate ${RELEASE_TAG_NAME}" ${REVISION_ID} ||
+    git tag -s ${RELEASE_TAG_NAME} -m "A release ${RELEASE_TAG_NAME}" ${REVISION_ID} ||
         { echo "Tagging with signing failed"; exit 240; }
 
     echo "Push the effective release and bump version to upstream."
