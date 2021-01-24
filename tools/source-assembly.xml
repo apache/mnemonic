@@ -276,7 +276,7 @@
         <include>DISCLAIMER*</include>
         <include>KEYS</include>
         <include>pom.xml</include>
-        <include>bin/**</include>
+        <include>tools/**</include>
         <include>docker/**</include>
         <include>gradle/**</include>
         <include>settings.gradle</include>

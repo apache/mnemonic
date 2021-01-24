@@ -81,6 +81,6 @@ then
 fi
 echo [SUCCESS] Mnemonic example is completed!
 
-python bin/runTestCases.py || { echo "Test failed"; exit 33; }
+python tools/runTestCases.py || { echo "Test failed"; exit 33; }
 
 popd

@@ -37,4 +37,4 @@ jobs:
             git clean -xdf
             mvn clean install
 #           the runall cannot be fulfilled using free plan since it needs more resource to run.
-#           bin/runall.sh
+#           tools/runall.sh

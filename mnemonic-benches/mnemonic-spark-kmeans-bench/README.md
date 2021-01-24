@@ -2,7 +2,7 @@
 
 
 ```bash
-  $ bin/gen_data.py <the number of dimensions> <the number of vectors> [-s seed]
+  $ tools/gen_data.py <the number of dimensions> <the number of vectors> [-s seed]
 ```
 
 
