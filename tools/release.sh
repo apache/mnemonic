@@ -84,7 +84,7 @@ build_candidate_branch() {
     pushd ${RELEASEBASENAME} || { echo "Unpacked source directory does not exist"; exit 90; }
     mvn clean install || { echo "Failed to compile the packaged source artifact"; exit 100; }
     if [ "${SKIP_TEST_RUN}" == "no" ]; then
-        python bin/runTestCases.py || { echo "Failed to verify the packaged source artifact"; exit 110; }
+        python tools/runTestCases.py || { echo "Failed to verify the packaged source artifact"; exit 110; }
     fi
     popd
     rm -rf ${RELEASEBASENAME}/

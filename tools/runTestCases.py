@@ -28,7 +28,7 @@ if not os.path.exists(testLogDir):
     os.makedirs(testLogDir)
 
 cleanupCmd = r'find mnemonic-* -type f \( -name "*.mne" -o -name "*.dat" \) -exec rm {} \;'
-testCmdFile = 'bin/test.conf'
+testCmdFile = 'tools/test.conf'
 tcCmdReg = re.compile('^mvn\s.*$')
 tcNameReg = re.compile('-D(?:test|suites)=(.+?)\s')
 tcModuleReg = re.compile('-pl\s(.+?)\s')
@@ -51,4 +51,3 @@ with open(testCmdFile) as fp:
             else:
                 print("[WARN] JAR file not found in " + tcNameReg.findall(line)[0] + " test case for \"" + tcModuleReg.findall(line)[0] + "\".")
 print("[DONE] All test cases are completed! Log files are available under folder testlog.")
-

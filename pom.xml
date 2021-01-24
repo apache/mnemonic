@@ -109,7 +109,7 @@
     <memory.service.dist.dir>${root.dir}/mnemonic-memory-services/service-dist</memory.service.dist.dir>
     <computing.service.dist.dir>${root.dir}/mnemonic-computing-services/service-dist</computing.service.dist.dir>
     <github.global.server>github</github.global.server>
-    <buildtools.dir>${basedir}/bin</buildtools.dir>
+    <buildtools.dir>${basedir}/tools</buildtools.dir>
     <gpg.keyname>apache.org</gpg.keyname>
     <slf4j.version>1.7.21</slf4j.version>
     <log4j.version>1.2.17</log4j.version>
@@ -296,8 +296,8 @@
           <artifactId>maven-checkstyle-plugin</artifactId>
           <version>3.0.0</version>
           <configuration>
-            <configLocation>bin/mnemonic-checkstyle.xml</configLocation>
-            <suppressionsLocation>bin/suppressions.xml</suppressionsLocation>
+            <configLocation>tools/mnemonic-checkstyle.xml</configLocation>
+            <suppressionsLocation>tools/suppressions.xml</suppressionsLocation>
             <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
             <includeTestSourceDirectory>true</includeTestSourceDirectory>
             <encoding>UTF-8</encoding>
@@ -475,22 +475,22 @@
     <id>activate-buildtools-in-module</id>
     <activation>
       <file>
-        <exists>${basedir}/../bin/mnemonic-checkstyle.xml</exists>
+        <exists>${basedir}/../tools/mnemonic-checkstyle.xml</exists>
       </file>
     </activation>
     <properties>
-      <buildtools.dir>${basedir}/../bin</buildtools.dir>
+      <buildtools.dir>${basedir}/../tools</buildtools.dir>
     </properties>
   </profile>
   <profile>
     <id>activate-buildtools-in-submodule</id>
     <activation>
       <file>
-        <exists>${basedir}/../../bin/mnemonic-checkstyle.xml</exists>
+        <exists>${basedir}/../../tools/mnemonic-checkstyle.xml</exists>
       </file>
     </activation>
     <properties>
-      <buildtools.dir>${basedir}/../../bin</buildtools.dir>
+      <buildtools.dir>${basedir}/../../tools</buildtools.dir>
     </properties>
   </profile>
 
@@ -513,7 +513,7 @@
           <configuration>
             <finalName>apache-mnemonic-${project.version}</finalName>
             <descriptors>
-              <descriptor>bin/source-assembly.xml</descriptor>
+              <descriptor>tools/source-assembly.xml</descriptor>
             </descriptors>
           </configuration>
         </plugin>

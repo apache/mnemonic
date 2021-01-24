@@ -39,6 +39,6 @@ RUN git clone https://github.com/apache/mnemonic.git && \
 
 ENV MNEMONIC_HOME /ws/mnemonic
 
-#RUN cd /ws/mnemonic && bin/runall.sh -y
+#RUN cd /ws/mnemonic && tools/runall.sh -y
 
 CMD ["bash"]
