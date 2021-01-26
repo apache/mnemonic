@@ -5,7 +5,6 @@
 ## <a href="https://mnemonic.apache.org/" target="_blank">Mnemonic Official Website</a>
 
 [![CI](https://github.com/apache/mnemonic/workflows/build%20in%20container/badge.svg)](https://github.com/apache/mnemonic/actions?query=workflow%3Abuild%20in%20container)
-[![Build Status](https://api.travis-ci.org/apache/mnemonic.svg?branch=master)](https://travis-ci.org/github/apache/mnemonic)
 
 Apache Mnemonic is a non-volatile hybrid memory storage oriented library, it proposed a non-volatile/durable Java object model and durable computing service that bring several advantages to significantly improve the performance of massive real-time data processing/analytics. developers are able to use this library to design their cache-less and SerDe-less high performance applications.
 
