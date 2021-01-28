@@ -25,10 +25,9 @@ jobs:
       env:
         MNE_MODE: development
     steps:
-      - name: Remove File
-        uses: JesseTG/rm@v1.0.2
-        with:
-          path: /ws/mnemonic
+      - name: Delete old project folder
+        run: |
+          rm -rf /ws/mnemonic
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Validate Gradle Wrapper
