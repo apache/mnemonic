@@ -28,6 +28,8 @@ import org.apache.mnemonic.MemClustering;
 import org.apache.mnemonic.Reclaim;
 import org.apache.mnemonic.SysMemAllocator;
 import org.apache.mnemonic.Utils;
+import org.apache.mnemonic.service.memory.internal.VMemServiceImpl;
+// import org.apache.mnemonic.service.memory.internal.PMemServiceImpl;
 
 import sun.misc.Unsafe;
 
@@ -65,8 +67,8 @@ public class Main {
         // true).disableActiveGC(),
         // MemClustering.PerformanceLevel.NORMAL),
         new MemClustering.NodeConfig(
-            new VolatileMemAllocator(Utils.getVolatileMemoryAllocatorService("vmem"), 1024 * 1024 * 20, "."),
-            // Utils.getVolatileMemoryAllocatorService("pmalloc"),
+            new VolatileMemAllocator(new VMemServiceImpl(), 1024 * 1024 * 20, "."),
+            // new PMemServiceImpl(),
             // 1024 * 1024 * 20, "./example.dat", true),
             MemClustering.PerformanceLevel.SLOW), };
 
