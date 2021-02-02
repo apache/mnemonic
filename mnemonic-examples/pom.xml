@@ -55,6 +55,16 @@
       <artifactId>mnemonic-collections</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.mnemonic</groupId>
+      <artifactId>mnemonic-nvml-vmem-service</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.mnemonic</groupId>
+      <artifactId>mnemonic-nvml-pmem-service</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- logging dependencies -->
     <!-- assume all APIs will be used -->
     <dependency>

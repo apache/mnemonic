@@ -21,14 +21,14 @@ import org.apache.mnemonic.DurableType;
 import org.apache.mnemonic.EntityFactoryProxy;
 import org.apache.mnemonic.EntityFactoryProxyHelper;
 import org.apache.mnemonic.NonVolatileMemAllocator;
-import org.apache.mnemonic.Utils;
+import org.apache.mnemonic.service.memory.internal.PMemServiceImpl;
 
 public class ShowOrder {
 
   public static void main(String[] argv) throws Exception {
 
     /* create a non-volatile memory pool from one of memory services */
-    NonVolatileMemAllocator act = new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService("pmalloc"),
+    NonVolatileMemAllocator act = new NonVolatileMemAllocator(new PMemServiceImpl(),
         1024L * 1024 * 1024, "./example_order.dat", false);
 
     DurableType listgftypes[] = {DurableType.DURABLE};
