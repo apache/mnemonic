@@ -24,6 +24,7 @@ import java.util.Random;
 import org.apache.mnemonic.EntityFactoryProxyHelper;
 import org.apache.mnemonic.Utils;
 import org.apache.mnemonic.NonVolatileMemAllocator;
+import org.apache.mnemonic.service.memory.internal.PMallocServiceImpl;
 //import org.apache.mnemonic.OutOfHybridMemory;
 import org.apache.mnemonic.EntityFactoryProxy;
 import org.apache.mnemonic.DurableType;
@@ -52,7 +53,7 @@ public class DurableTreeNGTest {
   public void setUp() throws Exception {
     rand = Utils.createRandom();
     unsafe = Utils.getUnsafe();
-    m_act = new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService("pmalloc"), 1024 * 1024 * 1024,
+    m_act = new NonVolatileMemAllocator(new PMallocServiceImpl(), 1024 * 1024 * 1024,
         "./pobj_tree.dat", true);
     cKEYCAPACITY = m_act.handlerCapacity();
     m_act.setBufferReclaimer(new Reclaim<ByteBuffer>() {

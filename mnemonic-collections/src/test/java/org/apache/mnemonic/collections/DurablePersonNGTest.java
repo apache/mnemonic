@@ -22,6 +22,7 @@ import org.apache.mnemonic.OutOfHybridMemory;
 import org.apache.mnemonic.Reclaim;
 import org.apache.mnemonic.RetrieveDurableEntityError;
 import org.apache.mnemonic.Utils;
+import org.apache.mnemonic.service.memory.internal.PMallocServiceImpl;
 import org.testng.annotations.Test;
 import java.nio.ByteBuffer;
 import java.util.Random;
@@ -38,7 +39,7 @@ public class DurablePersonNGTest {
   @Test(expectedExceptions = { OutOfHybridMemory.class })
   public void testGenPeople() throws OutOfHybridMemory, RetrieveDurableEntityError {
     Random rand = Utils.createRandom();
-    NonVolatileMemAllocator act = new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService("pmalloc"),
+    NonVolatileMemAllocator act = new NonVolatileMemAllocator(new PMallocServiceImpl(),
         1024 * 1024 * 8, "./pobj_person.dat", true);
     cKEYCAPACITY = act.handlerCapacity();
     act.setBufferReclaimer(new Reclaim<ByteBuffer>() {
@@ -110,7 +111,7 @@ public class DurablePersonNGTest {
 
   @Test(dependsOnMethods = { "testGenPeople" })
   public void testCheckPeople() throws RetrieveDurableEntityError {
-    NonVolatileMemAllocator act = new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService("pmalloc"),
+    NonVolatileMemAllocator act = new NonVolatileMemAllocator(new PMallocServiceImpl(),
         1024 * 1024 * 8, "./pobj_person.dat", true);
     act.setBufferReclaimer(new Reclaim<ByteBuffer>() {
       @Override
