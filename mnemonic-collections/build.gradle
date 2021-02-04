@@ -33,6 +33,7 @@ compileTestJava {
 dependencies {
   annotationProcessor project(':mnemonic-core')
   api project(':mnemonic-core')
+  api project(':mnemonic-memory-services:mnemonic-pmalloc-service')
   api 'org.apache.commons:commons-lang3'
   api 'org.flowcomputing.commons:commons-primitives'
   api 'org.slf4j:slf4j-api'
