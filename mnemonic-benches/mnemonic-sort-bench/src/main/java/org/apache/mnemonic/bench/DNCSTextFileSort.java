@@ -21,6 +21,7 @@ import org.apache.mnemonic.DurableType;
 import org.apache.mnemonic.EntityFactoryProxy;
 import org.apache.mnemonic.Utils;
 import org.apache.mnemonic.VolatileMemAllocator;
+import org.apache.mnemonic.service.memory.internal.SysVMemServiceImpl;
 import org.apache.mnemonic.collections.DurableSinglyLinkedList;
 import org.apache.mnemonic.collections.DurableSinglyLinkedListFactory;
 import org.apache.mnemonic.collections.SinglyLinkedNode;
@@ -52,7 +53,7 @@ public class DNCSTextFileSort implements TextFileSort {
     if (null != m_act) {
       clear();
     }
-    m_act = new VolatileMemAllocator(Utils.getVolatileMemoryAllocatorService("sysvmem"), 1024 * 1024 * 1024 * 5,
+    m_act = new VolatileMemAllocator(new SysVMemServiceImpl(), 1024 * 1024 * 1024 * 5,
         uri);
     String text = null;
     SinglyLinkedNode<Long> curnode = null, prvnode = null, node = null;
