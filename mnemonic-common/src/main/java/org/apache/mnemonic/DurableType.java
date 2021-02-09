@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,17 +15,35 @@
  * limitations under the License.
  */
 
-description = 'mnemonic-common'
+package org.apache.mnemonic;
 
-dependencies {
-  api 'org.apache.commons:commons-lang3'
-  api 'org.flowcomputing.commons:commons-resgc'
-  api 'org.flowcomputing.commons:commons-primitives'
-  api 'org.slf4j:slf4j-api'
-  api 'org.slf4j:jul-to-slf4j'
-  api 'org.slf4j:jcl-over-slf4j'
-  api 'log4j:log4j'
-  api 'org.slf4j:slf4j-log4j12'
-  testCompileOnly 'org.testng:testng'
+/**
+ * defines the types of generic field
+ *
+ */
+public enum DurableType {
+
+  BOOLEAN(1),
+  CHARACTER(2),
+  BYTE(3),
+  SHORT(4),
+  INTEGER(5),
+  LONG(6),
+  FLOAT(7),
+  DOUBLE(8),
+  STRING(9),
+  DURABLE(10),
+  BUFFER(11),
+  CHUNK(12);
+
+  private int value;
+
+  DurableType(int val) {
+    this.value = val;
+  }
+
+  public int getValue() {
+    return value;
+  }
+
 }
-test.useTestNG()
