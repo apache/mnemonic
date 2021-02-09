@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,18 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.mnemonic.service.memory;
 
-description = 'mnemonic-common'
+public enum MemoryServiceFeature {
 
-dependencies {
-  api 'org.apache.commons:commons-lang3'
-  api 'org.flowcomputing.commons:commons-resgc'
-  api 'org.flowcomputing.commons:commons-primitives'
-  api 'org.slf4j:slf4j-api'
-  api 'org.slf4j:jul-to-slf4j'
-  api 'org.slf4j:jcl-over-slf4j'
-  api 'log4j:log4j'
-  api 'org.slf4j:slf4j-log4j12'
-  testCompileOnly 'org.testng:testng'
+  VOLATILE(1),
+  NONVOLATILE(2),
+  TRANSACTABLE(3),
+  QUERYABLE(4),
+  ABSTRACTADDRESSING(5),
+  EXPANDABLE(6),
+  SHRINKABLE(7);
+
+  private int value;
+
+  MemoryServiceFeature(int val) {
+    this.value = val;
+  }
+
+  public int getValue() {
+    return value;
+  }
+
 }
-test.useTestNG()
