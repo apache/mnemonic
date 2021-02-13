@@ -51,7 +51,7 @@
   <dependencies>
     <dependency>
       <groupId>org.apache.mnemonic</groupId>
-      <artifactId>mnemonic-core</artifactId>
+      <artifactId>mnemonic-common</artifactId>
       <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>
