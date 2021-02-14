@@ -38,6 +38,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.apache.mnemonic</groupId>
+      <artifactId>mnemonic-pmalloc-service</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>

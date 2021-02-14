@@ -35,6 +35,7 @@ dependencies {
   annotationProcessor project(':mnemonic-core')
   api project(':mnemonic-collections')
   api project(':mnemonic-sessions')
+  api project(':mnemonic-memory-services:mnemonic-pmalloc-service')
   api 'org.apache.commons:commons-lang3'
   api 'org.flowcomputing.commons:commons-primitives'
   implementation "org.apache.hadoop:hadoop-common:${hadoop_version}"
