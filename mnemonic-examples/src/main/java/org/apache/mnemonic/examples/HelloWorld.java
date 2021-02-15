@@ -22,14 +22,13 @@ import org.apache.mnemonic.NonVolatileMemAllocator;
 import org.apache.mnemonic.Utils;
 import org.apache.mnemonic.collections.DurableString;
 import org.apache.mnemonic.collections.DurableStringFactory;
-import org.apache.mnemonic.service.memory.internal.PMemServiceImpl;
 
 public class HelloWorld {
 
   public static void main(String[] argv) throws Exception {
 
     /* create a non-volatile memory pool from one of memory services */
-    NonVolatileMemAllocator act = new NonVolatileMemAllocator(new PMemServiceImpl(),
+    NonVolatileMemAllocator act = new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService("pmalloc"),
         1024L * 1024 * 1024, "./example_helloworld.dat", true);
 
     /* create durable string object */
