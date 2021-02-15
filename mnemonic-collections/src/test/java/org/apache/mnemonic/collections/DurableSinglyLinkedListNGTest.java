@@ -25,7 +25,6 @@ import java.util.Random;
 
 import org.apache.mnemonic.EntityFactoryProxyHelper;
 import org.apache.mnemonic.NonVolatileMemAllocator;
-import org.apache.mnemonic.service.memory.internal.PMallocServiceImpl;
 import org.apache.mnemonic.EntityFactoryProxy;
 import org.apache.mnemonic.Reclaim;
 import org.apache.mnemonic.Utils;
@@ -48,7 +47,7 @@ public class DurableSinglyLinkedListNGTest {
   @BeforeClass
   public void setUp() {
     m_rand = Utils.createRandom();
-    m_act = new NonVolatileMemAllocator(new PMallocServiceImpl(), 1024 * 1024 * 1024,
+    m_act = new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService("pmalloc"), 1024 * 1024 * 1024,
         "./pobj_NodeValue.dat", true);
     cKEYCAPACITY = m_act.handlerCapacity();
     m_act.setBufferReclaimer(new Reclaim<ByteBuffer>() {
