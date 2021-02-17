@@ -28,7 +28,6 @@ import org.apache.mnemonic.EntityFactoryProxyHelper;
 import org.apache.mnemonic.NonVolatileMemAllocator;
 import org.apache.mnemonic.EntityFactoryProxy;
 import org.apache.mnemonic.Utils;
-import org.apache.mnemonic.service.memory.internal.PMallocServiceImpl;
 import org.apache.mnemonic.DurableType;
 import org.apache.mnemonic.collections.DurableSinglyLinkedList;
 import org.apache.mnemonic.collections.DurableSinglyLinkedListFactory;
@@ -54,7 +53,7 @@ public class DurableSinglyLinkedListNGPrintTest {
   public void setUp() throws IOException {
     m_rand = Utils.createRandom();
     Files.deleteIfExists(Paths.get(uri));
-    m_act = new NonVolatileMemAllocator(new PMallocServiceImpl(), 1024 * 1024 * 1024,
+    m_act = new NonVolatileMemAllocator(Utils.getNonVolatileMemoryAllocatorService("pmalloc"), 1024 * 1024 * 1024,
         uri, true);
     cKEYCAPACITY = m_act.handlerCapacity();
     for (long i = 0; i < cKEYCAPACITY; ++i) {
