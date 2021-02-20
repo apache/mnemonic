@@ -24,6 +24,7 @@ compileTestJava {
 }
 
 dependencies {
+    api project(':mnemonic-common')
     api 'org.apache.commons:commons-lang3'
     api 'org.flowcomputing.commons:commons-resgc'
     api 'org.flowcomputing.commons:commons-primitives'
