@@ -24,7 +24,7 @@ plugins {
 description = 'mnemonic-pmdk-pmem-service'
 
 dependencies {
-  implementation project(':mnemonic-core')
+  implementation project(':mnemonic-common')
   implementation 'org.flowcomputing.commons:commons-primitives'
   testCompileOnly 'org.testng:testng'
 }

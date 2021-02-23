@@ -25,6 +25,10 @@ compileTestJava {
 
 dependencies {
     api project(':mnemonic-common')
+    api project(':mnemonic-memory-services:mnemonic-pmalloc-service')
+    api project(':mnemonic-memory-services:mnemonic-pmdk-pmem-service')    
+    api project(':mnemonic-memory-services:mnemonic-pmdk-vmem-service')
+    api project(':mnemonic-memory-services:mnemonic-nvml-vmem-service')
     api 'org.apache.commons:commons-lang3'
     api 'org.flowcomputing.commons:commons-resgc'
     api 'org.flowcomputing.commons:commons-primitives'

@@ -79,6 +79,26 @@
       <artifactId>mnemonic-common</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.mnemonic</groupId>
+      <artifactId>mnemonic-pmalloc-service</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.mnemonic</groupId>
+      <artifactId>mnemonic-pmdk-vmem-service</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.mnemonic</groupId>
+      <artifactId>mnemonic-pmdk-pmem-service</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.mnemonic</groupId>
+      <artifactId>mnemonic-nvml-vmem-service</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
   <build>
