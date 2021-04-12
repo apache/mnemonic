@@ -65,6 +65,21 @@
       <artifactId>mnemonic-nvml-pmem-service</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.mnemonic</groupId>
+      <artifactId>mnemonic-pmdk-vmem-service</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.mnemonic</groupId>
+      <artifactId>mnemonic-pmdk-pmem-service</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.mnemonic</groupId>
+      <artifactId>mnemonic-pmalloc-service</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- logging dependencies -->
     <!-- assume all APIs will be used -->
     <dependency>
@@ -236,8 +251,6 @@
             <configuration>
               <executable>java</executable>
               <arguments>
-                <!-- replace it with ${project.build.directory}/service-dist in client POM -->
-                <argument>-Djava.ext.dirs=${memory.service.dist.dir}</argument>
                 <argument>-ea</argument>
                 <argument>-classpath</argument>
                 <classpath />
@@ -271,8 +284,6 @@
             <configuration>
               <executable>java</executable>
               <arguments>
-                <!-- replace it with ${project.build.directory}/service-dist in client POM -->
-                <argument>-Djava.ext.dirs=${memory.service.dist.dir}</argument>
                 <argument>-ea</argument>
                 <argument>-classpath</argument>
                 <classpath />
@@ -306,8 +317,6 @@
             <configuration>
               <executable>java</executable>
               <arguments>
-                <!-- replace it with ${project.build.directory}/service-dist in client POM -->
-                <argument>-Djava.ext.dirs=${memory.service.dist.dir}</argument>
                 <argument>-ea</argument>
                 <argument>-classpath</argument>
                 <classpath />
@@ -341,8 +350,6 @@
             <configuration>
               <executable>java</executable>
               <arguments>
-                <!-- replace it with ${project.build.directory}/service-dist in client POM -->
-                <argument>-Djava.ext.dirs=${memory.service.dist.dir}</argument>
                 <argument>-ea</argument>
                 <argument>-classpath</argument>
                 <classpath />
