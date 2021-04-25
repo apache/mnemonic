@@ -18,14 +18,14 @@
 FROM ubuntu:18.04
 MAINTAINER Yanhui Zhao (yanhui.zhao@outlook.com)
 
-RUN apt-get -y update && \
-    apt-get install -y default-jdk cmake check git pkg-config autoconf man build-essential gcc g++ uuid-dev pandoc devscripts flex doxygen maven
+RUN apt-get -y update && apt-get install -y software-properties-common && add-apt-repository ppa:openjdk-r/ppa && apt-get -y update && \
+    apt-get install -y openjdk-14-jdk cmake check git pkg-config autoconf man build-essential gcc g++ uuid-dev pandoc devscripts flex doxygen maven
 
 RUN apt-get install -y libndctl-dev libpmem-dev libvmem-dev libpmemobj-dev
 
 RUN apt-get clean
 
-ENV JAVA_HOME /usr/lib/jvm/default-java
+ENV JAVA_HOME /usr/lib/jvm/java-14-openjdk-amd64
 ENV PATH $JAVA_HOME/bin:$PATH
 
 WORKDIR /ws
