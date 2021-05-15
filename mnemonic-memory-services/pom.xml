@@ -88,7 +88,6 @@
       <extension>
         <groupId>kr.motd.maven</groupId>
         <artifactId>os-maven-plugin</artifactId>
-        <version>1.4.0.Final</version>
       </extension>
     </extensions>
     <plugins>
@@ -98,7 +97,6 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
-          <version>3.0.2</version>
           <configuration>
             <forceCreation>true</forceCreation>
             <archive>
@@ -109,7 +107,6 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-shade-plugin</artifactId>
-          <version>2.4.3</version>
           <configuration>
             <minimizeJar>true</minimizeJar>
             <filters>
