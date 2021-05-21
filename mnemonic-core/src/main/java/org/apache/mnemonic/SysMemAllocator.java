@@ -36,55 +36,37 @@ import static org.apache.mnemonic.service.memory.MemoryServiceFeature.SHRINKABLE
 
 /**
  * manage a system memory pool as a internal volatile allocator
- * 
+ *
  */
 @SuppressWarnings("restriction")
 public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
 
   private boolean m_activegc = true;
   private long m_gctimeout = 100;
-  private Unsafe m_unsafe = null;
+  private static Unsafe m_unsafe = null;
   private AtomicLong currentMemory = new AtomicLong(0L);
   private long maxStoreCapacity = 0L;
   private Map<Long, Long> m_chunksize = new ConcurrentHashMap<Long, Long>();
 
-  static final Method CLEANMETHOD;
-
-  static {
-    try {
-      Class<?> cleanerOrCleanable;
-      try {
-        cleanerOrCleanable = Class.forName("sun.misc.Cleaner");
-      } catch (ClassNotFoundException e1) {
-        try {
-          cleanerOrCleanable = Class.forName("java.lang.ref.Cleaner$Cleanable");
-        } catch (ClassNotFoundException e2) {
-          e2.addSuppressed(e1);
-          throw e2;
-        }
-      }
-      CLEANMETHOD = cleanerOrCleanable.getDeclaredMethod("clean");
-    } catch (Exception e) {
-      throw new Error(e);
-    }
-  }
+  private static Method buf_clean_method;
 
   /**
    * Constructor, it initialize and allocate a memory pool from Java off-heap
    * with specified capacity.
-   * 
+   *
    * @param capacity
    *          specify the capacity of a system memory pool
-   * 
+   *
    * @param isnew
    *          a place holder, always specify it as true
-   * 
+   *
    * @throws Exception
    *           fail to retrieve Unsafe object
-   * 
+   *
    */
   public SysMemAllocator(long capacity, boolean isnew) throws Exception {
     m_unsafe = Utils.getUnsafe();
+    buf_clean_method = sun.misc.Unsafe.class.getMethod("invokeCleaner", java.nio.ByteBuffer.class);
     maxStoreCapacity = capacity;
     /**
      * create a resource collector to release specified bytebuffer that backed
@@ -101,11 +83,8 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
         }
         if (!cb_reclaimed) {
           try {
-            final Object bufferCleaner = ((sun.nio.ch.DirectBuffer) mres).cleaner();
-            if (null != bufferCleaner) {
-              CLEANMETHOD.invoke(bufferCleaner);
-            }
-          } catch (InvocationTargetException | IllegalAccessException e) {
+            buf_clean_method.invoke(m_unsafe, mres);
+          } catch(Exception e) {
             throw new Error(e);
           }
           mres = null;
@@ -220,13 +199,13 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
 
   /**
    * re-size a specified chunk on its backed memory pool.
-   * 
+   *
    * @param mholder
    *          the holder of memory chunk. it can be null.
-   * 
+   *
    * @param size
    *          specify a new size of memory chunk
-   * 
+   *
    * @return the resized memory chunk handler
    */
   @Override
@@ -259,10 +238,10 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
    *
    * @param mholder
    *          the holder of memory buffer. it can be null.
-   * 
+   *
    * @param size
    *          specify a new size of memory chunk
-   * 
+   *
    * @return the resized memory buffer handler
    *
    */
@@ -297,10 +276,10 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
 
   /**
    * create a memory chunk that is managed by its holder.
-   * 
+   *
    * @param size
    *          specify the size of memory chunk
-   * 
+   *
    * @param autoreclaim
    *          specify whether or not to reclaim this chunk automatically
    *
@@ -336,7 +315,7 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
 
   /**
    * create a memory buffer that is managed by its holder.
-   * 
+   *
    * @param size
    *          specify the size of memory buffer
    *
