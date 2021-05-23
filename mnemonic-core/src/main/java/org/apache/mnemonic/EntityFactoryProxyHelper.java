@@ -18,7 +18,7 @@
 package org.apache.mnemonic;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.flowcomputing.commons.resgc.ReclaimContext;
+import org.apache.mnemonic.resgc.ReclaimContext;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

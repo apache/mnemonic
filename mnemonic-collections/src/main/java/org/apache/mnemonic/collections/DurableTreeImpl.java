@@ -24,10 +24,10 @@ import org.apache.mnemonic.MemoryDurableEntity;
 import org.apache.mnemonic.OutOfHybridMemory;
 import org.apache.mnemonic.RestorableAllocator;
 import org.apache.mnemonic.RestoreDurableEntityError;
+import org.apache.mnemonic.resgc.ReclaimContext;
 import org.apache.mnemonic.RetrieveDurableEntityError;
 import org.apache.mnemonic.Utils;
 
-import org.flowcomputing.commons.resgc.ReclaimContext;
 import sun.misc.Unsafe;
 
 @SuppressWarnings("restriction")

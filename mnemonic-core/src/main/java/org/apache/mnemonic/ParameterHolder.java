@@ -18,7 +18,7 @@
 package org.apache.mnemonic;
 
 import org.apache.commons.lang3.tuple.MutablePair;
-import org.flowcomputing.commons.resgc.ReclaimContext;
+import org.apache.mnemonic.resgc.ReclaimContext;
 
 public class ParameterHolder<A extends RetrievableAllocator<A>> {
 

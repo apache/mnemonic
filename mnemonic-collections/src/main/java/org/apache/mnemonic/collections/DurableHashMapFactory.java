@@ -22,7 +22,7 @@ import org.apache.mnemonic.EntityFactoryProxy;
 import org.apache.mnemonic.OutOfHybridMemory;
 import org.apache.mnemonic.RestorableAllocator;
 import org.apache.mnemonic.RestoreDurableEntityError;
-import org.flowcomputing.commons.resgc.ReclaimContext;
+import org.apache.mnemonic.resgc.ReclaimContext;
 
 public class DurableHashMapFactory {
   public static <A extends RestorableAllocator<A>, K, V> DurableHashMap<K, V>

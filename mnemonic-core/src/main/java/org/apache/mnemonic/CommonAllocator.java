@@ -18,8 +18,8 @@
 package org.apache.mnemonic;
 
 import org.apache.mnemonic.service.memory.MemoryServiceFeature;
-import org.flowcomputing.commons.resgc.ReclaimContext;
-import org.flowcomputing.commons.resgc.ResCollector;
+import org.apache.mnemonic.resgc.ReclaimContext;
+import org.apache.mnemonic.resgc.ResCollector;
 
 import java.nio.ByteBuffer;
 import java.util.Set;

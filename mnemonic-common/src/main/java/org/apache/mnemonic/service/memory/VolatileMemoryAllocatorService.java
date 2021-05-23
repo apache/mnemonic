@@ -17,7 +17,7 @@
 
 package org.apache.mnemonic.service.memory;
 
-import org.flowcomputing.commons.resgc.ReclaimContext;
+import org.apache.mnemonic.resgc.ReclaimContext;
 
 import java.nio.ByteBuffer;
 import java.util.Set;

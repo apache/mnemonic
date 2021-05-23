@@ -22,8 +22,8 @@ import org.apache.mnemonic.query.memory.ResultSet;
 import org.apache.mnemonic.service.computing.ValueInfo;
 import org.apache.mnemonic.service.memory.MemoryServiceFeature;
 import org.apache.mnemonic.service.memory.NonVolatileMemoryAllocatorService;
+import org.apache.mnemonic.resgc.ReclaimContext;
 import org.flowcomputing.commons.primitives.NativeLibraryLoader;
-import org.flowcomputing.commons.resgc.ReclaimContext;
 
 import java.nio.ByteBuffer;
 import java.util.HashSet;

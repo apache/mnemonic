@@ -17,7 +17,7 @@
 
 package org.apache.mnemonic;
 
-import org.flowcomputing.commons.resgc.ReclaimContext;
+import org.apache.mnemonic.resgc.ReclaimContext;
 
 /**
  * an interface to allocate memory resources from any underlying memory kind of

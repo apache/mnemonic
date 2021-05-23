@@ -15,25 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.mnemonic;
-
-import org.apache.mnemonic.resgc.ReclaimContext;
+package org.apache.mnemonic.resgc;
 
 /**
- *
+ * the context interface for reclaim operation.
  *
  */
+public interface ReclaimContext extends Cloneable {
 
-public interface MemoryDurableEntity<ALLOC_PMem3C93D24F59 extends RestorableAllocator<ALLOC_PMem3C93D24F59>> {
-
-  void initializeDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-                               DurableType[] gfields, boolean autoreclaim, ReclaimContext rctx);
-
-  void createDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-      DurableType[] gfields, boolean autoreclaim, ReclaimContext rctx) throws OutOfHybridMemory;
-
-  void restoreDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-      DurableType[] gfields, long phandler, boolean autoreclaim, ReclaimContext rctx)
-          throws RestoreDurableEntityError;
+    ReclaimContext clone();
 
 }
+

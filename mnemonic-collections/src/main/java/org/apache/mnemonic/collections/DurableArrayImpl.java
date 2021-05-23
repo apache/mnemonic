@@ -23,6 +23,7 @@ import org.apache.mnemonic.DurableType;
 import org.apache.mnemonic.MemChunkHolder;
 import org.apache.mnemonic.MemoryDurableEntity;
 import org.apache.mnemonic.OutOfHybridMemory;
+import org.apache.mnemonic.resgc.ReclaimContext;
 import org.apache.mnemonic.RestorableAllocator;
 import org.apache.mnemonic.RestoreDurableEntityError;
 import org.apache.mnemonic.RetrieveDurableEntityError;
@@ -30,7 +31,6 @@ import org.apache.mnemonic.Utils;
 
 import java.util.NoSuchElementException;
 
-import org.flowcomputing.commons.resgc.ReclaimContext;
 import sun.misc.Unsafe;
 import java.util.Iterator;
 

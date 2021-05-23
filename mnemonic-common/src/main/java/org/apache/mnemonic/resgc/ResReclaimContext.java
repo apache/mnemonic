@@ -15,25 +15,32 @@
  * limitations under the License.
  */
 
-package org.apache.mnemonic;
+package org.apache.mnemonic.resgc;
 
-import org.apache.mnemonic.resgc.ReclaimContext;
+public class ResReclaimContext implements ReclaimContext {
 
-/**
- *
- *
- */
+    protected int m_modeid;
 
-public interface MemoryDurableEntity<ALLOC_PMem3C93D24F59 extends RestorableAllocator<ALLOC_PMem3C93D24F59>> {
+    public ResReclaimContext() {
+        m_modeid = 0;
+    }
 
-  void initializeDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-                               DurableType[] gfields, boolean autoreclaim, ReclaimContext rctx);
+    public ResReclaimContext(int modeid) {
+        m_modeid = modeid;
+    }
 
-  void createDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-      DurableType[] gfields, boolean autoreclaim, ReclaimContext rctx) throws OutOfHybridMemory;
+    @Override
+    public ResReclaimContext clone() {
+        return new ResReclaimContext(m_modeid);
+    }
 
-  void restoreDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-      DurableType[] gfields, long phandler, boolean autoreclaim, ReclaimContext rctx)
-          throws RestoreDurableEntityError;
+    public int getModeId() {
+        return m_modeid;
+    }
+
+    public void setModeId(int modeid) {
+        this.m_modeid = modeid;
+    }
 
 }
+

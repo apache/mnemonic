@@ -24,7 +24,7 @@ import org.apache.mnemonic.query.memory.ResultSet;
 import org.apache.mnemonic.service.computing.ValueInfo;
 import org.apache.mnemonic.service.memory.MemoryServiceFeature;
 import org.apache.mnemonic.service.memory.VolatileMemoryAllocatorService;
-import org.flowcomputing.commons.resgc.ReclaimContext;
+import org.apache.mnemonic.resgc.ReclaimContext;
 
 import java.io.File;
 import java.io.IOException;

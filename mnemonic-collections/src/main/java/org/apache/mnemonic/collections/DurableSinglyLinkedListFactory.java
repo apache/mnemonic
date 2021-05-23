@@ -22,7 +22,7 @@ import org.apache.mnemonic.OutOfHybridMemory;
 import org.apache.mnemonic.ParameterHolder;
 import org.apache.mnemonic.RestorableAllocator;
 import org.apache.mnemonic.RestoreDurableEntityError;
-import org.flowcomputing.commons.resgc.ReclaimContext;
+import org.apache.mnemonic.resgc.ReclaimContext;
 
 public class DurableSinglyLinkedListFactory {
   public static <A extends RestorableAllocator<A>, E> DurableSinglyLinkedList<E> create(

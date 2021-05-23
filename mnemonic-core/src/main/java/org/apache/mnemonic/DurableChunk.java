@@ -17,7 +17,7 @@
 
 package org.apache.mnemonic;
 
-import org.flowcomputing.commons.resgc.ReclaimContext;
+import org.apache.mnemonic.resgc.ReclaimContext;
 
 public class DurableChunk<A extends RetrievableAllocator<A>> extends MemChunkHolder<A> implements Durable {
   protected Persistence<A> m_persistOps = null;

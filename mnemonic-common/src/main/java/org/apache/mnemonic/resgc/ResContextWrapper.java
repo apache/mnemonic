@@ -15,25 +15,41 @@
  * limitations under the License.
  */
 
-package org.apache.mnemonic;
+package org.apache.mnemonic.resgc;
 
-import org.apache.mnemonic.resgc.ReclaimContext;
+public class ResContextWrapper<MRES> implements ContextWrapper<MRES> {
 
-/**
- *
- *
- */
+    protected MRES m_res = null;
+    protected ReclaimContext m_context = null;
 
-public interface MemoryDurableEntity<ALLOC_PMem3C93D24F59 extends RestorableAllocator<ALLOC_PMem3C93D24F59>> {
+    public ResContextWrapper() {
+        m_res = null;
+        m_context = null;
+    }
 
-  void initializeDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-                               DurableType[] gfields, boolean autoreclaim, ReclaimContext rctx);
+    public ResContextWrapper(MRES res, ReclaimContext context) {
+        m_res = res;
+        m_context = context;
+    }
 
-  void createDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-      DurableType[] gfields, boolean autoreclaim, ReclaimContext rctx) throws OutOfHybridMemory;
+    @Override
+    public MRES getRes() {
+        return m_res;
+    }
 
-  void restoreDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-      DurableType[] gfields, long phandler, boolean autoreclaim, ReclaimContext rctx)
-          throws RestoreDurableEntityError;
+    @Override
+    public void setRes(MRES res) {
+        m_res = res;
+    }
+
+    @Override
+    public ReclaimContext getContext() {
+        return m_context;
+    }
+
+    @Override
+    public void setContext(ReclaimContext rctx) {
+        m_context = rctx;
+    }
 
 }
