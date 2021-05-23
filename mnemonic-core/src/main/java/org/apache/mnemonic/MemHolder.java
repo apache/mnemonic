@@ -17,8 +17,8 @@
 
 package org.apache.mnemonic;
 
-import org.flowcomputing.commons.resgc.ReclaimContext;
-import org.flowcomputing.commons.resgc.ResHolder;
+import org.apache.mnemonic.resgc.ReclaimContext;
+import org.apache.mnemonic.resgc.ResHolder;
 
 /**
  * hold a memory kind of resource.

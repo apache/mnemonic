@@ -27,7 +27,7 @@ import org.apache.mnemonic.RetrieveDurableEntityError;
 import org.apache.mnemonic.Utils;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.flowcomputing.commons.resgc.ReclaimContext;
+import org.apache.mnemonic.resgc.ReclaimContext;
 import sun.misc.Unsafe;
 import java.util.Iterator;
 

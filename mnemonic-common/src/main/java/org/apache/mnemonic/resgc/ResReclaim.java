@@ -15,25 +15,23 @@
  * limitations under the License.
  */
 
-package org.apache.mnemonic;
-
-import org.apache.mnemonic.resgc.ReclaimContext;
+package org.apache.mnemonic.resgc;
 
 /**
+ * Reclaim any kind of resource. it is customized by client code that is
+ * specific to how to destroy a kind of specified resource.
+ * 
+ * @author wg
  *
- *
+ * @param <MRES> the type of a resource
  */
+public interface ResReclaim<MRES> {
 
-public interface MemoryDurableEntity<ALLOC_PMem3C93D24F59 extends RestorableAllocator<ALLOC_PMem3C93D24F59>> {
-
-  void initializeDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-                               DurableType[] gfields, boolean autoreclaim, ReclaimContext rctx);
-
-  void createDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-      DurableType[] gfields, boolean autoreclaim, ReclaimContext rctx) throws OutOfHybridMemory;
-
-  void restoreDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-      DurableType[] gfields, long phandler, boolean autoreclaim, ReclaimContext rctx)
-          throws RestoreDurableEntityError;
-
+    /**
+     * reclaim a specified resource.
+     *
+     * @param cw
+     *            a resource context wrapper to be used for resource release
+     */
+    void reclaim(ContextWrapper<MRES> cw);
 }

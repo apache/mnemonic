@@ -17,7 +17,7 @@
 
 package org.apache.mnemonic;
 
-import org.flowcomputing.commons.resgc.ReclaimContext;
+import org.apache.mnemonic.resgc.ReclaimContext;
 
 /**
  * this interface defines the interactive functionalities with Mnenomic core

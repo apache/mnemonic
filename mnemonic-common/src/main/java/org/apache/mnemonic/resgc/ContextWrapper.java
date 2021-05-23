@@ -15,25 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.mnemonic;
-
-import org.apache.mnemonic.resgc.ReclaimContext;
+package org.apache.mnemonic.resgc;
 
 /**
+ * the context wrapper interface for registering and callback.
  *
- *
+ * @param <MRES>
+ *            resource type to be holden.
  */
+public interface ContextWrapper<MRES> {
 
-public interface MemoryDurableEntity<ALLOC_PMem3C93D24F59 extends RestorableAllocator<ALLOC_PMem3C93D24F59>> {
+    MRES getRes();
 
-  void initializeDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-                               DurableType[] gfields, boolean autoreclaim, ReclaimContext rctx);
+    void setRes(MRES res);
 
-  void createDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-      DurableType[] gfields, boolean autoreclaim, ReclaimContext rctx) throws OutOfHybridMemory;
+    ReclaimContext getContext();
 
-  void restoreDurableEntity(ALLOC_PMem3C93D24F59 allocator, EntityFactoryProxy[] efproxys,
-      DurableType[] gfields, long phandler, boolean autoreclaim, ReclaimContext rctx)
-          throws RestoreDurableEntityError;
-
+    void setContext(ReclaimContext rctx);
 }

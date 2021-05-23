@@ -43,10 +43,6 @@
     </dependency>
     <dependency>
       <groupId>org.flowcomputing.commons</groupId>
-      <artifactId>commons-resgc</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.flowcomputing.commons</groupId>
       <artifactId>commons-primitives</artifactId>
     </dependency>
     <!-- logging dependencies -->

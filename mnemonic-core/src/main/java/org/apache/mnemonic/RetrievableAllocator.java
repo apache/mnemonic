@@ -17,7 +17,7 @@
 
 package org.apache.mnemonic;
 
-import org.flowcomputing.commons.resgc.ReclaimContext;
+import org.apache.mnemonic.resgc.ReclaimContext;
 
 public abstract class RetrievableAllocator<A extends RetrievableAllocator<A>> extends CommonAllocator<A>
   implements AddressTranslator, HandlerStore, Transaction {

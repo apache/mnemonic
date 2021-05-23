@@ -17,15 +17,14 @@
 
 package org.apache.mnemonic;
 
-import org.flowcomputing.commons.resgc.ContextWrapper;
-import org.flowcomputing.commons.resgc.ResCollector;
-import org.flowcomputing.commons.resgc.ResReclaim;
-import org.flowcomputing.commons.resgc.ReclaimContext;
+import org.apache.mnemonic.resgc.ContextWrapper;
+import org.apache.mnemonic.resgc.ResCollector;
+import org.apache.mnemonic.resgc.ResReclaim;
+import org.apache.mnemonic.resgc.ReclaimContext;
 
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -84,7 +83,7 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
         if (!cb_reclaimed) {
           try {
             buf_clean_method.invoke(m_unsafe, mres);
-          } catch(Exception e) {
+          } catch (Exception e) {
             throw new Error(e);
           }
           mres = null;

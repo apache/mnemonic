@@ -23,10 +23,10 @@ import org.apache.mnemonic.query.memory.ResultSet;
 import org.apache.mnemonic.service.computing.ValueInfo;
 import org.apache.mnemonic.service.memory.MemoryServiceFeature;
 import org.apache.mnemonic.service.memory.NonVolatileMemoryAllocatorService;
-import org.flowcomputing.commons.resgc.ContextWrapper;
-import org.flowcomputing.commons.resgc.ResCollector;
-import org.flowcomputing.commons.resgc.ResReclaim;
-import org.flowcomputing.commons.resgc.ReclaimContext;
+import org.apache.mnemonic.resgc.ContextWrapper;
+import org.apache.mnemonic.resgc.ResCollector;
+import org.apache.mnemonic.resgc.ResReclaim;
+import org.apache.mnemonic.resgc.ReclaimContext;
 
 import java.nio.ByteBuffer;
 
