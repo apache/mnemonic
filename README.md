@@ -1,4 +1,4 @@
-<img src="https://mnemonic.apache.org/img/mnemonic_logo.png" width=200 />
+<img src="https://mnemonic.apache.org/img/mnemonic_logo_v2.png" width=200 />
 
 ================================
 
