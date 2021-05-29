@@ -30,7 +30,6 @@ dependencies {
   api project(':mnemonic-memory-services:mnemonic-sys-vmem-service')
   api 'commons-cli:commons-cli'
   api 'org.apache.commons:commons-lang3'
-  api 'org.flowcomputing.commons:commons-primitives'
   api 'org.slf4j:slf4j-api'
   api 'org.slf4j:jul-to-slf4j'
   api 'org.slf4j:jcl-over-slf4j'

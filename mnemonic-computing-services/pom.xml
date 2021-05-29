@@ -51,13 +51,14 @@
     </dependency>
     <dependency>
       <groupId>org.apache.mnemonic</groupId>
+      <artifactId>mnemonic-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.mnemonic</groupId>
       <artifactId>mnemonic-collections</artifactId>
       <version>${project.version}</version>
       <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.flowcomputing.commons</groupId>
-      <artifactId>commons-primitives</artifactId>
     </dependency>
     <!-- logging dependencies -->
     <!-- assume all APIs will be used -->

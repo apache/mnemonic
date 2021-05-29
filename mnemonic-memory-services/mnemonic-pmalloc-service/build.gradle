@@ -25,7 +25,6 @@ description = 'mnemonic-pmalloc-service'
 
 dependencies {
   implementation project(':mnemonic-common')
-  implementation 'org.flowcomputing.commons:commons-primitives'
   testCompileOnly 'org.testng:testng'
 }
 
