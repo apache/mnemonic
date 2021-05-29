@@ -19,7 +19,7 @@ package org.apache.mnemonic.service.computing.internal;
 
 import org.apache.mnemonic.service.computing.GeneralComputingService;
 import org.apache.mnemonic.service.computing.ValueInfo;
-import org.flowcomputing.commons.primitives.NativeLibraryLoader;
+import org.apache.mnemonic.primitives.NativeLibraryLoader;
 
 public class VectorizationServiceImpl implements GeneralComputingService {
   static {

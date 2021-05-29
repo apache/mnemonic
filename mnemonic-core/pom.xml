@@ -41,10 +41,6 @@
       <artifactId>testng</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.flowcomputing.commons</groupId>
-      <artifactId>commons-primitives</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.squareup</groupId>
       <artifactId>javapoet</artifactId>
     </dependency>

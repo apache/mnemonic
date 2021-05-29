@@ -42,7 +42,6 @@ dependencies {
   annotationProcessor project(':mnemonic-core')
   api project(':mnemonic-spark:mnemonic-spark-core')
   api 'org.apache.commons:commons-lang3'
-  api 'org.flowcomputing.commons:commons-primitives'
   implementation "org.apache.spark:spark-core_${scala_bin_version}:${spark_version}"
   implementation "org.apache.spark:spark-mllib_${scala_bin_version}:${spark_version}"
   implementation "org.scala-lang:scala-library:${scala_version}"

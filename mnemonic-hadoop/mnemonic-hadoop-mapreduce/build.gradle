@@ -37,7 +37,6 @@ dependencies {
   api project(':mnemonic-sessions')
   api project(':mnemonic-memory-services:mnemonic-pmalloc-service')
   api 'org.apache.commons:commons-lang3'
-  api 'org.flowcomputing.commons:commons-primitives'
   implementation "org.apache.hadoop:hadoop-common:${hadoop_version}"
   implementation "org.apache.hadoop:hadoop-hdfs:${hadoop_version}"
   implementation "org.apache.hadoop:hadoop-mapreduce-client-core:${hadoop_version}"
