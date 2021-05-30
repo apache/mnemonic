@@ -88,7 +88,6 @@
     <module>mnemonic-examples</module>
     <module>mnemonic-memory-services</module>
     <module>mnemonic-computing-services</module>
-    <module>mnemonic-query</module>
     <module>mnemonic-common</module>
     <module>mnemonic-sessions</module>
     <module>mnemonic-hadoop</module>
