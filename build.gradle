@@ -38,7 +38,6 @@ subprojects {
     dependencies {
       dependency 'org.apache.commons:commons-lang3:3.4'
       dependency 'org.testng:testng:6.8.17'
-      dependency 'org.flowcomputing.commons:commons-resgc:0.8.17'
       dependency 'commons-cli:commons-cli:1.3.1'
       dependency 'com.squareup:javapoet:1.11.1'
       dependency 'org.slf4j:slf4j-api:1.7.21'

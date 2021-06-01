@@ -30,7 +30,6 @@ dependencies {
     api project(':mnemonic-memory-services:mnemonic-pmdk-vmem-service')
     api project(':mnemonic-memory-services:mnemonic-nvml-vmem-service')
     api 'org.apache.commons:commons-lang3'
-    api 'org.flowcomputing.commons:commons-resgc'
     api 'com.squareup:javapoet'
     api 'org.slf4j:slf4j-api'
     api 'org.slf4j:jul-to-slf4j'
