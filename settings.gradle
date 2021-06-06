@@ -29,7 +29,6 @@ include ':mnemonic-memory-services:mnemonic-pmdk-pmem-service'
 include ':mnemonic-memory-services'
 include ':mnemonic-computing-services:mnemonic-utilities-service'
 include ':mnemonic-computing-services'
-include ':mnemonic-query'
 include ':mnemonic-common'
 include ':mnemonic-benches:mnemonic-sort-bench'
 include ':mnemonic-benches:mnemonic-spark-kmeans-bench'
@@ -50,7 +49,6 @@ project(':mnemonic-memory-services:mnemonic-pmdk-pmem-service').projectDir = "$r
 project(':mnemonic-memory-services').projectDir = "$rootDir/mnemonic-memory-services" as File
 project(':mnemonic-computing-services:mnemonic-utilities-service').projectDir = "$rootDir/mnemonic-computing-services/mnemonic-utilities-service" as File
 project(':mnemonic-computing-services').projectDir = "$rootDir/mnemonic-computing-services" as File
-project(':mnemonic-query').projectDir = "$rootDir/mnemonic-query" as File
 project(':mnemonic-common').projectDir = "$rootDir/mnemonic-common" as File
 project(':mnemonic-benches:mnemonic-sort-bench').projectDir = "mnemonic-benches/mnemonic-sort-bench" as File
 project(':mnemonic-benches:mnemonic-spark-kmeans-bench').projectDir = "$rootDir/mnemonic-benches/mnemonic-spark-kmeans-bench" as File
