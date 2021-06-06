@@ -32,7 +32,7 @@ import java.io.OutputStream;
  */
 public final class NativeLibraryLoader {
     
-    private static final int COPYING_BUFFER_LENGTH = 80960;
+    private static final int COPYING_BUFFER_LENGTH = 40960;
     
     /**
      * private constructor that prevents it from instantiating.
