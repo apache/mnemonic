@@ -27,7 +27,7 @@ project.gradle.startParameter.excludedTaskNames.add('test')
 
 allprojects  {
   group = 'org.apache.mnemonic'
-  version = '0.14.0-SNAPSHOT'
+  version = '0.15.0-SNAPSHOT'
 }
 
 subprojects {
@@ -55,8 +55,8 @@ subprojects {
     mavenCentral()
   }
 
-  sourceCompatibility = 1.8
-  targetCompatibility = 1.8
+  sourceCompatibility = 14
+  targetCompatibility = 14
   tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
   }

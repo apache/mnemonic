@@ -277,10 +277,7 @@
         <include>pom.xml</include>
         <include>tools/**</include>
         <include>docker/**</include>
-        <include>gradle/**</include>
         <include>settings.gradle</include>
-        <include>gradlew</include>
-        <include>gradlew.bat</include>
         <include>build.gradle</include>
       </includes>
       <useDefaultExcludes>true</useDefaultExcludes>
