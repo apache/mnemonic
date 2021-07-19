@@ -376,7 +376,6 @@
           <configuration>
             <skipTests>${skipTests}</skipTests>
             <enableAssertions>true</enableAssertions>
-            <argLine>-Djava.ext.dirs=${memory.service.dist.dir}:${computing.service.dist.dir}</argLine>
           </configuration>
         </plugin>
         <plugin>
