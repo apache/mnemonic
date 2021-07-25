@@ -154,7 +154,6 @@
             <configuration>
               <executable>java</executable>
               <arguments>
-                <argument>-Djava.ext.dirs=${project.build.directory}/service-dist</argument>
                 <argument>-ea</argument>
                 <argument>-classpath</argument>
                 <classpath />
