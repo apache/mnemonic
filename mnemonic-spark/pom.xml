@@ -158,9 +158,8 @@
             <junitxml>.</junitxml>
             <parallel>false</parallel>
             <filereports>SparkIntegrationTestSuite.txt</filereports>
-            <forkMode>always</forkMode>
+            <forkMode>once</forkMode>
             <skipTests>${skipTests}</skipTests>
-            <argLine>-Djava.ext.dirs=${memory.service.dist.dir}:${computing.service.dist.dir}</argLine>
             <systemProperties>
               <spark.durable-basedir>
                 ./target
