@@ -355,6 +355,7 @@
             <compilerArgs>
               <arg>-XDignore.symbol.file</arg>
               <arg>-XDenableSunApiLintControl</arg>
+              <arg>--add-opens=java.base/java.nio=ALL-UNNAMED</arg>
             </compilerArgs>
             <fork>true</fork>
           </configuration>
@@ -376,6 +377,7 @@
           <configuration>
             <skipTests>${skipTests}</skipTests>
             <enableAssertions>true</enableAssertions>
+            <argLine>--add-opens=java.base/java.nio=ALL-UNNAMED</argLine>
           </configuration>
         </plugin>
         <plugin>
