@@ -28,7 +28,6 @@ import org.apache.mnemonic.Utils;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.mnemonic.resgc.ReclaimContext;
-import sun.misc.Unsafe;
 import java.util.Iterator;
 
 @SuppressWarnings("restriction")
@@ -36,7 +35,8 @@ public class DurableHashSetImpl<A extends RestorableAllocator<A>, E>
         extends DurableHashSet<E> implements MemoryDurableEntity<A> {
 
   private static long[][] fieldInfo;
-  private Unsafe unsafe;
+  @SuppressWarnings({"restriction", "UseOfSunClasses"})
+  private sun.misc.Unsafe unsafe;
   private EntityFactoryProxy[] factoryProxy;
   private DurableType[] genericType;
   private volatile boolean autoReclaim;

@@ -31,7 +31,6 @@ import org.apache.mnemonic.resgc.ReclaimContext;
 import org.apache.mnemonic.RetrieveDurableEntityError;
 import org.apache.mnemonic.Utils;
 import org.apache.commons.lang3.ArrayUtils;
-import sun.misc.Unsafe;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -43,7 +42,8 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
   private static final float DEFAULT_MAP_LOAD_FACTOR = 0.75f;
   private static final long MAX_OBJECT_SIZE = 8;
   private static long[][] fieldInfo;
-  private Unsafe unsafe;
+  @SuppressWarnings({"restriction", "UseOfSunClasses"})
+  private sun.misc.Unsafe unsafe;
   private EntityFactoryProxy[] factoryProxy;
   private EntityFactoryProxy[] listefproxies;
   private DurableType[] genericField;
@@ -56,7 +56,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
   private A allocator;
   /**
    * Set initial capacity for a hashmap. It can grow in size.
-   * 
+   *
    * @param capacity
    *          Initial capacity to be set
    */
@@ -74,7 +74,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
 
   /**
    * Add a new key-value pair to map
-   * 
+   *
    * @param key
    *          the key to be set
    *
@@ -97,7 +97,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
 
   /**
    * Add a new key-value pair to map at a given bucket address
-   * 
+   *
    * @param key
    *          the key to be set
    *
@@ -181,7 +181,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
 
   /**
    * Return a value to which key is mapped
-   * 
+   *
    * @param key
    *          the key whose value is to be retrieved
    *
@@ -197,7 +197,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
 
   /**
    * Return a value to which key is mapped given a bucket address
-   * 
+   *
    * @param key
    *          the key whose value is to be retrieved
    *
@@ -227,7 +227,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
 
   /**
    * Remove a mapping for a specified key
-   * 
+   *
    * @param key
    *          the key whose value is to be removed
    *
@@ -243,7 +243,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
 
   /**
    * Remove a mapping for a specified key at given bucket address
-   * 
+   *
    * @param key
    *          the key whose value is to be removed
    *
@@ -272,12 +272,12 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
         head = head.getNext();
       }
       if (true == found) {
-        if (null == prev) { 
+        if (null == prev) {
           if (null == head.getNext()) {
             unsafe.putAddress(bucketAddr, 0L);
             head.destroy();
           } else {
-            unsafe.putAddress(bucketAddr, head.getNext().getHandler());        
+            unsafe.putAddress(bucketAddr, head.getNext().getHandler());
             head.destroy();
           }
         } else {
@@ -285,19 +285,19 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
           head.destroy();
         }
         mapSize--;
-      }       
+      }
     }
     return retValue;
   }
 
   /**
    * Rehashes the entire map into a new map of given capacity
-   * 
+   *
    * @param newCapacity
    *          the capacity of new map
    */
   public void resize(long newCapacity) {
-    MemChunkHolder<A> prevHolder = holder; 
+    MemChunkHolder<A> prevHolder = holder;
     long bucketAddr = prevHolder.get();
     long maxbucketAddr = bucketAddr + MAX_OBJECT_SIZE * totalCapacity;
     holder = allocator.createChunk(MAX_OBJECT_SIZE * newCapacity, autoReclaim);
@@ -328,7 +328,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
 
   /**
    * Transfers a map item from old map to the new map
-   * 
+   *
    * @param elem
    *          the item in the old map
    */
@@ -349,7 +349,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
 
   /**
    * Recomputes the size of the map during restore without persistence
-   * 
+   *
    *  @return size of the map
    */
   protected long recomputeMapSize() {
@@ -457,7 +457,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
   }
 
   @Override
-  public void restoreDurableEntity(A allocator, EntityFactoryProxy[] factoryProxy, 
+  public void restoreDurableEntity(A allocator, EntityFactoryProxy[] factoryProxy,
              DurableType[] gField, long phandler, boolean autoReclaim, ReclaimContext rctx)
           throws RestoreDurableEntityError {
     initializeDurableEntity(allocator, factoryProxy, gField, autoReclaim, rctx);
@@ -477,7 +477,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
 
 
   @Override
-  public void initializeDurableEntity(A allocator, EntityFactoryProxy[] factoryProxy, 
+  public void initializeDurableEntity(A allocator, EntityFactoryProxy[] factoryProxy,
               DurableType[] gField, boolean autoReclaim, ReclaimContext rctx) {
     this.allocator = allocator;
     this.factoryProxy = factoryProxy;
@@ -504,7 +504,7 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
   }
 
   @Override
-  public void createDurableEntity(A allocator, EntityFactoryProxy[] factoryProxy, 
+  public void createDurableEntity(A allocator, EntityFactoryProxy[] factoryProxy,
               DurableType[] gField, boolean autoReclaim, ReclaimContext rctx) throws OutOfHybridMemory {
     initializeDurableEntity(allocator, factoryProxy, gField, autoReclaim, rctx);
     this.holder = allocator.createChunk(MAX_OBJECT_SIZE * totalCapacity, autoReclaim, reclaimcontext);
@@ -596,4 +596,3 @@ public class DurableHashMapImpl<A extends RestorableAllocator<A>, K, V>
     }
   }
 }
- 

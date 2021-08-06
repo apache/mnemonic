@@ -39,8 +39,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.testng.Assert;
 
-import sun.misc.Unsafe;
-
 /**
  *
  *
@@ -50,7 +48,8 @@ public class DurableArrayNGTest {
   private long cKEYCAPACITY;
   private NonVolatileMemAllocator m_act;
   private Random rand;
-  private Unsafe unsafe;
+  @SuppressWarnings({"restriction", "UseOfSunClasses"})
+  private sun.misc.Unsafe unsafe;
 
   protected DurableBuffer<NonVolatileMemAllocator>
       genuptBuffer(NonVolatileMemAllocator act, Checksum cs, int size) {
@@ -355,13 +354,13 @@ public class DurableArrayNGTest {
     Person<Long> person =  (Person<Long>) efproxies[1].create(m_act, null, null, false);
     person.setName("Alice", false);
     person.setAge((short) 31);
-    DurableHashMap<String, Person<Long>> first = DurableHashMapFactory.create(m_act, 
+    DurableHashMap<String, Person<Long>> first = DurableHashMapFactory.create(m_act,
                             efproxies, gtypes, 10, false);
     first.put("hello", person);
     Person<Long> anotherPerson =  (Person<Long>) efproxies[1].create(m_act, null, null, false);
     anotherPerson.setAge((short) 30);
     anotherPerson.setName("Bob", false);
-    DurableHashMap<String, Person<Long>> second = DurableHashMapFactory.create(m_act, 
+    DurableHashMap<String, Person<Long>> second = DurableHashMapFactory.create(m_act,
                             efproxies, gtypes, 10, false);
     second.put("world", anotherPerson);
 

@@ -28,14 +28,13 @@ import org.apache.mnemonic.resgc.ReclaimContext;
 import org.apache.mnemonic.RetrieveDurableEntityError;
 import org.apache.mnemonic.Utils;
 
-import sun.misc.Unsafe;
-
 @SuppressWarnings("restriction")
 public class DurableTreeImpl<A extends RestorableAllocator<A>, E extends Comparable<E>>
   extends DurableTree<E> implements MemoryDurableEntity<A> {
 
   private static long[][] fieldInfo;
-  private Unsafe unsafe;
+  @SuppressWarnings({"restriction", "UseOfSunClasses"})
+  private sun.misc.Unsafe unsafe;
   private EntityFactoryProxy[] factoryProxy;
   private DurableType[] genericType;
   private volatile boolean autoReclaim;

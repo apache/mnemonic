@@ -38,8 +38,6 @@ import org.testng.annotations.Test;
 import org.testng.AssertJUnit;
 import org.testng.Assert;
 
-import sun.misc.Unsafe;
-
 /**
  *
  *
@@ -49,7 +47,8 @@ public class DurableHashSetNGTest {
   private long cKEYCAPACITY;
   private NonVolatileMemAllocator m_act;
   private Random rand;
-  private Unsafe unsafe;
+  @SuppressWarnings({"restriction", "UseOfSunClasses"})
+  private sun.misc.Unsafe unsafe;
   private long initialCapacity;
 
   protected DurableBuffer<NonVolatileMemAllocator>
@@ -279,4 +278,3 @@ public class DurableHashSetNGTest {
   }
 
 }
-

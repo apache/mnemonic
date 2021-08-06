@@ -145,7 +145,7 @@
       <dependency>
         <groupId>com.squareup</groupId>
         <artifactId>javapoet</artifactId>
-        <version>1.11.1</version>
+        <version>1.13.0</version>
       </dependency>
       <!-- logging dependencies -->
       <dependency>

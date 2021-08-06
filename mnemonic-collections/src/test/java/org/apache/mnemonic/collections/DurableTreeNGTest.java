@@ -35,8 +35,6 @@ import org.testng.annotations.Test;
 import org.testng.AssertJUnit;
 //import org.testng.Assert;
 
-import sun.misc.Unsafe;
-
 /**
  *
  *
@@ -46,7 +44,8 @@ public class DurableTreeNGTest {
   private long cKEYCAPACITY;
   private NonVolatileMemAllocator m_act;
   private Random rand;
-  private Unsafe unsafe;
+  @SuppressWarnings({"restriction", "UseOfSunClasses"})
+  private sun.misc.Unsafe unsafe;
 
   @BeforeClass
   public void setUp() throws Exception {

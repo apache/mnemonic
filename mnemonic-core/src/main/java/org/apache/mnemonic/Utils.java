@@ -22,7 +22,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.mnemonic.service.computing.GeneralComputingService;
 import org.apache.mnemonic.service.memory.NonVolatileMemoryAllocatorService;
 import org.apache.mnemonic.service.memory.VolatileMemoryAllocatorService;
-import sun.misc.Unsafe;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -42,7 +41,7 @@ import java.util.UUID;
  * <p>
  * Utilities for project.
  * </p>
- * 
+ *
  */
 @SuppressWarnings("restriction")
 public class Utils {
@@ -57,7 +56,8 @@ public class Utils {
   public static final String ANSI_CYAN = "\u001B[36m";
   public static final String ANSI_WHITE = "\u001B[37m";
 
-  private static Unsafe m_unsafe = null;
+  @SuppressWarnings({"restriction", "UseOfSunClasses"})
+  private static sun.misc.Unsafe m_unsafe = null;
 
   private static ServiceLoader<VolatileMemoryAllocatorService> m_vmasvcloader = null;
   private static ServiceLoader<NonVolatileMemoryAllocatorService> m_nvmasvcloader = null;
@@ -65,7 +65,7 @@ public class Utils {
 
   /**
    * retrieve a volatile memory allocator service
-   * 
+   *
    * @param id
    *          specify a name of allocator to retrieve
    *
@@ -77,7 +77,7 @@ public class Utils {
 
   /**
    * retrieve a volatile memory allocator service
-   * 
+   *
    * @param id
    *          specify a name of allocator to retrieve
    *
@@ -109,7 +109,7 @@ public class Utils {
 
   /**
    * retrieve a non-volatile memory allocator service
-   * 
+   *
    * @param id
    *          specify a name of allocator to retrieve
    *
@@ -161,7 +161,7 @@ public class Utils {
 
   /**
    * Generates a unique name that contains current timestamp.
-   * 
+   *
    * @param format
    *          the template that is used to generate unique name.
    *
@@ -225,7 +225,8 @@ public class Utils {
    *
    * @return an unsafe object
    */
-  public static Unsafe getUnsafe() throws Exception {
+  @SuppressWarnings({"restriction", "UseOfSunClasses"})
+  public static sun.misc.Unsafe getUnsafe() throws Exception {
     if (null == m_unsafe) {
       Field field = sun.misc.Unsafe.class.getDeclaredField("theUnsafe");
       field.setAccessible(true);
@@ -407,7 +408,7 @@ public class Utils {
 
   /**
    * generate native form of object stack parameter frame.
-   * 
+   *
    * @param objstack
    *          a stack of object info retrieved from
    *          Durable.getNativeFieldInfo(), order matters
@@ -552,7 +553,8 @@ public class Utils {
    * @return
    *         the address of this object
    */
-  public static long addressOf(Unsafe unsafe, Object o) {
+  @SuppressWarnings({"restriction", "UseOfSunClasses"})
+  public static long addressOf(sun.misc.Unsafe unsafe, Object o) {
     Object[] array = new Object[] {o};
 
     long baseOffset = unsafe.arrayBaseOffset(Object[].class);

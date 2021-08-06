@@ -28,8 +28,6 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import sun.misc.Unsafe;
-
 @SuppressWarnings("restriction")
 public class DurablePersonRefBreakNGTest {
     public static String uri = "./pobj_person_refbreak.dat";
@@ -37,7 +35,8 @@ public class DurablePersonRefBreakNGTest {
     private long pic_checksum;
     private long fp_checksum;
     private Random rand;
-    private Unsafe unsafe;
+    @SuppressWarnings({"restriction", "UseOfSunClasses"})
+    private sun.misc.Unsafe unsafe;
 
     protected DurableBuffer<NonVolatileMemAllocator>
     genuptBuffer(NonVolatileMemAllocator act, Checksum cs, int size) {

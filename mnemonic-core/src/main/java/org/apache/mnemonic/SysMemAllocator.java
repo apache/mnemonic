@@ -22,8 +22,6 @@ import org.apache.mnemonic.resgc.ResCollector;
 import org.apache.mnemonic.resgc.ResReclaim;
 import org.apache.mnemonic.resgc.ReclaimContext;
 
-import sun.misc.Unsafe;
-
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.util.Map;
@@ -42,7 +40,8 @@ public class SysMemAllocator extends CommonAllocator<SysMemAllocator> {
 
   private boolean m_activegc = true;
   private long m_gctimeout = 100;
-  private static Unsafe m_unsafe = null;
+  @SuppressWarnings({"restriction", "UseOfSunClasses"})
+  private static sun.misc.Unsafe m_unsafe = null;
   private AtomicLong currentMemory = new AtomicLong(0L);
   private long maxStoreCapacity = 0L;
   private Map<Long, Long> m_chunksize = new ConcurrentHashMap<Long, Long>();

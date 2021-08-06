@@ -29,11 +29,9 @@ import org.apache.mnemonic.Reclaim;
 import org.apache.mnemonic.SysMemAllocator;
 import org.apache.mnemonic.Utils;
 
-import sun.misc.Unsafe;
-
 /**
  * Main is the class of example.
- * 
+ *
  */
 @SuppressWarnings("restriction")
 public class Main {
@@ -164,7 +162,8 @@ public class Main {
      */
     System.out.println(Utils.ANSI_GREEN + "[[Demo Allocation, Auto Destruction "
         + "and Manual Destruction of Big Memory Chunk.]]" + Utils.ANSI_RESET);
-    Unsafe unsafe = Utils.getUnsafe();
+    @SuppressWarnings({"restriction", "UseOfSunClasses"})
+    sun.misc.Unsafe unsafe = Utils.getUnsafe();
     MemChunkHolder<?> mch;
     for (int idx = 1; idx <= 50; ++idx) {
       int size = randomGenerator.nextInt(1024 * 1024) + 1024 * 1024;

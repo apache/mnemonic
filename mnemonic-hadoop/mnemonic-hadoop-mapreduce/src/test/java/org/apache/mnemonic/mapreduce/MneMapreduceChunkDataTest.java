@@ -57,8 +57,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import sun.misc.Unsafe;
-
 @SuppressWarnings("restriction")
 public class MneMapreduceChunkDataTest {
 
@@ -75,7 +73,8 @@ public class MneMapreduceChunkDataTest {
   private long m_reccnt = 5000L;
   private volatile long m_checksum;
   private volatile long m_totalsize = 0L;
-  private Unsafe unsafe;
+  @SuppressWarnings({"restriction", "UseOfSunClasses"})
+  private sun.misc.Unsafe unsafe;
 
   @BeforeClass
   public void setUp() throws Exception {

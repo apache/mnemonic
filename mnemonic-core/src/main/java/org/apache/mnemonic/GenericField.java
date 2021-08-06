@@ -18,7 +18,6 @@
 package org.apache.mnemonic;
 
 import org.apache.mnemonic.resgc.ReclaimContext;
-import sun.misc.Unsafe;
 
 /**
  * this class defines generic field for non-volatile entity
@@ -28,7 +27,8 @@ import sun.misc.Unsafe;
 @SuppressWarnings("restriction")
 public class GenericField<A extends RestorableAllocator<A>, E> implements Durable {
 
-  private Unsafe m_unsafe;
+  @SuppressWarnings({"restriction", "UseOfSunClasses"})
+  private sun.misc.Unsafe m_unsafe;
   private long m_fpos;
   private DurableType m_dgftype = null;
   private Durable m_field = null;
@@ -71,9 +71,10 @@ public class GenericField<A extends RestorableAllocator<A>, E> implements Durabl
    *          specify the field position
    *
    */
+  @SuppressWarnings({"restriction", "UseOfSunClasses"})
   public GenericField(EntityFactoryProxy defproxy, DurableType dgftype,
       EntityFactoryProxy[] efproxies, DurableType[] gftypes,
-      A allocator, Unsafe unsafe, boolean autoreclaim, ReclaimContext rctx, Long fpos) {
+      A allocator, sun.misc.Unsafe unsafe, boolean autoreclaim, ReclaimContext rctx, Long fpos) {
     m_unsafe = unsafe;
     m_fpos = fpos;
     m_allocator = allocator;
