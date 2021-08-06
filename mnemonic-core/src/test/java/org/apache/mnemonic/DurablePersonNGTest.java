@@ -33,15 +33,14 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import sun.misc.Unsafe;
-
 @SuppressWarnings("restriction")
 public class DurablePersonNGTest {
   private long cKEYCAPACITY;
   private long pic_checksum;
   private long fp_checksum;
   private Random rand;
-  private Unsafe unsafe;
+  @SuppressWarnings({"restriction", "UseOfSunClasses"})
+  private sun.misc.Unsafe unsafe;
 
   protected DurableBuffer<NonVolatileMemAllocator>
       genuptBuffer(NonVolatileMemAllocator act, Checksum cs, int size) {
@@ -83,7 +82,7 @@ public class DurablePersonNGTest {
     rand = Utils.createRandom();
     unsafe = Utils.getUnsafe();
   }
-  
+
   @Test(expectedExceptions = { OutOfHybridMemory.class })
   public void testGenPeople() throws OutOfHybridMemory, RetrieveDurableEntityError {
     Random rand = Utils.createRandom();

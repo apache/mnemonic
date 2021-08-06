@@ -39,8 +39,6 @@ import org.testng.annotations.Test;
 import org.testng.AssertJUnit;
 import org.testng.Assert;
 
-import sun.misc.Unsafe;
-
 /**
  *
  *
@@ -50,7 +48,8 @@ public class DurableHashMapNGTest {
   private long cKEYCAPACITY;
   private NonVolatileMemAllocator m_act;
   private Random rand;
-  private Unsafe unsafe;
+  @SuppressWarnings({"restriction", "UseOfSunClasses"})
+  private sun.misc.Unsafe unsafe;
   private long mInitialCapacity = 1;
 
   protected DurableBuffer<NonVolatileMemAllocator>
@@ -127,7 +126,7 @@ public class DurableHashMapNGTest {
   public void testGetPutRemovePrimitives() {
     DurableType gtypes[] = {DurableType.STRING, DurableType.INTEGER};
     DurableHashMap<String, Integer> map = DurableHashMapFactory.create(m_act, null, gtypes, mInitialCapacity, false);
-    
+
     Long handler = map.getHandler();
     Integer val = map.put("hello", 1);
     AssertJUnit.assertNull(val);
@@ -142,7 +141,7 @@ public class DurableHashMapNGTest {
 
     val = map.get("hello");
     AssertJUnit.assertEquals(3, val.intValue());
-    val = map.get("world"); 
+    val = map.get("world");
     AssertJUnit.assertEquals(2, val.intValue());
     val = map.get("test");
     AssertJUnit.assertNull(val);
@@ -170,11 +169,11 @@ public class DurableHashMapNGTest {
     AssertJUnit.assertEquals(entry.getKey(), "hello");
     AssertJUnit.assertEquals(entry.getValue().intValue(), 3);
 
-    DurableHashMap<String, Integer> restoredMap = DurableHashMapFactory.restore(m_act, null, gtypes, handler, 
+    DurableHashMap<String, Integer> restoredMap = DurableHashMapFactory.restore(m_act, null, gtypes, handler,
         false);
     val = restoredMap.get("hello");
     AssertJUnit.assertEquals(3, val.intValue());
-    val = restoredMap.get("world"); 
+    val = restoredMap.get("world");
     AssertJUnit.assertNull(val);
     val = restoredMap.get("test");
     AssertJUnit.assertNull(val);
@@ -190,10 +189,10 @@ public class DurableHashMapNGTest {
 
   @Test(enabled = true)
   public void testGetPutKeyDurable() throws NoSuchMethodException, ClassNotFoundException {
-    
+
     DurableType gtypes[] = {DurableType.DURABLE, DurableType.STRING};
     EntityFactoryProxy efproxies[] = {new EntityFactoryProxyHelper<Person>(Person.class)};
-    
+
     Person<Long> person =  (Person<Long>) efproxies[0].create(m_act, null, null, false);
     person.setAge((short) 31);
     person.setName("Bob", true);
@@ -203,10 +202,10 @@ public class DurableHashMapNGTest {
     anotherPerson.setAge((short) 30);
     anotherPerson.setName("Alice", true);
 
-    DurableHashMap<Person<Long>, String> map = DurableHashMapFactory.create(m_act, 
+    DurableHashMap<Person<Long>, String> map = DurableHashMapFactory.create(m_act,
                       efproxies, gtypes, mInitialCapacity, false);
     String str = map.put(person, "hello");
-    AssertJUnit.assertNull(str); 
+    AssertJUnit.assertNull(str);
     str = map.get(person);
     AssertJUnit.assertEquals(str, "hello");
     str = map.put(person, "world");
@@ -215,12 +214,12 @@ public class DurableHashMapNGTest {
     AssertJUnit.assertEquals(str, "world");
 
     str = map.put(anotherPerson, "testing");
-    AssertJUnit.assertNull(str); 
+    AssertJUnit.assertNull(str);
     str = map.get(anotherPerson);
     AssertJUnit.assertEquals(str, "testing");
     str = map.get(person);
     AssertJUnit.assertEquals(str, "world");
-    
+
     Person<Long> third =  (Person<Long>) efproxies[0].create(m_act, null, null, false);
     third.setAge((short) 31);
     third.setName("Bob", true);
@@ -233,14 +232,14 @@ public class DurableHashMapNGTest {
 
   @Test(enabled = true)
   public void testGetPutValueDurable() throws NoSuchMethodException, ClassNotFoundException {
-    
+
     DurableType gtypes[] = {DurableType.STRING, DurableType.DURABLE};
     EntityFactoryProxy efproxies[] = {null, new EntityFactoryProxyHelper<Person>(Person.class)};
-    
+
     Person<Long> person =  (Person<Long>) efproxies[1].create(m_act, null, null, false);
     person.setName("Alice", false);
     person.setAge((short) 31);
-    DurableHashMap<String, Person<Long>> map = DurableHashMapFactory.create(m_act, 
+    DurableHashMap<String, Person<Long>> map = DurableHashMapFactory.create(m_act,
                             efproxies, gtypes, mInitialCapacity, false);
     map.put("hello", person);
     Person<Long> anotherPerson =  (Person<Long>) efproxies[1].create(m_act, null, null, false);
@@ -267,7 +266,7 @@ public class DurableHashMapNGTest {
 
   @Test(enabled = true)
   public void testGetPutKeyValueDurable() throws NoSuchMethodException, ClassNotFoundException {
-    
+
     DurableType gtypes[] = {DurableType.DURABLE, DurableType.DURABLE};
     EntityFactoryProxy efproxies[] = {new EntityFactoryProxyHelper<Person>(Person.class),
         new EntityFactoryProxyHelper<Person>(Person.class)};
@@ -280,12 +279,12 @@ public class DurableHashMapNGTest {
     anotherPerson.setAge((short) 30);
     anotherPerson.setName("Alice", true);
 
-    DurableHashMap<Person<Long>, Person<Long>> map = DurableHashMapFactory.create(m_act, 
+    DurableHashMap<Person<Long>, Person<Long>> map = DurableHashMapFactory.create(m_act,
                             efproxies, gtypes, mInitialCapacity, false);
     map.put(person, anotherPerson);
 
     Person<Long> per = map.get(person);
-    AssertJUnit.assertEquals(30, (int)per.getAge()); 
+    AssertJUnit.assertEquals(30, (int)per.getAge());
     per = map.get(anotherPerson);
     AssertJUnit.assertNull(per);
 
@@ -300,7 +299,7 @@ public class DurableHashMapNGTest {
     EntityFactoryProxy mapefproxies[] = {null,
         new EntityFactoryProxyHelper<DurableHashMap>(DurableHashMap.class, 2), null,
         new EntityFactoryProxyHelper<Person>(Person.class)};
-    
+
     Person<Long> person =  PersonFactory.create(m_act, null, null, false);
     person.setAge((short) 31);
     person.setName("Bob", true);
@@ -309,8 +308,8 @@ public class DurableHashMapNGTest {
     Person<Long> anotherPerson =  PersonFactory.create(m_act, null, null, false);
     anotherPerson.setAge((short) 30);
     anotherPerson.setName("Alice", true);
-    
-    DurableHashMap<String, Person<Long>> map = DurableHashMapFactory.create(m_act, 
+
+    DurableHashMap<String, Person<Long>> map = DurableHashMapFactory.create(m_act,
                             efproxies, gtypes, mInitialCapacity, false);
     map.put("world", person);
     Person<Long> per = map.get("world");
@@ -328,7 +327,7 @@ public class DurableHashMapNGTest {
 
     bigMap.destroy();
   }
-    
+
   @Test(enabled = true)
   public void testAutoResizeMaps() {
     DurableType gtypes[] = {DurableType.STRING, DurableType.INTEGER};
@@ -352,8 +351,8 @@ public class DurableHashMapNGTest {
     AssertJUnit.assertEquals(map.getSize(), 200);
     for (int i = 0; i < 200; i++) {
       AssertJUnit.assertEquals(map.get("str" + i).intValue(), i);
-    } 
-    DurableHashMap<String, Integer> restoredMap = DurableHashMapFactory.restore(m_act, null, gtypes, handler, 
+    }
+    DurableHashMap<String, Integer> restoredMap = DurableHashMapFactory.restore(m_act, null, gtypes, handler,
         false);
     AssertJUnit.assertEquals(restoredMap.getSize(), 200);
     for (int i = 0; i < 200; i++) {

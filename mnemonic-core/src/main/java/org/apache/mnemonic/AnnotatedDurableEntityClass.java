@@ -56,7 +56,6 @@ import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
 
 import org.apache.mnemonic.resgc.ReclaimContext;
-import sun.misc.Unsafe;
 
 /**
  * this class managed to generate generic durable concrete object and their
@@ -200,7 +199,7 @@ public class AnnotatedDurableEntityClass {
     m_entitymtdinfo.put("initializeDurableEntity", new MethodInfo());
     m_entitymtdinfo.put("createDurableEntity", new MethodInfo());
     m_entitymtdinfo.put("restoreDurableEntity", new MethodInfo());
-    
+
     m_extramtdinfo.put("getNativeFieldInfo_static", new MethodInfo());
 
   }
@@ -210,6 +209,8 @@ public class AnnotatedDurableEntityClass {
     FieldInfo fieldinfo;
     String methodname;
     long fieldoff = 0;
+    AnnotationSpec unsafeannotation = AnnotationSpec.builder(SuppressWarnings.class)
+        .addMember("value", "{$S,$S}", "restriction", "UseOfSunClasses").build();
     TypeElement intf_durable = m_elemutils.getTypeElement(Durable.class.getCanonicalName());
     TypeElement intf_entity = m_elemutils.getTypeElement(MemoryDurableEntity.class.getCanonicalName());
     // System.err.printf("<><><><><> %s ======\n", intf_entity.toString());
@@ -228,8 +229,10 @@ public class AnnotatedDurableEntityClass {
 
     fieldinfo = new FieldInfo();
     fieldinfo.name = String.format("m_unsafe_%s", Utils.genRandomString());
-    fieldinfo.type = TypeName.get(m_elemutils.getTypeElement(Unsafe.class.getCanonicalName()).asType());
-    fieldinfo.specbuilder = FieldSpec.builder(fieldinfo.type, fieldinfo.name, Modifier.PRIVATE);
+    // fieldinfo.type = TypeName.get(m_elemutils.getTypeElement(sun.misc.Unsafe.class.getCanonicalName()).asType());
+    fieldinfo.type = ClassName.get("sun.misc", "Unsafe");
+    fieldinfo.specbuilder = FieldSpec.builder(fieldinfo.type, fieldinfo.name, Modifier.PRIVATE)
+                                     .addAnnotation(unsafeannotation);
     m_fieldsinfo.put("unsafe", fieldinfo);
 
     fieldinfo = new FieldInfo();
@@ -986,6 +989,9 @@ public class AnnotatedDurableEntityClass {
       fieldinfo = fieldinfos.get(name);
       if (null != fieldinfo.specbuilder) {
         typespecbuilder.addField(fieldinfo.specbuilder.build());
+        if (name.equals("unsafe")) {
+            typespecbuilder.alwaysQualify("Unsafe");
+        }
       }
     }
   }

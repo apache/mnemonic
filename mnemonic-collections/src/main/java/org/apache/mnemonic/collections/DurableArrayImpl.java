@@ -30,8 +30,6 @@ import org.apache.mnemonic.RetrieveDurableEntityError;
 import org.apache.mnemonic.Utils;
 
 import java.util.NoSuchElementException;
-
-import sun.misc.Unsafe;
 import java.util.Iterator;
 
 @SuppressWarnings("restriction")
@@ -41,7 +39,8 @@ public class DurableArrayImpl<A extends RestorableAllocator<A>, E>
   private static final int MAX_OBJECT_SIZE = 8;
   private static long[][] fieldInfo;
   private Object[] genericField;
-  private Unsafe unsafe;
+  @SuppressWarnings({"restriction", "UseOfSunClasses"})
+  private sun.misc.Unsafe unsafe;
   private EntityFactoryProxy[] factoryProxy;
   private DurableType[] genericType;
   private volatile boolean autoReclaim;

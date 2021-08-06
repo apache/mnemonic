@@ -26,13 +26,13 @@ import org.apache.mnemonic.RestoreDurableEntityError;
 import org.apache.mnemonic.RetrieveDurableEntityError;
 import org.apache.mnemonic.Utils;
 import org.apache.mnemonic.resgc.ReclaimContext;
-import sun.misc.Unsafe;
 
 @SuppressWarnings("restriction")
 public class DurableSinglyLinkedListImpl<A extends RestorableAllocator<A>, E>
         extends DurableSinglyLinkedList<E> implements MemoryDurableEntity<A> {
   private static long[][] fieldInfo;
-  private Unsafe unsafe;
+  @SuppressWarnings({"restriction", "UseOfSunClasses"})
+  private sun.misc.Unsafe unsafe;
   private EntityFactoryProxy[] factoryProxy;
   private DurableType[] genericType;
   private volatile boolean autoReclaim;
