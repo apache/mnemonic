@@ -27,7 +27,7 @@
     <artifactId>mnemonic-memory-services</artifactId>
     <version>0.16.0-SNAPSHOT</version>
   </parent>
-  
+
   <artifactId>mnemonic-nvml-pmem-service</artifactId>
   <name>mnemonic-nvml-pmem-service</name>
 
@@ -64,7 +64,6 @@
             </goals>
             <configuration>
               <target>
-                <echo>Java Home: ${java.home}</echo>
                 <mkdir dir="src/main/native/build" />
                 <exec dir="src/main/native/build" executable="cmake" failonerror="true">
                   <arg value=".." />
@@ -150,7 +149,7 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.apache.maven.plugins</groupId> 
+            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <argLine>-Xmx2g -XX:MaxPermSize=1g</argLine>
@@ -158,7 +157,7 @@
                 <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
               </suiteXmlFiles>
             </configuration>
-          </plugin> 
+          </plugin>
         </plugins>
       </build>
     </profile>
