@@ -64,7 +64,6 @@
             </goals>
             <configuration>
               <target>
-                <echo>Java Home: ${java.home}</echo>
                 <mkdir dir="src/main/native/build" />
                 <exec dir="src/main/native/build" executable="cmake" failonerror="true">
                   <arg value=".." />
