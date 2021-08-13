@@ -21,7 +21,7 @@ package org.apache.mnemonic.hadoop;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.mnemonic.ConfigurationException;
 import org.apache.mnemonic.DurableType;

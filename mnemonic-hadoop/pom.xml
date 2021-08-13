@@ -35,7 +35,7 @@
   <url>http://mnemonic.apache.org</url>
 
   <properties>
-	<hadoop.version>2.7.3</hadoop.version>
+	<hadoop.version>3.3.1</hadoop.version>
   </properties>
 
   <modules>
@@ -79,6 +79,11 @@
 
     <!-- logging dependencies -->
     <!-- assume all APIs will be used -->
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.1</version>
+    </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
