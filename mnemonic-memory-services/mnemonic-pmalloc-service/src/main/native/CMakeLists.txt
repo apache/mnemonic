@@ -40,12 +40,29 @@ include_directories(${JNI_INCLUDE_DIRS})
 find_package(Threads REQUIRED)
 include_directories(${CMAKE_THREAD_LIBS_INIT})
 
-find_library(LIBPMALLOC_LIBRARIES NAMES libpmalloc_static.a)
-if (NOT LIBPMALLOC_LIBRARIES)
-   message(FATAL_ERROR "not found pmalloc library")
-endif (NOT LIBPMALLOC_LIBRARIES)
+#find_library(LIBPMALLOC_LIBRARIES NAMES libpmalloc_static.a)
+#if (NOT LIBPMALLOC_LIBRARIES)
+#   message(FATAL_ERROR "not found pmalloc library")
+#endif (NOT LIBPMALLOC_LIBRARIES)
 
-add_library(pmallocallocator SHARED common.c org_apache_mnemonic_service_memory_internal_PMallocServiceImpl.c)
+add_library(pmallocallocator SHARED 
+	common.c 
+	org_apache_mnemonic_service_memory_internal_PMallocServiceImpl.c
+	pmaddress.c
+	pmalign.c
+	pmattach.c
+	pmcalloc.c
+	pmcheck.c
+	pmdetach.c
+	pmfree.c
+	pmfunction.c
+	pmkeys.c
+	pmmap.c
+	pmrealloc.c
+	pmreport.c
+	pmsync.c
+	pmvalloc.c
+)
 target_include_directories(pmallocallocator PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(pmallocallocator ${LIBPMALLOC_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
