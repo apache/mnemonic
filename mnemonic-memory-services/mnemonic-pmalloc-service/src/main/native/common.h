@@ -35,7 +35,7 @@ extern "C" {
 #include <assert.h>
 #include <pthread.h>
 #include <jni.h>
-#include <pmalloc.h>
+#include "pmalloc.h"
 
 void throw(JNIEnv* env, const char* msg);
 
