@@ -30,9 +30,6 @@ ENV PATH $JAVA_HOME/bin:$PATH
 
 WORKDIR /ws
 
-RUN git clone https://github.com/NonVolatileComputing/pmalloc.git && \
-    cd pmalloc && mkdir build && cd build && cmake .. && make && make install
-
 RUN git clone https://github.com/apache/mnemonic.git && \
     cd mnemonic && mvn clean package install
 
