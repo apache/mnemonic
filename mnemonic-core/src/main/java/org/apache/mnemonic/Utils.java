@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.ServiceLoader;
 import java.util.UUID;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * <p>
@@ -492,12 +493,12 @@ public class Utils {
     try {
       for (Class<?> itm : proxyclses) {
         if (EntityFactoryProxy.class.isAssignableFrom(itm)) {
-            ret.add((EntityFactoryProxy)itm.newInstance());
+            ret.add((EntityFactoryProxy)itm.getDeclaredConstructor().newInstance());
         } else {
           throw new ConfigurationException(String.format("%s is not EntityFactoryProxy", itm.getName()));
         }
       }
-    } catch (InstantiationException | IllegalAccessException e) {
+    } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
       throw new IllegalArgumentException("Failed to instantiate assigned EntityFactoryProxy classes.", e);
     }
     return ret.toArray(new EntityFactoryProxy[0]);
