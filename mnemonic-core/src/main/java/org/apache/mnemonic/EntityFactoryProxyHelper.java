@@ -74,6 +74,7 @@ public class EntityFactoryProxyHelper<D extends Durable>
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <A extends RestorableAllocator<A>> D create(
       A allocator, EntityFactoryProxy[] factoryproxys,
@@ -90,6 +91,7 @@ public class EntityFactoryProxyHelper<D extends Durable>
     return (D)o;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <A extends RestorableAllocator<A>> D create(
       ParameterHolder<A> ph) {
@@ -107,6 +109,7 @@ public class EntityFactoryProxyHelper<D extends Durable>
     return (D)o;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <A extends RestorableAllocator<A>> D restore(
       A allocator, EntityFactoryProxy[] factoryproxys,
@@ -123,6 +126,7 @@ public class EntityFactoryProxyHelper<D extends Durable>
     return (D)o;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <A extends RestorableAllocator<A>> D restore(
       ParameterHolder<A> ph) {

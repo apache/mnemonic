@@ -114,6 +114,7 @@ public abstract class DurableInputSession<V, A extends RestorableAllocator<A>, T
      *
      * @return the next node
      */
+    @SuppressWarnings("unchecked")
     @Override
     public V next() {
       V ret;

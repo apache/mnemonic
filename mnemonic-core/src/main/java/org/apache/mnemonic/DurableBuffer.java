@@ -24,6 +24,7 @@ import java.nio.ByteBuffer;
 public class DurableBuffer<A extends RetrievableAllocator<A>> extends MemBufferHolder<A> implements Durable {
   protected Persistence<A> m_persistOps = null;
 
+  @SuppressWarnings("unchecked")
   public DurableBuffer(A ar, ByteBuffer mres) {
     super(ar, mres);
     if (ar instanceof Persistence) {

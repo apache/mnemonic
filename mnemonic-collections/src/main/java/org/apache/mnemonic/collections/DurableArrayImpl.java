@@ -32,7 +32,7 @@ import org.apache.mnemonic.Utils;
 import java.util.NoSuchElementException;
 import java.util.Iterator;
 
-@SuppressWarnings("restriction")
+@SuppressWarnings({"restriction", "unchecked"})
 public class DurableArrayImpl<A extends RestorableAllocator<A>, E>
         extends DurableArray<E> implements MemoryDurableEntity<A> {
 
