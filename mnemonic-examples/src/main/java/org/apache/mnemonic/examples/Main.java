@@ -33,7 +33,7 @@ import org.apache.mnemonic.Utils;
  * Main is the class of example.
  *
  */
-@SuppressWarnings("restriction")
+@SuppressWarnings({"restriction", "unchecked"})
 public class Main {
 
   /**

@@ -181,7 +181,7 @@ public class DurableHashSetImpl<A extends RestorableAllocator<A>, E>
     this.autoReclaim = autoReclaim;
     DurableType gftypes[] = {DurableType.BOOLEAN};
     this.genericType = ArrayUtils.addAll(gType, gftypes);
-    this.factoryProxy = ArrayUtils.addAll(factoryProxy, null);
+    this.factoryProxy = ArrayUtils.addAll(factoryProxy, (EntityFactoryProxy[])null);
     try {
       this.unsafe = Utils.getUnsafe();
     } catch (Exception e) {

@@ -22,6 +22,7 @@ import org.apache.mnemonic.resgc.ReclaimContext;
 public class DurableChunk<A extends RetrievableAllocator<A>> extends MemChunkHolder<A> implements Durable {
   protected Persistence<A> m_persistOps = null;
 
+  @SuppressWarnings("unchecked")
   public DurableChunk(A ar, Long mres, long size) {
     super(ar, mres, size);
     if (ar instanceof Persistence) {
@@ -98,6 +99,7 @@ public class DurableChunk<A extends RetrievableAllocator<A>> extends MemChunkHol
    * @return
    *          the ChunkBuffer to present the region of chunk
    */
+  @SuppressWarnings("unchecked")
   public ChunkBuffer getChunkBuffer(long offset, int size) {
     return new ChunkBuffer(this, offset, size);
   }

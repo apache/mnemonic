@@ -71,7 +71,7 @@ public class GenericField<A extends RestorableAllocator<A>, E> implements Durabl
    *          specify the field position
    *
    */
-  @SuppressWarnings({"restriction", "UseOfSunClasses"})
+  @SuppressWarnings({"restriction", "UseOfSunClasses", "unchecked"})
   public GenericField(EntityFactoryProxy defproxy, DurableType dgftype,
       EntityFactoryProxy[] efproxies, DurableType[] gftypes,
       A allocator, sun.misc.Unsafe unsafe, boolean autoreclaim, ReclaimContext rctx, Long fpos) {

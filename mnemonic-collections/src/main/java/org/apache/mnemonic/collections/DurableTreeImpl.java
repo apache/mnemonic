@@ -28,7 +28,7 @@ import org.apache.mnemonic.resgc.ReclaimContext;
 import org.apache.mnemonic.RetrieveDurableEntityError;
 import org.apache.mnemonic.Utils;
 
-@SuppressWarnings("restriction")
+@SuppressWarnings({"restriction", "unchecked"})
 public class DurableTreeImpl<A extends RestorableAllocator<A>, E extends Comparable<E>>
   extends DurableTree<E> implements MemoryDurableEntity<A> {
 
