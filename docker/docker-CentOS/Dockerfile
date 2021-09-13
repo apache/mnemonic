@@ -20,13 +20,19 @@ MAINTAINER Gang Wang (garyw@apache.org)
 
 RUN yum -y install epel-release
 RUN yum -y update && yum -y groupinstall 'Development Tools' && \
-    yum -y install java-devel cmake check check-devel libuuid-devel man zlib-devel maven
+    yum -y install cmake check check-devel libuuid-devel man zlib-devel maven
 
 RUN yum -y install ndctl-devel libpmem-devel libvmem-devel libpmemobj-devel
 
 RUN yum clean all
 
-ENV JAVA_HOME /usr/lib/jvm/java
+# install java
+RUN curl -O https://download.java.net/java/GA/jdk14.0.2/205943a0976c4ed48cb16f1043c5c647/12/GPL/openjdk-14.0.2_linux-x64_bin.tar.gz && \
+    tar xvf openjdk-14.0.2_linux-x64_bin.tar.gz && \
+    mv jdk-14.0.2/ /opt/ && \
+    rm openjdk-14.0.2_linux-x64_bin.tar.gz
+
+ENV JAVA_HOME /opt/jdk-14.0.2
 ENV PATH $JAVA_HOME/bin:$PATH
 
 WORKDIR /ws
