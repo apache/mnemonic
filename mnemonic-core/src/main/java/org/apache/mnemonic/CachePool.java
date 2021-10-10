@@ -25,13 +25,13 @@ import java.util.Map;
  * This is a abstract CachePool class that is inherited from LinedHashMap class,
  * it extends functionalities of its parent class to support some new features
  * that is usually requried in data caching usage scenario.
- * 
- * 
+ *
+ *
  */
 public abstract class CachePool<KeyT, ValueT> extends LinkedHashMap<KeyT, ValueT> {
 
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = 1L;
 
@@ -41,14 +41,14 @@ public abstract class CachePool<KeyT, ValueT> extends LinkedHashMap<KeyT, ValueT
 
   /**
    * Return available capacity for new entries.
-   * 
+   *
    * @return available capacity in this cache pool
    */
   public abstract long freeCapacity();
 
   /**
    * Return the used capacity of cached entries.
-   * 
+   *
    * @return the used size of this cache pool
    */
   public abstract long usedCapacity();
@@ -60,36 +60,36 @@ public abstract class CachePool<KeyT, ValueT> extends LinkedHashMap<KeyT, ValueT
    * the eldest entry that can be customized by ( {@link DropEvent}). If this
    * cache pool previously contained an entry for the key, the old value will be
    * replaced by the specified value
-   * 
+   *
    * @param k
    *          the key whoes associated value is to be put
-   * 
+   *
    * @param v
    *          the value to be put
-   * 
+   *
    * @param fsop
    *          the customized operations to free space to hold new entry
-   * 
+   *
    * @param dfilter
    *          the filter of entries for deletion
-   * 
-   * @return <tt>true</tt> if the entry has been put into this container
-   * 
+   *
+   * @return <code>true</code> if the entry has been put into this container
+   *
    */
   public abstract ValueT put(KeyT k, ValueT v, DropEvent<KeyT, ValueT> fsop, EvictFilter<KeyT, ValueT> dfilter);
 
   /**
    * Put all entries into this cache pool and evict eldes entries if necessary.
-   * 
+   *
    * @param m
    *          the Map object that contains entries to be put
-   * 
+   *
    * @param fsop
    *          the customized operations to free space to hold new entry
-   * 
+   *
    * @param dfilter
    *          the filter of entries for deletion
-   * 
+   *
    */
   public abstract void putAll(Map<? extends KeyT, ? extends ValueT> m, DropEvent<KeyT, ValueT> fsop,
       EvictFilter<KeyT, ValueT> dfilter);
@@ -97,37 +97,37 @@ public abstract class CachePool<KeyT, ValueT> extends LinkedHashMap<KeyT, ValueT
   /**
    * Returns a new {@link Set} view of the keys of this cache pool, It contains
    * the most recently visited keys
-   * 
+   *
    * @param n
    *          the number of keys to retrieve
-   * 
+   *
    * @return a set of hot keys
    */
   public abstract Set<KeyT> hotKeySet(int n);
 
   /**
    * Ensure the free capacity is greater than the specified size
-   * 
+   *
    * @param freesz
    *          the size of free capacity that needs to be secured
-   * 
-   * @return <tt>true</tt> if the size of free capacity is greater than the
+   *
+   * @return <code>true</code> if the size of free capacity is greater than the
    *         specified size after evacuation
-   * 
+   *
    * @see #ensureFreeSpace(long, DropEvent, EvictFilter)
    */
   public abstract boolean ensureFreeSpace(long freesz);
 
   /**
    * Removes a first qualified entry in this cache pool
-   * 
+   *
    * @param fsop
    *          the customized callback to post-process its evicted entry
-   * 
+   *
    * @param dfilter
    *          the filter for entry deletion
-   * 
-   * @return <tt>true</tt> if there is one qualified entry that has been dropped
+   *
+   * @return <code>true</code> if there is one qualified entry that has been dropped
    */
   public abstract boolean removeFirstEntry(DropEvent<KeyT, ValueT> fsop, EvictFilter<KeyT, ValueT> dfilter);
 
@@ -135,17 +135,17 @@ public abstract class CachePool<KeyT, ValueT> extends LinkedHashMap<KeyT, ValueT
    * Ensure the size of free capacity is greater than the specified size, the
    * entries will be filtered by {@link EvictFilter} before dropping, the
    * {@link DropEvent} is used for post-processing
-   * 
+   *
    * @param freesz
    *          the size of free capacity that needs to be secured
-   * 
+   *
    * @param fsop
    *          the customized operations to free space to hold new entry
-   * 
+   *
    * @param dfilter
    *          the filter of entries for deletion
-   * 
-   * @return <tt>true</tt> if the size of free capacity is greater than the
+   *
+   * @return <code>true</code> if the size of free capacity is greater than the
    *         specified size after evication if necessary
    */
   public abstract boolean ensureFreeSpace(long freesz, DropEvent<KeyT, ValueT> fsop, EvictFilter<KeyT, ValueT> dfilter);

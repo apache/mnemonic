@@ -123,10 +123,6 @@
               <header>Mnenomic-VMemAllocator, ${project.version}</header>
               <footer>Mnenomic-VMemAllocator, ${project.version}</footer>
               <doctitle>Mnenomic, ${project.version}</doctitle>
-              <links>
-                <link>http://static.springsource.org/spring/docs/3.0.x/javadoc-api/</link>
-                <additionalparam>-Xdoclint:all -Xdoclint:-missing</additionalparam>
-              </links>
             </configuration>
             <executions>
               <execution>
