@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-FROM ubuntu:20.04
+FROM ubuntu:21.10
 MAINTAINER Yanhui Zhao (yanhui.zhao@outlook.com)
 
 RUN apt-get -y update && apt-get install -y software-properties-common && add-apt-repository ppa:openjdk-r/ppa && apt-get -y update && \
