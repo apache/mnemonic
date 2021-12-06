@@ -21,7 +21,7 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     container:
-      image: mnemonic/mneci:v4
+      image: mnemonic/mneci:v5
       env:
         MNE_MODE: development
     steps:
