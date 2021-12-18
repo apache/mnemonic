@@ -27,6 +27,8 @@ import org.apache.mnemonic.resgc.ReclaimContext;
 import java.nio.ByteBuffer;
 import java.util.Set;
 
+import redis.clients.jedis.Jedis;
+
 public class RedisServiceImpl implements NonVolatileMemoryAllocatorService {
 
   @Override
@@ -211,4 +213,9 @@ public class RedisServiceImpl implements NonVolatileMemoryAllocatorService {
     return null;
   }
 
+  public void jedisTest() {
+    Jedis jedis = new Jedis("localhost");
+    jedis.set("foo", "bar");
+    String value = jedis.get("foo");
+  }
 }
