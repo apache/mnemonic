@@ -46,6 +46,9 @@
   <build>
     <resources>
       <resource>
+        <directory>src/main/native/dist</directory>
+      </resource>
+      <resource>
         <directory>src/main/resources</directory>
       </resource>
     </resources>
@@ -53,6 +56,43 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>build-native</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <mkdir dir="src/main/native/build" />
+                <exec dir="src/main/native/build" executable="cmake" failonerror="true">
+                  <arg value=".." />
+                </exec>
+                <exec dir="src/main/native/build" executable="make" failonerror="true">
+                  <env key="JAVA_HOME" value="${java.home}/.." />
+                </exec>
+              </target>
+            </configuration>
+          </execution>
+          <execution>
+            <id>clean-native</id>
+            <phase>clean</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <delete dir="src/main/native/build" />
+                <delete dir="src/main/native/dist" />
+              </target>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -85,8 +125,8 @@
               <aggregate>true</aggregate>
               <show>public</show>
               <nohelp>true</nohelp>
-              <header></header>
-              <footer></footer>
+              <header>Mnenomic-RedisAllocator, ${project.version}</header>
+              <footer>Mnenomic-RedisAllocator, ${project.version}</footer>
               <doctitle>Mnenomic, ${project.version}</doctitle>
             </configuration>
             <executions>
