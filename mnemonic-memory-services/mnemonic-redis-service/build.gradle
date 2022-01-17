@@ -24,7 +24,7 @@ description = 'mnemonic-redis-service'
 
 dependencies {
   implementation project(':mnemonic-common')
-  testCompileOnly 'org.testng:testng'
+  
 }
 
 def nativeDir = "$projectDir/src/main/native"
@@ -42,11 +42,6 @@ task copyResources(type: Copy) {
   into "${buildDir}/classes/java/main/native"
 }
 
-shadowJar {
-  minimize()
-  destinationDirectory = file("$projectDir/../service-dist")
-  archiveClassifier = osdetector.classifier
-}
 
 task cleanDist(type: Delete) {
   delete "$nativeDir/dist"
@@ -54,7 +49,6 @@ task cleanDist(type: Delete) {
 
 compileJava.dependsOn cmakeBuild
 processResources.dependsOn copyResources
-build.dependsOn shadowJar
 clean.dependsOn cmakeClean
 clean.dependsOn cleanDist
 
