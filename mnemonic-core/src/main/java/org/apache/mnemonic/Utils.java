@@ -214,7 +214,7 @@ public class Utils {
       System.runFinalization();
       Thread.sleep(timeout);
     } catch (InterruptedException ex) {
-      ex.printStackTrace();
+      Thread.currentThread().interrupt();
     }
   }
 
