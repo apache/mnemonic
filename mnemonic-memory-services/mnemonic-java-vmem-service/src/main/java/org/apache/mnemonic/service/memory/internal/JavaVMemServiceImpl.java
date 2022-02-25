@@ -220,13 +220,13 @@ public class JavaVMemServiceImpl implements VolatileMemoryAllocatorService {
   @Override
   public void free(long id, long addr, ReclaimContext rctx) {
     MemoryInfo mi = this.getMemPools().get((int)id);
-    FileChannel channel = mi.getFileChannel();
+    // FileChannel channel = mi.getFileChannel();
     int startIdx, requiredblocks, size;
     long baseAddr;
     try {
       for (int blockIdx = 0; blockIdx < mi.getByteBufferBlocksList().size(); blockIdx++) {
         BufferBlockInfo bufferBlock = mi.getByteBufferBlocksList().get(blockIdx);
-        if (bufferBlock.getChunkSizeMap().containsKey(addr)) {
+        if (bufferBlock != null && bufferBlock.getChunkSizeMap().containsKey(addr)) {
           size = bufferBlock.getChunkSizeMap().get(addr);
           BitSet chunksMap = bufferBlock.getBufferBlockChunksMap();
           baseAddr = bufferBlock.getBufferBlockBaseAddress();
