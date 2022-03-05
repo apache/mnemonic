@@ -1,0 +1,6 @@
+{
+    "atlascode.enableCurlLogging": false,
+    "atlascode.jira.showCreateIssueProblems": false,
+    "atlascode.enableCharles": false,
+    "atlascode.bitbucket.enabled": false
+}
