@@ -338,6 +338,7 @@
               <exclude>gradlew/</exclude>
               <exclude>gradlew.bat</exclude>
               <exclude>**/build/</exclude>
+              <exclude>.dccache</exclude>
             </excludes>
           </configuration>
           <executions>
