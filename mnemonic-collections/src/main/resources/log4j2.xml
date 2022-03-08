@@ -1,0 +1,121 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn">
+    <Properties>
+        <Property name="service">api</Property>
+        <Property name="logFileRoot">/data/soft/log</Property>
+        <Property name="pattern">[%p %d] %c{1.} [%t] %m%n</Property>
+    </Properties>
+    <Appenders>
+        <RollingRandomAccessFile name="fileAppender" fileName="${logFileRoot}/${service}.log"
+                                 filePattern="${logFileRoot}/bk/${service}-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>${pattern}</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingRandomAccessFile>
+        <RollingRandomAccessFile name="otherAppender" fileName="${logFileRoot}/${service}-other.log"
+                                 filePattern="${logFileRoot}/bk/${service}-other-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>${pattern}</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingRandomAccessFile>
+        <RollingRandomAccessFile name="paodingAppender" fileName="${logFileRoot}/${service}-paoding.log"
+                                 filePattern="${logFileRoot}/bk/${service}-paoding-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>${pattern}</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingRandomAccessFile>
+        <RollingRandomAccessFile name="passportAppender" fileName="${logFileRoot}/${service}-passport.log"
+                                 filePattern="${logFileRoot}/bk/${service}-passport-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>${pattern}</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingRandomAccessFile>
+        <RollingRandomAccessFile name="rootAppender" fileName="${logFileRoot}/${service}-root.log"
+                                 filePattern="${logFileRoot}/bk/${service}-root-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>${pattern}</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingRandomAccessFile>
+        <RollingFile name="XLOGGER_SELF_APPENDER" fileName="${logFileRoot}/xlogger-self.log"
+                     filePattern="${logFileRoot}/bk/xlogger-self-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout>
+                <pattern>${pattern}</pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+        <RollingFile name="trace-log" fileName="${logFileRoot}/xlogger-trace.log"
+                     filePattern="${logFileRoot}/bk/xlogger-trace-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout>
+                <pattern>${pattern}</pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+        </RollingFile>
+        <ScribeXLogger name="Scribe" cluster="${xlogger-cluster}" blockWhenBufferFull="false" />
+    </Appenders>
+    <Loggers>
+        <AsyncLogger name="com.xxx.vip" level="${log4j_level}" additivity="false">
+            <AppenderRef ref="fileAppender"/>
+        </AsyncLogger>
+        <AsyncLogger name="net.paoding.rose" level="${log4j_other_level}" additivity="false">
+            <AppenderRef ref="paodingAppender"/>
+        </AsyncLogger>
+        <AsyncLogger name="com.xxx.passport" level="${log4j_other_level}" additivity="false">
+            <AppenderRef ref="passportAppender"/>
+        </AsyncLogger>
+        <AsyncLogger name="com.xxx" level="${log4j_other_level}" additivity="false">
+            <AppenderRef ref="otherAppender"/>
+        </AsyncLogger>
+
+        <AsyncLogger name="com.xxx.common.logger.v2.XLogger" level="${log4j_level}" additivity="false">
+            <AppenderRef ref="Scribe"/>
+        </AsyncLogger>
+        <AsyncLogger name="com.xxx.common.logger.v2.XLoggerJson" level="${log4j_level}" additivity="false">
+            <AppenderRef ref="trace-log"/>
+        </AsyncLogger>
+        <AsyncLogger name="com.xxx.common.logger.v2.ThriftScribeAppender" level="${log4j_level}" additivity="false" >
+            <AppenderRef ref="XLOGGER_SELF_APPENDER"/>
+        </AsyncLogger>
+
+        <AsyncRoot level="${log4j_level}">
+            <AppenderRef ref="rootAppender"/>
+        </AsyncRoot>
+    </Loggers>
+</Configuration>
