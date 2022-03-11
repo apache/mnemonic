@@ -22,6 +22,7 @@ import sys
 import os.path
 import subprocess
 import os
+from shlex import quote
 from benchcommon import *
 
 parser = argparse.ArgumentParser()
@@ -42,11 +43,11 @@ for efn in fns:
   if fn:
     if os.path.isfile(fn):
       print("Processing {0}, run mode A".format(fn))
-      subprocess.check_call(runcmdtmp.format('A', fn), shell=True);
+      subprocess.check_call(quote(runcmdtmp.format('A', fn)), shell=True);
       print("Processing {0}, run mode B".format(fn))
-      subprocess.check_call(runcmdtmp.format('B', fn), shell=True);
+      subprocess.check_call(quote(runcmdtmp.format('B', fn)), shell=True);
       print("Comparing results {0} - {1}".format(rstfntmp.format('A', fn), rstfntmp.format('B', fn)))
-      subprocess.check_call(cmpcmdtmp.format('A', fn, 'B', fn), shell=True);
+      subprocess.check_call(quote(cmpcmdtmp.format('A', fn, 'B', fn)), shell=True);
     else:
       print("Input data file {0} does not exist.".format(fn))
 
