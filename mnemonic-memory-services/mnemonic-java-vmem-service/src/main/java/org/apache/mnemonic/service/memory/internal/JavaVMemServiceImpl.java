@@ -191,7 +191,10 @@ public class JavaVMemServiceImpl implements VolatileMemoryAllocatorService {
           }
         }
         markUsed(chunksMap, startIdx, requiredBlocks);
-        mi.getByteBufferBlocksList().get(blockIdx).setChunkSizeMap(handler, bufSize);
+        BufferBlockInfo bufferBlock = mi.getByteBufferBlocksList().get(blockIdx)
+        if (bufferBlock != null) {
+          bufferBlock.setChunkSizeMap(handler, bufSize);
+        }
         break;
       }
     }
@@ -288,7 +291,7 @@ public class JavaVMemServiceImpl implements VolatileMemoryAllocatorService {
       handler = getByteBufferHandler(id, bytebuf);
       for (int blockIdx = 0; blockIdx < mi.getByteBufferBlocksList().size(); blockIdx++) {
         BufferBlockInfo bufferBlock = mi.getByteBufferBlocksList().get(blockIdx);
-        if (bufferBlock.getChunkSizeMap().containsKey(handler)) {
+        if (bufferBlock != null && bufferBlock.getChunkSizeMap().containsKey(handler)) {
           BitSet chunksMap = bufferBlock.getBufferBlockChunksMap();
           baseAddr = bufferBlock.getBufferBlockBaseAddress();
           startIdx = (int)Math.floor((double)((handler - baseAddr) / CHUNK_BLOCK_SIZE));
@@ -309,7 +312,7 @@ public class JavaVMemServiceImpl implements VolatileMemoryAllocatorService {
     int size;
     for (int blockIdx = 0; blockIdx < mi.getByteBufferBlocksList().size(); blockIdx++) {
       BufferBlockInfo blockInfo = mi.getByteBufferBlocksList().get(blockIdx);
-      if (blockInfo.getChunkSizeMap().containsKey(handler)) {
+      if (blockInfo != null && blockInfo.getChunkSizeMap().containsKey(handler)) {
         size = blockInfo.getChunkSizeMap().get(handler);
         bb = createChunkBuffer(handler, size);
       }
@@ -324,7 +327,7 @@ public class JavaVMemServiceImpl implements VolatileMemoryAllocatorService {
     MemoryInfo mi = this.getMemPools().get((int)id);
     for (int blockIdx = 0; blockIdx < mi.getByteBufferBlocksList().size(); blockIdx++) {
       BufferBlockInfo blockInfo = mi.getByteBufferBlocksList().get(blockIdx);
-      if (blockInfo.getChunkSizeMap().containsKey(handler)) {
+      if (blockInfo != null && blockInfo.getChunkSizeMap().containsKey(handler)) {
         size = blockInfo.getChunkSizeMap().get(handler);
       }
     }
