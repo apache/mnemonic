@@ -191,7 +191,7 @@ public class JavaVMemServiceImpl implements VolatileMemoryAllocatorService {
           }
         }
         markUsed(chunksMap, startIdx, requiredBlocks);
-        BufferBlockInfo bufferBlock = mi.getByteBufferBlocksList().get(blockIdx)
+        BufferBlockInfo bufferBlock = mi.getByteBufferBlocksList().get(blockIdx);
         if (bufferBlock != null) {
           bufferBlock.setChunkSizeMap(handler, bufSize);
         }
