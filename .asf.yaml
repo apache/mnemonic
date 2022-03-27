@@ -22,7 +22,8 @@ notifications:
   pullrequests:         dev@mnemonic.apache.org
   pullrequests_status:  dev@mnemonic.apache.org
   pullrequests_comment: dev@mnemonic.apache.org
-  jira_options: link label worklog
+  jira_options:         link label worklog
+  jobs:                 dev@mnemonic.apache.org
 
 
 github:
