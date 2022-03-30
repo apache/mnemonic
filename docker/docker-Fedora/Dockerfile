@@ -34,6 +34,11 @@ ENV PATH $JAVA_HOME/bin:$PATH
 
 WORKDIR /ws
 
+RUN git clone https://github.com/redis/hiredis.git && \
+	cd hiredis && make && make install
+
+RUN cd /ws
+
 RUN git clone https://github.com/apache/mnemonic.git && \
     cd mnemonic && mvn clean package install
 
