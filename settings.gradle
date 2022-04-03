@@ -31,9 +31,9 @@ include ':mnemonic-computing-services:mnemonic-utilities-service'
 include ':mnemonic-computing-services'
 include ':mnemonic-common'
 include ':mnemonic-benches:mnemonic-sort-bench'
-include ':mnemonic-benches:mnemonic-spark-kmeans-bench'
+// include ':mnemonic-benches:mnemonic-spark-kmeans-bench'
 include ':mnemonic-sessions'
-include ':mnemonic-spark:mnemonic-spark-core'
+// include ':mnemonic-spark:mnemonic-spark-core'
 include ':mnemonic-hadoop:mnemonic-hadoop-mapreduce'
 
 project(':mnemonic-core').projectDir = "$rootDir/mnemonic-core" as File
@@ -51,7 +51,7 @@ project(':mnemonic-computing-services:mnemonic-utilities-service').projectDir = 
 project(':mnemonic-computing-services').projectDir = "$rootDir/mnemonic-computing-services" as File
 project(':mnemonic-common').projectDir = "$rootDir/mnemonic-common" as File
 project(':mnemonic-benches:mnemonic-sort-bench').projectDir = "mnemonic-benches/mnemonic-sort-bench" as File
-project(':mnemonic-benches:mnemonic-spark-kmeans-bench').projectDir = "$rootDir/mnemonic-benches/mnemonic-spark-kmeans-bench" as File
+// project(':mnemonic-benches:mnemonic-spark-kmeans-bench').projectDir = "$rootDir/mnemonic-benches/mnemonic-spark-kmeans-bench" as File
 project(':mnemonic-sessions').projectDir = "$rootDir/mnemonic-sessions" as File
-project(':mnemonic-spark:mnemonic-spark-core').projectDir = "$rootDir/mnemonic-spark/mnemonic-spark-core" as File
+// project(':mnemonic-spark:mnemonic-spark-core').projectDir = "$rootDir/mnemonic-spark/mnemonic-spark-core" as File
 project(':mnemonic-hadoop:mnemonic-hadoop-mapreduce').projectDir = "$rootDir/mnemonic-hadoop/mnemonic-hadoop-mapreduce" as File

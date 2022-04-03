@@ -91,7 +91,7 @@
     <module>mnemonic-common</module>
     <module>mnemonic-sessions</module>
     <module>mnemonic-hadoop</module>
-    <module>mnemonic-spark</module>
+    <!-- <module>mnemonic-spark</module> -->
     <module>mnemonic-benches</module>
   </modules>
 
@@ -339,6 +339,8 @@
               <exclude>gradlew.bat</exclude>
               <exclude>**/build/</exclude>
               <exclude>.dccache</exclude>
+              <exclude>mnemonic-spark/</exclude>
+              <exclude>**/mnemonic-spark-kmeans-bench/</exclude>
             </excludes>
           </configuration>
           <executions>
@@ -578,7 +580,7 @@
       <module>mnemonic-benches</module>
       <module>mnemonic-sessions</module>
       <module>mnemonic-hadoop</module>
-      <module>mnemonic-spark</module>
+      <!-- <module>mnemonic-spark</module> -->
     </modules>
   </profile>
 </profiles>
