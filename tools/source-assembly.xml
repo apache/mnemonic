@@ -166,7 +166,7 @@
     <moduleSet>
       <includes>
         <include>org.apache.mnemonic:mnemonic-sort-bench</include>
-        <include>org.apache.mnemonic:mnemonic-spark-kmeans-bench</include>
+        <!-- <include>org.apache.mnemonic:mnemonic-spark-kmeans-bench</include> -->
       </includes>
       <sources>
         <fileSets>
@@ -223,47 +223,47 @@
         <outputDirectoryMapping>mnemonic-hadoop/${module.artifactId}</outputDirectoryMapping>
       </sources>
     </moduleSet>
-    <moduleSet>
-      <includes>
-        <include>org.apache.mnemonic:mnemonic-spark</include>
-      </includes>
-      <sources>
-        <fileSets>
-          <fileSet>
-            <directory>.</directory>
-            <outputDirectory>.</outputDirectory>
-            <useDefaultExcludes>true</useDefaultExcludes>
-            <excludes>
-              <exclude>**/target/**</exclude>
-              <exclude>dependency-reduced-pom.xml</exclude>
-              <exclude>**/*.dat</exclude>
-              <exclude>**/*.mne</exclude>
-            </excludes>
-          </fileSet>
-        </fileSets>
-      </sources>
-    </moduleSet>
-    <moduleSet>
-      <includes>
-        <include>org.apache.mnemonic:mnemonic-spark-core</include>
-      </includes>
-      <sources>
-        <fileSets>
-          <fileSet>
-            <directory>.</directory>
-            <outputDirectory>.</outputDirectory>
-            <useDefaultExcludes>true</useDefaultExcludes>
-            <excludes>
-              <exclude>**/target/**</exclude>
-              <exclude>dependency-reduced-pom.xml</exclude>
-              <exclude>**/*.dat</exclude>
-              <exclude>**/*.mne</exclude>
-            </excludes>
-          </fileSet>
-        </fileSets>
-        <outputDirectoryMapping>mnemonic-spark/${module.artifactId}</outputDirectoryMapping>
-      </sources>
-    </moduleSet>
+    <!-- <moduleSet> -->
+    <!--   <includes> -->
+    <!--     <include>org.apache.mnemonic:mnemonic-spark</include> -->
+    <!--   </includes> -->
+    <!--   <sources> -->
+    <!--     <fileSets> -->
+    <!--       <fileSet> -->
+    <!--         <directory>.</directory> -->
+    <!--         <outputDirectory>.</outputDirectory> -->
+    <!--         <useDefaultExcludes>true</useDefaultExcludes> -->
+    <!--         <excludes> -->
+    <!--           <exclude>**/target/**</exclude> -->
+    <!--           <exclude>dependency-reduced-pom.xml</exclude> -->
+    <!--           <exclude>**/*.dat</exclude> -->
+    <!--           <exclude>**/*.mne</exclude> -->
+    <!--         </excludes> -->
+    <!--       </fileSet> -->
+    <!--     </fileSets> -->
+    <!--   </sources> -->
+    <!-- </moduleSet> -->
+    <!-- <moduleSet> -->
+    <!--   <includes> -->
+    <!--     <include>org.apache.mnemonic:mnemonic-spark-core</include> -->
+    <!--   </includes> -->
+    <!--   <sources> -->
+    <!--     <fileSets> -->
+    <!--       <fileSet> -->
+    <!--         <directory>.</directory> -->
+    <!--         <outputDirectory>.</outputDirectory> -->
+    <!--         <useDefaultExcludes>true</useDefaultExcludes> -->
+    <!--         <excludes> -->
+    <!--           <exclude>**/target/**</exclude> -->
+    <!--           <exclude>dependency-reduced-pom.xml</exclude> -->
+    <!--           <exclude>**/*.dat</exclude> -->
+    <!--           <exclude>**/*.mne</exclude> -->
+    <!--         </excludes> -->
+    <!--       </fileSet> -->
+    <!--     </fileSets> -->
+    <!--     <outputDirectoryMapping>mnemonic-spark/${module.artifactId}</outputDirectoryMapping> -->
+    <!--   </sources> -->
+    <!-- </moduleSet> -->
   </moduleSets>
   <fileSets>
     <fileSet>
