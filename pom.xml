@@ -111,7 +111,7 @@
     <buildtools.dir>${basedir}/tools</buildtools.dir>
     <gpg.keyname>apache.org</gpg.keyname>
     <slf4j.version>1.7.25</slf4j.version>
-    <log4j.version>2.11.0</log4j.version>
+    <log4j.version>2.17.1</log4j.version>
     <logback.version>1.2.10</logback.version>
   </properties>
 
