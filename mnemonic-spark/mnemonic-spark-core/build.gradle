@@ -46,11 +46,7 @@ dependencies {
   implementation "org.apache.spark:spark-core_${scala_bin_version}:${spark_version}"
   implementation "org.apache.spark:spark-mllib_${scala_bin_version}:${spark_version}"
   implementation "org.scala-lang:scala-library:${scala_version}"
-  api 'org.slf4j:slf4j-api'
-  api 'org.slf4j:jul-to-slf4j'
-  api 'org.slf4j:jcl-over-slf4j'
-  api 'log4j:log4j'
-  api 'org.slf4j:slf4j-log4j12'
+  api 'org.apache.logging.log4j:log4j-slf4j-impl'
   testCompileOnly 'org.testng:testng'
   testImplementation "org.scalatest:scalatest_${scala_bin_version}:${scalatest_version}"
 }
