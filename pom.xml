@@ -99,7 +99,7 @@
     <java.version>17</java.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
-    <maven.min-version>3.2.1</maven.min-version>
+    <maven.min-version>3.8.5</maven.min-version>
     <enforcer.skip>false</enforcer.skip>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
