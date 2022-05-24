@@ -45,7 +45,6 @@
     <module>mnemonic-pmalloc-service</module>
     <module>mnemonic-sys-vmem-service</module>
     <module>mnemonic-java-vmem-service</module>
-    <module>mnemonic-pmdk-vmem-service</module>
     <module>mnemonic-pmdk-pmem-service</module>
   </modules>
 
