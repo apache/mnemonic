@@ -16,7 +16,7 @@
 #
 
 FROM fedora:34
-MAINTAINER Xiaojin Jiao (xjiao@apache.org)
+LABEL maintainer="Xiaojin Jiao (xjiao@apache.org)"
 
 # update container
 RUN dnf -y update && dnf clean all
