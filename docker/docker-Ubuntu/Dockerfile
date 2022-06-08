@@ -16,7 +16,7 @@
 #
 
 FROM ubuntu:21.10
-MAINTAINER Yanhui Zhao (yanhui.zhao@outlook.com)
+LABEL maintainer="Yanhui Zhao (yanhui.zhao@outlook.com)"
 
 RUN apt-get -y update && apt-get install -y software-properties-common && add-apt-repository ppa:openjdk-r/ppa && apt-get -y update && \
     apt-get install -y openjdk-17-jdk cmake check git pkg-config autoconf man build-essential gcc g++ uuid-dev pandoc devscripts flex doxygen maven

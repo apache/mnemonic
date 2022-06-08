@@ -16,7 +16,7 @@
 #
 
 FROM centos:8
-MAINTAINER Gang Wang (garyw@apache.org)
+LABEL maintainer="Gordon King (garyw@apache.org)"
 
 RUN yum -y install epel-release
 RUN yum -y update && yum -y groupinstall 'Development Tools' && \
