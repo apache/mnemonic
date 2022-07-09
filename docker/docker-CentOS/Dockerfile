@@ -22,7 +22,7 @@ RUN yum -y install epel-release
 RUN yum -y update && yum -y groupinstall 'Development Tools' && \
     yum -y install cmake check check-devel libuuid-devel man zlib-devel maven
 
-RUN yum -y install ndctl-devel libpmem-devel libvmem-devel libpmemobj-devel
+RUN yum -y install ndctl-devel libpmem-devel libvmem-devel libpmemobj-devel libmemkind-devel
 
 RUN yum clean all
 

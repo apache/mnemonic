@@ -26,7 +26,7 @@ RUN dnf -y install cmake check git \
                    gcc g++ \
                    java-latest-openjdk-devel.x86_64
 
-RUN dnf -y install ndctl-devel libpmem-devel libvmem-devel libpmemobj-devel &&\
+RUN dnf -y install ndctl-devel libpmem-devel libvmem-devel libpmemobj-devel libmemkind-devel &&\
     dnf clean all
 
 ENV JAVA_HOME /usr/lib/jvm/java-16-openjdk
