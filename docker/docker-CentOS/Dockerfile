@@ -16,13 +16,13 @@
 #
 
 FROM centos:8
-MAINTAINER Gang Wang (garyw@apache.org)
+LABEL maintainer="Gordon King (garyw@apache.org)"
 
 RUN yum -y install epel-release
 RUN yum -y update && yum -y groupinstall 'Development Tools' && \
     yum -y install cmake check check-devel libuuid-devel man zlib-devel maven
 
-RUN yum -y install ndctl-devel libpmem-devel libvmem-devel libpmemobj-devel
+RUN yum -y install ndctl-devel libpmem-devel libvmem-devel libpmemobj-devel libmemkind-devel
 
 RUN yum clean all
 
