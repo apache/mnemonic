@@ -15,13 +15,13 @@
 # limitations under the License.
 #
 
-FROM ubuntu:21.10
+FROM ubuntu:22.04
 LABEL maintainer="Yanhui Zhao (yanhui.zhao@outlook.com)"
 
 RUN apt-get -y update && apt-get install -y software-properties-common && add-apt-repository ppa:openjdk-r/ppa && apt-get -y update && \
     apt-get install -y openjdk-17-jdk cmake check git pkg-config autoconf man build-essential gcc g++ uuid-dev pandoc devscripts flex doxygen maven
 
-RUN apt-get install -y libndctl-dev libpmem-dev libvmem-dev libpmemobj-dev libmemkind-dev
+RUN apt-get install -y libndctl-dev libpmem-dev libpmemobj-dev libmemkind-dev
 
 RUN apt-get clean
 
@@ -29,6 +29,11 @@ ENV JAVA_HOME /usr/lib/jvm/java-17-openjdk-amd64
 ENV PATH $JAVA_HOME/bin:$PATH
 
 WORKDIR /ws
+
+RUN git clone https://github.com/pmem/vmem && \
+    cd vmem && make && make install
+
+RUN cd /ws
 
 RUN git clone https://github.com/redis/hiredis.git && \
 	cd hiredis && make && make install
