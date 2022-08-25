@@ -38,6 +38,10 @@ RUN cd /ws
 RUN git clone https://github.com/redis/hiredis.git && \
 	cd hiredis && make && make install
 
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y
+
+ENV PATH="/root/.cargo/bin:${PATH}"
+
 RUN cd /ws
 
 RUN git clone https://github.com/apache/mnemonic.git && \
