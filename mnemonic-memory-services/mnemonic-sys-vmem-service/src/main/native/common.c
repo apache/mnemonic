@@ -87,3 +87,9 @@ sysvsize(SysVMPool *pool, void *p) {
   }
   return ret;
 }
+
+inline size_t
+sysvversion(SysVMPool *pool, void *p) {
+  size_t ret = 0;
+  return ret;
+}

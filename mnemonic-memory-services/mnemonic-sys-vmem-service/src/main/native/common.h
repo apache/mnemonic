@@ -45,6 +45,7 @@ jlong addr_to_java(void* p);
 typedef struct {
   //size_t size;
   jlong size;
+  size_t version;
 } PMBHeader;
 
 #define PMBHSZ (sizeof(PMBHeader))
@@ -58,6 +59,8 @@ void *sysvrealloc(SysVMPool *pool, void *p, size_t size, int initzero);
 void sysvfree(SysVMPool *pool, void *p);
 
 size_t sysvsize(SysVMPool *pool, void *p);
+
+size_t sysvversion(SysVMPool *pool, void *p);
 
 #ifdef __cplusplus
 }
