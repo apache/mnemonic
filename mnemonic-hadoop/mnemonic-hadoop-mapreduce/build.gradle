@@ -30,7 +30,7 @@ compileTestJava {
 }
 
 dependencies {
-  def hadoop_version = '2.7.3'
+  def hadoop_version = '2.10.2'
 
   annotationProcessor project(':mnemonic-core')
   api project(':mnemonic-collections')
