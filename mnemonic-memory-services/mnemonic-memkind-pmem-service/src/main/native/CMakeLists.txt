@@ -43,7 +43,7 @@ if (NOT LIBVMEMKIND_LIBRARIES)
    message(FATAL_ERROR "not found memkind library")
 endif (NOT LIBVMEMKIND_LIBRARIES)
 
-add_library(vmemkindallocator SHARED common.c org_apache_mnemonic_service_memory_internal_VMemServiceImpl.c)
+add_library(vmemkindallocator SHARED common.c org_apache_mnemonic_service_memory_internal_VMemKindServiceImpl.c)
 target_include_directories(vmemkindallocator PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(vmemkindallocator ${LIBVMEMKIND_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 

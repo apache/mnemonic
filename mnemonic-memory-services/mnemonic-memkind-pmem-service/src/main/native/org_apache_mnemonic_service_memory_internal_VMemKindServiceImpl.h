@@ -17,29 +17,29 @@
  */
 
 #include <jni.h>
-/* Header for class org_apache_mnemonic_service_memory_internal_VMemServiceImpl */
+/* Header for class org_apache_mnemonic_service_memory_internal_VMemKindServiceImpl */
 
 #include "common.h"
 
-#ifndef _Included_org_apache_mnemonic_service_memory_internal_VMemServiceImpl
-#define _Included_org_apache_mnemonic_service_memory_internal_VMemServiceImpl
+#ifndef _Included_org_apache_mnemonic_service_memory_internal_VMemKindServiceImpl
+#define _Included_org_apache_mnemonic_service_memory_internal_VMemKindServiceImpl
 #ifdef __cplusplus
 extern "C" {
 #endif
 /*
- * Class:     org_apache_mnemonic_service_memory_internal_VMemServiceImpl
+ * Class:     org_apache_mnemonic_service_memory_internal_VMemKindServiceImpl
  * Method:    jniInit
  * Signature: (II)V
  */
-JNIEXPORT void JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl_jniInit
+JNIEXPORT void JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemKindServiceImpl_jniInit
 (JNIEnv *, jobject, jint, jint);
 
 /*
- * Class:     org_apache_mnemonic_service_memory_internal_VMemServiceImpl
+ * Class:     org_apache_mnemonic_service_memory_internal_VMemKindServiceImpl
  * Method:    jniTerm
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl_jniTerm
+JNIEXPORT void JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemKindServiceImpl_jniTerm
 (JNIEnv *, jobject);
 
 #ifdef __cplusplus
