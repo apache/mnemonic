@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "org_apache_mnemonic_service_memory_internal_VMemServiceImpl.h"
+#include "org_apache_mnemonic_service_memory_internal_VMemKindServiceImpl.h"
 
 static VMPool *g_vmpool_arr = NULL;
 static size_t g_vmpool_count = 0;
@@ -28,7 +28,7 @@ static pthread_rwlock_t g_vmem_rwlock = PTHREAD_RWLOCK_INITIALIZER;
  *****************************************************************************/
 
 JNIEXPORT
-jlong JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl_nallocate(JNIEnv* env,
+jlong JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemKindServiceImpl_nallocate(JNIEnv* env,
     jobject this, jlong id, jlong size, jboolean initzero) {
   VMPool *pool;
   pthread_rwlock_rdlock(&g_vmem_rwlock);
@@ -41,7 +41,7 @@ jlong JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl_n
 }
 
 JNIEXPORT
-jlong JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl_nreallocate(JNIEnv* env,
+jlong JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemKindServiceImpl_nreallocate(JNIEnv* env,
     jobject this, jlong id, jlong addr, jlong size, jboolean initzero) {
   VMPool *pool;
   pthread_rwlock_rdlock(&g_vmem_rwlock);
@@ -55,7 +55,7 @@ jlong JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl_n
 }
 
 JNIEXPORT
-void JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl_nfree(
+void JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemKindServiceImpl_nfree(
     JNIEnv* env,
     jobject this, jlong id,
     jlong addr) {
@@ -70,14 +70,14 @@ void JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl_nf
 }
 
 JNIEXPORT
-void JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl_nsync(
+void JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemKindServiceImpl_nsync(
     JNIEnv* env,
     jobject this, jlong id, jlong addr, jlong len, jboolean autodetect)
 {
 }
 
 JNIEXPORT
-jlong JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl_ncapacity(
+jlong JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemKindServiceImpl_ncapacity(
     JNIEnv* env,
     jobject this, jlong id)
 {
@@ -87,7 +87,7 @@ jlong JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl_n
 }
 
 JNIEXPORT
-jobject JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl_ncreateByteBuffer(
+jobject JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemKindServiceImpl_ncreateByteBuffer(
     JNIEnv *env, jobject this, jlong id, jlong size) {
   VMPool *pool;
   jobject ret = NULL;
@@ -102,7 +102,7 @@ jobject JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl
 }
 
 JNIEXPORT
-jobject JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl_nretrieveByteBuffer(
+jobject JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemKindServiceImpl_nretrieveByteBuffer(
     JNIEnv *env, jobject this, jlong id, jlong addr) {
   jobject ret = NULL;
   void* p = addr_from_java(addr);
@@ -114,7 +114,7 @@ jobject JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl
 }
 
 JNIEXPORT
-jlong JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl_nretrieveSize(JNIEnv *env,
+jlong JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemKindServiceImpl_nretrieveSize(JNIEnv *env,
     jobject this, jlong id, jlong addr) {
   VMPool *pool;
   pthread_rwlock_rdlock(&g_vmem_rwlock);
@@ -126,7 +126,7 @@ jlong JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl_n
 }
 
 JNIEXPORT
-jlong JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl_ngetByteBufferHandler(
+jlong JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemKindServiceImpl_ngetByteBufferHandler(
     JNIEnv *env, jobject this, jlong id, jobject bytebuf) {
 //  fprintf(stderr, "ngetByteBufferAddress Get Called %X, %X\n", env, bytebuf);
   jlong ret = 0L;
@@ -140,7 +140,7 @@ jlong JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl_n
 }
 
 JNIEXPORT
-jobject JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl_nresizeByteBuffer(
+jobject JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemKindServiceImpl_nresizeByteBuffer(
     JNIEnv *env, jobject this, jlong id, jobject bytebuf, jlong size) {
   VMPool *pool;
   jobject ret = NULL;
@@ -162,7 +162,7 @@ jobject JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl
 }
 
 JNIEXPORT
-void JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl_ndestroyByteBuffer(
+void JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemKindServiceImpl_ndestroyByteBuffer(
     JNIEnv *env, jobject this, jlong id, jobject bytebuf) {
   VMPool *pool;
   pthread_rwlock_rdlock(&g_vmem_rwlock);
@@ -180,21 +180,21 @@ void JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl_nd
 
 
 JNIEXPORT
-void JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl_nsetHandler(
+void JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemKindServiceImpl_nsetHandler(
     JNIEnv *env, jobject this, jlong id, jlong key, jlong value)
 {
   throw(env, "setkey()/getkey() temporarily not supported");
 }
 
 JNIEXPORT
-jlong JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl_ngetHandler(JNIEnv *env,
+jlong JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemKindServiceImpl_ngetHandler(JNIEnv *env,
     jobject this, jlong id, jlong key) {
   throw(env, "setkey()/getkey() temporarily not supported");
   return 0;
 }
 
 JNIEXPORT
-jlong JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl_nhandlerCapacity(
+jlong JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemKindServiceImpl_nhandlerCapacity(
     JNIEnv *env, jobject this) {
   throw(env, "setkey()/getkey() temporarily not supported");
   return 0;
@@ -202,13 +202,13 @@ jlong JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl_n
 
 
 JNIEXPORT
-jlong JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl_ngetBaseAddress(JNIEnv *env,
+jlong JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemKindServiceImpl_ngetBaseAddress(JNIEnv *env,
     jobject this, jlong id) {
   return 0L;
 }
 
 JNIEXPORT
-jlong JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl_ninit(JNIEnv *env, jclass this,
+jlong JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemKindServiceImpl_ninit(JNIEnv *env, jclass this,
     jlong capacity, jstring pathname, jboolean isnew) {
   pthread_rwlock_wrlock(&g_vmem_rwlock);
   VMPool *pool;
@@ -241,7 +241,7 @@ jlong JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl_n
 }
 
 JNIEXPORT
-void JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemServiceImpl_nclose
+void JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemKindServiceImpl_nclose
 (JNIEnv *env, jobject this, jlong id)
 {
   VMPool *pool;
