@@ -51,7 +51,7 @@ typedef struct {
 #define PMBHSZ (sizeof(PMBHeader))
 
 typedef struct {
-  memkind_t *kind;
+  memkind_t kind;
   size_t capacity;
   pthread_mutex_t mutex;
 } VMPool;
