@@ -330,6 +330,10 @@
               <exclude>**/META-INFO/**/*</exclude>
               <exclude>**/native/build/**/*</exclude>
               <exclude>**/native/dist/**/*</exclude>
+              <exclude>**/native/CMakeFiles/**/*</exclude>
+              <exclude>**/native/*.cmake</exclude>
+              <exclude>**/native/Makefile</exclude>
+              <exclude>**/native/CMakeCache.txt</exclude>
               <exclude>**/service-dist/**</exclude>
               <exclude>**/*.iml</exclude>
               <exclude>**/*.patch</exclude>
