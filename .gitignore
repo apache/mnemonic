@@ -13,7 +13,9 @@ target/
 *.war
 *.ear
 hs_err_pid*
-/build/
+**/build/
+**/CMakeFiles/
+*.cmake
 gradle-app.setting
 gradle.properties
 !gradle-wrapper.jar
