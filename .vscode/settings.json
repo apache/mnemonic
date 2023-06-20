@@ -19,5 +19,6 @@
     "atlascode.enableCurlLogging": false,
     "atlascode.jira.showCreateIssueProblems": false,
     "atlascode.enableCharles": false,
-    "atlascode.bitbucket.enabled": false
+    "atlascode.bitbucket.enabled": false,
+    "java.compile.nullAnalysis.mode": "automatic"
 }
