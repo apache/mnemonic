@@ -314,7 +314,7 @@
         <plugin>
           <groupId>org.apache.rat</groupId>
           <artifactId>apache-rat-plugin</artifactId>
-          <version>0.11</version>
+          <version>0.15</version>
           <configuration>
             <excludes>
               <exclude>.git/**/*</exclude>
