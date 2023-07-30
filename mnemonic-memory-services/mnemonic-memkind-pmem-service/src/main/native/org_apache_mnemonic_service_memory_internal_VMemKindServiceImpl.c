@@ -213,7 +213,7 @@ jlong JNICALL Java_org_apache_mnemonic_service_memory_internal_VMemKindServiceIm
   pthread_rwlock_wrlock(&g_vmem_rwlock);
   VMPool *pool;
   size_t ret = -1;
-  memkind_t *mkind = realloc(NULL, sizeof(memkind_t));
+  memkind_t *vmkind = realloc(NULL, sizeof(memkind_t));
   const char* mpathname = (*env)->GetStringUTFChars(env, pathname, NULL);
   if (NULL == mpathname) {
     pthread_rwlock_unlock(&g_vmem_rwlock);
