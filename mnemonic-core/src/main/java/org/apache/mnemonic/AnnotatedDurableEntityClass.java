@@ -895,13 +895,13 @@ public class AnnotatedDurableEntityClass {
     String factoryproxyname = m_fieldsinfo.get("factoryproxy").name;
     String genericfieldname = m_fieldsinfo.get("genericfield").name;
     String reclaimctxname = m_fieldsinfo.get("reclaimcontext").name;
-    for (String name : m_entitymtdinfo.keySet()) {
-      methodinfo = m_entitymtdinfo.get(name);
+    for (Map.Entry<String, MethodInfo> entry : m_entitymtdinfo.entrySet()) {
+      methodinfo = entry.getValue();
       code = CodeBlock.builder();
       arg0 = methodinfo.elem.getParameters().get(0);
       arg1 = methodinfo.elem.getParameters().get(1);
       arg2 = methodinfo.elem.getParameters().get(2);
-      switch (name) {
+      switch (entry.getKey()) {
       case "initializeDurableEntity":
         arg3 = methodinfo.elem.getParameters().get(3);
         arg4 = methodinfo.elem.getParameters().get(4);
@@ -931,7 +931,7 @@ public class AnnotatedDurableEntityClass {
         // if (isUnboxPrimitive(dynfieldinfo.type)) {
         // code.addStatement("$1N($2L)", gsetterName(fname, false),
         // getIntialValueLiteral(dynfieldinfo.type));
-        // } else {
+        // } else {TypeSpec
         // code.addStatement("$1N(null, false)", gsetterName(fname, false));
         // }
         // }
@@ -950,7 +950,7 @@ public class AnnotatedDurableEntityClass {
 //        code.endControlFlow();
         code.addStatement("initializeDurableEntity($1L, $2L, $3L, $4L, $5L)", arg0, arg1, arg2, arg4, arg5);
         code.beginControlFlow("if (0L == $1L)", arg3);
-        code.addStatement("throw new RestoreDurableEntityError(\"Input handler is null on $1N.\")", name);
+        code.addStatement("throw new RestoreDurableEntityError(\"Input handler is null on $1N.\")", entry.getKey());
         code.endControlFlow();
         code.addStatement("$1N = $2N.retrieveChunk($3L, $4N, $5N)",
                 holdername, allocname, arg3, autoreclaimname, reclaimctxname);
@@ -960,7 +960,7 @@ public class AnnotatedDurableEntityClass {
         code.addStatement("initializeAfterRestore()");
         break;
       default:
-        throw new AnnotationProcessingException(null, "Method %s is not supported.", name);
+        throw new AnnotationProcessingException(null, "Method %s is not supported.", entry.getKey());
       }
       typespecbuilder.addMethod(methodinfo.specbuilder.addCode(code.build()).build());
     }
