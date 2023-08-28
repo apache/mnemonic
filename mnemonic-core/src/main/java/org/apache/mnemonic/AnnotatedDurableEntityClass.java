@@ -807,7 +807,7 @@ public class AnnotatedDurableEntityClass {
         switch (name) {
           case "cancelAutoReclaim":
             code.addStatement("$1N.cancelAutoReclaim()", holdername);
-            for (Entry entry : m_dynfieldsinfo.entryset()) {
+            for (Map.Entry<String, FieldInfo> entry : m_dynfieldsinfo.entrySet()) {
               dynfieldinfo = entry.getValue();
               if (!isUnboxPrimitive(dynfieldinfo.type)) {
                 code.beginControlFlow("if (null != $1N)", dynfieldinfo.name);
@@ -821,8 +821,8 @@ public class AnnotatedDurableEntityClass {
             if (methodinfo.elem.asType().toString().contains("ReclaimContext")) {
               VariableElement arg0 = methodinfo.elem.getParameters().get(0);
               code.addStatement("$1N.registerAutoReclaim($2L)", holdername, arg0);
-              for (String fname : m_dynfieldsinfo.keySet()) {
-                dynfieldinfo = m_dynfieldsinfo.get(fname);
+              for (Map.Entry<String, AnnotatedDurableEntityClass.FieldInfo> entry: m_dynfieldsinfo.entrySet()) {
+                dynfieldinfo = entry.getValue();
                 if (!isUnboxPrimitive(dynfieldinfo.type)) {
                   code.beginControlFlow("if (null != $1N)", dynfieldinfo.name);
                   code.addStatement("$1N.registerAutoReclaim($2L)", dynfieldinfo.name, arg0);
