@@ -807,8 +807,8 @@ public class AnnotatedDurableEntityClass {
         switch (name) {
           case "cancelAutoReclaim":
             code.addStatement("$1N.cancelAutoReclaim()", holdername);
-            for (String fname : m_dynfieldsinfo.keySet()) {
-              dynfieldinfo = m_dynfieldsinfo.get(fname);
+            for (Map.Entry<String, FieldInfo> entry : m_dynfieldsinfo.entrySet()) {
+              dynfieldinfo = entry.getValue();
               if (!isUnboxPrimitive(dynfieldinfo.type)) {
                 code.beginControlFlow("if (null != $1N)", dynfieldinfo.name);
                 code.addStatement("$1N.cancelAutoReclaim()", dynfieldinfo.name);
