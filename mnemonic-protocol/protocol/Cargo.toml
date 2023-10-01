@@ -15,6 +15,11 @@
 # specific language governing permissions and limitations
 # under the License.
 
-[workspace]
+[package]
+name = "protocol"
+version = "0.1.0"
+edition = "2021"
 
-members = ["protocol"]
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
