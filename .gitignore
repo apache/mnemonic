@@ -67,4 +67,5 @@ GTAGS
 TAGS
 .dccache
 Cargo.lock
-
+snyk-*
+.history/
