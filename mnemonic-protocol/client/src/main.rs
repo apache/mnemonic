@@ -15,8 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// Import necessary libraries
 use reqwest;
 
+// Main asynchronous function
 #[tokio::main]
 async fn main() -> Result<(), reqwest::Error> {
     // The URL of the server you want to visit
@@ -32,8 +34,16 @@ async fn main() -> Result<(), reqwest::Error> {
         println!("Response body:\n{}", body);
     } else {
         // Print the status code and reason phrase for unsuccessful requests
-        println!("Request failed with status: {} - {}", response.status(), response.status().canonical_reason().unwrap_or("Unknown"));
+        println!(
+            "Request failed with status: {} - {}",
+            response.status(),
+            response
+                .status()
+                .canonical_reason()
+                .unwrap_or("Unknown")
+        );
     }
 
+    // Return Ok to indicate success
     Ok(())
 }
