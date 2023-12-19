@@ -23,167 +23,129 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Objects;
 
 /**
- * load native library from itself in Jar or file system.
- * 
- * @author wg
+ * A utility class to load native libraries from the classpath or file system.
+ * This class can load native libraries from JAR resources or from the local file system.
+ * It provides methods to load libraries by name, directory, and temporary directory.
  *
+ * @author wg
  */
 public final class NativeLibraryLoader {
-    
-    private static final int COPYING_BUFFER_LENGTH = 40960;
-    
-    /**
-     * private constructor that prevents it from instantiating.
-     */
-    private NativeLibraryLoader() {
 
+    private static final int COPYING_BUFFER_LENGTH = 40960;
+
+    private NativeLibraryLoader() {
+        // private constructor to prevent instantiation
     }
-    
+
     /**
-     * retrieve the extension of native library specific to the underlying
-     * system.
-     * 
-     * @return the extension of library
+     * Retrieve the extension of a native library specific to the underlying system.
+     *
+     * @return the extension of the library
      */
     public static String getNativeLibraryExtension() {
-        String libname = System.mapLibraryName("dummylib");
-        int idx = libname.lastIndexOf(".");
-        return idx < 0 ? null : libname.substring(idx);
+        String libName = System.mapLibraryName("dummylib");
+        int lastDotIndex = libName.lastIndexOf(".");
+        return lastDotIndex < 0 ? null : libName.substring(lastDotIndex);
     }
-    
+
     /**
-     * retrieve the suffix of native library
-     * 
-     * @return the suffix of extension of library
+     * Retrieve the suffix of the native library extension.
+     *
+     * @return the suffix of the extension of the library
      */
     public static String getNativeLibraryExtSuffix() {
         String ext = getNativeLibraryExtension();
-        return null == ext ? null : ext.substring(1);
+        return Objects.requireNonNullElse(ext, "").substring(1);
     }
-    
+
     /**
-     * load native library from itself in jar package
-     * 
-     * @param libname
-     *            the name of native library without prefix and suffix
-     * 
-     * @see #loadFromJar(String, String, File)
-     */
-    public static void loadFromJar(String libname) throws IOException {
-        loadFromJar(libname, "/native", null);
-    }
-    
-    /**
-     * load native library from itself in jar package
-     * 
-     * @param libname
-     *            the name of native library without prefix and suffix
-     * 
-     * @param libdir
-     *            the directory in Jar package that contains this native library
-     * 
-     * @see #loadFromJar(String, String, File)
-     */
-    public static void loadLibraryFromJar(String libname, String libdir)
-            throws IOException {
-        loadFromJar(libname, libdir, null);
-    }
-    
-    /**
-     * load native library from itself in jar package
-     * 
-     * @param libname
-     *            the name of native library without prefix and suffix
-     * 
-     * @param libdir
-     *            the directory in Jar package that contains this native library
+     * Load a native library from the JAR package.
      *
-     * @param tmpdir
-     *            the directory which is used to temporarily store the specified
-     *            native library
+     * @param libName the name of the native library without prefix and suffix
+     * @throws IOException if an I/O error occurs
      */
-    public static void loadFromJar(String libname, String libdir, File tmpdir)
-            throws IOException {
-        
-        if (!libname.trim().isEmpty()) {
-            
-            String pathname = String.format("%s/%s", libdir,
-                    System.mapLibraryName(libname));
-            
-            String tmpfprefix = libname;
-            String tmpfsuffix = getNativeLibraryExtension();
-            tmpfsuffix = null == tmpfsuffix ? "" : tmpfsuffix;
-            
-            File temp = File.createTempFile(tmpfprefix, tmpfsuffix, tmpdir);
-            temp.deleteOnExit();
-            
-            if (!temp.exists()) {
-                throw new FileNotFoundException("The tempfile "
-                        + temp.getAbsolutePath() + " does not exist.");
-            }
-            
-            byte[] buffer = new byte[COPYING_BUFFER_LENGTH];
-            int readBytes;
-            
-            InputStream is = NativeLibraryLoader.class
-                .getResourceAsStream(pathname);
+    public static void loadFromJar(String libName) throws IOException {
+        loadFromJar(libName, "/native", null);
+    }
+
+    /**
+     * Load a native library from the JAR package.
+     *
+     * @param libName the name of the native library without prefix and suffix
+     * @param libDir  the directory in the JAR package that contains this native library
+     * @throws IOException if an I/O error occurs
+     */
+    public static void loadLibraryFromJar(String libName, String libDir) throws IOException {
+        loadFromJar(libName, libDir, null);
+    }
+
+    /**
+     * Load a native library from the JAR package.
+     *
+     * @param libName the name of the native library without prefix and suffix
+     * @param libDir  the directory in the JAR package that contains this native library
+     * @param tmpDir  the directory used to temporarily store the specified native library
+     * @throws IOException if an I/O error occurs
+     */
+    public static void loadFromJar(String libName, String libDir, File tmpDir) throws IOException {
+        if (libName.trim().isEmpty()) {
+            throw new RuntimeException("Library name is not specified.");
+        }
+
+        String pathname = String.format("%s/%s", libDir, System.mapLibraryName(libName));
+        String tmpFilePrefix = libName;
+        String tmpFileSuffix = getNativeLibraryExtension();
+        tmpFileSuffix = Objects.requireNonNullElse(tmpFileSuffix, "");
+
+        File temp = File.createTempFile(tmpFilePrefix, tmpFileSuffix, tmpDir);
+        temp.deleteOnExit();
+
+        if (!temp.exists()) {
+            throw new FileNotFoundException("The tempfile " + temp.getAbsolutePath() + " does not exist.");
+        }
+
+        byte[] buffer = new byte[COPYING_BUFFER_LENGTH];
+        int readBytes;
+
+        try (InputStream is = NativeLibraryLoader.class.getResourceAsStream(pathname);
+             OutputStream os = new FileOutputStream(temp)) {
+
             if (is == null) {
-                throw new FileNotFoundException("The library " + pathname
-                        + " was not found inside jar file.");
+                throw new FileNotFoundException("The library " + pathname + " was not found inside the JAR file.");
             }
-            OutputStream os = new FileOutputStream(temp);
-            
-            try {
-                while ((readBytes = is.read(buffer)) != -1) {
-                    os.write(buffer, 0, readBytes);
-                }
-            } finally {
-                os.close();
-                is.close();
+
+            while ((readBytes = is.read(buffer)) != -1) {
+                os.write(buffer, 0, readBytes);
             }
-            
-            System.load(temp.getAbsolutePath());
-        
-        } else {
+        }
+
+        System.load(temp.getAbsolutePath());
+    }
+
+    /**
+     * Load a native library from the current directory in the file system.
+     *
+     * @param libName the name of the native library without prefix and suffix
+     */
+    public static void loadFromFileSystem(String libName) {
+        loadFromFileSystem(libName, ".");
+    }
+
+    /**
+     * Load a native library from the specified directory in the file system.
+     *
+     * @param libName the name of the native library without prefix and suffix
+     * @param libDir  the directory in the file system that contains this native library
+     */
+    public static void loadFromFileSystem(String libName, String libDir) {
+        if (libName.trim().isEmpty()) {
             throw new RuntimeException("Library name is not specified.");
         }
-    }
-    
-    /**
-     * load native library from current directory in file system.
-     * 
-     * @param libname
-     *            the name of native library without prefix and suffix
-     * 
-     * @see #loadFromFileSystem(String, String)
-     */
-    public static void loadFromFileSystem(String libname) {
-        loadFromFileSystem(libname, ".");
-    }
-    
-    /**
-     * load native library from specified directory in file system.
-     * 
-     * @param libname
-     *            the name of native library without prefix and suffix
-     * 
-     * @param libdir
-     *            the directory in file system that contains this native library
-     * 
-     */
-    public static void loadFromFileSystem(String libname, String libdir) {
-        
-        if (!libname.trim().isEmpty()) {
-            
-            String pathname = String.format("%s/%s", libdir,
-                    System.mapLibraryName(libname));
-            
-            System.load(pathname);
-        
-        } else {
-            throw new RuntimeException("Library name is not specified.");
-        }
+
+        String pathname = String.format("%s/%s", libDir, System.mapLibraryName(libName));
+        System.load(pathname);
     }
 }
