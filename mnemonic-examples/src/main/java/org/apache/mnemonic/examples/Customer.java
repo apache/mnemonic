@@ -29,28 +29,58 @@ import org.apache.mnemonic.RetrieveDurableEntityError;
 @DurableEntity
 public abstract class Customer implements Durable {
 
-  @Override
-  public void initializeAfterCreate() {
-  }
+    /**
+     * This method is called after an instance of Customer is created.
+     */
+    @Override
+    public void initializeAfterCreate() {
+        // Initialization logic after creation (if needed)
+    }
 
-  @Override
-  public void initializeAfterRestore() {
-  }
+    /**
+     * This method is called after an instance of Customer is restored from durable memory.
+     */
+    @Override
+    public void initializeAfterRestore() {
+        // Initialization logic after restoration (if needed)
+    }
 
-  @Override
-  public void setupGenericInfo(EntityFactoryProxy[] efproxies, DurableType[] gftypes) {
+    /**
+     * Setup generic information for the entity.
+     *
+     * @param efproxies array of entity factory proxies
+     * @param gftypes   array of durable types
+     */
+    @Override
+    public void setupGenericInfo(EntityFactoryProxy[] efproxies, DurableType[] gftypes) {
+        // Setup generic information (if needed)
+    }
 
-  }
+    /**
+     * Getter method for the 'name' field.
+     *
+     * @return the name of the customer
+     * @throws RetrieveDurableEntityError if an error occurs during entity retrieval
+     */
+    @DurableGetter
+    public abstract String getName() throws RetrieveDurableEntityError;
 
-  @DurableGetter
-  public abstract String getName() throws RetrieveDurableEntityError;
+    /**
+     * Setter method for the 'name' field.
+     *
+     * @param name    the name to set for the customer
+     * @param destroy whether to destroy the previous value
+     * @throws OutOfHybridMemory         if there is not enough hybrid memory available
+     * @throws RetrieveDurableEntityError if an error occurs during entity retrieval
+     */
+    @DurableSetter
+    public abstract void setName(String name, boolean destroy)
+            throws OutOfHybridMemory, RetrieveDurableEntityError;
 
-  @DurableSetter
-  public abstract void setName(String name, boolean destroy)
-      throws OutOfHybridMemory, RetrieveDurableEntityError;
-
-  public void show() {
-    System.out.printf("%s \n", getName());
-  }
-
+    /**
+     * Display information about the customer.
+     */
+    public void show() {
+        System.out.printf("Customer Name: %s \n", getName());
+    }
 }
