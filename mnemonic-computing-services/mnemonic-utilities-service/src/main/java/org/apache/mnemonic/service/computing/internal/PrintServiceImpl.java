@@ -22,44 +22,55 @@ import org.apache.mnemonic.service.computing.ValueInfo;
 import org.apache.mnemonic.primitives.NativeLibraryLoader;
 
 public class PrintServiceImpl implements GeneralComputingService {
-  static {
-    try {
-      NativeLibraryLoader.loadFromJar("utilitiescomputing");
-    } catch (Exception e) {
-      throw new Error(e);
+
+    // Load the native library when the class is loaded
+    static {
+        try {
+            NativeLibraryLoader.loadFromJar("utilitiescomputing");
+        } catch (Exception e) {
+            // If there's an error loading the native library, throw an Error
+            throw new Error("Failed to load native library", e);
+        }
     }
-  }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getServiceId() {
-    return "print";
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public long[] perform(String mode, ValueInfo[] valinfos) {
-    long[] ret = null;
-    if (null != valinfos) {
-      ret = nperformPrint(valinfos);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getServiceId() {
+        // Return the unique identifier for this computing service
+        return "print";
     }
-    return ret;
-  }
 
-  @Override
-  public long[] perform(String mode, ValueInfo[] valinfos, long dcHandler, long dcSize) {
-    throw new UnsupportedOperationException("Invalid operation for print.");
-  }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long[] perform(String mode, ValueInfo[] valinfos) {
+        long[] ret = null;
+        if (valinfos != null) {
+            // Call the native method to perform the print action
+            ret = nperformPrint(valinfos);
+        }
+        return ret;
+    }
 
-  /**
-   * A native function to fulfill the action of print in native level.
-   * @param valinfos an array of value info, some of them could be set as NULL
-   * @return an array of handler returned by native level
-   */
-  protected native long[] nperformPrint(ValueInfo[] valinfos);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long[] perform(String mode, ValueInfo[] valinfos, long dcHandler, long dcSize) {
+        // This operation is not supported for print, so throw an UnsupportedOperationException
+        throw new UnsupportedOperationException("Invalid operation for print.");
+    }
+
+    /**
+     * A native function to fulfill the action of print at the native level.
+     *
+     * @param valinfos an array of value info, some of them could be set as NULL
+     * @return an array of handler returned by native level
+     */
+    protected native long[] nperformPrint(ValueInfo[] valinfos);
 
 }
+
