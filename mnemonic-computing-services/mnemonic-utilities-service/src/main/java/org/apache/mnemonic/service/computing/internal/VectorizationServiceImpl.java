@@ -22,44 +22,52 @@ import org.apache.mnemonic.service.computing.ValueInfo;
 import org.apache.mnemonic.primitives.NativeLibraryLoader;
 
 public class VectorizationServiceImpl implements GeneralComputingService {
-  static {
-    try {
-      NativeLibraryLoader.loadFromJar("utilitiescomputing");
-    } catch (Exception e) {
-      throw new Error(e);
+
+    // Load the native library when the class is loaded
+    static {
+        try {
+            NativeLibraryLoader.loadFromJar("utilitiescomputing");
+        } catch (Exception e) {
+            throw new Error(e);
+        }
     }
-  }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getServiceId() {
-    return "vectorize";
-  }
-
-  @Override
-  public long[] perform(String mode, ValueInfo[] valinfos) {
-    throw new UnsupportedOperationException("Invalid operation for vectorize.");
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public long[] perform(String mode, ValueInfo[] valinfos, long dcHandler, long dcSize) {
-    long[] ret = null;
-    if (null != valinfos) {
-      ret = nperformVectorization(valinfos, dcHandler, dcSize);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getServiceId() {
+        return "vectorize";
     }
-    return ret;
-  }
 
-  /**
-   * A native function to fulfill the action of print in native level.
-   * @param valinfos an array of value info, some of them could be set as NULL
-   * @return an array of handler returned by native level
-   */
-  protected native long[] nperformVectorization(ValueInfo[] valinfos, long dcHandler, long dcSize);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long[] perform(String mode, ValueInfo[] valinfos) {
+        // Vectorization service does not support general computing, throw an exception
+        throw new UnsupportedOperationException("Invalid operation for vectorize.");
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public long[] perform(String mode, ValueInfo[] valinfos, long dcHandler, long dcSize) {
+        // Perform vectorization using native implementation
+        return (valinfos != null) ? nperformVectorization(valinfos, dcHandler, dcSize) : null;
+    }
+
+    /**
+     * A native function to perform vectorization.
+     *
+     * @param valinfos  an array of value info, some of them could be set as NULL
+     * @param dcHandler handler for data chunk
+     * @param dcSize    size of the data chunk
+     * @return an array of handler returned by native level
+     */
+    protected native long[] nperformVectorization(ValueInfo[] valinfos, long dcHandler, long dcSize);
+
+    // Additional methods or improvements can be added as needed
 }
+
