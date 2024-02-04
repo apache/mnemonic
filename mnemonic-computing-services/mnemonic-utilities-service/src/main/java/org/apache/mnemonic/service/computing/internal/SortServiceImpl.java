@@ -21,51 +21,79 @@ import org.apache.mnemonic.service.computing.GeneralComputingService;
 import org.apache.mnemonic.service.computing.ValueInfo;
 import org.apache.mnemonic.primitives.NativeLibraryLoader;
 
+/**
+ * Implementation of the GeneralComputingService interface for sorting operations.
+ */
 public class SortServiceImpl implements GeneralComputingService {
-  static {
-    try {
-      NativeLibraryLoader.loadFromJar("utilitiescomputing");
-    } catch (Exception e) {
-      throw new Error(e);
+
+    // Load native library when the class is loaded
+    static {
+        try {
+            NativeLibraryLoader.loadFromJar("utilitiescomputing");
+        } catch (Exception e) {
+            throw new Error("Failed to load native library", e);
+        }
     }
-  }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getServiceId() {
-    return "sort";
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public long[] perform(String mode, ValueInfo[] valinfos) {
-    long[] ret = null;
-    if (null != mode && null != valinfos) {
-      if ("tensor_bubble".equals(mode)) {
-        ret = nperformBubbleSort(valinfos);
-      } else if ("1dlong_bubble".equals(mode)) {
-        ret = nperform1DLongBubbleSort(valinfos);
-      }
+    /**
+     * Get the service identifier.
+     *
+     * @return the service identifier
+     */
+    @Override
+    public String getServiceId() {
+        return "sort";
     }
-    return ret;
-  }
 
-  @Override
-  public long[] perform(String mode, ValueInfo[] valinfos, long dcHandler, long dcSize) {
-    throw new UnsupportedOperationException("Invalid operation for sort.");
-  }
+    /**
+     * Perform sorting operation based on the specified mode.
+     *
+     * @param mode     the sorting mode
+     * @param valinfos an array of ValueInfo objects
+     * @return an array of handler returned by native level
+     */
+    @Override
+    public long[] perform(String mode, ValueInfo[] valinfos) {
+        long[] ret = null;
+        if (mode != null && valinfos != null) {
+            if ("tensor_bubble".equals(mode)) {
+                ret = nperformBubbleSort(valinfos);
+            } else if ("1dlong_bubble".equals(mode)) {
+                ret = nperform1DLongBubbleSort(valinfos);
+            }
+        }
+        return ret;
+    }
 
-  /**
-   * A native function to fulfill the action of print in native level.
-   * @param valinfos an array of value info, some of them could be set as NULL
-   * @return an array of handler returned by native level
-   */
-  protected native long[] nperformBubbleSort(ValueInfo[] valinfos);
+    /**
+     * Perform sorting operation based on the specified mode, with additional parameters.
+     *
+     * @param mode     the sorting mode
+     * @param valinfos an array of ValueInfo objects
+     * @param dcHandler data container handler
+     * @param dcSize    data container size
+     * @return an array of handler returned by native level
+     */
+    @Override
+    public long[] perform(String mode, ValueInfo[] valinfos, long dcHandler, long dcSize) {
+        throw new UnsupportedOperationException("Invalid operation for sort.");
+    }
 
-  protected native long[] nperform1DLongBubbleSort(ValueInfo[] valinfos);
+    /**
+     * Native function to perform bubble sort.
+     *
+     * @param valinfos an array of ValueInfo objects
+     * @return an array of handler returned by native level
+     */
+    protected native long[] nperformBubbleSort(ValueInfo[] valinfos);
+
+    /**
+     * Native function to perform 1D long bubble sort.
+     *
+     * @param valinfos an array of ValueInfo objects
+     * @return an array of handler returned by native level
+     */
+    protected native long[] nperform1DLongBubbleSort(ValueInfo[] valinfos);
 
 }
+
