@@ -20,12 +20,35 @@ package org.apache.mnemonic.sessions;
 
 import org.apache.mnemonic.RestorableAllocator;
 
+/**
+ * Interface for creating durable objects.
+ *
+ * @param <V> Type of the durable object
+ * @param <A> Type of the allocator used for allocation
+ */
 public interface ObjectCreator<V, A extends RestorableAllocator<A>> {
 
-  V newDurableObjectRecord();
+    /**
+     * Creates a new durable object record.
+     *
+     * @return the newly created durable object record
+     */
+    V newDurableObjectRecord();
 
-  V newDurableObjectRecord(long size);
+    /**
+     * Creates a new durable object record with the specified size.
+     *
+     * @param size the size of the durable object record
+     * @return the newly created durable object record
+     */
+    V newDurableObjectRecord(long size);
 
-  A getAllocator();
+    /**
+     * Retrieves the allocator used for allocation.
+     *
+     * @return the allocator used for allocation
+     */
+    A getAllocator();
 }
+
 
