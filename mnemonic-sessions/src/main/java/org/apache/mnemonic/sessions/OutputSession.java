@@ -22,13 +22,33 @@ import java.io.Closeable;
 
 import org.apache.mnemonic.RestorableAllocator;
 
+/**
+ * Interface representing an output session for storing data in Mnemonic.
+ *
+ * @param <V> the type of data to be stored
+ * @param <A> the type of allocator used for memory allocation
+ */
 public interface OutputSession<V, A extends RestorableAllocator<A>>
     extends ObjectCreator<V, A>, DurableComputable<A>, Closeable {
 
+  /**
+   * Posts a value to the output session for storage.
+   *
+   * @param v the value to be stored
+   */
   void post(V v);
 
+  /**
+   * Destroys a pending record with the specified key.
+   *
+   * @param k the key of the pending record to be destroyed
+   */
   void destroyPendingRecord(V k);
 
+  /**
+   * Destroys all pending records in the output session.
+   */
   void destroyAllPendingRecords();
 
 }
+
