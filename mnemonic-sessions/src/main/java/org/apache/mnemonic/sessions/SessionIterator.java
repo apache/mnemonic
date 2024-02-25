@@ -23,23 +23,71 @@ import java.util.Iterator;
 import org.apache.mnemonic.CloseableIterator;
 import org.apache.mnemonic.RestorableAllocator;
 
+/**
+ * An interface representing a session iterator.
+ *
+ * @param <V> the type of elements returned by this iterator
+ * @param <A> the type of the allocator
+ * @param <T> the type of elements in the source iterator
+ * @param <S> the type of state associated with the iterator
+ */
 public interface SessionIterator<V, A extends RestorableAllocator<A>, T, S>
-    extends CloseableIterator<V>, DurableComputable<A> {
+        extends CloseableIterator<V>, DurableComputable<A> {
 
-  void setAllocator(A alloc);
+    /**
+     * Sets the allocator for this session iterator.
+     *
+     * @param alloc the allocator to be set
+     */
+    void setAllocator(A alloc);
 
-  void setHandler(long hdl);
+    /**
+     * Sets the handler for this session iterator.
+     *
+     * @param hdl the handler to be set
+     */
+    void setHandler(long hdl);
 
-  void setIterator(Iterator<V> iter);
+    /**
+     * Sets the iterator for this session iterator.
+     *
+     * @param iter the iterator to be set
+     */
+    void setIterator(Iterator<V> iter);
 
-  Iterator<V> getIterator();
+    /**
+     * Retrieves the iterator associated with this session iterator.
+     *
+     * @return the iterator associated with this session iterator
+     */
+    Iterator<V> getIterator();
 
-  void setSourceIterator(Iterator<T> iter);
+    /**
+     * Sets the source iterator for this session iterator.
+     *
+     * @param iter the source iterator to be set
+     */
+    void setSourceIterator(Iterator<T> iter);
 
-  Iterator<T> getSourceIterator();
+    /**
+     * Retrieves the source iterator associated with this session iterator.
+     *
+     * @return the source iterator associated with this session iterator
+     */
+    Iterator<T> getSourceIterator();
 
-  S getState();
+    /**
+     * Retrieves the state associated with this session iterator.
+     *
+     * @return the state associated with this session iterator
+     */
+    S getState();
 
-  void setState(S state);
-
+    /**
+     * Sets the state associated with this session iterator.
+     *
+     * @param state the state to be set
+     */
+    void setState(S state);
 }
+
