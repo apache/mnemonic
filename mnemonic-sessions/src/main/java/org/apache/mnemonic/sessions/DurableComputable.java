@@ -20,9 +20,25 @@ package org.apache.mnemonic.sessions;
 
 import org.apache.mnemonic.RestorableAllocator;
 
+/**
+ * Represents a durable computable entity.
+ *
+ * @param <A> the type of the allocator
+ */
 public interface DurableComputable<A extends RestorableAllocator<A>> {
 
-  A getAllocator();
+    /**
+     * Retrieves the allocator associated with this computable entity.
+     *
+     * @return the allocator
+     */
+    A getAllocator();
 
-  long getHandler();
+    /**
+     * Retrieves the handler associated with this computable entity.
+     *
+     * @return the handler
+     */
+    long getHandler();
 }
+
