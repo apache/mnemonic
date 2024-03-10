@@ -20,8 +20,20 @@ package org.apache.mnemonic.sessions;
 
 import java.util.Iterator;
 
+/**
+ * Represents an input session that provides a way to iterate over elements of type V.
+ *
+ * @param <V> the type of elements in the input session
+ */
 public interface InputSession<V> extends Iterable<V> {
 
-  Iterator<V> iterator();
+    /**
+     * Returns an iterator over the elements in this input session.
+     *
+     * @return an iterator
+     */
+    @Override
+    Iterator<V> iterator();
 
 }
+
