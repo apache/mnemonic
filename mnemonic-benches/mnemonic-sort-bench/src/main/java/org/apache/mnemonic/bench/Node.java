@@ -17,30 +17,62 @@
 
 package org.apache.mnemonic.bench;
 
+/**
+ * Represents a node in a linked list.
+ *
+ * @param <T> the type of data stored in the node
+ */
 public class Node<T> {
 
-  T data;
-  Node<T> nextNode;
+    private T data; // The data stored in the node
+    private Node<T> nextNode; // Reference to the next node in the list
 
-  public Node(T data) {
-    this.data = data;
-    this.nextNode = null;
-  }
+    /**
+     * Constructs a new node with the given data.
+     *
+     * @param data the data to be stored in the node
+     */
+    public Node(T data) {
+        this.data = data;
+        this.nextNode = null;
+    }
 
-  public Node(T data, Node<T> node) {
-    this.data = data;
-    this.nextNode = node;
-  }
-  
-  public T getData() {
-    return this.data;
-  }
+    /**
+     * Constructs a new node with the given data and reference to the next node.
+     *
+     * @param data     the data to be stored in the node
+     * @param nextNode the next node in the list
+     */
+    public Node(T data, Node<T> nextNode) {
+        this.data = data;
+        this.nextNode = nextNode;
+    }
 
-  public void setNext(Node<T> node) {
-    this.nextNode = node;
-  }
-  
-  public Node<T> getNext() {
-    return this.nextNode;
-  }
+    /**
+     * Gets the data stored in the node.
+     *
+     * @return the data stored in the node
+     */
+    public T getData() {
+        return this.data;
+    }
+
+    /**
+     * Sets the reference to the next node.
+     *
+     * @param nextNode the next node in the list
+     */
+    public void setNext(Node<T> nextNode) {
+        this.nextNode = nextNode;
+    }
+
+    /**
+     * Gets the next node in the list.
+     *
+     * @return the next node in the list
+     */
+    public Node<T> getNext() {
+        return this.nextNode;
+    }
 }
+
