@@ -18,31 +18,61 @@
 
 package org.apache.mnemonic.hadoop;
 
+/**
+ * Represents a container for durable input values within the Hadoop environment.
+ * @param <V> The type of the value stored in the container.
+ */
 public class MneDurableInputValue<V> {
 
+  // The session associated with this input value
   protected MneDurableInputSession<V> m_session;
+  
+  // The stored value
   protected V m_value;
 
+  /**
+   * Constructs a new MneDurableInputValue with the given session.
+   * @param sess The durable input session associated with this value.
+   */
   public MneDurableInputValue(MneDurableInputSession<V> sess) {
     m_session = sess;
   }
 
+  /**
+   * Constructs a new MneDurableInputValue with the given session and value.
+   * @param sess The durable input session associated with this value.
+   * @param value The value to be stored in this container.
+   */
   public MneDurableInputValue(MneDurableInputSession<V> sess, V value) {
     m_session = sess;
     m_value = value;
   }
 
+  /**
+   * Retrieves the session associated with this input value.
+   * @return The durable input session associated with this value.
+   */
   public MneDurableInputSession<V> getSession() {
     return m_session;
   }
 
+  /**
+   * Sets the value of this container.
+   * @param value The value to be stored.
+   * @return This MneDurableInputValue instance.
+   */
   public MneDurableInputValue<V> of(V value) {
     m_value = value;
     return this;
   }
 
+  /**
+   * Retrieves the value stored in this container.
+   * @return The value stored in this container.
+   */
   public V getValue() {
     return m_value;
   }
 
 }
+
