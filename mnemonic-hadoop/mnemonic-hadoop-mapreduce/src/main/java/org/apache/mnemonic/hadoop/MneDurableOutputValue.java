@@ -24,45 +24,81 @@ import java.io.IOException;
 
 import org.apache.hadoop.io.Writable;
 
-public class MneDurableOutputValue<V>
-    implements Writable {
+/**
+ * This class represents a durable output value for Mnemonic Protocol in Hadoop.
+ * It implements the Writable interface for serialization.
+ *
+ * @param <V> the type of the value
+ */
+public class MneDurableOutputValue<V> implements Writable {
 
-  protected MneDurableOutputSession<V> m_session;
-  protected V m_value;
+    protected MneDurableOutputSession<V> m_session; // The durable output session
+    protected V m_value; // The value to be written
 
-  public MneDurableOutputValue(MneDurableOutputSession<V> sess) {
-    m_session = sess;
-  }
+    /**
+     * Constructs a MneDurableOutputValue with the specified session.
+     *
+     * @param sess the durable output session
+     */
+    public MneDurableOutputValue(MneDurableOutputSession<V> sess) {
+        m_session = sess;
+    }
 
-  public MneDurableOutputValue(MneDurableOutputSession<V> sess, V value) {
-    m_session = sess;
-    m_value = value;
-  }
+    /**
+     * Constructs a MneDurableOutputValue with the specified session and value.
+     *
+     * @param sess  the durable output session
+     * @param value the value to be written
+     */
+    public MneDurableOutputValue(MneDurableOutputSession<V> sess, V value) {
+        m_session = sess;
+        m_value = value;
+    }
 
-  public MneDurableOutputSession<V> getSession() {
-    return m_session;
-  }
+    /**
+     * Gets the durable output session associated with this value.
+     *
+     * @return the durable output session
+     */
+    public MneDurableOutputSession<V> getSession() {
+        return m_session;
+    }
 
-  public MneDurableOutputValue<V> of(V value) {
-    m_value = value;
-    return this;
-  }
+    /**
+     * Sets the value of this output value.
+     *
+     * @param value the value to be set
+     * @return this output value
+     */
+    public MneDurableOutputValue<V> of(V value) {
+        m_value = value;
+        return this;
+    }
 
-  public V getValue() {
-    return m_value;
-  }
-  
-  public void post() {
-    m_session.post(m_value);
-  }
+    /**
+     * Gets the value of this output value.
+     *
+     * @return the value
+     */
+    public V getValue() {
+        return m_value;
+    }
 
-  @Override
-  public void write(DataOutput out) throws IOException {
-    throw new UnsupportedOperationException();
-  }
+    /**
+     * Posts the value to the associated durable output session.
+     */
+    public void post() {
+        m_session.post(m_value);
+    }
 
-  @Override
-  public void readFields(DataInput in) throws IOException {
-    throw new UnsupportedOperationException();
-  }
+    @Override
+    public void write(DataOutput out) throws IOException {
+        throw new UnsupportedOperationException("Serialization is not supported for MneDurableOutputValue");
+    }
+
+    @Override
+    public void readFields(DataInput in) throws IOException {
+        throw new UnsupportedOperationException("Deserialization is not supported for MneDurableOutputValue");
+    }
 }
+
