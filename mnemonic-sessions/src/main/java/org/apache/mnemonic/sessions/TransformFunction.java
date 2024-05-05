@@ -20,8 +20,23 @@ package org.apache.mnemonic.sessions;
 
 import org.apache.mnemonic.RestorableAllocator;
 
+/**
+ * Represents a transformation function that transforms a value of type T into a value of type V.
+ *
+ * @param <V> the type of the transformed value
+ * @param <A> the type of the allocator used for object creation
+ * @param <T> the type of the input value to be transformed
+ */
 public interface TransformFunction<V, A extends RestorableAllocator<A>, T> {
 
-  V transform(T value, ObjectCreator<V, A> objcreator);
+    /**
+     * Transforms the input value into a value of type V.
+     *
+     * @param value       the input value to be transformed
+     * @param objcreator  an object creator for creating instances of V using the allocator
+     * @return the transformed value of type V
+     */
+    V transform(T value, ObjectCreator<V, A> objcreator);
 
 }
+
