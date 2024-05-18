@@ -20,6 +20,11 @@ package org.apache.mnemonic;
 import java.io.Closeable;
 import java.util.Iterator;
 
+/**
+ * An iterator that is also a Closeable resource.
+ * 
+ * @param <E> the type of elements returned by this iterator
+ */
 public interface CloseableIterator<E> extends Iterator<E>, Closeable {
-
+    // No additional methods needed, inherits from Iterator and Closeable
 }
