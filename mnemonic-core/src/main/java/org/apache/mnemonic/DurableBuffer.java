@@ -18,12 +18,25 @@
 package org.apache.mnemonic;
 
 import org.apache.mnemonic.resgc.ReclaimContext;
-
 import java.nio.ByteBuffer;
 
+/**
+ * DurableBuffer is a non-volatile buffer that supports persistence and
+ * restoration.
+ *
+ * @param <A> The allocator type that implements RetrievableAllocator
+ */
 public class DurableBuffer<A extends RetrievableAllocator<A>> extends MemBufferHolder<A> implements Durable {
+  
+  // Persistence operations if the allocator supports it
   protected Persistence<A> m_persistOps = null;
 
+  /**
+   * Constructor for DurableBuffer.
+   *
+   * @param ar The allocator to be used.
+   * @param mres The ByteBuffer resource.
+   */
   @SuppressWarnings("unchecked")
   public DurableBuffer(A ar, ByteBuffer mres) {
     super(ar, mres);
@@ -32,30 +45,55 @@ public class DurableBuffer<A extends RetrievableAllocator<A>> extends MemBufferH
     }
   }
 
+  /**
+   * Called after creating the object to initialize it.
+   */
   @Override
   public void initializeAfterCreate() {
+    // Implementation for initializing after creation
   }
 
+  /**
+   * Called after restoring the object to initialize it.
+   */
   @Override
   public void initializeAfterRestore() {
+    // Implementation for initializing after restoration
   }
 
+  /**
+   * Setup generic information for the entity factory proxies and types.
+   *
+   * @param efproxies Array of entity factory proxies.
+   * @param gftypes Array of generic field types.
+   */
   @Override
   public void setupGenericInfo(EntityFactoryProxy[] efproxies, DurableType[] gftypes) {
+    // Implementation for setting up generic information
   }
 
+  /**
+   * Register the buffer for automatic reclamation.
+   *
+   * @param rctx The reclaim context.
+   */
   @Override
   public void registerAutoReclaim(ReclaimContext rctx) {
     super.registerAutoReclaim(rctx);
   }
 
+  /**
+   * Get the handler of the buffer.
+   *
+   * @return The buffer handler.
+   */
   @Override
   public long getHandler() {
     return m_allocator.getBufferHandler(this);
   }
 
   /**
-   * sync. this object
+   * Synchronize the buffer to volatile memory.
    */
   @Override
   public void syncToVolatileMemory() {
@@ -63,33 +101,60 @@ public class DurableBuffer<A extends RetrievableAllocator<A>> extends MemBufferH
   }
 
   /**
-   * Make any cached changes to this object persistent.
+   * Make any cached changes to the buffer persistent.
    */
   @Override
   public void syncToNonVolatileMemory() {
-    if (null != m_persistOps) {
+    if (m_persistOps != null) {
       m_persistOps.syncToNonVolatileMemory(this);
     }
   }
 
   /**
-   * flush processors cache for this object
+   * Flush processor cache for the buffer.
    */
   @Override
   public void syncToLocal() {
-    if (null != m_persistOps) {
+    if (m_persistOps != null) {
       m_persistOps.syncToLocal(this);
     }
   }
 
+  /**
+   * Get native field information.
+   *
+   * @return An array of native field information.
+   */
   @Override
   public long[][] getNativeFieldInfo() {
-    return null;
+    return null; // Implementation can be added if needed
   }
 
+  /**
+   * Break references held by this buffer.
+   */
   @Override
   public void refbreak() {
-    return;
+    // Implementation for breaking references
   }
 
+  /**
+   * Example of an additional method: Clear the buffer.
+   */
+  public void clearBuffer() {
+    ByteBuffer buffer = get();
+    if (buffer != null) {
+      buffer.clear();
+    }
+  }
+
+  /**
+   * Example of an additional method: Get buffer capacity.
+   *
+   * @return The capacity of the buffer.
+   */
+  public int getCapacity() {
+    ByteBuffer buffer = get();
+    return buffer != null ? buffer.capacity() : 0;
+  }
 }
