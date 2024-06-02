@@ -25,67 +25,76 @@ import org.apache.mnemonic.RestoreDurableEntityError;
 import org.apache.mnemonic.resgc.ReclaimContext;
 
 public class DurableTreeFactory {
-  public static <A extends RestorableAllocator<A>, E extends Comparable<E>> DurableTree<E>
-              create(A allocator) throws OutOfHybridMemory {
-    return create(allocator, false);
-  }
 
-  public static <A extends RestorableAllocator<A>, E extends Comparable<E>> DurableTree<E>
-              create(A allocator, boolean autoreclaim) throws OutOfHybridMemory {
-    return create(allocator, null, null, autoreclaim, null);
-  }
+    // Create a DurableTree with default autoreclaim set to false
+    public static <A extends RestorableAllocator<A>, E extends Comparable<E>> DurableTree<E> 
+    create(A allocator) throws OutOfHybridMemory {
+        return create(allocator, false);
+    }
 
-  public static <A extends RestorableAllocator<A>, E extends Comparable<E>> DurableTree<E>
-              create(A allocator, boolean autoreclaim, ReclaimContext reclaimcontext)
-          throws OutOfHybridMemory {
-    return create(allocator, null, null, autoreclaim, reclaimcontext);
-  }
+    // Create a DurableTree with specified autoreclaim option
+    public static <A extends RestorableAllocator<A>, E extends Comparable<E>> DurableTree<E> 
+    create(A allocator, boolean autoreclaim) throws OutOfHybridMemory {
+        return create(allocator, null, null, autoreclaim, null);
+    }
 
-  public static <A extends RestorableAllocator<A>, E extends Comparable<E>> DurableTree<E>
-              create(A allocator, EntityFactoryProxy[] factoryproxys, DurableType[] gfields,
-                   boolean autoreclaim) throws OutOfHybridMemory {
-    return create(allocator, factoryproxys, gfields, autoreclaim, null);
-  }
+    // Create a DurableTree with specified autoreclaim option and reclaim context
+    public static <A extends RestorableAllocator<A>, E extends Comparable<E>> DurableTree<E> 
+    create(A allocator, boolean autoreclaim, ReclaimContext reclaimcontext) throws OutOfHybridMemory {
+        return create(allocator, null, null, autoreclaim, reclaimcontext);
+    }
 
-  public static <A extends RestorableAllocator<A>, E extends Comparable<E>> DurableTree<E>
-              create(A allocator, EntityFactoryProxy[] factoryproxys, DurableType[] gfields,
-                   boolean autoreclaim, ReclaimContext reclaimcontext) throws OutOfHybridMemory {
-    DurableTreeImpl<A, E> entity = new DurableTreeImpl<A, E>();
-    entity.setupGenericInfo(factoryproxys, gfields);
-    entity.createDurableEntity(allocator, factoryproxys, gfields, autoreclaim, reclaimcontext);
-    return entity;
-  }
+    // Create a DurableTree with specified factory proxies and durable types
+    public static <A extends RestorableAllocator<A>, E extends Comparable<E>> DurableTree<E> 
+    create(A allocator, EntityFactoryProxy[] factoryproxys, DurableType[] gfields, boolean autoreclaim) 
+    throws OutOfHybridMemory {
+        return create(allocator, factoryproxys, gfields, autoreclaim, null);
+    }
 
-  public static <A extends RestorableAllocator<A>, E extends Comparable<E>> DurableTree<E>
-              restore(A allocator, long phandler) throws RestoreDurableEntityError {
-    return restore(allocator, phandler, false);
-  }
+    // Create a DurableTree with all options
+    public static <A extends RestorableAllocator<A>, E extends Comparable<E>> DurableTree<E> 
+    create(A allocator, EntityFactoryProxy[] factoryproxys, DurableType[] gfields, boolean autoreclaim, 
+    ReclaimContext reclaimcontext) throws OutOfHybridMemory {
+        DurableTreeImpl<A, E> entity = new DurableTreeImpl<>();
+        entity.setupGenericInfo(factoryproxys, gfields);
+        entity.createDurableEntity(allocator, factoryproxys, gfields, autoreclaim, reclaimcontext);
+        return entity;
+    }
 
-  public static <A extends RestorableAllocator<A>, E extends Comparable<E>> DurableTree<E>
-              restore(A allocator, long phandler, boolean autoreclaim) throws RestoreDurableEntityError {
-    return restore(allocator, null, null, phandler, autoreclaim, null);
-  }
+    // Restore a DurableTree with default autoreclaim set to false
+    public static <A extends RestorableAllocator<A>, E extends Comparable<E>> DurableTree<E> 
+    restore(A allocator, long phandler) throws RestoreDurableEntityError {
+        return restore(allocator, phandler, false);
+    }
 
-  public static <A extends RestorableAllocator<A>, E extends Comparable<E>> DurableTree<E>
-              restore(A allocator, long phandler, boolean autoreclaim, ReclaimContext reclaimcontext)
-          throws RestoreDurableEntityError {
-    return restore(allocator, null, null, phandler, autoreclaim, reclaimcontext);
-  }
+    // Restore a DurableTree with specified autoreclaim option
+    public static <A extends RestorableAllocator<A>, E extends Comparable<E>> DurableTree<E> 
+    restore(A allocator, long phandler, boolean autoreclaim) throws RestoreDurableEntityError {
+        return restore(allocator, null, null, phandler, autoreclaim, null);
+    }
 
-  public static <A extends RestorableAllocator<A>, E extends Comparable<E>> DurableTree<E>
-              restore(A allocator, EntityFactoryProxy[] factoryproxys, DurableType[] gfields,
-                   long phandler, boolean autoreclaim)
-          throws RestoreDurableEntityError {
-    return restore(allocator, factoryproxys, gfields, phandler, autoreclaim, null);
-  }
+    // Restore a DurableTree with specified autoreclaim option and reclaim context
+    public static <A extends RestorableAllocator<A>, E extends Comparable<E>> DurableTree<E> 
+    restore(A allocator, long phandler, boolean autoreclaim, ReclaimContext reclaimcontext) 
+    throws RestoreDurableEntityError {
+        return restore(allocator, null, null, phandler, autoreclaim, reclaimcontext);
+    }
 
-  public static <A extends RestorableAllocator<A>, E extends Comparable<E>> DurableTree<E>
-              restore(A allocator, EntityFactoryProxy[] factoryproxys, DurableType[] gfields,
-                   long phandler, boolean autoreclaim, ReclaimContext reclaimcontext)
-          throws RestoreDurableEntityError {
-    DurableTreeImpl<A, E> entity = new DurableTreeImpl<A, E>();
-    entity.setupGenericInfo(factoryproxys, gfields);
-    entity.restoreDurableEntity(allocator, factoryproxys, gfields, phandler, autoreclaim, reclaimcontext);
-    return entity;
-  }
+    // Restore a DurableTree with specified factory proxies and durable types
+    public static <A extends RestorableAllocator<A>, E extends Comparable<E>> DurableTree<E> 
+    restore(A allocator, EntityFactoryProxy[] factoryproxys, DurableType[] gfields, long phandler, 
+    boolean autoreclaim) throws RestoreDurableEntityError {
+        return restore(allocator, factoryproxys, gfields, phandler, autoreclaim, null);
+    }
+
+    // Restore a DurableTree with all options
+    public static <A extends RestorableAllocator<A>, E extends Comparable<E>> DurableTree<E> 
+    restore(A allocator, EntityFactoryProxy[] factoryproxys, DurableType[] gfields, long phandler, 
+    boolean autoreclaim, ReclaimContext reclaimcontext) throws RestoreDurableEntityError {
+        DurableTreeImpl<A, E> entity = new DurableTreeImpl<>();
+        entity.setupGenericInfo(factoryproxys, gfields);
+        entity.restoreDurableEntity(allocator, factoryproxys, gfields, phandler, autoreclaim, reclaimcontext);
+        return entity;
+    }
 }
+
