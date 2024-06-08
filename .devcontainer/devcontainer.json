@@ -16,9 +16,10 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.234.0/containers/ubuntu
 {
-	"name": "apache mnemonic",
-	"dockerComposeFile": "docker-compose.devcontainer.yml",
-	"service": "mnemonic",
-	"workspaceFolder": "/ws/mnemonic",
-	"shutdownAction": "stopCompose"
+	"name": "apache mnemonic",  // The name of the project or service
+	"dockerComposeFile": "docker-compose.devcontainer.yml",  // The Docker Compose file to use for setting up the development environment
+	"service": "mnemonic",  // The specific service in the Docker Compose file to focus on
+	"workspaceFolder": "/ws/mnemonic",  // The folder in the container that will be used as the workspace
+	"shutdownAction": "stopCompose"  // The action to take when shutting down the container (stopping the Docker Compose setup)
 }
+
