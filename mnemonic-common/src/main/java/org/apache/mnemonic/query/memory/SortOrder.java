@@ -16,20 +16,35 @@
  */
 package org.apache.mnemonic.query.memory;
 
+/**
+ * Enum representing different sort orders that can be applied to a query.
+ */
 public enum SortOrder {
 
-  NONE(1),
-  ASCENDING(2),
-  DESCENDING(3);
+    // Enum constants representing the sort order types
+    NONE(1),        // No sorting
+    ASCENDING(2),   // Ascending order sorting
+    DESCENDING(3);  // Descending order sorting
 
-  private int value;
+    // Private field to store the integer value associated with each sort order
+    private int value;
 
-  SortOrder(int val) {
-      this.value = val;
+    /**
+     * Constructor to initialize the enum constant with a specific integer value.
+     * 
+     * @param val The integer value representing the sort order.
+     */
+    SortOrder(int val) {
+        this.value = val;
     }
 
-  public int getValue() {
-      return value;
+    /**
+     * Getter method to retrieve the integer value associated with the sort order.
+     * 
+     * @return The integer value representing the sort order.
+     */
+    public int getValue() {
+        return value;
     }
-
 }
+
