@@ -31,16 +31,31 @@ import org.apache.mnemonic.hadoop.MneDurableInputValue;
 
 /**
  * A Mnemonic input format that satisfies the org.apache.hadoop.mapred API.
+ * 
+ * @param <MV> The type parameter representing the mnemonic durable input value.
+ * @param <V> The type parameter representing the value.
  */
 public class MneInputFormat<MV extends MneDurableInputValue<V>, V> extends FileInputFormat<NullWritable, MV> {
 
+  /**
+   * Creates a RecordReader for the given InputSplit.
+   *
+   * @param inputSplit The input split containing the information about the file to read.
+   * @param jobConf The job configuration containing the job settings.
+   * @param reporter The reporter to report progress, status updates, etc.
+   * @return A RecordReader to read the records from the input split.
+   * @throws IOException If an error occurs while creating the RecordReader.
+   */
   @Override
-  public RecordReader<NullWritable, MV>
-  getRecordReader(InputSplit inputSpilt,
-                  JobConf jobConf,
-                  Reporter reporter) throws IOException {
-    MneMapredRecordReader<MV, V> reader =
-            new MneMapredRecordReader<MV, V>((FileSplit) inputSpilt, jobConf);
+  public RecordReader<NullWritable, MV> getRecordReader(InputSplit inputSplit, JobConf jobConf, Reporter reporter) 
+      throws IOException {
+    // Cast the input split to a FileSplit to work with file-based input splits
+    FileSplit fileSplit = (FileSplit) inputSplit;
+
+    // Create a new instance of MneMapredRecordReader with the given file split and job configuration
+    MneMapredRecordReader<MV, V> reader = new MneMapredRecordReader<MV, V>(fileSplit, jobConf);
+
+    // Return the created RecordReader
     return reader;
   }
 
