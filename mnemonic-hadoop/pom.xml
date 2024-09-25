@@ -35,7 +35,7 @@
   <url>http://mnemonic.apache.org</url>
 
   <properties>
-	<hadoop.version>3.3.3</hadoop.version>
+	<hadoop.version>3.4.0</hadoop.version>
   </properties>
 
   <modules>
