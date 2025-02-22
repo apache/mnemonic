@@ -32,240 +32,214 @@ import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
 
+/**
+ * VMemKindServiceImpl is an implementation of the VolatileMemoryAllocatorService.
+ * It provides volatile memory allocation using the vmemkind library.
+ */
 public class VMemKindServiceImpl implements VolatileMemoryAllocatorService {
-  private static boolean nativeLoaded = false;
-  static void loadNativeLibrary() {
-    try {
-      NativeLibraryLoader.loadFromJar("vmemkindallocator");
-    } catch (Exception e) {
-      throw new Error(e);
+    
+    /** Flag to track if the native library has been loaded. */
+    private static boolean nativeLoaded = false;
+
+    /**
+     * Loads the native vmemkind library required for memory operations.
+     * This function ensures that the library is only loaded once.
+     */
+    static void loadNativeLibrary() {
+        try {
+            NativeLibraryLoader.loadFromJar("vmemkindallocator");
+        } catch (Exception e) {
+            throw new Error(e);
+        }
+        nativeLoaded = true;
     }
-    nativeLoaded = true;
-  }
 
-  protected Map<Long, Long> m_info = Collections.synchronizedMap(new HashMap<Long, Long>());
+    /** A thread-safe map to track memory allocations and their capacities. */
+    protected Map<Long, Long> m_info = Collections.synchronizedMap(new HashMap<Long, Long>());
 
-  @Override
-  public String getServiceId() {
-    return "vmem";
-  }
-
-  @Override
-  public long init(long capacity, String uri, boolean isnew) {
-    if (!nativeLoaded) {
-      loadNativeLibrary();
+    /**
+     * Returns the unique identifier for this memory service.
+     *
+     * @return Service ID as a string.
+     */
+    @Override
+    public String getServiceId() {
+        return "vmem";
     }
-    long ret = ninit(capacity, uri, isnew);
-    m_info.put(ret, capacity);
-    return ret;
-  }
 
-  @Override
-  public long adjustCapacity(long id, long reserve) {
-    throw new UnsupportedOperationException("Unsupported to reduce capacity of this memory service");
-  }
+    /**
+     * Initializes a volatile memory space with a given capacity.
+     * Loads the native library if it has not been loaded.
+     *
+     * @param capacity The size of the memory region.
+     * @param uri The URI identifier (not used in volatile memory).
+     * @param isnew Flag indicating whether a new region is created.
+     * @return The identifier of the allocated memory space.
+     */
+    @Override
+    public long init(long capacity, String uri, boolean isnew) {
+        if (!nativeLoaded) {
+            loadNativeLibrary();
+        }
+        long ret = ninit(capacity, uri, isnew);
+        m_info.put(ret, capacity);
+        return ret;
+    }
 
-  @Override
-  public void close(long id) {
-    nclose(id);
-  }
+    /**
+     * Adjusts the capacity of the memory region.
+     * This operation is not supported for volatile memory.
+     *
+     * @throws UnsupportedOperationException Always throws an exception.
+     */
+    @Override
+    public long adjustCapacity(long id, long reserve) {
+        throw new UnsupportedOperationException("Unsupported to reduce capacity of this memory service");
+    }
 
-  @Override
-  public void syncToVolatileMemory(long id, long addr, long length, boolean autodetect) {
-    nsync(id, addr, length, autodetect);
-  }
+    /**
+     * Closes a memory region.
+     *
+     * @param id The identifier of the memory region.
+     */
+    @Override
+    public void close(long id) {
+        nclose(id);
+    }
 
-  @Override
-  public long capacity(long id) {
-    return m_info.get(id);
-  }
+    /**
+     * Synchronizes volatile memory to ensure consistency.
+     *
+     * @param id The identifier of the memory region.
+     * @param addr The starting address of the memory to be synchronized.
+     * @param length The length of the memory to synchronize.
+     * @param autodetect Flag to enable automatic detection of memory regions.
+     */
+    @Override
+    public void syncToVolatileMemory(long id, long addr, long length, boolean autodetect) {
+        nsync(id, addr, length, autodetect);
+    }
 
-  @Override
-  public long allocate(long id, long size, boolean initzero) {
-    return nallocate(id, size, initzero);
-  }
+    /**
+     * Retrieves the allocated capacity of a memory region.
+     *
+     * @param id The identifier of the memory region.
+     * @return The capacity in bytes.
+     */
+    @Override
+    public long capacity(long id) {
+        return m_info.get(id);
+    }
 
-  @Override
-  public long reallocate(long id, long addr, long size, boolean initzero) {
-    return nreallocate(id, addr, size, initzero);
-  }
+    /**
+     * Allocates memory in the specified region.
+     *
+     * @param id The identifier of the memory region.
+     * @param size The size of the memory to allocate.
+     * @param initzero Flag indicating whether to initialize memory to zero.
+     * @return The address of the allocated memory.
+     */
+    @Override
+    public long allocate(long id, long size, boolean initzero) {
+        return nallocate(id, size, initzero);
+    }
 
-  @Override
-  public void free(long id, long addr, ReclaimContext rctx) {
-    nfree(id, addr);
-  }
+    /**
+     * Retrieves supported memory service features.
+     *
+     * @return A set of memory service features.
+     */
+    @Override
+    public Set<MemoryServiceFeature> getFeatures() {
+        Set<MemoryServiceFeature> ret = new HashSet<>();
+        ret.add(MemoryServiceFeature.VOLATILE);
+        return ret;
+    }
 
-  @Override
-  public ByteBuffer createByteBuffer(long id, long size) {
-    return ncreateByteBuffer(id, size);
-  }
+    /**
+     * Retrieves a direct byte buffer from the memory region.
+     *
+     * @param id The memory region identifier.
+     * @param size The size of the buffer.
+     * @return The allocated ByteBuffer.
+     */
+    @Override
+    public ByteBuffer createByteBuffer(long id, long size) {
+        return ncreateByteBuffer(id, size);
+    }
 
-  @Override
-  public ByteBuffer resizeByteBuffer(long id, ByteBuffer bytebuf, long size) {
-    return nresizeByteBuffer(id, bytebuf, size);
-  }
+    /**
+     * Handles unsupported transaction operations by throwing an exception.
+     */
+    @Override
+    public void beginTransaction(boolean readOnly) {
+        throw new UnsupportedOperationException("Not support transaction");
+    }
 
-  @Override
-  public void destroyByteBuffer(long id, ByteBuffer bytebuf, ReclaimContext rctx) {
-    ndestroyByteBuffer(id, bytebuf);
-  }
+    @Override
+    public void commitTransaction() {
+        throw new UnsupportedOperationException("Not support transaction");
+    }
 
-  @Override
-  public ByteBuffer retrieveByteBuffer(long id, long handler) {
-    return nretrieveByteBuffer(id, handler);
-  }
+    @Override
+    public void abortTransaction() {
+        throw new UnsupportedOperationException("Not support transaction");
+    }
 
-  @Override
-  public long retrieveSize(long id, long handler) {
-    return nretrieveSize(id, handler);
-  }
+    @Override
+    public boolean isInTransaction() {
+        throw new UnsupportedOperationException("Not support transaction");
+    }
 
-  @Override
-  public long getByteBufferHandler(long id, ByteBuffer buf) {
-    return ngetByteBufferHandler(id, buf);
-  }
+    /**
+     * Native method declarations for interacting with the underlying memory system.
+     * These methods are implemented in the native library.
+     */
+    protected native long ninit(long capacity, String uri, boolean isnew);
+    protected native void nclose(long id);
+    protected native void nsync(long id, long addr, long length, boolean autodetect);
+    protected native long nallocate(long id, long size, boolean initzero);
+    protected native ByteBuffer ncreateByteBuffer(long id, long size);
 
-  @Override
-  public void setHandler(long id, long key, long handler) {
-    nsetHandler(id, key, handler);
-  }
+    /* Optional Queryable Service */
+    
+    @Override
+    public String[] getClassNames(long id) {
+        throw new UnsupportedOperationException();
+    }
 
-  @Override
-  public long getHandler(long id, long key) {
-    return ngetHandler(id, key);
-  }
+    @Override
+    public String[] getEntityNames(long id, String clsname) {
+        throw new UnsupportedOperationException();
+    }
 
-  @Override
-  public long handlerCapacity(long id) {
-    return nhandlerCapacity(id);
-  }
+    @Override
+    public EntityInfo getEntityInfo(long id, String clsname, String etyname) {
+        throw new UnsupportedOperationException();
+    }
 
-  @Override
-  public long getBaseAddress(long id) {
-    return 0L;
-    //return ngetBaseAddress(id);
-  }
+    @Override
+    public void createEntity(long id, EntityInfo entityinfo) {
+        throw new UnsupportedOperationException();
+    }
 
-  @Override
-  public void beginTransaction(boolean readOnly) {
-    throw new UnsupportedOperationException("Not support transaction");
-  }
+    @Override
+    public void destroyEntity(long id, String clsname, String etyname) {
+        throw new UnsupportedOperationException();
+    }
 
-  @Override
-  public void commitTransaction() {
-    throw new UnsupportedOperationException("Not support transaction");
-  }
+    @Override
+    public void updateQueryableInfo(long id, String clsname, String etyname, ValueInfo updobjs) {
+        throw new UnsupportedOperationException();
+    }
 
-  @Override
-  public void abortTransaction() {
-    throw new UnsupportedOperationException("Not support transaction");
-  }
+    @Override
+    public void deleteQueryableInfo(long id, String clsname, String etyname, ValueInfo updobjs) {
+        throw new UnsupportedOperationException();
+    }
 
-  @Override
-  public boolean isInTransaction() {
-    throw new UnsupportedOperationException("Not support transaction");
-  }
-
-  @Override
-  public Set<MemoryServiceFeature> getFeatures() {
-    Set<MemoryServiceFeature> ret = new HashSet<MemoryServiceFeature>();
-    ret.add(MemoryServiceFeature.VOLATILE);
-    return ret;
-  }
-
-  @Override
-  public byte[] getAbstractAddress(long addr) {
-    throw new UnsupportedOperationException("Unrsupported to get abstract address");
-  }
-
-  @Override
-  public long getPortableAddress(long addr) {
-    throw new UnsupportedOperationException("Unrsupported to get portable address");
-  }
-
-  @Override
-  public long getEffectiveAddress(long addr) {
-    throw new UnsupportedOperationException("Unrsupported to get effective address");
-  }
-
-  @Override
-  public long[] getMemoryFunctions() {
-    return new long[0];
-  }
-
-  protected native long ninit(long capacity, String uri, boolean isnew);
-
-  protected native void nclose(long id);
-
-  protected native void nsync(long id, long addr, long length, boolean autodetect);
-
-  protected native long ncapacity(long id);
-
-  protected native long nallocate(long id, long size, boolean initzero);
-
-  protected native long nreallocate(long id, long addr, long size, boolean initzero);
-
-  protected native void nfree(long id, long addr);
-
-  protected native ByteBuffer ncreateByteBuffer(long id, long size);
-
-  protected native ByteBuffer nresizeByteBuffer(long id, ByteBuffer bytebuf, long size);
-
-  protected native void ndestroyByteBuffer(long id, ByteBuffer bytebuf);
-
-  protected native ByteBuffer nretrieveByteBuffer(long id, long handler);
-
-  protected native long nretrieveSize(long id, long handler);
-
-  protected native long ngetByteBufferHandler(long id, ByteBuffer buf);
-
-  protected native void nsetHandler(long id, long key, long handler);
-
-  protected native long ngetHandler(long id, long key);
-
-  protected native long nhandlerCapacity(long id);
-
-  protected native long ngetBaseAddress(long id);
-
-  /* Optional Queryable Service */
-
-  @Override
-  public String[] getClassNames(long id) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public String[] getEntityNames(long id, String clsname) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public EntityInfo getEntityInfo(long id, String clsname, String etyname) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void createEntity(long id, EntityInfo entityinfo) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void destroyEntity(long id, String clsname, String etyname) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void updateQueryableInfo(long id, String clsname, String etyname, ValueInfo updobjs) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void deleteQueryableInfo(long id, String clsname, String etyname, ValueInfo updobjs) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public ResultSet query(long id, String querystr) {
-    throw new UnsupportedOperationException();
-  }
+    @Override
+    public ResultSet query(long id, String querystr) {
+        throw new UnsupportedOperationException();
+    }
 }
